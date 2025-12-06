@@ -1,0 +1,735 @@
+# ================================================================
+# Kong API Gateway - Complete Production Configuration
+# File: gateway/kong/kong.yml
+# ================================================================
+_format_version: "3.0"
+_transform: true
+
+# ================================================================
+# UPSTREAM DEFINITIONS (Load Balancing & Health Checks)
+# ================================================================
+upstreams:
+  # Web BFF Upstream
+  - name: web-bff-upstream
+    algorithm: round-robin
+    hash_on: none
+    hash_fallback: none
+    slots: 10000
+    healthchecks:
+      active:
+        type: http
+        http_path: /actuator/health
+        https_verify_certificate: false
+        healthy:
+          interval: 10
+          http_statuses: [200, 302]
+          successes: 2
+        unhealthy:
+          interval: 5
+          http_statuses: [429, 500, 503]
+          tcp_failures: 2
+          timeouts: 3
+          http_failures: 3
+      passive:
+        healthy:
+          http_statuses: [200, 201, 202, 203, 204, 205, 206, 207, 208, 226, 300, 301, 302, 303, 304, 305, 306, 307, 308]
+          successes: 5
+        unhealthy:
+          http_statuses: [429, 500, 503]
+          tcp_failures: 2
+          timeouts: 3
+          http_failures: 5
+    tags:
+      - web-bff
+      - upstream
+    targets:
+      - target: web-bff:8081
+        weight: 100
+        tags:
+          - primary
+
+  # Mobile BFF Upstream
+  - name: mobile-bff-upstream
+    algorithm: round-robin
+    healthchecks:
+      active:
+        type: http
+        http_path: /actuator/health
+        timeout: 5
+        healthy:
+          interval: 10
+          successes: 2
+        unhealthy:
+          interval: 5
+          http_failures: 3
+    tags:
+      - mobile-bff
+      - upstream
+    targets:
+      - target: mobile-bff:8082
+        weight: 100
+
+  # Internal Services Upstreams
+  - name: booking-upstream
+    algorithm: consistent-hashing
+    hash_on: header
+    hash_on_header: X-User-ID
+    hash_fallback: ip
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:
+          interval: 10
+          successes: 2
+    targets:
+      - target: booking-service:8091
+        weight: 100
+
+  - name: payment-upstream
+    algorithm: round-robin
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:
+          interval: 10
+          successes: 2
+    targets:
+      - target: payment-service:8092
+        weight: 100
+
+  - name: hotel-upstream
+    algorithm: round-robin
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:
+          interval: 10
+          successes: 2
+    targets:
+      - target: hotel-service:8093
+        weight: 100
+
+  - name: movies-upstream
+    algorithm: round-robin
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:
+          interval: 10
+          successes: 2
+    targets:
+      - target: movies-service:8094
+        weight: 100
+
+# ================================================================
+# SERVICES DEFINITIONS
+# ================================================================
+services:
+  # ============================================================
+  # WEB BFF SERVICE
+  # ============================================================
+  - name: web-bff-service
+    host: web-bff-upstream
+    protocol: http
+    port: 8081
+    path: /
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - web
+      - bff
+      - public
+    
+    routes:
+      - name: web-bff-public-routes
+        paths:
+          - /api/web/hotels/search
+          - /api/web/movies
+          - /api/web/recommendations
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: false
+        preserve_host: true
+        tags:
+          - public
+
+      - name: web-bff-authenticated-routes
+        paths:
+          - /api/web/booking
+          - /api/web/dashboard
+          - /api/web/bookings
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+          - OPTIONS
+        strip_path: false
+        preserve_host: true
+        tags:
+          - authenticated
+    
+    plugins:
+      # CORS Configuration
+      - name: cors
+        config:
+          origins:
+            - http://localhost:3000
+            - http://localhost:3001
+            - https://ticketkatum.com
+            - https://www.ticketkatum.com
+            - https://app.ticketkatum.com
+          methods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - PATCH
+            - OPTIONS
+          headers:
+            - Accept
+            - Accept-Version
+            - Content-Length
+            - Content-MD5
+            - Content-Type
+            - Date
+            - Authorization
+            - X-Auth-Token
+            - X-Request-ID
+            - X-Correlation-ID
+          exposed_headers:
+            - X-Auth-Token
+            - X-Request-ID
+            - X-Correlation-ID
+          credentials: true
+          max_age: 3600
+          preflight_continue: false
+      
+      # Rate Limiting - Per Consumer
+      - name: rate-limiting
+        config:
+          minute: 100
+          hour: 5000
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          redis_timeout: 2000
+          fault_tolerant: true
+          hide_client_headers: false
+      
+      # Request Size Limiting
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 10
+          size_unit: megabytes
+          require_content_length: false
+      
+      # Request Transformer - Add Headers
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - X-Gateway-Source:kong
+              - X-Forwarded-By:api-gateway
+      
+      # Response Transformer - Security Headers
+      - name: response-transformer
+        config:
+          add:
+            headers:
+              - X-Content-Type-Options:nosniff
+              - X-Frame-Options:DENY
+              - X-XSS-Protection:1; mode=block
+              - Strict-Transport-Security:max-age=31536000; includeSubDomains
+              - Content-Security-Policy:default-src 'self'
+              - Referrer-Policy:strict-origin-when-cross-origin
+      
+      # Logging to File
+      - name: file-log
+        config:
+          path: /tmp/kong/web-bff.log
+          reopen: true
+          custom_fields_by_lua:
+            request_id: "return kong.request.get_header('X-Request-ID')"
+            user_id: "return kong.ctx.shared.authenticated_credential and kong.ctx.shared.authenticated_credential.id or nil"
+
+  # ============================================================
+  # MOBILE BFF SERVICE
+  # ============================================================
+  - name: mobile-bff-service
+    host: mobile-bff-upstream
+    protocol: http
+    port: 8082
+    connect_timeout: 60000
+    write_timeout: 60000
+    read_timeout: 60000
+    retries: 3
+    tags:
+      - mobile
+      - bff
+      - public
+    
+    routes:
+      - name: mobile-bff-routes
+        paths:
+          - /api/mobile
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+          - OPTIONS
+        strip_path: false
+        preserve_host: true
+        tags:
+          - mobile
+    
+    plugins:
+      # Higher rate limits for mobile
+      - name: rate-limiting
+        config:
+          minute: 200
+          hour: 10000
+          policy: redis
+          redis_host: redis
+          redis_port: 6379
+          fault_tolerant: true
+      
+      # Response Caching for GET requests
+      - name: proxy-cache
+        config:
+          request_method:
+            - GET
+            - HEAD
+          response_code:
+            - 200
+            - 301
+            - 302
+            - 404
+          content_type:
+            - text/plain
+            - application/json
+            - application/json; charset=utf-8
+          cache_ttl: 300
+          strategy: memory
+          memory:
+            dictionary_name: kong_cache
+      
+      # Response Compression
+      - name: response-compression
+        config:
+          types:
+            - application/json
+            - text/plain
+            - text/html
+          min_length: 1000
+          algorithms:
+            - gzip
+            - br
+
+  # ============================================================
+  # AUTHENTICATION SERVICE (New)
+  # ============================================================
+  - name: auth-service
+    host: auth-service
+    protocol: http
+    port: 8090
+    path: /
+    tags:
+      - auth
+      - public
+    
+    routes:
+      - name: auth-login
+        paths:
+          - /api/auth/login
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+        tags:
+          - public
+
+      - name: auth-register
+        paths:
+          - /api/auth/register
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+        tags:
+          - public
+
+      - name: auth-refresh
+        paths:
+          - /api/auth/refresh
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+        tags:
+          - public
+
+      - name: auth-logout
+        paths:
+          - /api/auth/logout
+        methods:
+          - POST
+          - OPTIONS
+        strip_path: false
+        tags:
+          - authenticated
+    
+    plugins:
+      # No rate limiting on login (handled by auth service)
+      - name: request-size-limiting
+        config:
+          allowed_payload_size: 1
+          size_unit: megabytes
+
+  # ============================================================
+  # INTERNAL SERVICES (Protected)
+  # ============================================================
+  - name: booking-service-internal
+    host: booking-upstream
+    protocol: http
+    port: 8091
+    tags:
+      - internal
+      - booking
+    
+    routes:
+      - name: booking-internal-routes
+        paths:
+          - /api/internal/booking
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: true
+        tags:
+          - internal
+    
+    plugins:
+      # IP Restriction
+      - name: ip-restriction
+        config:
+          allow:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+          message: Access restricted to internal network only
+      
+      # Key Authentication
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+            - x-api-key
+          key_in_body: false
+          key_in_query: true
+          key_in_header: true
+          hide_credentials: true
+          anonymous: null
+          run_on_preflight: false
+
+  - name: payment-service-internal
+    host: payment-upstream
+    protocol: http
+    port: 8092
+    tags:
+      - internal
+      - payment
+    
+    routes:
+      - name: payment-internal-routes
+        paths:
+          - /api/internal/payment
+        methods:
+          - GET
+          - POST
+        strip_path: true
+        tags:
+          - internal
+    
+    plugins:
+      - name: ip-restriction
+        config:
+          allow:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+          hide_credentials: true
+
+  - name: hotel-service-internal
+    host: hotel-upstream
+    protocol: http
+    port: 8093
+    tags:
+      - internal
+      - hotel
+    
+    routes:
+      - name: hotel-internal-routes
+        paths:
+          - /api/internal/hotel
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: true
+        tags:
+          - internal
+    
+    plugins:
+      - name: ip-restriction
+        config:
+          allow:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+          hide_credentials: true
+
+  - name: movies-service-internal
+    host: movies-upstream
+    protocol: http
+    port: 8094
+    tags:
+      - internal
+      - movies
+    
+    routes:
+      - name: movies-internal-routes
+        paths:
+          - /api/internal/movies
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: true
+        tags:
+          - internal
+    
+    plugins:
+      - name: ip-restriction
+        config:
+          allow:
+            - 10.0.0.0/8
+            - 172.16.0.0/12
+            - 192.168.0.0/16
+
+      - name: key-auth
+        config:
+          key_names:
+            - apikey
+          hide_credentials: true
+
+  # ============================================================
+  # ADMIN API SERVICE (Super Protected)
+  # ============================================================
+  - name: admin-api-service
+    host: web-bff-upstream
+    protocol: http
+    port: 8081
+    tags:
+      - admin
+      - internal
+    
+    routes:
+      - name: admin-routes
+        paths:
+          - /api/admin
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+        strip_path: false
+        tags:
+          - admin
+    
+    plugins:
+      # IP Whitelist - Admin only
+      - name: ip-restriction
+        config:
+          allow:
+            - 10.0.0.100/32
+            - 192.168.1.100/32
+          message: Admin access restricted
+      
+      # Basic Auth
+      - name: basic-auth
+        config:
+          hide_credentials: true
+          anonymous: null
+      
+      # ACL
+      - name: acl
+        config:
+          allow:
+            - admin
+          hide_groups_header: true
+
+# ================================================================
+# CONSUMERS (API Keys & Authentication)
+# ================================================================
+consumers:
+  # Internal Service Consumer
+  - username: internal-service
+    custom_id: internal-svc-001
+    tags:
+      - internal
+      - service
+    keyauth_credentials:
+      - key: ${INTERNAL_API_KEY:-internal-api-key-change-in-production}
+        tags:
+          - internal
+
+  # Monitoring Service Consumer
+  - username: monitoring-service
+    custom_id: monitoring-svc-001
+    tags:
+      - monitoring
+      - service
+    keyauth_credentials:
+      - key: ${MONITORING_API_KEY:-monitoring-api-key-change-in-production}
+        tags:
+          - monitoring
+  
+  # Admin Console Consumer
+  - username: admin-console
+    custom_id: admin-console-001
+    tags:
+      - admin
+    basicauth_credentials:
+      - username: admin
+        password: ${ADMIN_PASSWORD:-change-this-password}
+    acls:
+      - group: admin
+
+  # Test User (Dev/Staging Only)
+  - username: test-user
+    custom_id: test-user-001
+    tags:
+      - testing
+      - dev
+    keyauth_credentials:
+      - key: test-api-key-12345
+
+# ================================================================
+# GLOBAL PLUGINS (Applied to All Routes)
+# ================================================================
+plugins:
+  # Request ID for Tracing
+  - name: correlation-id
+    config:
+      header_name: X-Request-ID
+      generator: uuid#counter
+      echo_downstream: true
+    tags:
+      - global
+      - tracing
+  
+  # Prometheus Metrics
+  - name: prometheus
+    config:
+      status_code_metrics: true
+      latency_metrics: true
+      bandwidth_metrics: true
+      upstream_health_metrics: true
+      per_consumer: true
+    tags:
+      - global
+      - monitoring
+  
+  # Request Termination for Maintenance
+  - name: request-termination
+    enabled: false
+    config:
+      status_code: 503
+      message: System under maintenance. Please try again later.
+      content_type: application/json
+      body: '{"error":"maintenance","message":"System under maintenance"}'
+    tags:
+      - global
+      - maintenance
+  
+  # Bot Detection
+  - name: bot-detection
+    config:
+      allow:
+        - googlebot
+        - bingbot
+        - baiduspider
+      deny:
+        - BadBot
+        - MaliciousBot
+    tags:
+      - global
+      - security
+  
+  # HTTP Log to External Service
+  - name: http-log
+    enabled: false
+    config:
+      http_endpoint: https://logs.ticketkatum.com/ingest
+      method: POST
+      timeout: 10000
+      keepalive: 60000
+      content_type: application/json
+      flush_timeout: 2
+      retry_count: 10
+      queue_size: 1000
+    tags:
+      - global
+      - logging
+
+# ================================================================
+# CERTIFICATE DEFINITIONS (SSL/TLS)
+# ================================================================
+certificates:
+  - cert: |
+      -----BEGIN CERTIFICATE-----
+      # Your SSL Certificate Here
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      # Your Private Key Here
+      -----END PRIVATE KEY-----
+    tags:
+      - production
+      - ssl
+    snis:
+      - api.ticketkatum.com
+      - www.ticketkatum.com
+
+# ================================================================
+# VAULTS (Secrets Management)
+# ================================================================
+vaults:
+  - name: env
+    prefix: ticketkatum-env
+    config:
+      prefix: KONG_VAULT_
+    tags:
+      - secrets
+      - production
