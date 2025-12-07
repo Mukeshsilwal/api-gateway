@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 public class CancelLog {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String cancelReason;

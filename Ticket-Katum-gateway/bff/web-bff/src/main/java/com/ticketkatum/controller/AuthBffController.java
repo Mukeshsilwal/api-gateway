@@ -3,8 +3,17 @@ package com.ticketkatum.controller;
 import com.ticketkatum.client.AuthServiceClient;
 import com.ticketkatum.client.UserServiceClient;
 import com.ticketkatum.dto.AggregatedLoginResponse;
+import com.ticketkatum.dto.AggregatedUserDashboard;
+import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.UserDto;
+import com.ticketkatum.dto.auth.ActiveSessionsResponse;
+import com.ticketkatum.dto.auth.UserActivitySummary;
 import com.ticketkatum.dto.auth.request.LoginRequest;
-import com.ticketkatum.service.WebBffAggregator;
+import com.ticketkatum.dto.auth.response.LogoutAllResponse;
+import com.ticketkatum.dto.auth.response.LogoutResponse;
+import com.ticketkatum.dto.auth.response.RefreshTokenResponse;
+import com.ticketkatum.dto.auth.response.SessionValidationResponse;
+import com.ticketkatum.service.AuthAggregator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Authentication BFF Controller
  * Handles authentication and user management with aggregated data
+ * Uses AuthAggregator for domain-specific logic
  */
 @Slf4j
 @RestController
@@ -28,7 +38,7 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Auth BFF", description = "Authentication and user management aggregated APIs")
 public class AuthBffController {
 
-    private final WebBffAggregator aggregator;
+    private final AuthAggregator authAggregator;
     private final AuthServiceClient authClient;
     private final UserServiceClient userClient;
 
@@ -48,7 +58,7 @@ public class AuthBffController {
         String ipAddress = getClientIP(request);
         String userAgent = getUserAgent(request);
 
-        return aggregator.loginWithProfile(loginRequest, ipAddress, userAgent)
+        return authAggregator.loginWithProfile(loginRequest, ipAddress, userAgent)
                 .thenApply(response -> ResponseEntity.ok(
                         new Response<>(200, "Login successful", response)))
                 .exceptionally(ex -> {
@@ -112,7 +122,7 @@ public class AuthBffController {
 
         log.info("BFF: Fetching user dashboard for: {}", username);
 
-        return aggregator.getUserDashboard(username, userId)
+        return authAggregator.getUserDashboard(username, userId)
                 .thenApply(dashboard -> ResponseEntity.ok(
                         new Response<>(200, "Dashboard retrieved successfully", dashboard)))
                 .exceptionally(ex -> {
@@ -123,10 +133,10 @@ public class AuthBffController {
     }
 
     /**
-     * Validate session
+     * Validate session with extended details
      */
     @GetMapping("/session/validate")
-    @Operation(summary = "Validate session", description = "Validate current session")
+    @Operation(summary = "Validate session", description = "Validate current session with details")
     public CompletableFuture<ResponseEntity<Response<SessionValidationResponse>>> validateSession(
             @RequestHeader("Session-Id") String sessionId,
             @RequestHeader("Authorization") String authHeader) {
@@ -135,7 +145,7 @@ public class AuthBffController {
 
         String token = authHeader.substring(7);
 
-        return authClient.validateSession(sessionId, token)
+        return authAggregator.validateSessionWithDetails(sessionId, token)
                 .thenApply(response -> ResponseEntity.ok(
                         new Response<>(200, "Session validated", response)))
                 .exceptionally(ex -> {
@@ -163,6 +173,27 @@ public class AuthBffController {
                     log.error("Failed to fetch sessions", ex);
                     return ResponseEntity.status(500).body(
                             new Response<>(500, "Failed to fetch sessions", null));
+                });
+    }
+
+    /**
+     * Get user activity summary
+     */
+    @GetMapping("/activity/{username}")
+    @Operation(summary = "Get user activity summary",
+            description = "Get comprehensive user activity information")
+    public CompletableFuture<ResponseEntity<Response<UserActivitySummary>>> getUserActivity(
+            @PathVariable String username) {
+
+        log.info("BFF: Fetching activity summary for: {}", username);
+
+        return authAggregator.getUserActivitySummary(username)
+                .thenApply(activity -> ResponseEntity.ok(
+                        new Response<>(200, "Activity retrieved", activity)))
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch activity", ex);
+                    return ResponseEntity.status(500).body(
+                            new Response<>(500, "Activity fetch failed", null));
                 });
     }
 

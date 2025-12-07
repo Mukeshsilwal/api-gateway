@@ -1,6 +1,8 @@
 package com.ticketkatum.dto.booking.response;
 
 import com.ticketkatum.dto.booking.BookingSummary;
+import com.ticketkatum.dto.hotel.HotelDTO;
+import com.ticketkatum.dto.hotel.RoomDTO;
 import com.ticketkatum.dto.payment.PaymentHistory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

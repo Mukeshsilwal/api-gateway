@@ -3,6 +3,7 @@ package com.ticketkatum.dto.hotel;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -31,8 +32,9 @@ public class HotelDTO {
     private Integer stars;
     private Double rating;
     private Integer starRating;
+    private  String imageUrl;
 
-    private String amenities;
+    private List<String> amenities;
 
     private String website;
 

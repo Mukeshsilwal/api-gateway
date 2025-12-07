@@ -362,4 +362,4 @@ public class HotelServiceClient {
         return mapper.convertValue(data,
                 mapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
-}}
+}

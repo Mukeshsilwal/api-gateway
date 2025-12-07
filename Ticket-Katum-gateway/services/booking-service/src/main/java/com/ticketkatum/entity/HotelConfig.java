@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 public class HotelConfig {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String hotelCode;

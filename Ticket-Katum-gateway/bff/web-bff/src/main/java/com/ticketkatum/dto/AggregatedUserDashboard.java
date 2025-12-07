@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,4 +23,5 @@ public class AggregatedUserDashboard {
     private List<ActiveSessionsResponse.SessionInfo> activeSessions;
     private UserStatistics statistics;
     private List<PaymentHistory> paymentHistory;
+
 }

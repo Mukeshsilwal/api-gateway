@@ -1,6 +1,12 @@
 package com.ticketkatum.client;
 
 import com.ticketkatum.config.ServiceUrlConfig;
+import com.ticketkatum.dto.HealthCheckResponse;
+import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.WebhookProcessingResponse;
+import com.ticketkatum.dto.payment.request.PaymentRequest;
+import com.ticketkatum.dto.payment.request.VerifyPaymentRequest;
+import com.ticketkatum.dto.payment.response.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +60,7 @@ public class PaymentServiceClient {
                 .toFuture()
                 .exceptionally(ex -> {
                     log.error("Error initiating payment", ex);
-                    throw new ServiceClientException("Payment initiation failed", ex);
+                    throw new RuntimeException("Payment initiation failed", ex);
                 });
     }
 

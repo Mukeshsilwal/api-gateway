@@ -1,6 +1,7 @@
 package com.ticketkatum.client;
 
 import com.ticketkatum.config.ServiceUrlConfig;
+import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.UserDto;
 import com.ticketkatum.dto.auth.ActiveSessionsResponse;
 import com.ticketkatum.dto.auth.request.LoginRequest;
@@ -58,7 +59,7 @@ public class AuthServiceClient {
                 .toFuture()
                 .exceptionally(ex -> {
                     log.error("Login failed for user: {}", loginRequest.getUsername(), ex);
-                    throw new ServiceClientException("Authentication failed", ex);
+                    throw new RuntimeException("Authentication failed", ex);
                 });
     }
 
@@ -217,7 +218,7 @@ public class AuthServiceClient {
     private CompletableFuture<LoginResponse> loginFallback(
             LoginRequest loginRequest, String ipAddress, String userAgent, Throwable ex) {
         log.warn("Fallback: login for user: {}", loginRequest.getUsername());
-        throw new ServiceClientException("Authentication service unavailable", ex);
+        throw new RuntimeException("Authentication service unavailable", ex);
     }
 
     private CompletableFuture<SessionValidationResponse> validateSessionFallback(

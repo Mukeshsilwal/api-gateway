@@ -1,6 +1,9 @@
 package com.ticketkatum.client;
 
 import com.ticketkatum.config.ServiceUrlConfig;
+import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.hotel.request.StaffRequest;
+import com.ticketkatum.dto.hotel.response.StaffResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j

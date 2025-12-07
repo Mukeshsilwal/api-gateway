@@ -1,6 +1,7 @@
 package com.ticketkatum.client;
 
 import com.ticketkatum.config.ServiceUrlConfig;
+import com.ticketkatum.exception.ServiceClientException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j

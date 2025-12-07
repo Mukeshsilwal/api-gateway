@@ -1,6 +1,17 @@
 package com.ticketkatum.controller;
 
-import com.ticketkatum.service.WebBffAggregator;
+import com.ticketkatum.client.BookingServiceClient;
+import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.booking.request.CompleteBookingRequest;
+import com.ticketkatum.dto.booking.response.BookingDetailsResponse;
+import com.ticketkatum.dto.booking.response.BookingHistoryResponse;
+import com.ticketkatum.dto.booking.response.CompleteBookingResponse;
+import com.ticketkatum.dto.hotel.request.HotelBookingRequest;
+import com.ticketkatum.dto.hotel.request.RefundRequest;
+import com.ticketkatum.dto.hotel.response.BookingResponse;
+import com.ticketkatum.dto.hotel.response.CancellationResponse;
+import com.ticketkatum.dto.hotel.response.RefundResponse;
+import com.ticketkatum.service.BookingAggregator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Booking BFF Controller
  * Handles booking operations with aggregated hotel and payment data
+ * Uses BookingAggregator for domain-specific logic
  */
 @Slf4j
 @RestController
@@ -22,7 +34,7 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Booking BFF", description = "Booking management aggregated APIs")
 public class BookingBffController {
 
-    private final WebBffAggregator aggregator;
+    private final BookingAggregator bookingAggregator;
     private final BookingServiceClient bookingClient;
 
     /**
@@ -37,7 +49,7 @@ public class BookingBffController {
 
         log.info("BFF: Complete booking flow for user: {}", request.getUserId());
 
-        return aggregator.completeBookingFlow(request)
+        return bookingAggregator.completeBookingFlow(request)
                 .thenApply(response -> ResponseEntity.ok(
                         new Response<>(200, "Booking completed successfully", response)))
                 .exceptionally(ex -> {
@@ -48,7 +60,7 @@ public class BookingBffController {
     }
 
     /**
-     * Book ticket
+     * Book ticket (simplified endpoint)
      */
     @PostMapping("/{category}/{service}")
     @Operation(summary = "Book ticket", description = "Create new booking")
@@ -84,7 +96,7 @@ public class BookingBffController {
 
         log.info("BFF: Cancelling booking - category: {}, service: {}", category, service);
 
-        return aggregator.cancelBookingWithRefund(category, service, request, reason)
+        return bookingAggregator.cancelBookingWithRefund(category, service, request, reason)
                 .thenApply(response -> ResponseEntity.ok(
                         new Response<>(200, "Booking cancelled", response)))
                 .exceptionally(ex -> {
@@ -95,7 +107,7 @@ public class BookingBffController {
     }
 
     /**
-     * Request refund
+     * Request refund (direct)
      */
     @PostMapping("/{category}/{service}/refund")
     @Operation(summary = "Request refund", description = "Process booking refund")
@@ -128,7 +140,7 @@ public class BookingBffController {
 
         log.info("BFF: Fetching booking details: {}", bookingId);
 
-        return aggregator.getBookingDetails(bookingId)
+        return bookingAggregator.getBookingDetails(bookingId)
                 .thenApply(details -> ResponseEntity.ok(
                         new Response<>(200, "Booking details retrieved", details)))
                 .exceptionally(ex -> {
@@ -151,17 +163,37 @@ public class BookingBffController {
 
         log.info("BFF: Fetching booking history for user: {}", userId);
 
-        // TODO: Implement actual booking history fetch
-        BookingHistoryResponse response = BookingHistoryResponse.builder()
-                .bookings(java.util.Collections.emptyList())
-                .totalBookings(0)
-                .totalPages(0)
-                .currentPage(page)
-                .statistics(new UserStatistics())
-                .build();
+        return bookingAggregator.getBookingHistory(userId, page, size)
+                .thenApply(history -> ResponseEntity.ok(
+                        new Response<>(200, "History retrieved", history)))
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch booking history", ex);
+                    return ResponseEntity.status(500).body(
+                            new Response<>(500, "History fetch failed", null));
+                });
+    }
 
-        return CompletableFuture.completedFuture(
-                ResponseEntity.ok(new Response<>(200, "History retrieved", response))
-        );
+    /**
+     * Get upcoming bookings for user
+     */
+    @GetMapping("/upcoming")
+    @Operation(summary = "Get upcoming bookings",
+            description = "Get user's upcoming bookings")
+    public CompletableFuture<ResponseEntity<Response<BookingHistoryResponse>>> getUpcomingBookings(
+            @RequestParam Integer userId,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        log.info("BFF: Fetching upcoming bookings for user: {}", userId);
+
+        // Can add filter for future dates in aggregator
+        return bookingAggregator.getBookingHistory(userId, page, size)
+                .thenApply(history -> ResponseEntity.ok(
+                        new Response<>(200, "Upcoming bookings retrieved", history)))
+                .exceptionally(ex -> {
+                    log.error("Failed to fetch upcoming bookings", ex);
+                    return ResponseEntity.status(500).body(
+                            new Response<>(500, "Fetch failed", null));
+                });
     }
 }

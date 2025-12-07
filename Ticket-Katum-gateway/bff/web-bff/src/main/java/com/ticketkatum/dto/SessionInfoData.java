@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public static class SessionInfo {
+public class SessionInfoData {
     private String sessionId;
     private String ipAddress;
     private String userAgent;

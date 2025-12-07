@@ -1,5 +1,8 @@
 package com.ticketkatum.dto;
 
+import com.ticketkatum.dto.hotel.GeoLocation;
+import com.ticketkatum.dto.hotel.HotelRecommendation;
+import com.ticketkatum.dto.payment.response.PaymentProvider;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

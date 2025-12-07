@@ -1,6 +1,7 @@
 package com.ticketkatum.dto.booking.request;
 
 import com.ticketkatum.dto.hotel.request.HotelBookingRequest;
+import com.ticketkatum.dto.payment.request.PaymentRequest;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

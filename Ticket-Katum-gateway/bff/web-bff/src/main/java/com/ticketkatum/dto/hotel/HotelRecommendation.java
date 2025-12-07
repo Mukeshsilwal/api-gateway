@@ -22,7 +22,7 @@ public class HotelRecommendation {
     private BigDecimal maxPrice;
 
     private Double averageRating;
-    private Integer totalReviews;
+    private Double totalReviews;
 
     // distance from user (in KM)
     private Double distance;
