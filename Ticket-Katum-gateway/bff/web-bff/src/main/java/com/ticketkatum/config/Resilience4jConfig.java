@@ -2,35 +2,43 @@ package com.ticketkatum.config;
 
 
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-import io.github.resilience4j.timelimiter.TimeLimiterConfig;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.cloud.client.circuitbreaker.Customizer;
+import io.github.resilience4j.retry.RetryConfig;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
+/**
+ * Resilience4j configuration for circuit breakers and retries
+ */
+@Slf4j
 @Configuration
 public class Resilience4jConfig {
 
     @Bean
-    public Customizer<Resilience4JCircuitBreakerFactory> defaultCustomizer() {
-        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
-                .timeLimiterConfig(TimeLimiterConfig.custom()
-                        .timeoutDuration(Duration.ofSeconds(30))
-                        .build())
-                .circuitBreakerConfig(CircuitBreakerConfig.custom()
-                        .slidingWindowSize(10)
-                        .minimumNumberOfCalls(5)
-                        .failureRateThreshold(50.0f)
-                        .waitDurationInOpenState(Duration.ofSeconds(30))
-                        .permittedNumberOfCallsInHalfOpenState(3)
-                        .automaticTransitionFromOpenToHalfOpenEnabled(true)
-                        .slowCallRateThreshold(100.0f)
-                        .slowCallDurationThreshold(Duration.ofSeconds(5))
-                        .build())
-                .build());
+    public CircuitBreakerConfig defaultCircuitBreakerConfig() {
+        return CircuitBreakerConfig.custom()
+                .failureRateThreshold(50)
+                .waitDurationInOpenState(Duration.ofMillis(10000))
+                .permittedNumberOfCallsInHalfOpenState(3)
+                .slidingWindowSize(10)
+                .minimumNumberOfCalls(5)
+                .automaticTransitionFromOpenToHalfOpenEnabled(true)
+                .recordExceptions(Exception.class)
+                .build();
+    }
+
+    @Bean
+    public RetryConfig defaultRetryConfig() {
+        return RetryConfig.custom()
+                .maxAttempts(3)
+                .waitDuration(Duration.ofMillis(500))
+                .retryExceptions(
+                        java.net.ConnectException.class,
+                        java.util.concurrent.TimeoutException.class,
+                        org.springframework.web.reactive.function.client.WebClientRequestException.class
+                )
+                .build();
     }
 }
-

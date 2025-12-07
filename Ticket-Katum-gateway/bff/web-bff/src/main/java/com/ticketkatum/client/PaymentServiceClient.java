@@ -1,179 +1,270 @@
 package com.ticketkatum.client;
 
-import com.ticketkatum.config.WebClientInvoker;
-import com.ticketkatum.dto.*;
+import com.ticketkatum.config.ServiceUrlConfig;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
+/**
+ * Client for Payment Gateway Microservice
+ * Handles payment initiation, verification, and provider management
+ */
 @Slf4j
-@Service
+@Component
+@RequiredArgsConstructor
+public class PaymentServiceClient {
 
-public class PaymentServiceClient extends WebClientInvoker {
+    private final WebClient.Builder webClientBuilder;
+    private final ServiceUrlConfig serviceUrls;
 
-    @Qualifier("paymentWebClient")
-    @Autowired
-    private WebClient webClient;
+    private static final String SERVICE_NAME = "payment-service";
+    private static final String CIRCUIT_BREAKER_NAME = "paymentService";
 
-    private static final String SERVICE = "paymentService";
+    private WebClient getWebClient() {
+        return webClientBuilder
+                .baseUrl(serviceUrls.getPaymentServiceUrl())
+                .build();
+    }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackInitiate")
-    @Retry(name = SERVICE)
-    public Mono<GenericResponse<PaymentResponse>> initiatePayment(
-            GenericRequest<InitiatePaymentRequest> request) {
+    /**
+     * Initiate payment with specified provider
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "initiatePaymentFallback")
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<PaymentResponse> initiatePayment(
+            String provider, PaymentRequest request) {
 
-        return invoke(
-                webClient.post()
-                        .uri("/api/payments/initiate")
-                        .bodyValue(request)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<PaymentResponse>>() {}),
-                SERVICE,
-                "initiatePayment"
+        log.debug("Initiating payment - Provider: {}, Amount: {}",
+                provider, request.getAmount());
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/payment/initiate/{provider}", provider)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), PaymentResponse.class))
+                .toFuture()
+                .exceptionally(ex -> {
+                    log.error("Error initiating payment", ex);
+                    throw new ServiceClientException("Payment initiation failed", ex);
+                });
+    }
+
+    /**
+     * Verify payment after callback from gateway
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "verifyPaymentFallback")
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<PaymentVerificationResponse> verifyPayment(
+            String provider, VerifyPaymentRequest request) {
+
+        log.debug("Verifying payment - Provider: {}, TxnId: {}",
+                provider, request.getTransactionId());
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/payment/verify/{provider}", provider)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), PaymentVerificationResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Get transaction status
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getTransactionStatusFallback")
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<TransactionStatusResponse> getTransactionStatus(
+            String transactionId) {
+
+        log.debug("Getting transaction status - TxnId: {}", transactionId);
+
+        return getWebClient()
+                .get()
+                .uri("/api/v1/payment/status/{transactionId}", transactionId)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), TransactionStatusResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Cancel transaction
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "cancelTransactionFallback")
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<CancelTransactionResponse> cancelTransaction(
+            String transactionId) {
+
+        log.debug("Cancelling transaction - TxnId: {}", transactionId);
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/payment/cancel/{transactionId}", transactionId)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), CancelTransactionResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Get list of available payment providers
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getPaymentProvidersFallback")
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<List<PaymentProvider>> getPaymentProviders() {
+        log.debug("Getting payment providers");
+
+        return getWebClient()
+                .get()
+                .uri("/api/v1/payment/providers")
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> {
+                    Object providersData = ((java.util.Map<?, ?>) response.getData()).get("providers");
+                    return objectMapperList(providersData, PaymentProvider.class);
+                })
+                .toFuture();
+    }
+
+    /**
+     * Health check for payment service
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<HealthCheckResponse> healthCheck() {
+        log.debug("Checking payment service health");
+
+        return getWebClient()
+                .get()
+                .uri("/api/v1/payment/health")
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), HealthCheckResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Process webhook from payment gateway
+     */
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<WebhookProcessingResponse> processWebhook(
+            String provider, String payload) {
+
+        log.debug("Processing webhook from provider: {}", provider);
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/payment/webhook/{provider}", provider)
+                .bodyValue(payload)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), WebhookProcessingResponse.class))
+                .toFuture()
+                .exceptionally(ex -> {
+                    log.error("Error processing webhook", ex);
+                    // Return default response
+                    return WebhookProcessingResponse.builder()
+                            .success(false)
+                            .message("Webhook processing failed")
+                            .build();
+                });
+    }
+
+    // ============ Fallback Methods ============
+
+    private CompletableFuture<PaymentResponse> initiatePaymentFallback(
+            String provider, PaymentRequest request, Throwable ex) {
+        log.warn("Fallback: initiatePayment for provider: {}", provider);
+        return CompletableFuture.completedFuture(
+                PaymentResponse.builder()
+                        .status("FAILED")
+                        .message("Payment service temporarily unavailable. Please try again later.")
+                        .transactionId(null)
+                        .paymentUrl(null)
+                        .build()
         );
     }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackGetPayment")
-    @Cacheable(value = "payments", key = "#paymentId")
-    public Mono<GenericResponse<PaymentResponse>> getPayment(String paymentId) {
-
-        log.debug("Fetching payment | payment_id={}", paymentId);
-
-        return invoke(
-                webClient.get()
-                        .uri("/api/payments/{id}", paymentId)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<PaymentResponse>>() {}),
-                SERVICE,
-                "getPayment"
+    private CompletableFuture<PaymentVerificationResponse> verifyPaymentFallback(
+            String provider, VerifyPaymentRequest request, Throwable ex) {
+        log.warn("Fallback: verifyPayment for transaction: {}", request.getTransactionId());
+        return CompletableFuture.completedFuture(
+                PaymentVerificationResponse.builder()
+                        .verified(false)
+                        .status("PENDING")
+                        .message("Payment verification temporarily unavailable")
+                        .transactionId(request.getTransactionId())
+                        .build()
         );
     }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackUserPayments")
-    public Mono<List<PaymentResponse>> getUserPayments(
-            String userId, Integer page, Integer limit) {
-
-        log.debug("Fetching user payments | user_id={}", userId);
-
-        return invoke(
-                webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/api/payments/user/{userId}")
-                                .queryParam("page", page)
-                                .queryParam("limit", limit)
-                                .build(userId))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<List<PaymentResponse>>>() {}),
-                SERVICE,
-                "getUserPayments"
-        ).map(response -> response.isSuccess() && response.getData() != null ?
-                response.getData() : Collections.emptyList());
-    }
-
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackGetByBooking")
-    public Mono<GenericResponse<PaymentResponse>> getPaymentByBookingId(String bookingId) {
-
-        log.debug("Fetching payment by booking | booking_id={}", bookingId);
-
-        return invoke(
-                webClient.get()
-                        .uri("/api/payments/booking/{bookingId}", bookingId)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<PaymentResponse>>() {}),
-                SERVICE,
-                "getPaymentByBookingId"
+    private CompletableFuture<TransactionStatusResponse> getTransactionStatusFallback(
+            String transactionId, Throwable ex) {
+        log.warn("Fallback: getTransactionStatus for: {}", transactionId);
+        return CompletableFuture.completedFuture(
+                TransactionStatusResponse.builder()
+                        .transactionId(transactionId)
+                        .status("UNKNOWN")
+                        .message("Transaction status unavailable")
+                        .build()
         );
     }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackRefund")
-    @Retry(name = SERVICE)
-    public Mono<GenericResponse<PaymentResponse>> refundPayment(
-            String paymentId, GenericRequest<RefundRequest> request) {
-
-        log.info("Initiating refund | payment_id={}", paymentId);
-
-        return invoke(
-                webClient.post()
-                        .uri("/api/payments/{id}/refund", paymentId)
-                        .bodyValue(request)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<PaymentResponse>>() {}),
-                SERVICE,
-                "refundPayment"
+    private CompletableFuture<CancelTransactionResponse> cancelTransactionFallback(
+            String transactionId, Throwable ex) {
+        log.warn("Fallback: cancelTransaction for: {}", transactionId);
+        return CompletableFuture.completedFuture(
+                CancelTransactionResponse.builder()
+                        .transactionId(transactionId)
+                        .cancelled(false)
+                        .message("Transaction cancellation unavailable")
+                        .build()
         );
     }
 
-    // Fallback methods
-    private Mono<GenericResponse<PaymentResponse>> fallbackInitiate(
-            GenericRequest<InitiatePaymentRequest> req, Throwable ex) {
-
-        log.error("Payment initiation fallback | error={}", ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Payment service unavailable. Please try again later.",
-                req.getRequestId()
+    private CompletableFuture<List<PaymentProvider>> getPaymentProvidersFallback(Throwable ex) {
+        log.warn("Fallback: getPaymentProviders");
+        // Return default providers
+        return CompletableFuture.completedFuture(List.of(
+                PaymentProvider.builder()
+                        .id("esewa")
+                        .name("eSewa")
+                        .enabled(false)
+                        .maxAmount(java.math.BigDecimal.valueOf(100000))
+                        .currency("NPR")
+                        .build(),
+                PaymentProvider.builder()
+                        .id("khalti")
+                        .name("Khalti")
+                        .enabled(false)
+                        .maxAmount(java.math.BigDecimal.valueOf(100000))
+                        .currency("NPR")
+                        .build()
         ));
     }
 
-    private Mono<GenericResponse<PaymentResponse>> fallbackGetPayment(
-            String paymentId, Throwable ex) {
-
-        log.error("Get payment fallback | payment_id={} | error={}",
-                paymentId, ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Unable to fetch payment details",
-                UUID.randomUUID().toString()
-        ));
+    // Helper methods
+    private <T> T objectMapper(Object data, Class<T> clazz) {
+        com.fasterxml.jackson.databind.ObjectMapper mapper =
+                new com.fasterxml.jackson.databind.ObjectMapper();
+        return mapper.convertValue(data, clazz);
     }
 
-    private Mono<List<PaymentResponse>> fallbackUserPayments(
-            String userId, Integer page, Integer limit, Throwable ex) {
-
-        log.error("User payments fallback | user_id={} | error={}",
-                userId, ex.getMessage());
-
-        return Mono.just(Collections.emptyList());
-    }
-
-    private Mono<GenericResponse<PaymentResponse>> fallbackGetByBooking(
-            String bookingId, Throwable ex) {
-
-        log.error("Get payment by booking fallback | booking_id={} | error={}",
-                bookingId, ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Payment details unavailable",
-                UUID.randomUUID().toString()
-        ));
-    }
-
-    private Mono<GenericResponse<PaymentResponse>> fallbackRefund(
-            String paymentId, GenericRequest<RefundRequest> req, Throwable ex) {
-
-        log.error("Refund fallback | payment_id={} | error={}",
-                paymentId, ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Unable to process refund. Please contact support.",
-                req.getRequestId()
-        ));
+    private <T> List<T> objectMapperList(Object data, Class<T> clazz) {
+        com.fasterxml.jackson.databind.ObjectMapper mapper =
+                new com.fasterxml.jackson.databind.ObjectMapper();
+        return mapper.convertValue(data,
+                mapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 }

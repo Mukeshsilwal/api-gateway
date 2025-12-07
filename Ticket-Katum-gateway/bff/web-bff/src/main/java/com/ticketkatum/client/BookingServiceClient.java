@@ -1,192 +1,138 @@
 package com.ticketkatum.client;
 
-import com.ticketkatum.config.WebClientInvoker;
-import com.ticketkatum.dto.BookingRequest;
-import com.ticketkatum.dto.BookingResponse;
-import com.ticketkatum.dto.GenericRequest;
-import com.ticketkatum.dto.GenericResponse;
+import com.ticketkatum.config.ServiceUrlConfig;
+import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.hotel.request.HotelBookingRequest;
+import com.ticketkatum.dto.hotel.request.RefundRequest;
+import com.ticketkatum.dto.hotel.response.BookingResponse;
+import com.ticketkatum.dto.hotel.response.CancellationResponse;
+import com.ticketkatum.dto.hotel.response.RefundResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
+/**
+ * Client for Booking Service
+ * Handles ticket booking, cancellation, and refunds
+ */
 @Slf4j
-@Service
-public class BookingServiceClient extends WebClientInvoker {
+@Component
+@RequiredArgsConstructor
+public class BookingServiceClient {
 
-    @Qualifier("bookingWebClient")
-    @Autowired
-    private WebClient webClient;
+    private final WebClient.Builder webClientBuilder;
+    private final ServiceUrlConfig serviceUrls;
 
-    private static final String SERVICE = "bookingService";
+    private static final String CIRCUIT_BREAKER_NAME = "bookingService";
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackCreate")
-    @Retry(name = SERVICE)
-    public Mono<GenericResponse<BookingResponse>> createBooking(BookingRequest request) {
+    private WebClient getWebClient() {
+        return webClientBuilder
+                .baseUrl(serviceUrls.getBookingServiceUrl())
+                .build();
+    }
 
-        GenericRequest<BookingRequest> wrapper =
-                GenericRequest.wrap(request, "web-bff");
+    /**
+     * Book ticket
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "bookTicketFallback")
+    @Retry(name = "booking-service")
+    public CompletableFuture<BookingResponse> bookTicket(
+            String category, String service, HotelBookingRequest request) {
 
-        return invoke(
-                webClient.post()
-                        .uri("/api/bookings")
-                        .bodyValue(wrapper)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<BookingResponse>>() {}),
-                SERVICE,
-                "createBooking"
+        log.debug("Booking ticket: category={}, service={}", category, service);
+
+        return getWebClient()
+                .post()
+                .uri("/api/booking/{category}/{service}", category, service)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), BookingResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Cancel booking
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "cancelBookingFallback")
+    @Retry(name = "booking-service")
+    public CompletableFuture<CancellationResponse> cancelBooking(
+            String category, String service, HotelBookingRequest request) {
+
+        log.debug("Cancelling booking: category={}, service={}", category, service);
+
+        return getWebClient()
+                .post()
+                .uri("/api/booking/{category}/{service}/cancel", category, service)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), CancellationResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Refund booking
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "refundBookingFallback")
+    @Retry(name = "booking-service")
+    public CompletableFuture<RefundResponse> refundBooking(
+            String category, String service, RefundRequest request) {
+
+        log.debug("Refunding booking: category={}, service={}", category, service);
+
+        return getWebClient()
+                .post()
+                .uri("/api/booking/{category}/{service}/refund", category, service)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), RefundResponse.class))
+                .toFuture();
+    }
+
+    // Fallback methods
+    private CompletableFuture<BookingResponse> bookTicketFallback(
+            String category, String service, HotelBookingRequest request, Throwable ex) {
+        log.warn("Fallback: bookTicket for category={}, service={}", category, service);
+        return CompletableFuture.completedFuture(
+                BookingResponse.builder()
+                        .success(false)
+                        .message("Booking service temporarily unavailable")
+                        .build()
         );
     }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackGetBooking")
-    @Cacheable(value = "bookings", key = "#bookingId")
-    public Mono<GenericResponse<BookingResponse>> getBooking(String bookingId) {
-
-        log.debug("Fetching booking | booking_id={}", bookingId);
-
-        return invoke(
-                webClient.get()
-                        .uri("/api/bookings/{id}", bookingId)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<BookingResponse>>() {}),
-                SERVICE,
-                "getBooking"
+    private CompletableFuture<CancellationResponse> cancelBookingFallback(
+            String category, String service, HotelBookingRequest request, Throwable ex) {
+        log.warn("Fallback: cancelBooking");
+        return CompletableFuture.completedFuture(
+                CancellationResponse.builder()
+                        .success(false)
+                        .message("Cancellation service temporarily unavailable")
+                        .build()
         );
     }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackUserBookings")
-    public Mono<List<BookingResponse>> getUserBookings(
-            String userId, Integer page, Integer limit) {
-
-        log.debug("Fetching user bookings | user_id={} | page={} | limit={}",
-                userId, page, limit);
-
-        return invoke(
-                webClient.get()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/api/bookings/user/{userId}")
-                                .queryParam("page", page)
-                                .queryParam("limit", limit)
-                                .build(userId))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<List<BookingResponse>>>() {}),
-                SERVICE,
-                "getUserBookings"
-        ).map(response -> response.isSuccess() && response.getData() != null ?
-                response.getData() : Collections.emptyList());
-    }
-
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackCancel")
-    @CacheEvict(value = "bookings", key = "#bookingId")
-    public Mono<GenericResponse<Void>> cancelBooking(String bookingId, String userId) {
-
-        log.info("Cancelling booking | booking_id={} | user_id={}", bookingId, userId);
-
-        return invoke(
-                webClient.delete()
-                        .uri(uriBuilder -> uriBuilder
-                                .path("/api/bookings/{id}")
-                                .queryParam("userId", userId)
-                                .build(bookingId))
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<Void>>() {}),
-                SERVICE,
-                "cancelBooking"
+    private CompletableFuture<RefundResponse> refundBookingFallback(
+            String category, String service, RefundRequest request, Throwable ex) {
+        log.warn("Fallback: refundBooking");
+        return CompletableFuture.completedFuture(
+                RefundResponse.builder()
+                        .success(false)
+                        .message("Refund service temporarily unavailable")
+                        .build()
         );
     }
 
-    @CircuitBreaker(name = SERVICE, fallbackMethod = "fallbackUpdate")
-    @CacheEvict(value = "bookings", key = "#bookingId")
-    public Mono<GenericResponse<BookingResponse>> updateBooking(
-            String bookingId, BookingRequest request) {
-
-        log.info("Updating booking | booking_id={}", bookingId);
-
-        GenericRequest<BookingRequest> wrapper =
-                GenericRequest.wrap(request, "web-bff");
-
-        return invoke(
-                webClient.put()
-                        .uri("/api/bookings/{id}", bookingId)
-                        .bodyValue(wrapper)
-                        .retrieve()
-                        .bodyToMono(new ParameterizedTypeReference<
-                                GenericResponse<BookingResponse>>() {}),
-                SERVICE,
-                "updateBooking"
-        );
-    }
-
-    // Fallback methods - Type-safe
-    private Mono<GenericResponse<BookingResponse>> fallbackCreate(
-            BookingRequest req, Throwable ex) {
-
-        log.error("Create booking fallback | error={}", ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Booking service unavailable. Please try again later.",
-                UUID.randomUUID().toString()
-        ));
-    }
-
-    private Mono<GenericResponse<BookingResponse>> fallbackGetBooking(
-            String bookingId, Throwable ex) {
-
-        log.error("Get booking fallback | booking_id={} | error={}",
-                bookingId, ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Unable to fetch booking details",
-                UUID.randomUUID().toString()
-        ));
-    }
-
-    private Mono<List<BookingResponse>> fallbackUserBookings(
-            String userId, Integer page, Integer limit, Throwable ex) {
-
-        log.error("User bookings fallback | user_id={} | error={}",
-                userId, ex.getMessage());
-
-        return Mono.just(Collections.emptyList());
-    }
-
-    private Mono<GenericResponse<Void>> fallbackCancel(
-            String bookingId, String userId, Throwable ex) {
-
-        log.error("Cancel booking fallback | booking_id={} | error={}",
-                bookingId, ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Unable to cancel booking. Please contact support.",
-                UUID.randomUUID().toString()
-        ));
-    }
-
-    private Mono<GenericResponse<BookingResponse>> fallbackUpdate(
-            String bookingId, BookingRequest request, Throwable ex) {
-
-        log.error("Update booking fallback | booking_id={} | error={}",
-                bookingId, ex.getMessage());
-
-        return Mono.just(GenericResponse.failure(
-                "Unable to update booking",
-                UUID.randomUUID().toString()
-        ));
+    private <T> T objectMapper(Object data, Class<T> clazz) {
+        com.fasterxml.jackson.databind.ObjectMapper mapper =
+                new com.fasterxml.jackson.databind.ObjectMapper();
+        return mapper.convertValue(data, clazz);
     }
 }
