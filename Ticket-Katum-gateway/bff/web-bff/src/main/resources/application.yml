@@ -39,8 +39,8 @@ microservices:
   image-service-url: ${IMAGE_SERVICE_URL:http://localhost:8086}
 
   # ========== Authentication & User Services ==========
-  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8080}
-  user-service-url: ${USER_SERVICE_URL:http://localhost:8080}
+  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8082}
+  user-service-url: ${USER_SERVICE_URL:http://localhost:8082}
 
   # ========== Booking Services ==========
   booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8091}

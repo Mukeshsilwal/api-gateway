@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.crypto.SecretKey;
@@ -31,14 +32,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Value("${security.jwt.secret}")
     private String jwtSecret;
 
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    /** ALL PUBLIC ENDPOINTS - These will skip JWT authentication completely */
+    private static final String[] PUBLIC_URLS = {
+            "/actuator/**",
+            "/health/**",
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html",
+            "/api/bff/v1/auth/**",
+            "/api/movies/**",
+            "/api/hotels/search/**",
+            "/api/hotels/*"
+    };
+
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
             FilterChain filterChain) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // Check if this is a public endpoint - skip JWT validation
+        if (isPublicEndpoint(path)) {
+            log.debug("Skipping JWT validation for public endpoint: {}", path);
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
+        // No Authorization header - let Spring Security handle it
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -53,7 +79,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
-
 
             String username = claims.getSubject();
             @SuppressWarnings("unchecked")
@@ -81,11 +106,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute("userId", claims.get("userId"));
                 request.setAttribute("username", username);
                 request.setAttribute("roles", roles);
+
+                log.debug("Successfully authenticated user: {}", username);
             }
         } catch (Exception e) {
-            log.error("JWT authentication failed: {}", e.getMessage());
+            log.error("JWT authentication failed for path {}: {}", path, e.getMessage());
+            // Don't set authentication - Spring Security will handle as unauthorized
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    /**
+     * Check if the request path matches any public endpoint pattern
+     */
+    private boolean isPublicEndpoint(String path) {
+        for (String publicUrl : PUBLIC_URLS) {
+            if (pathMatcher.match(publicUrl, path)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

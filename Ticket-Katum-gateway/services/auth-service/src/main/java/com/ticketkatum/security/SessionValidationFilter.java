@@ -48,13 +48,16 @@ public class SessionValidationFilter extends OncePerRequestFilter {
     private static final List<String> PUBLIC_URLS = Arrays.asList(
             "/auth/**",
             "/register/**",
+            "/api/bff/v1/auth/**",  // ← ADDED THIS
             "/bookSeats/confirm",
             "/bookSeats/cancel",
             "/payment/**",
             "/api/v1/payment/**",
-            "/actuator/health",
+            "/actuator/**",
+            "/health/**",
             "/v3/api-docs/**",
             "/swagger-ui/**",
+            "/swagger-ui.html",
             "/error"
     );
 

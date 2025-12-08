@@ -1,25 +1,35 @@
 package com.ticketkatum.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.ticketkatum.enums.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import org.springframework.lang.Nullable;
 
-import java.time.LocalDateTime;
-
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class UserDto {
-    private Integer id;
+
+    private Integer id1;
+
+    @NonNull
+    @Email
+    @NotEmpty
     private String username;
+
+    @NonNull
+    @NotEmpty
+    @Size(min = 7, max = 50)
     private String password;
+
+    @Nullable
+    private Role role;
+
     private String fullName;
-    private String email;
+
     private String phone;
-    private String role;
-    private boolean enabled;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }

@@ -93,7 +93,6 @@ public class UserServiceClient {
         log.warn("Fallback: getUserById for ID: {}", userId);
         return CompletableFuture.completedFuture(
                 UserDto.builder()
-                        .id(userId)
                         .username("User information unavailable")
                         .build()
         );

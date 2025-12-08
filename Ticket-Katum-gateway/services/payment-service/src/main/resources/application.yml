@@ -18,14 +18,15 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-sendgrid:   # FIXED BLOCK (no longer inside server)
-  api:
-    key: ${SENDGRID_API_KEY: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}
 
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
       group-id: payment-group
+
+sendgrid:
+  api:
+    key: ${SENDGRID_API_KEY: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}
 
 eureka:
   client:

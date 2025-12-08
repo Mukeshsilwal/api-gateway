@@ -1,6 +1,7 @@
 package com.ticketkatum.config;
 
 import com.ticketkatum.security.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +35,8 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // Public endpoints - ORDER MATTERS!
+                        .requestMatchers("/api/bff/v1/auth/**").permitAll()
                         .requestMatchers(
                                 "/actuator/**",
                                 "/health/**",
@@ -48,7 +49,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/search/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/{id}").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/bff/v1/auth/register").permitAll()
 
                         // Authentication required
                         .requestMatchers("/api/bookings/**").authenticated()
@@ -61,8 +61,22 @@ public class SecurityConfig {
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )
+                // Add custom JWT filter
                 .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                // Handle authentication exceptions
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write(String.format(
+                                    "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}",
+                                    java.time.LocalDateTime.now(),
+                                    authException.getMessage(),
+                                    request.getRequestURI()
+                            ));
+                        })
+                );
 
         return http.build();
     }

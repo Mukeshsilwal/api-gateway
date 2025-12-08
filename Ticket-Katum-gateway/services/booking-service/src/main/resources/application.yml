@@ -16,14 +16,13 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none   # change to update in production
+      ddl-auto: none   # Flyway is enabled → keep this as NONE
     show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        jdbc:
-          batch_size: 20
+        jdbc.batch_size: 20
         order_inserts: true
         order_updates: true
 
@@ -66,9 +65,9 @@ server:
   http2:
     enabled: true
 
-sendgrid:   # FIXED BLOCK (no longer inside server)
+sendgrid:
   api:
-    key: ${SENDGRID_API_KEY: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}
+    key: ${SENDGRID_API_KEY:REPLACE_ME}
 
 management:
   endpoints:
