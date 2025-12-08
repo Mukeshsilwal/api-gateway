@@ -31,27 +31,27 @@ spring:
 # ============================================================
 microservices:
   # ========== Hotel Management Services ==========
-  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8081}
+  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8087}
   recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8082}
-  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8083}
+  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8086}
   maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8084}
   staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8085}
   image-service-url: ${IMAGE_SERVICE_URL:http://localhost:8086}
 
   # ========== Authentication & User Services ==========
-  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8087}
-  user-service-url: ${USER_SERVICE_URL:http://localhost:8088}
+  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8080}
+  user-service-url: ${USER_SERVICE_URL:http://localhost:8080}
 
   # ========== Booking Services ==========
-  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8089}
+  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8091}
 
   # ========== Bus Ticketing Services ==========
-  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8090}
-  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8090}
-  route-service-url: ${ROUTE_SERVICE_URL:http://localhost:8090}
-  seat-service-url: ${SEAT_SERVICE_URL:http://localhost:8090}
-  ticket-service-url: ${TICKET_SERVICE_URL:http://localhost:8090}
-  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8090}
+  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8083}
+  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8083}
+  route-service-url: ${ROUTE_SERVICE_URL:http://localhost:8083}
+  seat-service-url: ${SEAT_SERVICE_URL:http://localhost:8083}
+  ticket-service-url: ${TICKET_SERVICE_URL:http://localhost:8083}
+  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8083}
 
   # ========== Common Services ==========
   notification-service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8091}

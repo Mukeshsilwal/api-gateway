@@ -3,6 +3,7 @@ package com.ticketkatum.redis;
 import com.ticketkatum.model.TicketDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TicketCacheService {
 
+    @Qualifier("customRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String TICKET_KEY = "ticket:";
     private static final String BOOKING_TICKETS_KEY = "booking:tickets:";

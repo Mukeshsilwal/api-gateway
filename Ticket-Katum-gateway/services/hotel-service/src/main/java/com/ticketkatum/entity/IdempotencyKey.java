@@ -8,7 +8,7 @@ import java.time.Instant;
 @Table(name = "idempotency_key", uniqueConstraints = @UniqueConstraint(columnNames = "key_value"))
 public class IdempotencyKey {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "key_value", nullable = false, unique = true)

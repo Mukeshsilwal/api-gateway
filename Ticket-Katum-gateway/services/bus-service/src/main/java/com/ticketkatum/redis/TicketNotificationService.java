@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.Map;
 @Slf4j
 public class TicketNotificationService {
 
+    @Qualifier("customRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic ticketUpdatesTopic;
     private final ObjectMapper objectMapper;

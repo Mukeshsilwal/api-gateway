@@ -12,7 +12,7 @@ import lombok.Setter;
 public class BusBooking {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String busName;

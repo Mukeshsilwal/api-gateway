@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/search/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/hotels/{id}").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/bff/v1/auth/register").permitAll()
 
                         // Authentication required
                         .requestMatchers("/api/bookings/**").authenticated()

@@ -1,6 +1,7 @@
 package com.ticketkatum.redis.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookingStatsService {
 
+    @Qualifier("customRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String STATS_KEY = "booking:stats:";
 

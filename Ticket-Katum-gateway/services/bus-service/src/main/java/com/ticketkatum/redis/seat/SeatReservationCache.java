@@ -2,6 +2,7 @@ package com.ticketkatum.redis.seat;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class SeatReservationCache {
 
+    @Qualifier("customRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String RESERVED_SEATS_KEY = "seats:reserved:";
     private static final String SEAT_STATUS_KEY = "seat:status:";

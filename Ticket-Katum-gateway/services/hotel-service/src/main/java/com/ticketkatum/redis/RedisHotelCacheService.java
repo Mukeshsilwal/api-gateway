@@ -5,6 +5,7 @@ import com.ticketkatum.entity.Hotel;
 import com.ticketkatum.model.HotelRecommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.GeoOperations;
@@ -29,6 +30,7 @@ public class RedisHotelCacheService {
     private static final int SEARCH_RESULT_TTL_MINUTES = 30;
     private static final int RECOMMENDATION_TTL_MINUTES = 60;
 
+    @Qualifier("customRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 

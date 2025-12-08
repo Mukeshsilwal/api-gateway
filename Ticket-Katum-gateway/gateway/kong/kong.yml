@@ -43,7 +43,7 @@ upstreams:
       - web-bff
       - upstream
     targets:
-      - target: web-bff:8081
+      - target: web-bff:8080
         weight: 100
         tags:
           - primary
@@ -94,7 +94,7 @@ upstreams:
           interval: 10
           successes: 2
     targets:
-      - target: payment-service:8092
+      - target: payment-service:8085
         weight: 100
 
   - name: hotel-upstream
@@ -106,7 +106,7 @@ upstreams:
           interval: 10
           successes: 2
     targets:
-      - target: hotel-service:8093
+      - target: hotel-service:8087
         weight: 100
 
   - name: movies-upstream
@@ -131,7 +131,7 @@ services:
   - name: web-bff-service
     host: web-bff-upstream
     protocol: http
-    port: 8081
+    port: 8080
     path: /
     connect_timeout: 60000
     write_timeout: 60000

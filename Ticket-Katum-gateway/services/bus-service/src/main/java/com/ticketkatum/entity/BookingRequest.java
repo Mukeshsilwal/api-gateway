@@ -15,7 +15,7 @@ import lombok.Setter;
 @Table(name = "booked")
 public class BookingRequest {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @OneToOne(fetch = FetchType.LAZY)

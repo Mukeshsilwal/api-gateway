@@ -1,19 +1,19 @@
 server:
-  port: 8081
+  port: 8083
 
 spring:
   application:
     name: bus-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/bus_service
+    url: jdbc:postgresql://localhost:5432/bus_db
     username: postgres
     password: admin
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -26,6 +26,10 @@ spring:
     redis:
       port: 6379
       host: localhost
+
+sendgrid:   # FIXED BLOCK (no longer inside server)
+  api:
+    key: ${SENDGRID_API_KEY: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}
 
 eureka:
   client:

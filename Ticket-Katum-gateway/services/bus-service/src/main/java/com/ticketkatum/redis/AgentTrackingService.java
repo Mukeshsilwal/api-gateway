@@ -1,6 +1,7 @@
 package com.ticketkatum.redis;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class AgentTrackingService {
 
+    @Qualifier("customRedisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
     private static final String ONLINE_AGENTS = "agents:online";
     private static final String AGENT_STATUS = "agent:status";

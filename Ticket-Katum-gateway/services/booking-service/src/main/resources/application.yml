@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: none   # change to update in production
     show-sql: false
     properties:
       hibernate:
@@ -33,14 +33,18 @@ spring:
     locations: classpath:db/migration
 
   redis:
-    port: ${SPRING_REDIS_PORT:6379}
-    password: ${SPRING_REDIS_PASSWORD:redis_password}
     timeout: 60000
     lettuce:
       pool:
         max-active: 50
         max-idle: 10
         min-idle: 5
+
+  data:
+    redis:
+      host: ${SPRING_REDIS_HOST:localhost}
+      port: ${SPRING_REDIS_PORT:6379}
+      password: ${SPRING_REDIS_PASSWORD:redis_password}
 
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
@@ -54,9 +58,6 @@ spring:
           initial-interval: 2000
           max-attempts: 3
           multiplier: 2
-  data:
-    redis:
-      host: ${SPRING_REDIS_HOST:localhost}
 
 server:
   port: 8091
@@ -65,17 +66,24 @@ server:
   http2:
     enabled: true
 
+sendgrid:   # FIXED BLOCK (no longer inside server)
+  api:
+    key: ${SENDGRID_API_KEY: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}
+
 management:
   endpoints:
     web:
       exposure:
         include: health,metrics,prometheus,info
+
   metrics:
     tags:
       application: ${spring.application.name}
+
   endpoint:
     health:
       show-details: always
+
   prometheus:
     metrics:
       export:
@@ -87,5 +95,6 @@ logging:
     com.ticketkatum: DEBUG
     org.springframework.web: INFO
     org.hibernate: WARN
+
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

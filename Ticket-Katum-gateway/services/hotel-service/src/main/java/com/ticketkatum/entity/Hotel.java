@@ -29,7 +29,7 @@ import java.util.Set;
 public class Hotel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -78,7 +78,6 @@ public class Hotel {
     @Column(precision = 10, scale = 2)
     private BigDecimal maxPrice;
 
-    @Column(precision = 3, scale = 2)
     private Double averageRating;
 
     private Integer totalReviews;
