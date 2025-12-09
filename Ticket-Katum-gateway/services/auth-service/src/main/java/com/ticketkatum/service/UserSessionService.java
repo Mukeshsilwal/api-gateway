@@ -3,6 +3,7 @@ package com.ticketkatum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -82,12 +83,19 @@ public class UserSessionService {
             redisTemplate.opsForHash().putAll(sessionKey, sessionData);
             redisTemplate.expire(sessionKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-            // Track user's active sessions
+            // Track user's active sessions as Set
             String userSessionsKey = buildUserSessionsKey(username);
-            redisTemplate.opsForSet().add(userSessionsKey, sessionId);
-            redisTemplate.expire(userSessionsKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            try {
+                redisTemplate.opsForSet().add(userSessionsKey, sessionId);
+                redisTemplate.expire(userSessionsKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            } catch (RedisSystemException e) {
+                log.warn("Detected wrong Redis key type for {}. Deleting and recreating as Set.", userSessionsKey);
+                redisTemplate.delete(userSessionsKey);
+                redisTemplate.opsForSet().add(userSessionsKey, sessionId);
+                redisTemplate.expire(userSessionsKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+            }
 
-            // Add to active users set with score (timestamp)
+            // Add to active users ZSet
             redisTemplate.opsForZSet().add(ACTIVE_USERS_KEY, username, now.toEpochSecond(ZoneOffset.UTC));
 
             // Update session metadata
@@ -104,12 +112,12 @@ public class UserSessionService {
         }
     }
 
+
     /**
      * Get session data with automatic expiry update
      */
     public Map<Object, Object> getSession(String sessionId) {
         if (sessionId == null || sessionId.trim().isEmpty()) {
-            log.warn("Attempted to get session with null or empty sessionId");
             return Collections.emptyMap();
         }
 
@@ -122,12 +130,9 @@ public class UserSessionService {
                 String lastAccessed = LocalDateTime.now().format(DATE_FORMATTER);
                 sessionData.put("lastAccessedAt", lastAccessed);
                 redisTemplate.opsForHash().put(sessionKey, "lastAccessedAt", lastAccessed);
-
-                log.debug("Retrieved session: {}", sessionId);
                 return sessionData;
             }
 
-            log.debug("Session not found: {}", sessionId);
             return Collections.emptyMap();
 
         } catch (Exception e) {
@@ -135,6 +140,7 @@ public class UserSessionService {
             return Collections.emptyMap();
         }
     }
+
 
     /**
      * Validate session exists and return username

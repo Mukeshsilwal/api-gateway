@@ -11,189 +11,247 @@ import com.ticketkatum.dto.hotel.request.RefundRequest;
 import com.ticketkatum.dto.hotel.response.BookingResponse;
 import com.ticketkatum.dto.hotel.response.CancellationResponse;
 import com.ticketkatum.dto.hotel.response.RefundResponse;
+import com.ticketkatum.exception.*;
 import com.ticketkatum.service.BookingAggregator;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
-/**
- * Booking BFF Controller
- * Handles booking operations with aggregated hotel and payment data
- * Uses BookingAggregator for domain-specific logic
- */
 @Slf4j
 @RestController
 @RequestMapping("/api/bff/v1/bookings")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Booking BFF", description = "Booking management aggregated APIs")
+@SecurityRequirement(name = "bearer-jwt")
 public class BookingBffController {
 
     private final BookingAggregator bookingAggregator;
     private final BookingServiceClient bookingClient;
+    private static final long OPERATION_TIMEOUT_SECONDS = 30;
 
-    /**
-     * Complete booking flow with hotel and payment
-     * Aggregates: availability check, booking, payment initiation
-     */
     @PostMapping("/complete")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Complete booking flow",
-            description = "Book hotel with payment in a single transaction")
+            description = "Book hotel with payment in a single transaction. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<CompleteBookingResponse>>> completeBooking(
             @Valid @RequestBody CompleteBookingRequest request) {
 
-        log.info("BFF: Complete booking flow for user: {}", request.getUserId());
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Complete booking flow for user: {}", correlationId, request.getUserId());
+
 
         return bookingAggregator.completeBookingFlow(request)
-                .thenApply(response -> ResponseEntity.ok(
-                        new Response<>(200, "Booking completed successfully", response)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(response -> {
+                    return ResponseEntity.status(HttpStatus.CREATED).body(
+                            Response.<CompleteBookingResponse>builder()
+                                    .statusCode(HttpStatus.CREATED.value())
+                                    .message("Booking completed successfully")
+                                    .data(response)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Booking flow failed", ex);
-                    return ResponseEntity.status(400).body(
-                            new Response<>(400, "Booking failed: " + ex.getMessage(), null));
+                    throw handleAsyncException(ex, correlationId, "Complete booking");
                 });
     }
 
-    /**
-     * Book ticket (simplified endpoint)
-     */
     @PostMapping("/{category}/{service}")
-    @Operation(summary = "Book ticket", description = "Create new booking")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Book ticket", description = "Create new booking. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<BookingResponse>>> bookTicket(
             @PathVariable String category,
             @PathVariable String service,
             @Valid @RequestBody HotelBookingRequest request) {
 
-        log.info("BFF: Booking ticket - category: {}, service: {}", category, service);
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Booking ticket - category: {}, service: {}",
+                correlationId, category, service);
 
         return bookingClient.bookTicket(category, service, request)
-                .thenApply(response -> ResponseEntity.ok(
-                        new Response<>(200, "Booking created", response)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(response -> {
+                    log.info("[{}] Booking created successfully: bookingId={}",
+                            correlationId, response.getBookingId());
+                    return ResponseEntity.status(HttpStatus.CREATED).body(
+                            Response.<BookingResponse>builder()
+                                    .statusCode(HttpStatus.CREATED.value())
+                                    .message("Booking created successfully")
+                                    .data(response)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Booking failed", ex);
-                    return ResponseEntity.status(400).body(
-                            new Response<>(400, "Booking failed", null));
+                    throw handleAsyncException(ex, correlationId, "Book ticket");
                 });
     }
 
-    /**
-     * Cancel booking with refund
-     * Aggregates: cancellation, refund processing
-     */
     @PostMapping("/{category}/{service}/cancel")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Cancel booking with refund",
-            description = "Cancel booking and process refund")
+            description = "Cancel booking and process refund. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<CancellationResponse>>> cancelBooking(
             @PathVariable String category,
             @PathVariable String service,
             @Valid @RequestBody HotelBookingRequest request,
             @RequestParam(required = false) String reason) {
 
-        log.info("BFF: Cancelling booking - category: {}, service: {}", category, service);
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Cancelling booking - category: {}, service: {}, reason: {}",
+                correlationId, category, service, reason);
+
 
         return bookingAggregator.cancelBookingWithRefund(category, service, request, reason)
-                .thenApply(response -> ResponseEntity.ok(
-                        new Response<>(200, "Booking cancelled", response)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(response -> {
+                    log.info("[{}] Booking cancelled successfully: bookingId={}",
+                            correlationId, response.getBookingId());
+                    return ResponseEntity.ok(
+                            Response.<CancellationResponse>builder()
+                                    .statusCode(HttpStatus.OK.value())
+                                    .message("Booking cancelled successfully")
+                                    .data(response)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Cancellation failed", ex);
-                    return ResponseEntity.status(400).body(
-                            new Response<>(400, "Cancellation failed", null));
+                    throw handleAsyncException(ex, correlationId, "Cancel booking");
                 });
     }
 
-    /**
-     * Request refund (direct)
-     */
     @PostMapping("/{category}/{service}/refund")
-    @Operation(summary = "Request refund", description = "Process booking refund")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Request refund", description = "Process booking refund. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<RefundResponse>>> refundBooking(
             @PathVariable String category,
             @PathVariable String service,
             @Valid @RequestBody RefundRequest request) {
 
-        log.info("BFF: Refund request for booking: {}", request.getBookingId());
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Refund request for booking: {}", correlationId, request.getBookingId());
 
         return bookingClient.refundBooking(category, service, request)
-                .thenApply(response -> ResponseEntity.ok(
-                        new Response<>(200, "Refund processed", response)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(response -> {
+                    log.info("[{}] Refund processed successfully: refundId={}",
+                            correlationId, response.getRefundId());
+                    return ResponseEntity.ok(
+                            Response.<RefundResponse>builder()
+                                    .statusCode(HttpStatus.OK.value())
+                                    .message("Refund processed successfully")
+                                    .data(response)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Refund failed", ex);
-                    return ResponseEntity.status(400).body(
-                            new Response<>(400, "Refund failed", null));
+                    throw handleAsyncException(ex, correlationId, "Process refund");
                 });
     }
 
-    /**
-     * Get booking details
-     * Aggregates: booking info, hotel details, payment status
-     */
     @GetMapping("/{bookingId}/details")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get booking details",
-            description = "Get complete booking information")
+            description = "Get complete booking information. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<BookingDetailsResponse>>> getBookingDetails(
             @PathVariable String bookingId) {
 
-        log.info("BFF: Fetching booking details: {}", bookingId);
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Fetching booking details: {}", correlationId, bookingId);
+
 
         return bookingAggregator.getBookingDetails(bookingId)
-                .thenApply(details -> ResponseEntity.ok(
-                        new Response<>(200, "Booking details retrieved", details)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(details -> {
+                    log.info("[{}] Booking details retrieved successfully", correlationId);
+                    return ResponseEntity.ok(
+                            Response.<BookingDetailsResponse>builder()
+                                    .statusCode(HttpStatus.OK.value())
+                                    .message("Booking details retrieved successfully")
+                                    .data(details)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Failed to fetch booking details", ex);
-                    return ResponseEntity.status(404).body(
-                            new Response<>(404, "Booking not found", null));
+                    throw handleAsyncException(ex, correlationId, "Get booking details");
                 });
     }
 
-    /**
-     * Get booking history
-     */
     @GetMapping("/history")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get booking history",
-            description = "Get user's booking history with pagination")
+            description = "Get user's booking history with pagination. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<BookingHistoryResponse>>> getBookingHistory(
-            @RequestParam Integer userId,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam @Min(1) Integer userId,
+            @RequestParam(defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(defaultValue = "10") @Min(1) Integer size) {
 
-        log.info("BFF: Fetching booking history for user: {}", userId);
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Fetching booking history for user: {}, page: {}, size: {}",
+                correlationId, userId, page, size);
+
 
         return bookingAggregator.getBookingHistory(userId, page, size)
-                .thenApply(history -> ResponseEntity.ok(
-                        new Response<>(200, "History retrieved", history)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(history -> {
+
+                    return ResponseEntity.ok(
+                            Response.<BookingHistoryResponse>builder()
+                                    .statusCode(HttpStatus.OK.value())
+                                    .message("Booking history retrieved successfully")
+                                    .data(history)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Failed to fetch booking history", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "History fetch failed", null));
+                    throw handleAsyncException(ex, correlationId, "Get booking history");
                 });
     }
 
-    /**
-     * Get upcoming bookings for user
-     */
     @GetMapping("/upcoming")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get upcoming bookings",
-            description = "Get user's upcoming bookings")
+            description = "Get user's upcoming bookings. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<BookingHistoryResponse>>> getUpcomingBookings(
-            @RequestParam Integer userId,
-            @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "10") Integer size) {
+            @RequestParam @Min(1) Integer userId,
+            @RequestParam(defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(defaultValue = "10") @Min(1) Integer size) {
 
-        log.info("BFF: Fetching upcoming bookings for user: {}", userId);
+        String correlationId = UUID.randomUUID().toString();
+        log.info("[{}] BFF: Fetching upcoming bookings for user: {}", correlationId, userId);
 
-        // Can add filter for future dates in aggregator
+
         return bookingAggregator.getBookingHistory(userId, page, size)
-                .thenApply(history -> ResponseEntity.ok(
-                        new Response<>(200, "Upcoming bookings retrieved", history)))
+                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                .thenApply(history -> {
+                    log.info("[{}] Upcoming bookings retrieved successfully", correlationId);
+                    return ResponseEntity.ok(
+                            Response.<BookingHistoryResponse>builder()
+                                    .statusCode(HttpStatus.OK.value())
+                                    .message("Upcoming bookings retrieved successfully")
+                                    .data(history)
+                                    .build());
+                })
                 .exceptionally(ex -> {
-                    log.error("Failed to fetch upcoming bookings", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Fetch failed", null));
+                    throw handleAsyncException(ex, correlationId, "Get upcoming bookings");
                 });
+    }
+
+    private RuntimeException handleAsyncException(Throwable ex, String correlationId, String operation) {
+        Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+        log.error("[{}] {} failed: {}", correlationId, operation, cause.getMessage(), cause);
+
+        if (cause instanceof RuntimeException) {
+            return (RuntimeException) cause;
+        }
+        return new BusinessException("OPERATION_FAILED",
+                operation + " failed: " + cause.getMessage(), cause);
     }
 }

@@ -32,7 +32,6 @@ spring:
     locations: classpath:db/migration
 
   redis:
-    timeout: 60000
     lettuce:
       pool:
         max-active: 50
@@ -44,6 +43,7 @@ spring:
       host: ${SPRING_REDIS_HOST:localhost}
       port: ${SPRING_REDIS_PORT:6379}
       password: ${SPRING_REDIS_PASSWORD:redis_password}
+      timeout: 60000
 
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}

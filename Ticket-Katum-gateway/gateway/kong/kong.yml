@@ -173,6 +173,23 @@ services:
         preserve_host: true
         tags:
           - authenticated
+
+      # Backwards-compatible route for existing BFF paths
+      - name: web-bff-bff-routes
+        paths:
+          - /api/bff
+          - /api/bff/v1
+        methods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - PATCH
+          - OPTIONS
+        strip_path: false
+        preserve_host: true
+        tags:
+          - bff
     
     plugins:
       # CORS Configuration

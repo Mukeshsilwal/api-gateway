@@ -1,48 +1,118 @@
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
-WORKDIR /app
+version: '3.8'
 
-# Copy and build application
-COPY pom.xml .
-COPY src ./src
+services:
+  # ============= Databases =============
+  
+  user-db:
+    image: postgres:15-alpine
+    container_name: user-db
+    environment:
+      POSTGRES_DB: user_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5432:5432"
+    volumes:
+      - user-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketkatum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# Build the application
-RUN mvn clean package -DskipTests
+  auth-db:
+    image: postgres:15-alpine
+    container_name: auth-db
+    environment:
+      POSTGRES_DB: auth_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketkatum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# Runtime stage
-FROM eclipse-temurin:17-jre-alpine
-WORKDIR /app
+  bus-db:
+    image: postgres:15-alpine
+    container_name: bus-db
+    environment:
+      POSTGRES_DB: bus_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5434:5432"
+    volumes:
+      - bus-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketkatum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# Create non-root user for security
-RUN addgroup -S spring && adduser -S spring -G spring
+  hotel-db:
+    image: postgres:15-alpine
+    container_name: hotel-db
+    environment:
+      POSTGRES_DB: hotel_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5435:5432"
+    volumes:
+      - hotel-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketkatum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# Install curl for health checks
-RUN apk add --no-cache curl
+  booking-db:
+    image: postgres:15-alpine
+    container_name: booking-db
+    environment:
+      POSTGRES_DB: booking_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5436:5432"
+    volumes:
+      - booking-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketkatum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-# Copy JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
-
-# Change ownership
-RUN chown -R spring:spring /app
-
-# Switch to non-root user
-USER spring:spring
-
-# Expose port
-EXPOSE 8081
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:8081/actuator/health || exit 1
-
-# JVM options optimized for containers
-ENV JAVA_OPTS="-Xms512m -Xmx1024m \
-  -XX:+UseG1GC \
-  -XX:MaxGCPauseMillis=200 \
-  -XX:+UseContainerSupport \
-  -XX:InitialRAMPercentage=50.0 \
-  -XX:MaxRAMPercentage=80.0 \
-  -XX:+HeapDumpOnOutOfMemoryError \
-  -XX:HeapDumpPath=/app/logs/heap-dump.hprof \
-  -Djava.security.egd=file:/dev/./urandom"
-
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+  payment-db:
+    image: postgres:15-alpine
+    container_name: payment-db
+    environment:
+      POSTGRES_DB: payment_service_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    ports:
+      - "5437:5432"
+    volumes:
+      - payment-db-data:/var/lib/postgresql/data
+    networks:
+      - ticketkatum-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

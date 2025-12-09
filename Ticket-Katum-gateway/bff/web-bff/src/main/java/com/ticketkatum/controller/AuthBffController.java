@@ -5,9 +5,10 @@ import com.ticketkatum.client.UserServiceClient;
 import com.ticketkatum.dto.AggregatedLoginResponse;
 import com.ticketkatum.dto.AggregatedUserDashboard;
 import com.ticketkatum.dto.Response;
-import com.ticketkatum.dto.UserDto;
 import com.ticketkatum.dto.auth.ActiveSessionsResponse;
+import com.ticketkatum.dto.auth.CreateUserRequest;
 import com.ticketkatum.dto.auth.UserActivitySummary;
+import com.ticketkatum.dto.auth.UserDto;
 import com.ticketkatum.dto.auth.request.LoginRequest;
 import com.ticketkatum.dto.auth.response.LogoutAllResponse;
 import com.ticketkatum.dto.auth.response.LogoutResponse;
@@ -239,9 +240,9 @@ public class AuthBffController {
     @PostMapping("/register")
     @Operation(summary = "Register user", description = "Register new user account")
     public CompletableFuture<ResponseEntity<Response<UserDto>>> register(
-            @Valid @RequestBody UserDto userDto) {
+            @Valid @RequestBody CreateUserRequest userDto) {
 
-        log.info("BFF: Registering new user: {}", userDto.getUsername());
+        log.info("BFF: Registering new user: {}", userDto.getEmail());
 
         return authClient.registerUser(userDto)
                 .thenApply(user -> ResponseEntity.status(201).body(

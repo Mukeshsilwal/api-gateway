@@ -1,6 +1,7 @@
 package com.ticketkatum.dto;
 
 import com.ticketkatum.dto.auth.ActiveSessionsResponse;
+import com.ticketkatum.dto.auth.UserDto;
 import com.ticketkatum.dto.auth.UserStatistics;
 import com.ticketkatum.dto.booking.BookingSummary;
 import com.ticketkatum.dto.payment.PaymentHistory;

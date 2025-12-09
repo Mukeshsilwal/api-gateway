@@ -1,43 +1,72 @@
 package com.ticketkatum.controller;
 
+import com.ticketkatum.model.CreateUserRequest;
+import com.ticketkatum.model.UpdateUserRequest;
 import com.ticketkatum.model.UserDto;
-import com.ticketkatum.service.UserService;
+import com.ticketkatum.service.serviceimpl.UserService;
+import com.ticketkatum.utils.Response;
+import com.ticketkatum.utils.ResponseHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
-
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Integer id) {
-        UserDto userDto = this.userService.getUserById(id);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<Response<UserDto>> createUser(@RequestBody CreateUserRequest request) {
+        log.info("Creating user: {}", request.getEmail());
+        UserDto user = userService.createUser(request);
+        Response<UserDto> response = ResponseHandler.success(
+                "User registered successfully",
+                user
+        );
+        return  ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<UserDto>> getAllUser() {
-        List<UserDto> userDto = this.userService.getAllUser();
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUser(id));
+    }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<UserDto> getUserByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers(
+            @RequestParam(required = false) String role) {
+        return ResponseEntity.ok(userService.getAllUsers(role));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable Integer id) {
-        UserDto userDto1 = this.userService.updateUser(userDto, id);
-        return new ResponseEntity<>(userDto, HttpStatus.OK);
+    public ResponseEntity<UserDto> updateUser(
+            @PathVariable Long id,
+            @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
-    @PostMapping("/")
-    public ResponseEntity<UserDto> createUser(@Validated @RequestBody UserDto userDto) {
-        UserDto userDto1 = this.userService.createUser(userDto);
-        return new ResponseEntity<>(userDto1, HttpStatus.CREATED);
+    @PutMapping("/{email}/credentials-status")
+    public ResponseEntity<Void> updateUserCredentialsStatus(
+            @PathVariable String email,
+            @RequestParam boolean nonExpired) {
+        userService.updateCredentialsStatus(email, nonExpired);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.ok().build();
     }
 }

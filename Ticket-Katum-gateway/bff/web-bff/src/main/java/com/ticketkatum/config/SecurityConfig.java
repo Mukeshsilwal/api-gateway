@@ -37,6 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints - ORDER MATTERS!
                         .requestMatchers("/api/bff/v1/auth/**").permitAll()
+                        // Allow gateway public paths to forward to BFF (rewritten by ApiPathRewriteFilter)
+                        .requestMatchers("/api/web/v1/auth/**").permitAll()
                         .requestMatchers(
                                 "/actuator/**",
                                 "/health/**",

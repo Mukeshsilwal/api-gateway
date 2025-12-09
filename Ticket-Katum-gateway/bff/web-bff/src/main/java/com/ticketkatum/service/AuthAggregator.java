@@ -4,10 +4,7 @@ import com.ticketkatum.client.AuthServiceClient;
 import com.ticketkatum.client.UserServiceClient;
 import com.ticketkatum.dto.AggregatedLoginResponse;
 import com.ticketkatum.dto.AggregatedUserDashboard;
-import com.ticketkatum.dto.UserDto;
-import com.ticketkatum.dto.auth.ActiveSessionsResponse;
-import com.ticketkatum.dto.auth.UserActivitySummary;
-import com.ticketkatum.dto.auth.UserStatistics;
+import com.ticketkatum.dto.auth.*;
 import com.ticketkatum.dto.auth.request.LoginRequest;
 import com.ticketkatum.dto.auth.response.SessionValidationResponse;
 import com.ticketkatum.exception.AggregationException;
@@ -19,7 +16,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 /**
  * Authentication Domain Aggregator
@@ -43,7 +39,9 @@ public class AuthAggregator {
 
         return authClient.login(loginRequest, ipAddress, userAgent)
                 .thenCompose(loginResponse -> {
-                    // Fetch additional user data in parallel
+                    if (loginResponse == null) {
+                        throw new AggregationException("Login failed: empty response from auth service");
+                    }
                     CompletableFuture<UserDto> userFuture =
                             userClient.getUserById(extractUserId(loginResponse.getUsername()));
 
@@ -51,21 +49,22 @@ public class AuthAggregator {
                             authClient.getOnlineUserCount();
 
                     return CompletableFuture.allOf(userFuture, onlineCountFuture)
-                            .thenApply(v ->
-                                    AggregatedLoginResponse.builder()
-                                            .authData(loginResponse)
-                                            .userProfile(userFuture.join())
-                                            .onlineUserCount(onlineCountFuture.join())
-                                            .recentBookings(Collections.emptyList())
-                                            .userPreferences(new HashMap<>())
-                                            .build()
+                            .thenApply(v -> AggregatedLoginResponse.builder()
+                                    .authData(loginResponse)
+                                    .userProfile(userFuture.join())
+                                    .onlineUserCount(onlineCountFuture.join())
+                                    .recentBookings(Collections.emptyList())
+                                    .userPreferences(new HashMap<>())
+                                    .build()
                             );
                 })
                 .exceptionally(ex -> {
                     log.error("Error in aggregated login", ex);
                     throw new AggregationException("Login aggregation failed", ex);
                 });
+
     }
+
 
     /**
      * Get user dashboard with bookings and statistics

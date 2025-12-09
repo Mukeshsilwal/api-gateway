@@ -1,10 +1,13 @@
 package com.ticketkatum.controller;
 
+import com.ticketkatum.model.CreateRegistrationRequest;
 import com.ticketkatum.model.JwtRequest;
+import com.ticketkatum.model.LoginResponse;
 import com.ticketkatum.model.UserDto;
 import com.ticketkatum.security.JwtService;
-import com.ticketkatum.service.UserService;
 import com.ticketkatum.service.UserSessionService;
+import com.ticketkatum.service.serviceimpl.RegistrationService;
+import com.ticketkatum.service.serviceimpl.UserService;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.utils.ResponseHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,123 +45,60 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthController {
 
-    private final UserService userService;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UserSessionService sessionService;
     private final AuthenticationManager authenticationManager;
+    private final RegistrationService registrationService;
 
     /**
      * User login endpoint
      * Creates JWT token and session
      */
     @PostMapping("/login")
-    public ResponseEntity<Response<Map<String, Object>>> login(
+    public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody JwtRequest loginRequest,
             HttpServletRequest request) {
 
-        try {
-            // Validate input
-            if (loginRequest.getUsername() == null || loginRequest.getUsername().trim().isEmpty()) {
-                throw new IllegalArgumentException("Username cannot be empty");
-            }
-            if (loginRequest.getPassword() == null || loginRequest.getPassword().isEmpty()) {
-                throw new IllegalArgumentException("Password cannot be empty");
-            }
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
 
-            log.info("Login attempt for user: {}", loginRequest.getUsername());
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-            // Authenticate using Spring Security
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getUsername(),
-                            loginRequest.getPassword()
-                    )
-            );
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        List<String> roles = userDetails.getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String sessionId = sessionService.createSession(
+                loginRequest.getUsername(),
+                accessToken,
+                Map.of(
+                        "ipAddress", getClientIP(request),
+                        "userAgent", getUserAgent(request),
+                        "roles", roles,
+                        "loginTime", System.currentTimeMillis()
+                )
+        );
 
-            // Generate JWT token
-            String accessToken = jwtService.generateAccessToken(userDetails);
-            String refreshToken = jwtService.generateRefreshToken(userDetails);
+        LoginResponse loginResponse = LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .sessionId(sessionId)
+                .username(userDetails.getUsername())
+                .roles(roles)
+                .activeSessionCount(sessionService.getUserSessionCount(loginRequest.getUsername()))
+                .tokenType("Bearer")
+                .build();
 
-            // Extract roles
-            List<String> roles = userDetails.getAuthorities()
-                    .stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList());
-
-            // Prepare session data
-            Map<String, Object> sessionData = new HashMap<>();
-            sessionData.put("ipAddress", getClientIP(request));
-            sessionData.put("userAgent", getUserAgent(request));
-            sessionData.put("roles", roles);
-            sessionData.put("loginTime", System.currentTimeMillis());
-
-            // Create session in Redis
-            String sessionId = sessionService.createSession(
-                    loginRequest.getUsername(),
-                    accessToken,
-                    sessionData
-            );
-
-            // Get active session count
-            Long sessionCount = sessionService.getUserSessionCount(loginRequest.getUsername());
-
-            // Prepare response
-            Map<String, Object> responseData = new HashMap<>();
-            responseData.put("accessToken", accessToken);
-            responseData.put("refreshToken", refreshToken);
-            responseData.put("sessionId", sessionId);
-            responseData.put("username", userDetails.getUsername());
-            responseData.put("roles", roles);
-            responseData.put("activeSessionCount", sessionCount);
-            responseData.put("tokenType", "Bearer");
-
-            log.info("User {} logged in successfully. Active sessions: {}",
-                    loginRequest.getUsername(), sessionCount);
-
-            Response<Map<String, Object>> response = ResponseHandler.success(
-                    "Login successful",
-                    responseData
-            );
-            return ResponseEntity.ok(response);
-
-        } catch (BadCredentialsException e) {
-            log.warn("Invalid credentials for user: {}", loginRequest.getUsername());
-            Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Invalid username or password"
-            );
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-
-        } catch (DisabledException e) {
-            log.warn("Disabled account login attempt: {}", loginRequest.getUsername());
-            Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Account is disabled. Please contact support."
-            );
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-
-        } catch (UsernameNotFoundException e) {
-            log.warn("User not found: {}", loginRequest.getUsername());
-            Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Invalid username or password"
-            );
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-
-        } catch (IllegalArgumentException e) {
-            log.warn("Invalid login request: {}", e.getMessage());
-            Response<Map<String, Object>> response = ResponseHandler.failure(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-
-        } catch (Exception e) {
-            log.error("Unexpected error during login for user: {}",
-                    loginRequest.getUsername(), e);
-            Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Login failed. Please try again later."
-            );
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        return  ResponseEntity.status(HttpStatus.CREATED).body(loginResponse);
     }
 
     /**
@@ -408,18 +348,17 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<Response<UserDto>> registerUser(
-            @Valid @RequestBody UserDto userDto) {
+            @Valid @RequestBody CreateRegistrationRequest createRegistrationRequest) {
 
         try {
-            log.info("Attempting to register user: {}", userDto.getFullName());
+            log.info("Attempting to register user: {}", createRegistrationRequest.getEmail());
 
-            UserDto savedUser = userService.createUser(userDto);
+            registrationService.registerAdmin(createRegistrationRequest);
 
-            log.info("User registered successfully: {}", savedUser.getFullName());
 
             Response<UserDto> response = ResponseHandler.success(
                     "User registered successfully",
-                    savedUser
+                    null
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
@@ -429,7 +368,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 
         } catch (Exception e) {
-            log.error("Error creating user: {}", userDto.getUsername(), e);
+            log.error("Error creating user: {}", createRegistrationRequest.getEmail(), e);
             Response<UserDto> response = ResponseHandler.failure(
                     "Registration failed. Please try again."
             );

@@ -1,7 +1,7 @@
 package com.ticketkatum.client;
 
 import com.ticketkatum.config.ServiceUrlConfig;
-import com.ticketkatum.dto.UserDto;
+import com.ticketkatum.dto.auth.UserDto;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -77,7 +77,7 @@ public class UserServiceClient {
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
     @Retry(name = "user-service")
     public CompletableFuture<UserDto> createUser(UserDto userDto) {
-        log.debug("Creating user: {}", userDto.getUsername());
+        log.debug("Creating user: {}", userDto.getEmail());
 
         return getWebClient()
                 .post()
@@ -93,7 +93,7 @@ public class UserServiceClient {
         log.warn("Fallback: getUserById for ID: {}", userId);
         return CompletableFuture.completedFuture(
                 UserDto.builder()
-                        .username("User information unavailable")
+                        .email("User information unavailable")
                         .build()
         );
     }

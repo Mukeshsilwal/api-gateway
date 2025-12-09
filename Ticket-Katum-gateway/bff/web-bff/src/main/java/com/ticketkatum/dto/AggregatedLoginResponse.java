@@ -1,5 +1,6 @@
 package com.ticketkatum.dto;
 
+import com.ticketkatum.dto.auth.UserDto;
 import com.ticketkatum.dto.auth.response.LoginResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

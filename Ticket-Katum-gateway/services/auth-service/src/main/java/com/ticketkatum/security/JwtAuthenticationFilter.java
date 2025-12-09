@@ -64,7 +64,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/actuator/health",
             "/v3/api-docs/**",
             "/swagger-ui/**",
-            "/error"
+            "/error",
+            "/api/users/**"
     );
 
     @Override

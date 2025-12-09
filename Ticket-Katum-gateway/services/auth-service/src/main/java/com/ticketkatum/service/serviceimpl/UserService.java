@@ -1,0 +1,149 @@
+package com.ticketkatum.service.serviceimpl;
+
+import com.ticketkatum.entity.User;
+import com.ticketkatum.enums.Role;
+import com.ticketkatum.exceotions.DuplicateResourceException;
+import com.ticketkatum.exceotions.ResourceNotFoundException;
+import com.ticketkatum.model.CreateUserRequest;
+import com.ticketkatum.model.UpdateUserRequest;
+import com.ticketkatum.model.UserDto;
+import com.ticketkatum.repository.UserRepo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepo userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UserDto createUser(CreateUserRequest request) {
+        log.info("Creating user with email: {}", request.getEmail());
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("User with email already exists: " + request.getEmail());
+        }
+
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.valueOf(request.getRole()))
+                .organizationName(request.getOrganizationName())
+                .enabled(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(false) // Force password change on first login
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        user = userRepository.save(user);
+        log.info("User created with ID: {}", user.getId());
+
+        return mapToDto(user);
+    }
+
+    public UserDto getUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        return mapToDto(user);
+    }
+
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+        return mapToDto(user);
+    }
+
+    public List<UserDto> getAllUsers(String role) {
+        List<User> users;
+
+        if (role != null && !role.isEmpty()) {
+            users = userRepository.findByRole(Role.valueOf(role));
+        } else {
+            users = userRepository.findAll();
+        }
+
+        return users.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public UserDto updateUser(Long id, UpdateUserRequest request) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+
+        if (request.getFirstName() != null) {
+            user.setFirstName(request.getFirstName());
+        }
+        if (request.getLastName() != null) {
+            user.setLastName(request.getLastName());
+        }
+        if (request.getPhoneNumber() != null) {
+            user.setPhoneNumber(request.getPhoneNumber());
+        }
+        if (request.getOrganizationName() != null) {
+            user.setOrganizationName(request.getOrganizationName());
+        }
+        if (request.getEnabled() != null) {
+            user.setEnabled(request.getEnabled());
+        }
+        if (request.getAccountNonLocked() != null) {
+            user.setAccountNonLocked(request.getAccountNonLocked());
+        }
+
+        user.setUpdatedAt(LocalDateTime.now());
+        user = userRepository.save(user);
+
+        log.info("User updated: {}", id);
+        return mapToDto(user);
+    }
+
+    @Transactional
+    public void updateCredentialsStatus(String email, boolean nonExpired) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
+
+        user.setCredentialsNonExpired(nonExpired);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Updated credentials status for user: {}", email);
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found: " + id);
+        }
+        userRepository.deleteById(id);
+        log.info("User deleted: {}", id);
+    }
+
+    private UserDto mapToDto(User user) {
+        return UserDto.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .phoneNumber(user.getPhoneNumber())
+                .role(user.getRole().name())
+                .organizationName(user.getOrganizationName())
+                .enabled(user.getEnabled())
+                .accountNonLocked(user.getAccountNonLocked())
+                .credentialsNonExpired(user.getCredentialsNonExpired())
+                .build();
+    }
+}

@@ -21,13 +21,13 @@ public class ServiceUrlConfig {
     private String maintenanceServiceUrl;
     private String staffServiceUrl;
     private String imageServiceUrl;
+    private String registrationServiceUrl;
+    private String bookingServiceUrl;
 
     // ============ Authentication & User Services ============
     private String authServiceUrl;
     private String userServiceUrl;
 
-    // ============ Booking Services ============
-    private String bookingServiceUrl;
 
     // ============ Bus Ticketing Services ============
     private String busServiceUrl;

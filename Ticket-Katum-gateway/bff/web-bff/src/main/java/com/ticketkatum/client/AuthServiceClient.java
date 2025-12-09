@@ -2,8 +2,9 @@ package com.ticketkatum.client;
 
 import com.ticketkatum.config.ServiceUrlConfig;
 import com.ticketkatum.dto.Response;
-import com.ticketkatum.dto.UserDto;
 import com.ticketkatum.dto.auth.ActiveSessionsResponse;
+import com.ticketkatum.dto.auth.CreateUserRequest;
+import com.ticketkatum.dto.auth.UserDto;
 import com.ticketkatum.dto.auth.request.LoginRequest;
 import com.ticketkatum.dto.auth.response.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -181,12 +182,12 @@ public class AuthServiceClient {
      */
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
     @Retry(name = SERVICE_NAME)
-    public CompletableFuture<UserDto> registerUser(UserDto userDto) {
-        log.debug("Registering new user: {}", userDto.getUsername());
+    public CompletableFuture<UserDto>   registerUser(CreateUserRequest userDto) {
+        log.debug("Registering new user: {}", userDto.getEmail());
 
         return getWebClient()
                 .post()
-                .uri("/auth/register")
+                .uri("/api/users")
                 .bodyValue(userDto)
                 .retrieve()
                 .bodyToMono(Response.class)
