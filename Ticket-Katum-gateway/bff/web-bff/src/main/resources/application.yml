@@ -1,0 +1,527 @@
+# ============================================================
+# TICKET KATUM WEB-BFF - COMPLETE CONFIGURATION
+# Backend for Frontend Layer
+# Supports: Hotel Management + Bus Ticketing + Authentication
+# ============================================================
+
+spring:
+  application:
+    name: ticket-katum-web-bff
+
+  # Server Configuration
+  server:
+    port: ${SERVER_PORT:8080}
+    servlet:
+      context-path: /
+    compression:
+      enabled: true
+      mime-types: application/json,application/xml,text/html,text/xml,text/plain
+    error:
+      include-message: always
+      include-binding-errors: always
+  servlet:
+    multipart:
+          enabled: true
+          max-file-size: 10MB
+          max-request-size: 20MB
+          file-size-threshold: 2KB
+
+# ============================================================
+# MICROSERVICES URLs
+# ============================================================
+microservices:
+  # ========== Hotel Management Services ==========
+  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8087}
+  recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8082}
+  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8086}
+  maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8084}
+  staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8085}
+  image-service-url: ${IMAGE_SERVICE_URL:http://localhost:8086}
+
+  # ========== Authentication & User Services ==========
+  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8082}
+  user-service-url: ${USER_SERVICE_URL:http://localhost:8082}
+
+  # ========== Booking Services ==========
+  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8091}
+
+  # ========== Bus Ticketing Services ==========
+  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8083}
+  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8083}
+  route-service-url: ${ROUTE_SERVICE_URL:http://localhost:8083}
+  seat-service-url: ${SEAT_SERVICE_URL:http://localhost:8083}
+  ticket-service-url: ${TICKET_SERVICE_URL:http://localhost:8083}
+  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8083}
+
+  # ========== Common Services ==========
+  notification-service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8091}
+  email-service-url: ${EMAIL_SERVICE_URL:http://localhost:8092}
+  sms-service-url: ${SMS_SERVICE_URL:http://localhost:8093}
+
+  # ========== Timeout Configuration ==========
+  timeout:
+    connection-timeout: ${CONNECTION_TIMEOUT:5000}  # 5 seconds
+    response-timeout: ${RESPONSE_TIMEOUT:10000}     # 10 seconds
+    read-timeout: ${READ_TIMEOUT:10000}              # 10 seconds
+
+# ============================================================
+# RESILIENCE4J CONFIGURATION
+# Circuit Breakers, Retries, Bulkheads
+# ============================================================
+resilience4j:
+  circuitbreaker:
+    instances:
+      # ========== Hotel Services ==========
+      hotelService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+        recordExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+
+      recommendationService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+
+      paymentService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 15s
+        failureRateThreshold: 30
+        recordExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+
+      maintenanceService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+
+      staffService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+
+      imageService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+
+      # ========== Auth & User Services ==========
+      authService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 30
+        recordExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+
+      userService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+
+      # ========== Booking Services ==========
+      bookingService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 15s
+        failureRateThreshold: 40
+
+      # ========== Bus Services ==========
+      busService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        recordExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+
+  # ========== Retry Configuration ==========
+  retry:
+    instances:
+      hotel-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+          - org.springframework.web.reactive.function.client.WebClientRequestException
+
+      recommendation-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+      payment-service:
+        maxAttempts: 2
+        waitDuration: 1s
+
+      maintenance-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+      staff-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+      image-service:
+        maxAttempts: 2
+        waitDuration: 1s
+
+      auth-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+
+      user-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+
+      booking-service:
+        maxAttempts: 2
+        waitDuration: 1s
+
+      bus-service:
+        maxAttempts: 3
+        waitDuration: 500ms
+        retryExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+
+  # ========== Bulkhead Configuration ==========
+  bulkhead:
+    instances:
+      hotelService:
+        maxConcurrentCalls: 50
+        maxWaitDuration: 500ms
+
+      recommendationService:
+        maxConcurrentCalls: 50
+        maxWaitDuration: 500ms
+
+      paymentService:
+        maxConcurrentCalls: 20
+        maxWaitDuration: 1s
+
+      authService:
+        maxConcurrentCalls: 100
+        maxWaitDuration: 500ms
+
+      busService:
+        maxConcurrentCalls: 50
+        maxWaitDuration: 500ms
+
+# ============================================================
+# THREAD POOL CONFIGURATION
+# For Async Operations
+# ============================================================
+async:
+  executor:
+    core-pool-size: 20
+    max-pool-size: 100
+    queue-capacity: 200
+    thread-name-prefix: bff-async-
+    keep-alive-seconds: 60
+
+# ============================================================
+# LOGGING CONFIGURATION
+# ============================================================
+logging:
+  level:
+    root: INFO
+    com.ticketkatum: DEBUG
+    org.springframework.web: DEBUG
+    io.github.resilience4j: DEBUG
+    org.springframework.web.reactive.function.client: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/web-bff.log
+    max-size: 10MB
+    max-history: 30
+    total-size-cap: 1GB
+
+# ============================================================
+# ACTUATOR CONFIGURATION
+# Health Checks & Monitoring
+# ============================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,circuitbreakers,retries,bulkheads
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  health:
+    circuitbreakers:
+      enabled: true
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+# ============================================================
+# SWAGGER/OPENAPI CONFIGURATION
+# API Documentation
+# ============================================================
+springdoc:
+  api-docs:
+    path: /api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    displayRequestDuration: true
+    filter: true
+  show-actuator: true
+  packages-to-scan: com.ticketkatum.webbff.controller
+  paths-to-match: /api/bff/**
+
+# ============================================================
+# CORS CONFIGURATION
+# Cross-Origin Resource Sharing
+# ============================================================
+cors:
+  allowed-origins:
+    - http://localhost:3000          # React dev
+    - http://localhost:4200          # Angular dev
+    - http://localhost:8080          # Local testing
+    - https://ticketkatum.com        # Production
+    - https://www.ticketkatum.com    # Production www
+    - https://admin.ticketkatum.com  # Admin portal
+  allowed-methods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - PATCH
+    - OPTIONS
+  allowed-headers: "*"
+  exposed-headers:
+    - Content-Disposition
+    - X-Total-Count
+    - X-Page-Number
+  allow-credentials: true
+  max-age: 3600
+
+# ============================================================
+# CACHE CONFIGURATION
+# Redis/In-Memory Caching
+# ============================================================
+cache:
+  enabled: ${CACHE_ENABLED:true}
+  ttl: 300 # 5 minutes default
+  redis:
+    enabled: ${REDIS_ENABLED:false}
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DB:0}
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: -1ms
+
+# ============================================================
+# RATE LIMITING CONFIGURATION
+# Request Rate Limits
+# ============================================================
+rate-limit:
+  enabled: ${RATE_LIMIT_ENABLED:true}
+  requests-per-minute: 100
+  burst-capacity: 200
+  replenish-rate: 100
+
+# ============================================================
+# MONITORING & TRACING
+# Distributed Tracing with Jaeger
+# ============================================================
+tracing:
+  enabled: ${TRACING_ENABLED:false}
+  jaeger:
+    host: ${JAEGER_HOST:localhost}
+    port: ${JAEGER_PORT:6831}
+    service-name: ticket-katum-web-bff
+
+# ============================================================
+# FEATURE FLAGS
+# Enable/Disable Features
+# ============================================================
+features:
+  # Hotel Features
+  personalized-recommendations: true
+  hotel-batch-operations: true
+  advanced-search: true
+  cache-warming: true
+
+  # Bus Features
+  bus-search-enabled: true
+  seat-auto-generation: true
+  ticket-pdf-generation: true
+  email-notifications: true
+  sms-notifications: false
+
+  # Booking Features
+  payment-integration: true
+  booking-cancellation: true
+  refund-processing: true
+
+  # Admin Features
+  bulk-operations: true
+  dashboard-analytics: true
+
+# ============================================================
+# SECURITY CONFIGURATION
+# ============================================================
+security:
+  jwt:
+    secret: ${JWT_SECRET:655468576D5A7133743677397A24432646294A404E635266556A586E32723575}
+    expiration: 86400000 # 24 hours
+    refresh-expiration: 604800000 # 7 days
+
+  api-key:
+    enabled: false
+    header-name: X-API-Key
+
+# ============================================================
+# DATABASE CONFIGURATION (if BFF needs direct DB access)
+# ============================================================
+#spring:
+#  datasource:
+#    url: ${DB_URL:jdbc:postgresql://localhost:5432/ticketkatum_bff}
+#    username: ${DB_USERNAME:postgres}
+#    password: ${DB_PASSWORD:password}
+#    driver-class-name: org.postgresql.Driver
+#  jpa:
+#    hibernate:
+#      ddl-auto: validate
+#    show-sql: false
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.PostgreSQLDialect
+#        format_sql: true
+
+# ============================================================
+# NOTIFICATION CONFIGURATION
+# Email & SMS Settings
+# ============================================================
+notification:
+  email:
+    enabled: ${EMAIL_ENABLED:true}
+    from: noreply@ticketkatum.com
+    smtp:
+      host: ${SMTP_HOST:smtp.gmail.com}
+      port: ${SMTP_PORT:587}
+      username: ${SMTP_USERNAME:}
+      password: ${SMTP_PASSWORD:}
+      auth: true
+      starttls: true
+
+  sms:
+    enabled: ${SMS_ENABLED:false}
+    provider: ${SMS_PROVIDER:sparrow}
+    api-key: ${SMS_API_KEY:}
+
+# ============================================================
+# FILE UPLOAD CONFIGURATION
+# ============================================================
+
+# ============================================================
+# PROFILES
+# ============================================================
+---
+# Development Profile
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    com.ticketkatum: DEBUG
+
+features:
+  email-notifications: false
+  sms-notifications: false
+
+---
+# Production Profile
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    root: WARN
+    com.ticketkatum: INFO
+
+features:
+  email-notifications: true
+  sms-notifications: true
+
+rate-limit:
+  requests-per-minute: 60
+
+---
+# Staging Profile
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+logging:
+  level:
+    com.ticketkatum: INFO
+
+features:
+  email-notifications: true
+  sms-notifications: false
