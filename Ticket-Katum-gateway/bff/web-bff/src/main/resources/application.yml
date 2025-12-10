@@ -7,24 +7,26 @@
 spring:
   application:
     name: ticket-katum-web-bff
+  zipkin:
+    enabled: false
 
-  # Server Configuration
-  server:
-    port: ${SERVER_PORT:8080}
+    # Server Configuration
+    server:
+      port: ${SERVER_PORT:8080}
+      servlet:
+        context-path: /
+      compression:
+        enabled: true
+        mime-types: application/json,application/xml,text/html,text/xml,text/plain
+      error:
+        include-message: always
+        include-binding-errors: always
     servlet:
-      context-path: /
-    compression:
-      enabled: true
-      mime-types: application/json,application/xml,text/html,text/xml,text/plain
-    error:
-      include-message: always
-      include-binding-errors: always
-  servlet:
-    multipart:
-          enabled: true
-          max-file-size: 10MB
-          max-request-size: 20MB
-          file-size-threshold: 2KB
+      multipart:
+        enabled: true
+        max-file-size: 10MB
+        max-request-size: 20MB
+        file-size-threshold: 2KB
 
 # ============================================================
 # MICROSERVICES URLs

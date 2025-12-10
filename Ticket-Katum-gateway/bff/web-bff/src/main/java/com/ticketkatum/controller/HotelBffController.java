@@ -23,7 +23,7 @@ import java.util.concurrent.CompletableFuture;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/hotels")
+@RequestMapping("/api/bff/v1/hotels")
 @RequiredArgsConstructor
 public class HotelBffController {
 
@@ -35,7 +35,7 @@ public class HotelBffController {
      * Create a new hotel
      * POST /api/v1/hotels
      */
-    @PostMapping
+    @PostMapping("/create")
     public CompletableFuture<ResponseEntity<Response<HotelDTO>>> createHotel(
             @Valid @RequestBody CreateHotelRequest request) {
 

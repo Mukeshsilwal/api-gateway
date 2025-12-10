@@ -49,7 +49,7 @@ public class HotelController {
      * GET /api/hotels/{hotelId}
      */
     @GetMapping("/{hotelId}")
-    public ResponseEntity<Response<HotelDTO>> getHotel(@PathVariable Long hotelId) {
+    public ResponseEntity<Response<HotelDTO>> getHotel(@PathVariable("hotelId") Long hotelId) {
         log.info("Fetching hotel with ID: {}", hotelId);
 
         try {
@@ -301,7 +301,7 @@ public class HotelController {
      * GET /api/hotels/code/{hotelCode}
      */
     @GetMapping("/code/{hotelCode}")
-    public ResponseEntity<Response<HotelDTO>> getHotelByCode(@PathVariable String hotelCode) {
+    public ResponseEntity<Response<HotelDTO>> getHotelByCode(@PathVariable("hotelCode") String hotelCode) {
         log.info("Fetching hotel with code: {}", hotelCode);
 
         try {

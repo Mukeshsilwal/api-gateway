@@ -350,11 +350,13 @@ public class HotelServiceClient {
                 .build());
     }
 
-    // Helper methods for object mapping
     private <T> T objectMapper(Object data, Class<T> clazz) {
-        // Use Jackson ObjectMapper or similar
         com.fasterxml.jackson.databind.ObjectMapper mapper =
                 new com.fasterxml.jackson.databind.ObjectMapper();
+
+        mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
         return mapper.convertValue(data, clazz);
     }
 

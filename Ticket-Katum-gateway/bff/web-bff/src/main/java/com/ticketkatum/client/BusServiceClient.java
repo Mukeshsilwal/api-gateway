@@ -37,10 +37,10 @@ public class BusServiceClient {
 
     private final WebClient.Builder webClientBuilder;
 
-    @Value("${services.bus-service.url}")
+    @Value("${microservices.bus-service-url}")
     private String busServiceUrl;
 
-    @Value("${services.bus-service.timeout:5000}")
+    @Value("${microservices.bus-service.timeout:5000}")
     private int timeout;
 
     private static final String SERVICE_NAME = "bus-service";
@@ -64,6 +64,184 @@ public class BusServiceClient {
                 .doOnSuccess(bus -> log.info("Bus created successfully: {}", bus.getId()))
                 .doOnError(error -> log.error("Failed to create bus: {}", error.getMessage()))
                 .onErrorMap(this::mapError)
+                .toFuture();
+    }
+
+
+    // ==================== Admin / Bus Stop Operations ====================
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createBusStopFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BusStopDto> createBusStop(BusStopDto busStopDto) {
+        log.info("Creating bus stop: {}", busStopDto.getName());
+
+        return webClientBuilder.build()
+                .post()
+                .uri(busServiceUrl + "/admin/post")
+                .bodyValue(busStopDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BusStopDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "updateBusStopFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BusStopDto> updateBusStop(long id, BusStopDto busStopDto) {
+        log.info("Updating bus stop with ID: {}", id);
+
+        return webClientBuilder.build()
+                .put()
+                .uri(busServiceUrl + "/admin/updateBusStop/{id}", id)
+                .bodyValue(busStopDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BusStopDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "deleteBusStopFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<Void> deleteBusStop(long id) {
+        log.info("Deleting bus stop with ID: {}", id);
+
+        return webClientBuilder.build()
+                .delete()
+                .uri(busServiceUrl + "/admin/deleteBusStop/{id}", id)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .toFuture();
+    }
+
+// ==================== Admin / Route Operations ====================
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createRouteFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<RouteDto> createRouteWithBusStops(long id1, long id2, RouteDto routeDto) {
+        log.info("Creating route with bus stops {} and {}", id1, id2);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(busServiceUrl + "/admin/busStopRoute/{id1}/{id2}", id1, id2)
+                .bodyValue(routeDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<RouteDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "deleteRouteFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<Void> deleteRoute(long routeId) {
+        log.info("Deleting route with ID: {}", routeId);
+
+        return webClientBuilder.build()
+                .delete()
+                .uri(busServiceUrl + "/admin/deleteRoute/{id}", routeId)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .toFuture();
+    }
+
+// ==================== Admin / Bus-Route Operations ====================
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createBusInRouteFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BusDto> createBusInRoute(long routeId, BusDto busDto) {
+        log.info("Creating bus in route: {}", routeId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(busServiceUrl + "/admin/routeBus/{id}", routeId)
+                .bodyValue(busDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "updateBusInRouteFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BusDto> updateBusInRoute(long busId, int routeId, BusDto busDto) {
+        log.info("Updating bus {} with route {}", busId, routeId);
+
+        return webClientBuilder.build()
+                .put()
+                .uri(busServiceUrl + "/admin/bus/{id}/route/{routeId}", busId, routeId)
+                .bodyValue(busDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "deleteBusInRouteFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<Void> deleteBusInRoute(long busId) {
+        log.info("Deleting bus: {}", busId);
+
+        return webClientBuilder.build()
+                .delete()
+                .uri(busServiceUrl + "/admin/deleteBus/{id}", busId)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .toFuture();
+    }
+
+// ==================== Admin / Seat Operations ====================
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createSeatFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<SeatDto> createSeatForBus(long busId, SeatDto seatDto) {
+        log.info("Creating seat for bus: {}", busId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(busServiceUrl + "/admin/postSeat/{id}", busId)
+                .bodyValue(seatDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "updateSeatFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<SeatDto> updateSeat(long seatId, SeatDto seatDto) {
+        log.info("Updating seat: {}", seatId);
+
+        return webClientBuilder.build()
+                .put()
+                .uri(busServiceUrl + "/admin/updateSeat/{id}", seatId)
+                .bodyValue(seatDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {})
+                .map(Response::getData)
+                .toFuture();
+    }
+
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "deleteSeatFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<Void> deleteSeat(long seatId) {
+        log.info("Deleting seat: {}", seatId);
+
+        return webClientBuilder.build()
+                .delete()
+                .uri(busServiceUrl + "/admin/deleteSeat/{id}", seatId)
+                .retrieve()
+                .bodyToMono(Void.class)
                 .toFuture();
     }
 

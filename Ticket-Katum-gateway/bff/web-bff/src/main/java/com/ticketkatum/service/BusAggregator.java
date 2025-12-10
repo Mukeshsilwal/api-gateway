@@ -75,78 +75,78 @@ public class BusAggregator {
      * Search buses with complete information
      * Aggregates: bus search, route details, seat availability
      */
-    public CompletableFuture<AggregatedBusSearchResults> searchBusesWithDetails(
-            BusSearchRequest searchRequest) {
-
-        log.info("Searching buses: {} to {} on {}",
-                searchRequest.getSource(),
-                searchRequest.getDestination(),
-                searchRequest.getDate());
-
-        return busClient.searchBuses(searchRequest)
-                .thenCompose(searchResponse -> {
-                    List<BusDto> buses = searchResponse.getBuses();
-
-                    // Fetch complete info for each bus in parallel
-                    List<CompletableFuture<EnrichedBusDto>> enrichedFutures = buses.stream()
-                            .map(bus -> enrichBusWithDetails(bus))
-                            .toList();
-
-                    return CompletableFuture.allOf(
-                            enrichedFutures.toArray(new CompletableFuture[0])
-                    ).thenApply(v -> {
-                        List<EnrichedBusDto> enrichedBuses = enrichedFutures.stream()
-                                .map(CompletableFuture::join)
-                                .collect(Collectors.toList());
-
-                        return AggregatedBusSearchResults.builder()
-                                .buses(enrichedBuses)
-                                .searchCriteria(searchRequest)
-                                .priceRange(calculatePriceRange(enrichedBuses))
-                                .availableOperators(extractOperators(enrichedBuses))
-                                .earliestDeparture(findEarliestDeparture(enrichedBuses))
-                                .latestDeparture(findLatestDeparture(enrichedBuses))
-                                .hasMoreResults(searchResponse.isHasMore())
-                                .nextCursor(searchResponse.getNextCursor())
-                                .build();
-                    });
-                })
-                .exceptionally(ex -> {
-                    log.error("Error in bus search aggregation", ex);
-                    throw new AggregationException("Bus search failed", ex);
-                });
-    }
-
-    /**
-     * Get route with bus stops and buses
-     */
-    public CompletableFuture<CompleteRouteInfo> getCompleteRouteInfo(Integer routeId) {
-        log.info("Aggregating complete route info for routeId: {}", routeId);
-
-        CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(routeId);
-
-        return routeFuture.thenCompose(route -> {
-                    List<BusStopDto> busStops = fetchBusStopsForRoute(route);
-
-                    CompletableFuture<List<BusDto>> busesFuture =
-                            busClient.getBusesByRoute(routeId);
-
-                    return busesFuture.thenApply(buses ->
-                            CompleteRouteInfo.builder()
-                                    .route(route)
-                                    .busStops(busStops)
-                                    .buses(buses)
-                                    .totalBuses(buses.size())
-                                    .totalDistance(calculateTotalDistance(busStops))
-                                    .estimatedDuration(calculateEstimatedDuration(route))
-                                    .build()
-                    );
-                })
-                .exceptionally(ex -> {
-                    log.error("Error aggregating route info", ex);
-                    throw new AggregationException("Route aggregation failed", ex);
-                });
-    }
+//    public CompletableFuture<AggregatedBusSearchResults> searchBusesWithDetails(
+//            BusSearchRequest searchRequest) {
+//
+//        log.info("Searching buses: {} to {} on {}",
+//                searchRequest.getSource(),
+//                searchRequest.getDestination(),
+//                searchRequest.getDate());
+//
+//        return busClient.searchBuses(searchRequest)
+//                .thenCompose(searchResponse -> {
+//                    List<BusDto> buses = searchResponse.getBuses();
+//
+//                    // Fetch complete info for each bus in parallel
+//                    List<CompletableFuture<EnrichedBusDto>> enrichedFutures = buses.stream()
+//                            .map(bus -> enrichBusWithDetails(bus))
+//                            .toList();
+//
+//                    return CompletableFuture.allOf(
+//                            enrichedFutures.toArray(new CompletableFuture[0])
+//                    ).thenApply(v -> {
+//                        List<EnrichedBusDto> enrichedBuses = enrichedFutures.stream()
+//                                .map(CompletableFuture::join)
+//                                .collect(Collectors.toList());
+//
+//                        return AggregatedBusSearchResults.builder()
+//                                .buses(enrichedBuses)
+//                                .searchCriteria(searchRequest)
+//                                .priceRange(calculatePriceRange(enrichedBuses))
+//                                .availableOperators(extractOperators(enrichedBuses))
+//                                .earliestDeparture(findEarliestDeparture(enrichedBuses))
+//                                .latestDeparture(findLatestDeparture(enrichedBuses))
+//                                .hasMoreResults(searchResponse.isHasMore())
+//                                .nextCursor(searchResponse.getNextCursor())
+//                                .build();
+//                    });
+//                })
+//                .exceptionally(ex -> {
+//                    log.error("Error in bus search aggregation", ex);
+//                    throw new AggregationException("Bus search failed", ex);
+//                });
+//    }
+//
+//    /**
+//     * Get route with bus stops and buses
+//     */
+//    public CompletableFuture<CompleteRouteInfo> getCompleteRouteInfo(Integer routeId) {
+//        log.info("Aggregating complete route info for routeId: {}", routeId);
+//
+//        CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(routeId);
+//
+//        return routeFuture.thenCompose(route -> {
+//                    List<BusStopDto> busStops = fetchBusStopsForRoute(route);
+//
+//                    CompletableFuture<List<BusDto>> busesFuture =
+//                            busClient.getBusesByRoute(routeId);
+//
+//                    return busesFuture.thenApply(buses ->
+//                            CompleteRouteInfo.builder()
+//                                    .route(route)
+//                                    .busStops(busStops)
+//                                    .buses(buses)
+//                                    .totalBuses(buses.size())
+//                                    .totalDistance(calculateTotalDistance(busStops))
+//                                    .estimatedDuration(calculateEstimatedDuration(route))
+//                                    .build()
+//                    );
+//                })
+//                .exceptionally(ex -> {
+//                    log.error("Error aggregating route info", ex);
+//                    throw new AggregationException("Route aggregation failed", ex);
+//                });
+//    }
 
     /**
      * Get all bus stops with routes
