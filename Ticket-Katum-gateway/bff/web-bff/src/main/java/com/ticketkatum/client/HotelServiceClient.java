@@ -297,6 +297,8 @@ public class HotelServiceClient {
                 .toFuture();
     }
 
+
+
     // ============ Fallback Methods ============
 
     private CompletableFuture<HotelDTO> getHotelByIdFallback(Long hotelId, Throwable ex) {

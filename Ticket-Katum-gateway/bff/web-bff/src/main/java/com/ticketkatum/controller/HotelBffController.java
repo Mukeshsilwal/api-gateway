@@ -1,234 +1,443 @@
 package com.ticketkatum.controller;
 
-import com.ticketkatum.dto.*;
-import com.ticketkatum.dto.hotel.HotelManagementDashboard;
+import com.ticketkatum.client.HotelServiceClient;
+import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.hotel.HotelDTO;
 import com.ticketkatum.dto.hotel.HotelSearchCriteria;
-import com.ticketkatum.dto.hotel.HotelSummaryDTO;
-import com.ticketkatum.exception.*;
-import com.ticketkatum.service.HotelAggregator;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.ticketkatum.dto.hotel.RoomDTO;
+import com.ticketkatum.dto.hotel.request.CreateHotelRequest;
+import com.ticketkatum.dto.hotel.request.CreateRoomRequest;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.UUID;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * Hotel Controller for Web BFF
+ * Proxies requests to Hotel Management Microservice
+ */
 @Slf4j
 @RestController
-@RequestMapping("/api/bff/v1/hotels")
+@RequestMapping("/api/v1/hotels")
 @RequiredArgsConstructor
-@Validated
-@Tag(name = "Hotel BFF", description = "Hotel aggregated APIs")
-@SecurityRequirement(name = "bearer-jwt")
 public class HotelBffController {
 
-    private final HotelAggregator hotelAggregator;
-    private static final long OPERATION_TIMEOUT_SECONDS = 30;
+    private final HotelServiceClient hotelClient;
 
-    @GetMapping("/{hotelId}/complete")
-    @Operation(summary = "Get complete hotel details",
-            description = "Returns hotel with rooms, staff, maintenance status, and recommendations")
-    public CompletableFuture<ResponseEntity<Response<AggregatedHotelDetails>>> getCompleteHotelDetails(
-            @Parameter(description = "Hotel ID") @PathVariable @Min(1) Long hotelId,
-            @Parameter(description = "User ID for personalization")
-            @RequestHeader(value = "X-User-Id", required = false) String userId) {
+    // ============ Hotel Operations ============
 
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Fetching complete hotel details for hotelId: {}", correlationId, hotelId);
+    /**
+     * Create a new hotel
+     * POST /api/v1/hotels
+     */
+    @PostMapping
+    public CompletableFuture<ResponseEntity<Response<HotelDTO>>> createHotel(
+            @Valid @RequestBody CreateHotelRequest request) {
 
-        return hotelAggregator.getCompleteHotelDetails(hotelId, userId)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(details -> {
-                    log.info("[{}] Hotel details retrieved successfully", correlationId);
-                    return ResponseEntity.ok(
-                            Response.<AggregatedHotelDetails>builder()
-                                    .statusCode(HttpStatus.OK.value())
-                                    .message("Hotel details retrieved successfully")
-                                    .data(details)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    throw handleAsyncException(ex, correlationId, "Get hotel details");
-                });
-    }
+        log.info("Creating hotel: {}", request.getName());
 
-    @PostMapping("/search")
-    @Operation(summary = "Search hotels with recommendations",
-            description = "Advanced hotel search with personalized recommendations")
-    public CompletableFuture<ResponseEntity<Response<AggregatedSearchResults>>> searchHotelsWithRecommendations(
-            @Valid @RequestBody HotelSearchCriteria criteria,
-            @RequestHeader(value = "X-User-Id", required = false) String userId) {
-
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Searching hotels for user: {}", correlationId, userId);
-
-        return hotelAggregator.searchHotelsWithRecommendations(criteria, userId)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(results -> {
-                    log.info("[{}] Search completed: {} results found",
-                            correlationId, results.getTotalResults());
-                    return ResponseEntity.ok(
-                            Response.<AggregatedSearchResults>builder()
-                                    .statusCode(HttpStatus.OK.value())
-                                    .message("Search completed successfully")
-                                    .data(results)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    throw handleAsyncException(ex, correlationId, "Search hotels");
-                });
-    }
-
-    @GetMapping("/{hotelId}/dashboard")
-    @PreAuthorize("hasAnyRole('ADMIN', 'HOTEL_MANAGER')")
-    @Operation(summary = "Get hotel management dashboard",
-            description = "Returns comprehensive dashboard data for hotel management. Requires ADMIN or HOTEL_MANAGER role.")
-    public CompletableFuture<ResponseEntity<Response<HotelManagementDashboard>>> getManagementDashboard(
-            @PathVariable @Min(1) Long hotelId) {
-
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Fetching management dashboard for hotelId: {}", correlationId, hotelId);
-
-        return hotelAggregator.getManagementDashboard(hotelId)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(dashboard -> {
-                    log.info("[{}] Dashboard data retrieved successfully", correlationId);
-                    return ResponseEntity.ok(
-                            Response.<HotelManagementDashboard>builder()
-                                    .statusCode(HttpStatus.OK.value())
-                                    .message("Dashboard data retrieved successfully")
-                                    .data(dashboard)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    throw handleAsyncException(ex, correlationId, "Get dashboard");
-                });
-    }
-
-    @GetMapping("/home")
-    @Operation(summary = "Get home page hotel data",
-            description = "Returns all hotel data needed for home page rendering")
-    public CompletableFuture<ResponseEntity<Response<HomePageData>>> getHomePageData(
-            @RequestHeader(value = "X-User-Id", required = false) String userId,
-            @RequestParam(required = false) @Min(-90) @Max(90) Double lat,
-            @RequestParam(required = false) @Min(-180) @Max(180) Double lon) {
-
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Fetching home page hotel data for user: {}", correlationId, userId);
-
-
-        return hotelAggregator.getHomePageData(userId, lat, lon)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(data -> {
-                    log.info("[{}] Home page data retrieved successfully", correlationId);
-                    return ResponseEntity.ok(
-                            Response.<HomePageData>builder()
-                                    .statusCode(HttpStatus.OK.value())
-                                    .message("Home page data retrieved successfully")
-                                    .data(data)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    throw handleAsyncException(ex, correlationId, "Get home page data");
-                });
-    }
-
-    @GetMapping("/quick-search")
-    @Operation(summary = "Quick hotel search",
-            description = "Fast search endpoint with minimal data for mobile clients")
-    public CompletableFuture<ResponseEntity<Response<AggregatedSearchResults>>> quickSearch(
-            @RequestParam String city,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) @Min(1) @Max(5) Integer minStars,
-            @RequestParam(defaultValue = "10") @Min(1) @Max(50) Integer limit,
-            @RequestHeader(value = "X-User-Id", required = false) String userId) {
-
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Quick search - city: {}, maxPrice: {}", correlationId, city, maxPrice);
-
-        HotelSearchCriteria criteria = HotelSearchCriteria.builder()
-                .city(city.trim())
-                .maxPrice(maxPrice)
-                .minStars(minStars)
-                .limit(limit)
-                .build();
-
-        return hotelAggregator.searchHotelsWithRecommendations(criteria, userId)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(results -> {
-                    log.info("[{}] Quick search completed: {} results", correlationId, results.getTotalResults());
-                    return ResponseEntity.ok(
-                            Response.<AggregatedSearchResults>builder()
-                                    .statusCode(HttpStatus.OK.value())
-                                    .message("Quick search completed successfully")
-                                    .data(results)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    throw handleAsyncException(ex, correlationId, "Quick search");
-                });
-    }
-
-    @GetMapping("/{hotelId}/summary")
-    @Operation(summary = "Get hotel summary",
-            description = "Returns lightweight hotel data optimized for listing views")
-    public CompletableFuture<ResponseEntity<Response<HotelSummaryDTO>>> getHotelSummary(
-            @PathVariable @Min(1) Long hotelId,
-            @RequestParam(required = false) @Min(-90) @Max(90) Double userLat,
-            @RequestParam(required = false) @Min(-180) @Max(180) Double userLon) {
-
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Fetching hotel summary for hotelId: {}", correlationId, hotelId);
-
-        return hotelAggregator.getCompleteHotelDetails(hotelId, null)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(details -> {
-                    HotelSummaryDTO summary = HotelSummaryDTO.builder()
-                            .id(details.getHotel().getId())
-                            .name(details.getHotel().getName())
-                            .city(details.getHotel().getCity())
-                            .stars(details.getHotel().getStars())
-                            .averageRating(details.getAverageRating())
-                            .reviewCount(details.getReviewCount())
-                            .priceRange(details.getPriceRange())
-                            .availableRooms(details.getAvailableRooms())
-                            .thumbnailImage(details.getHotel().getImageUrl())
+        return hotelClient.createHotel(request)
+                .thenApply(hotel -> {
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(200)
+                            .message("Hotel created successfully")
+                            .data(hotel)
                             .build();
-
-                    log.info("[{}] Hotel summary retrieved successfully", correlationId);
-                    return ResponseEntity.ok(
-                            Response.<HotelSummaryDTO>builder()
-                                    .statusCode(HttpStatus.OK.value())
-                                    .message("Hotel summary retrieved successfully")
-                                    .data(summary)
-                                    .build());
+                    return ResponseEntity.status(HttpStatus.CREATED).body(response);
                 })
                 .exceptionally(ex -> {
-                    throw handleAsyncException(ex, correlationId, "Get hotel summary");
+                    log.error("Error creating hotel", ex);
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(500)
+                            .message("Failed to create hotel: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
                 });
     }
 
-    private RuntimeException handleAsyncException(Throwable ex, String correlationId, String operation) {
-        Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
-        log.error("[{}] {} failed: {}", correlationId, operation, cause.getMessage(), cause);
+    /**
+     * Get hotel by ID
+     * GET /api/v1/hotels/{hotelId}
+     */
+    @GetMapping("/{hotelId}")
+    public CompletableFuture<ResponseEntity<Response<HotelDTO>>> getHotel(
+            @PathVariable Long hotelId) {
 
-        if (cause instanceof RuntimeException) {
-            return (RuntimeException) cause;
-        }
-        return new BusinessException("OPERATION_FAILED",
-                operation + " failed: " + cause.getMessage(), cause);
+        log.info("Fetching hotel with ID: {}", hotelId);
+
+        return hotelClient.getHotelById(hotelId)
+                .thenApply(hotel -> {
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(200)
+                            .message("Hotel retrieved successfully")
+                            .data(hotel)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching hotel {}", hotelId, ex);
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(500)
+                            .message("Hotel not found: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                });
+    }
+
+    /**
+     * Get hotel by code
+     * GET /api/v1/hotels/code/{hotelCode}
+     */
+    @GetMapping("/code/{hotelCode}")
+    public CompletableFuture<ResponseEntity<Response<HotelDTO>>> getHotelByCode(
+            @PathVariable String hotelCode) {
+
+        log.info("Fetching hotel with code: {}", hotelCode);
+
+        return hotelClient.getHotelByCode(hotelCode)
+                .thenApply(hotel -> {
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(200)
+                            .message("Hotel retrieved successfully")
+                            .data(hotel)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching hotel by code {}", hotelCode, ex);
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(500)
+                            .message("Hotel not found: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                });
+    }
+
+    /**
+     * Get all hotels with optional filters
+     * GET /api/v1/hotels?city=Kathmandu&minStars=4
+     */
+    @GetMapping
+    public CompletableFuture<ResponseEntity<Response<List<HotelDTO>>>> getAllHotels(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) Integer minStars) {
+
+        log.info("Fetching all hotels - city: {}, minStars: {}", city, minStars);
+
+        return hotelClient.getAllHotels(city, minStars)
+                .thenApply(hotels -> {
+                    Response<List<HotelDTO>> response = Response.<List<HotelDTO>>builder()
+                            .statusCode(200)
+                            .message("Found " + hotels.size() + " hotels")
+                            .data(hotels)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching hotels", ex);
+                    Response<List<HotelDTO>> response = Response.<List<HotelDTO>>builder()
+                            .statusCode(500)
+                            .message("Failed to fetch hotels: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
+    }
+
+    /**
+     * Search hotels by criteria
+     * POST /api/v1/hotels/search
+     */
+    @PostMapping("/search")
+    public CompletableFuture<ResponseEntity<Response<List<HotelDTO>>>> searchHotels(
+            @RequestBody HotelSearchCriteria criteria) {
+
+        log.info("Searching hotels with criteria: {}", criteria);
+
+        return hotelClient.searchHotels(criteria)
+                .thenApply(hotels -> {
+                    Response<List<HotelDTO>> response = Response.<List<HotelDTO>>builder()
+                            .statusCode(200)
+                            .message("Found " + hotels.size() + " hotels")
+                            .data(hotels)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error searching hotels", ex);
+                    Response<List<HotelDTO>> response = Response.<List<HotelDTO>>builder()
+                            .statusCode(500)
+                            .message("Search failed: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
+    }
+
+    /**
+     * Update hotel
+     * PUT /api/v1/hotels/{hotelId}
+     */
+    @PutMapping("/{hotelId}")
+    public CompletableFuture<ResponseEntity<Response<HotelDTO>>> updateHotel(
+            @PathVariable Long hotelId,
+            @Valid @RequestBody CreateHotelRequest request) {
+
+        log.info("Updating hotel: {}", hotelId);
+
+        return hotelClient.updateHotel(hotelId, request)
+                .thenApply(hotel -> {
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(200)
+                            .message("Hotel updated successfully")
+                            .data(hotel)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error updating hotel {}", hotelId, ex);
+                    Response<HotelDTO> response = Response.<HotelDTO>builder()
+                            .statusCode(500)
+                            .message("Failed to update hotel: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                });
+    }
+
+    /**
+     * Delete hotel
+     * DELETE /api/v1/hotels/{hotelId}
+     */
+    @DeleteMapping("/{hotelId}")
+    public CompletableFuture<ResponseEntity<Response<Void>>> deleteHotel(
+            @PathVariable Long hotelId) {
+
+        log.info("Deleting hotel: {}", hotelId);
+
+        return hotelClient.deleteHotel(hotelId)
+                .thenApply(v -> {
+                    Response<Void> response = Response.<Void>builder()
+                            .statusCode(200)
+                            .message("Hotel deleted successfully")
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error deleting hotel {}", hotelId, ex);
+                    Response<Void> response = Response.<Void>builder()
+                            .statusCode(500)
+                            .message("Failed to delete hotel: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
+    }
+
+    // ============ Room Operations ============
+
+    /**
+     * Add room to hotel
+     * POST /api/v1/hotels/{hotelCode}/rooms
+     */
+    @PostMapping("/{hotelCode}/rooms")
+    public CompletableFuture<ResponseEntity<Response<RoomDTO>>> addRoomToHotel(
+            @PathVariable String hotelCode,
+            @Valid @RequestBody CreateRoomRequest request) {
+
+        log.info("Adding room to hotel: {}", hotelCode);
+
+        return hotelClient.addRoom(hotelCode, request)
+                .thenApply(room -> {
+                    Response<RoomDTO> response = Response.<RoomDTO>builder()
+                            .statusCode(200)
+                            .message("Room added successfully")
+                            .data(room)
+                            .build();
+                    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error adding room to hotel {}", hotelCode, ex);
+                    Response<RoomDTO> response = Response.<RoomDTO>builder()
+                            .statusCode(500)
+                            .message("Failed to add room: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                });
+    }
+
+    /**
+     * Get rooms by hotel code
+     * GET /api/v1/hotels/{hotelCode}/rooms
+     */
+    @GetMapping("/{hotelCode}/rooms")
+    public CompletableFuture<ResponseEntity<Response<List<RoomDTO>>>> getRoomsByHotelCode(
+            @PathVariable String hotelCode) {
+
+        log.info("Fetching rooms for hotel: {}", hotelCode);
+
+        return hotelClient.getRoomsByHotelCode(hotelCode)
+                .thenApply(rooms -> {
+                    Response<List<RoomDTO>> response = Response.<List<RoomDTO>>builder()
+                            .statusCode(200)
+                            .message("Found " + rooms.size() + " rooms")
+                            .data(rooms)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching rooms for hotel {}", hotelCode, ex);
+                    Response<List<RoomDTO>> response = Response.<List<RoomDTO>>builder()
+                            .statusCode(500)
+                            .message("Failed to fetch rooms: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
+    }
+
+    /**
+     * Get rooms by hotel ID
+     * GET /api/v1/hotels/hotel/{hotelId}/rooms
+     */
+    @GetMapping("/hotel/{hotelId}/rooms")
+    public CompletableFuture<ResponseEntity<Response<List<RoomDTO>>>> getRoomsByHotelId(
+            @PathVariable Long hotelId) {
+
+        log.info("Fetching rooms for hotel ID: {}", hotelId);
+
+        return hotelClient.getRoomsByHotelId(hotelId)
+                .thenApply(rooms -> {
+                    Response<List<RoomDTO>> response = Response.<List<RoomDTO>>builder()
+                            .statusCode(200)
+                            .message("Found " + rooms.size() + " rooms")
+                            .data(rooms)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching rooms for hotel ID {}", hotelId, ex);
+                    Response<List<RoomDTO>> response = Response.<List<RoomDTO>>builder()
+                            .statusCode(500)
+                            .message("Failed to fetch rooms: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
+    }
+
+    /**
+     * Get room by ID
+     * GET /api/v1/hotels/rooms/{roomId}
+     */
+    @GetMapping("/rooms/{roomId}")
+    public CompletableFuture<ResponseEntity<Response<RoomDTO>>> getRoomById(
+            @PathVariable Long roomId) {
+
+        log.info("Fetching room with ID: {}", roomId);
+
+        return hotelClient.getRoomById(roomId)
+                .thenApply(room -> {
+                    Response<RoomDTO> response = Response.<RoomDTO>builder()
+                            .statusCode(200)
+                            .message("Room retrieved successfully")
+                            .data(room)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching room {}", roomId, ex);
+                    Response<RoomDTO> response = Response.<RoomDTO>builder()
+                            .statusCode(500)
+                            .message("Room not found: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                });
+    }
+
+    /**
+     * Get multiple rooms by IDs
+     * POST /api/v1/hotels/rooms/batch
+     */
+    @PostMapping("/rooms/batch")
+    public CompletableFuture<ResponseEntity<Response<List<RoomDTO>>>> getRoomsByIds(
+            @RequestBody List<Long> roomIds) {
+
+        log.info("Fetching rooms by IDs: {}", roomIds);
+
+        return hotelClient.getRoomsByIds(roomIds)
+                .thenApply(rooms -> {
+                    Response<List<RoomDTO>> response = Response.<List<RoomDTO>>builder()
+                            .statusCode(200)
+                            .message("Found " + rooms.size() + " rooms")
+                            .data(rooms)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error fetching rooms by IDs", ex);
+                    Response<List<RoomDTO>> response = Response.<List<RoomDTO>>builder()
+                            .statusCode(500)
+                            .message("Failed to fetch rooms: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
+    }
+
+    /**
+     * Update room
+     * PUT /api/v1/hotels/rooms/{roomId}
+     */
+    @PutMapping("/rooms/{roomId}")
+    public CompletableFuture<ResponseEntity<Response<RoomDTO>>> updateRoom(
+            @PathVariable Long roomId,
+            @Valid @RequestBody CreateRoomRequest request) {
+
+        log.info("Updating room: {}", roomId);
+
+        return hotelClient.updateRoom(roomId, request)
+                .thenApply(room -> {
+                    Response<RoomDTO> response = Response.<RoomDTO>builder()
+                            .statusCode(200)
+                            .message("Room updated successfully")
+                            .data(room)
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error updating room {}", roomId, ex);
+                    Response<RoomDTO> response = Response.<RoomDTO>builder()
+                            .statusCode(500)
+                            .message("Failed to update room: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+                });
+    }
+
+    /**
+     * Delete room
+     * DELETE /api/v1/hotels/rooms/{roomId}
+     */
+    @DeleteMapping("/rooms/{roomId}")
+    public CompletableFuture<ResponseEntity<Response<Void>>> deleteRoom(
+            @PathVariable Long roomId) {
+
+        log.info("Deleting room: {}", roomId);
+
+        return hotelClient.deleteRoom(roomId)
+                .thenApply(v -> {
+                    Response<Void> response = Response.<Void>builder()
+                            .statusCode(200)
+                            .message("Room deleted successfully")
+                            .build();
+                    return ResponseEntity.ok(response);
+                })
+                .exceptionally(ex -> {
+                    log.error("Error deleting room {}", roomId, ex);
+                    Response<Void> response = Response.<Void>builder()
+                            .statusCode(500)
+                            .message("Failed to delete room: " + ex.getMessage())
+                            .build();
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+                });
     }
 }
