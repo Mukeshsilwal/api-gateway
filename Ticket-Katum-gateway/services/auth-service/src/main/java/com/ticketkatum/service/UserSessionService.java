@@ -7,7 +7,6 @@ import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -83,15 +82,16 @@ public class UserSessionService {
             redisTemplate.opsForHash().putAll(sessionKey, sessionData);
             redisTemplate.expire(sessionKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
 
-            // Track user's active sessions as Set
+            // Track user's active sessions as ZSet (Sorted Set) for O(1) access to oldest
             String userSessionsKey = buildUserSessionsKey(username);
             try {
-                redisTemplate.opsForSet().add(userSessionsKey, sessionId);
+                // Use timestamp as score for sorting by age
+                redisTemplate.opsForZSet().add(userSessionsKey, sessionId, now.toEpochSecond(ZoneOffset.UTC));
                 redisTemplate.expire(userSessionsKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             } catch (RedisSystemException e) {
-                log.warn("Detected wrong Redis key type for {}. Deleting and recreating as Set.", userSessionsKey);
+                log.warn("Detected wrong Redis key type for {}. Deleting and recreating as ZSet.", userSessionsKey);
                 redisTemplate.delete(userSessionsKey);
-                redisTemplate.opsForSet().add(userSessionsKey, sessionId);
+                redisTemplate.opsForZSet().add(userSessionsKey, sessionId, now.toEpochSecond(ZoneOffset.UTC));
                 redisTemplate.expire(userSessionsKey, SESSION_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             }
 
@@ -208,14 +208,25 @@ public class UserSessionService {
         try {
             String sessionKey = buildSessionKey(sessionId);
 
-            // Check if session exists
-            Boolean exists = redisTemplate.hasKey(sessionKey);
-            if (Boolean.TRUE.equals(exists)) {
-                redisTemplate.expire(sessionKey, SESSION_EXTENSION_SECONDS, TimeUnit.SECONDS);
+            // Need to fetch username first to update active status
+            Object username = redisTemplate.opsForHash().get(sessionKey, "username");
 
-                // Update expiresAt timestamp
-                LocalDateTime newExpiry = LocalDateTime.now().plusSeconds(SESSION_EXTENSION_SECONDS);
-                redisTemplate.opsForHash().put(sessionKey, "expiresAt", newExpiry.format(DATE_FORMATTER));
+            if (username != null) {
+                // Pipeline the write operations for performance
+                redisTemplate.executePipelined(new org.springframework.data.redis.core.SessionCallback<Object>() {
+                    @Override
+                    public Object execute(org.springframework.data.redis.core.RedisOperations operations) {
+                        operations.expire(sessionKey, SESSION_EXTENSION_SECONDS, TimeUnit.SECONDS);
+
+                        // Update expiresAt timestamp
+                        LocalDateTime newExpiry = LocalDateTime.now().plusSeconds(SESSION_EXTENSION_SECONDS);
+                        operations.opsForHash().put(sessionKey, "expiresAt", newExpiry.format(DATE_FORMATTER));
+
+                        // Refresh user in active users list
+                        operations.opsForZSet().add(ACTIVE_USERS_KEY, username, Instant.now().getEpochSecond());
+                        return null;
+                    }
+                });
 
                 log.debug("Extended session: {}", sessionId);
             }
@@ -246,12 +257,12 @@ public class UserSessionService {
             if (username != null) {
                 String usernameStr = username.toString();
 
-                // Remove from user's sessions
+                // Remove from user's sessions (ZSet)
                 String userSessionsKey = buildUserSessionsKey(usernameStr);
-                redisTemplate.opsForSet().remove(userSessionsKey, sessionId);
+                redisTemplate.opsForZSet().remove(userSessionsKey, sessionId);
 
                 // Check if user has other active sessions
-                Long remainingSessions = redisTemplate.opsForSet().size(userSessionsKey);
+                Long remainingSessions = redisTemplate.opsForZSet().zCard(userSessionsKey);
                 if (remainingSessions == null || remainingSessions == 0) {
                     // Remove from active users if no sessions remain
                     redisTemplate.opsForZSet().remove(ACTIVE_USERS_KEY, usernameStr);
@@ -280,7 +291,8 @@ public class UserSessionService {
 
         try {
             String userSessionsKey = buildUserSessionsKey(username);
-            Set<Object> sessionIds = redisTemplate.opsForSet().members(userSessionsKey);
+            // Use range for ZSet
+            Set<Object> sessionIds = redisTemplate.opsForZSet().range(userSessionsKey, 0, -1);
 
             long invalidatedCount = 0;
             if (sessionIds != null && !sessionIds.isEmpty()) {
@@ -318,24 +330,41 @@ public class UserSessionService {
 
         try {
             String userSessionsKey = buildUserSessionsKey(username);
-            Set<Object> sessionIds = redisTemplate.opsForSet().members(userSessionsKey);
+            // Fetch from ZSet
+            Set<Object> sessionIds = redisTemplate.opsForZSet().range(userSessionsKey, 0, -1);
 
             if (sessionIds == null || sessionIds.isEmpty()) {
                 return Collections.emptyList();
             }
 
-            List<Map<Object, Object>> sessions = new ArrayList<>();
-            for (Object sessionId : sessionIds) {
-                String sessionKey = buildSessionKey(sessionId.toString());
-                Map<Object, Object> sessionData = redisTemplate.opsForHash().entries(sessionKey);
+            // Convert to list to ensure order consistency during iteration
+            List<Object> sessionIdList = new ArrayList<>(sessionIds);
 
-                if (sessionData != null && !sessionData.isEmpty()) {
+            // Use Pipelining to fetch all session details in one network round-trip
+            List<Object> results = redisTemplate.executePipelined(new org.springframework.data.redis.core.SessionCallback<Object>() {
+                @Override
+                public Object execute(org.springframework.data.redis.core.RedisOperations operations) {
+                    for (Object sessionId : sessionIdList) {
+                        String sessionKey = buildSessionKey(sessionId.toString());
+                        operations.opsForHash().entries(sessionKey);
+                    }
+                    return null;
+                }
+            });
+
+            List<Map<Object, Object>> sessions = new ArrayList<>();
+            for (int i = 0; i < results.size(); i++) {
+                Object result = results.get(i);
+                Object sessionId = sessionIdList.get(i);
+
+                if (result instanceof Map && !((Map<?, ?>) result).isEmpty()) {
+                    Map<Object, Object> sessionData = (Map<Object, Object>) result;
                     // Remove sensitive data before returning
                     sessionData.remove("token");
                     sessions.add(sessionData);
                 } else {
                     // Clean up stale session reference
-                    redisTemplate.opsForSet().remove(userSessionsKey, sessionId);
+                    redisTemplate.opsForZSet().remove(userSessionsKey, sessionId);
                 }
             }
 
@@ -450,7 +479,8 @@ public class UserSessionService {
 
         try {
             String userSessionsKey = buildUserSessionsKey(username);
-            Long count = redisTemplate.opsForSet().size(userSessionsKey);
+            // Use zCard for ZSet
+            Long count = redisTemplate.opsForZSet().zCard(userSessionsKey);
             return count != null ? count : 0L;
 
         } catch (Exception e) {
@@ -466,29 +496,16 @@ public class UserSessionService {
     private void enforceSessionLimit(String username) {
         try {
             String userSessionsKey = buildUserSessionsKey(username);
-            Set<Object> sessionIds = redisTemplate.opsForSet().members(userSessionsKey);
+            Long count = redisTemplate.opsForZSet().zCard(userSessionsKey);
 
-            if (sessionIds != null && sessionIds.size() >= MAX_SESSIONS_PER_USER) {
-                // Find oldest session
-                String oldestSessionId = null;
-                LocalDateTime oldestTime = LocalDateTime.now();
+            if (count != null && count >= MAX_SESSIONS_PER_USER) {
+                // Efficiently find oldest session (lowest score in ZSet)
+                // O(log(N)) instead of O(N) loop
+                Set<Object> oldest = redisTemplate.opsForZSet().range(userSessionsKey, 0, 0);
 
-                for (Object sessionId : sessionIds) {
-                    String sessionKey = buildSessionKey(sessionId.toString());
-                    Object createdAtObj = redisTemplate.opsForHash().get(sessionKey, "createdAt");
-
-                    if (createdAtObj != null) {
-                        LocalDateTime createdAt = LocalDateTime.parse(createdAtObj.toString(), DATE_FORMATTER);
-                        if (createdAt.isBefore(oldestTime)) {
-                            oldestTime = createdAt;
-                            oldestSessionId = sessionId.toString();
-                        }
-                    }
-                }
-
-                // Remove oldest session
-                if (oldestSessionId != null) {
-                    invalidateSession(oldestSessionId);
+                if (oldest != null && !oldest.isEmpty()) {
+                    Object oldestSessionId = oldest.iterator().next();
+                    invalidateSession(oldestSessionId.toString());
                     log.info("Removed oldest session {} for user {} (limit: {})",
                             oldestSessionId, username, MAX_SESSIONS_PER_USER);
                 }
@@ -538,9 +555,14 @@ public class UserSessionService {
      */
     public void cleanupExpiredSessions() {
         try {
-            // Redis TTL handles automatic cleanup
-            // This method can be used for additional cleanup logic if needed
-            log.info("Session cleanup executed");
+            // Cleanup stale users from "active users" list
+            // Redis TTL handles session keys, but we need to remove users whose sessions expired naturally
+            long cutoffTimestamp = Instant.now().getEpochSecond() - SESSION_TIMEOUT_SECONDS;
+
+            // Remove users with score (last active time) older than cutoff
+            redisTemplate.opsForZSet().removeRangeByScore(ACTIVE_USERS_KEY, 0, cutoffTimestamp);
+
+            log.info("Session cleanup executed: removed inactive users");
 
         } catch (Exception e) {
             log.error("Error during session cleanup: {}", e.getMessage());

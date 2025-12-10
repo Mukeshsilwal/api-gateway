@@ -65,20 +65,20 @@ public class SecurityConfig {
                 )
                 // Add custom JWT filter
                 .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
+                        UsernamePasswordAuthenticationFilter.class);
                 // Handle authentication exceptions
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write(String.format(
-                                    "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}",
-                                    java.time.LocalDateTime.now(),
-                                    authException.getMessage(),
-                                    request.getRequestURI()
-                            ));
-                        })
-                );
+//                .exceptionHandling(exception -> exception
+//                        .authenticationEntryPoint((request, response, authException) -> {
+//                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//                            response.setContentType("application/json");
+//                            response.getWriter().write(String.format(
+//                                    "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}",
+//                                    java.time.LocalDateTime.now(),
+//                                    authException.getMessage(),
+//                                    request.getRequestURI()
+//                            ));
+//                        })
+//                );
 
         return http.build();
     }

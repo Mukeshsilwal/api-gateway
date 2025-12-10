@@ -1,12 +1,10 @@
 package com.ticketkatum.controller;
 
-import com.ticketkatum.client.RegistrationServiceClient;
-import com.ticketkatum.dto.Response;
-import com.ticketkatum.dto.auth.AdminRegistrationRequestDto;
 import com.ticketkatum.dto.auth.AdminRegistrationRequestWeb;
+import com.ticketkatum.dto.auth.request.ApiResponse;
 import com.ticketkatum.dto.auth.request.ChangePasswordRequest;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.ticketkatum.dto.auth.request.OtpRequestWeb;
+import com.ticketkatum.service.RegistrationBffService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,306 +12,236 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
-@Slf4j
+/**
+ * Registration BFF Controller
+ * Backend for Frontend layer for Registration Service
+ */
 @RestController
+@RequestMapping("/api/bff/registration")
 @RequiredArgsConstructor
-@RequestMapping("/api/bff/v1/registration")
-@Tag(name = "Registration BFF", description = "Aggregated registration APIs for admin & users")
+@Slf4j
 @CrossOrigin(origins = "*", maxAge = 3600)
 public class RegistrationBffController {
 
-    private final RegistrationServiceClient registrationClient;
+    private final RegistrationBffService bffService;
 
-    // -----------------------------------------------------------------------
-    // 1. SUBMIT ADMIN REGISTRATION REQUEST
-    // -----------------------------------------------------------------------
+    /**
+     * Submit admin registration request
+     * POST /api/bff/registration/admin/request
+     */
     @PostMapping("/admin/request")
-    @Operation(summary = "Submit admin registration request")
-    public CompletableFuture<ResponseEntity<Response<Void>>> registerAdmin(
+    public Mono<ResponseEntity<ApiResponse<String>>> registerAdmin(
             @Valid @RequestBody AdminRegistrationRequestWeb request) {
 
-        log.info("BFF: Received admin registration request for email: {}", request.getEmail());
+        log.info("BFF Controller: Received admin registration request for: {}", request.getEmail());
 
-        return registrationClient.registerAdmin(request)
-                .thenApply(resp ->
-                        ResponseEntity.status(HttpStatus.CREATED)
-                                .body(Response.<Void>builder()
-                                        .statusCode(201)
-                                        .message("Registration submitted successfully")
-                                        .data(null)
-                                        .build())
-                )
-                .exceptionally(ex -> {
-                    log.error("Registration error for email: {}", request.getEmail(), ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<Void>builder()
-                                    .statusCode(500)
-                                    .message("Internal error: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
+        return bffService.registerAdmin(request)
+                .map(response -> response.isSuccess()
+                        ? ResponseEntity.status(HttpStatus.CREATED).body(response)
+                        : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response))
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: Registration failed", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<String>builder()
+                                    .success(false)
+                                    .message("Registration failed: " + error.getMessage())
+                                    .build()));
                 });
     }
 
-    // -----------------------------------------------------------------------
-    // 2. APPROVE REGISTRATION REQUEST
-    // -----------------------------------------------------------------------
-    @PostMapping("/admin/approve/{id}")
-    @Operation(summary = "Approve admin registration request")
+    /**
+     * Approve admin registration request
+     * POST /api/bff/registration/admin/approve/{requestId}
+     */
+    @PostMapping("/admin/approve/{requestId}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public CompletableFuture<ResponseEntity<Response<Void>>> approveRequest(
-            @PathVariable Long id,
+    public Mono<ResponseEntity<ApiResponse<String>>> approveRequest(
+            @PathVariable Long requestId,
             @RequestHeader("Authorization") String authorization) {
+
+        log.info("BFF Controller: Approving request ID: {}", requestId);
 
         String token = extractToken(authorization);
 
-        log.info("BFF: Approving admin registration ID: {}", id);
-
-        return registrationClient.approveRequest(id, token)
-                .thenApply(resp -> {
-                    boolean isSuccess = resp.getStatusCode() == 200;
-
-                    return isSuccess
-                            ? ResponseEntity.ok(Response.<Void>builder()
-                            .statusCode(200)
-                            .message("Approved successfully")
-                            .data(null)
-                            .build())
-                            : ResponseEntity.status(400)
-                            .body(Response.<Void>builder()
-                                    .statusCode(400)
-                                    .message("Approval failed")
-                                    .data(null)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    log.error("Approval failed for ID {}", id, ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<Void>builder()
-                                    .statusCode(500)
-                                    .message("Internal error: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
+        return bffService.approveRequest(requestId, token)
+                .map(response -> response.isSuccess()
+                        ? ResponseEntity.ok(response)
+                        : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response))
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: Approval failed", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<String>builder()
+                                    .success(false)
+                                    .message("Approval failed: " + error.getMessage())
+                                    .build()));
                 });
     }
 
-    // -----------------------------------------------------------------------
-    // 3. GET ALL REGISTRATION REQUESTS
-    // -----------------------------------------------------------------------
+    /**
+     * Reject admin registration request
+     * DELETE /api/bff/registration/admin/reject/{requestId}
+     */
+    @DeleteMapping("/admin/reject/{requestId}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public Mono<ResponseEntity<ApiResponse<String>>> rejectRequest(
+            @PathVariable Long requestId,
+            @RequestHeader("Authorization") String authorization) {
+
+        log.info("BFF Controller: Rejecting request ID: {}", requestId);
+
+        String token = extractToken(authorization);
+
+        return bffService.rejectRequest(requestId, token)
+                .map(response -> response.isSuccess()
+                        ? ResponseEntity.ok(response)
+                        : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response))
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: Rejection failed", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<String>builder()
+                                    .success(false)
+                                    .message("Rejection failed: " + error.getMessage())
+                                    .build()));
+                });
+    }
+
+    /**
+     * Get all registration requests
+     * GET /api/bff/registration/admin/requests
+     */
     @GetMapping("/admin/requests")
-    @Operation(summary = "Get all admin registration requests")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public CompletableFuture<ResponseEntity<Response<List<AdminRegistrationRequestDto>>>> getAllRequests(
+    public Mono<ResponseEntity<ApiResponse<List<?>>>> getAllRequests(
             @RequestHeader("Authorization") String authorization) {
+
+        log.info("BFF Controller: Fetching all requests");
 
         String token = extractToken(authorization);
 
-        log.info("BFF: Fetching all registration requests");
-
-        return registrationClient.getAllRequests(token)
-                .thenApply(list ->
-                        ResponseEntity.ok(Response.<List<AdminRegistrationRequestDto>>builder()
-                                .statusCode(200)
-                                .message("Requests fetched successfully")
-                                .data(list)
-                                .build()))
-                .exceptionally(ex -> {
-                    log.error("Error retrieving requests", ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<List<AdminRegistrationRequestDto>>builder()
-                                    .statusCode(500)
-                                    .message("Cannot fetch requests: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
+        return bffService.getAllRequests(token)
+                .map(ResponseEntity::ok)
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: Failed to fetch requests", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<List<?>>builder()
+                                    .success(false)
+                                    .message("Failed to fetch requests: " + error.getMessage())
+                                    .build()));
                 });
     }
 
-    // -----------------------------------------------------------------------
-    // 4. GET REQUEST BY ID
-    // -----------------------------------------------------------------------
-    @GetMapping("/admin/requests/{id}")
-    @Operation(summary = "Get admin registration request by ID")
+    /**
+     * Get registration request by ID
+     * GET /api/bff/registration/admin/requests/{requestId}
+     */
+    @GetMapping("/admin/requests/{requestId}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public CompletableFuture<ResponseEntity<Response<AdminRegistrationRequestDto>>> getRequestById(
-            @PathVariable Long id,
+    public Mono<ResponseEntity<ApiResponse<Map<String, Object>>>> getRequestById(
+            @PathVariable Long requestId,
             @RequestHeader("Authorization") String authorization) {
+
+        log.info("BFF Controller: Fetching request ID: {}", requestId);
 
         String token = extractToken(authorization);
 
-        log.info("BFF: Fetching registration request ID: {}", id);
-
-        return registrationClient.getRequestById(id, token)
-                .thenApply(req ->
-                        req != null
-                                ? ResponseEntity.ok(Response.<AdminRegistrationRequestDto>builder()
-                                .statusCode(200)
-                                .message("Request fetched")
-                                .data(req)
-                                .build())
-                                : ResponseEntity.status(404)
-                                .body(Response.<AdminRegistrationRequestDto>builder()
-                                        .statusCode(404)
-                                        .message("Request not found")
-                                        .data(null)
-                                        .build())
-                )
-                .exceptionally(ex -> {
-                    log.error("Error fetching request ID {}", id, ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<AdminRegistrationRequestDto>builder()
-                                    .statusCode(500)
-                                    .message("Error: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
+        return bffService.getRequestById(requestId, token)
+                .map(response -> response.isSuccess()
+                        ? ResponseEntity.ok(response)
+                        : ResponseEntity.status(HttpStatus.NOT_FOUND).body(response))
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: Failed to fetch request", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<Map<String, Object>>builder()
+                                    .success(false)
+                                    .message("Failed to fetch request: " + error.getMessage())
+                                    .build()));
                 });
     }
 
-    // -----------------------------------------------------------------------
-    // 5. CHANGE PASSWORD
-    // -----------------------------------------------------------------------
+    /**
+     * Change user password
+     * POST /api/bff/registration/change-password
+     */
     @PostMapping("/change-password")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Change user password")
-    public CompletableFuture<ResponseEntity<Response<Void>>> changePassword(
+    public Mono<ResponseEntity<ApiResponse<String>>> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             @RequestHeader("Authorization") String authorization) {
 
+        log.info("BFF Controller: Changing password for: {}", request.getUsername());
+
         String token = extractToken(authorization);
 
-        log.info("BFF: Password change request for user {}", request.getUsername());
-
-        return registrationClient.changePassword(request, token)
-                .thenApply(resp -> {
-                    boolean isSuccess = resp.getStatusCode() == 200;
-
-                    return isSuccess
-                            ? ResponseEntity.ok(Response.<Void>builder()
-                            .statusCode(200)
-                            .message("Password changed")
-                            .data(null)
-                            .build())
-                            : ResponseEntity.status(400)
-                            .body(Response.<Void>builder()
-                                    .statusCode(400)
-                                    .message("Password change failed")
-                                    .data(null)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    log.error("Password change failed", ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<Void>builder()
-                                    .statusCode(500)
-                                    .message("Error: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
+        return bffService.changePassword(request, token)
+                .map(response -> response.isSuccess()
+                        ? ResponseEntity.ok(response)
+                        : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response))
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: Password change failed", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<String>builder()
+                                    .success(false)
+                                    .message("Password change failed: " + error.getMessage())
+                                    .build()));
                 });
     }
 
-    // -----------------------------------------------------------------------
-    // 6. SEND OTP
-    // -----------------------------------------------------------------------
+    /**
+     * Send OTP to user
+     * POST /api/bff/registration/send-otp
+     */
     @PostMapping("/send-otp")
-    @Operation(summary = "Send OTP to user")
-    public CompletableFuture<ResponseEntity<Response<Void>>> sendOtp(
-            @RequestBody Map<String, String> body) {
+    public Mono<ResponseEntity<ApiResponse<Map<String, Object>>>> sendOtp(
+            @Valid @RequestBody OtpRequestWeb request) {
 
-        String username = body.get("username");
+        log.info("BFF Controller: Sending OTP to: {}", request.getUsername());
 
-        log.info("BFF: Sending OTP to {}", username);
-
-        return registrationClient.sendOtp(username)
-                .thenApply(resp -> {
-                    boolean isSuccess = resp.getStatusCode() == 200;
-
-                    return isSuccess
-                            ? ResponseEntity.ok(Response.<Void>builder()
-                            .statusCode(200)
-                            .message("OTP sent")
-                            .data(null)
-                            .build())
-                            : ResponseEntity.status(400)
-                            .body(Response.<Void>builder()
-                                    .statusCode(400)
-                                    .message("OTP failed")
-                                    .data(null)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    log.error("OTP failed", ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<Void>builder()
-                                    .statusCode(500)
-                                    .message("Error: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
+        return bffService.sendOtp(request)
+                .map(response -> response.isSuccess()
+                        ? ResponseEntity.ok(response)
+                        : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response))
+                .onErrorResume(error -> {
+                    log.error("BFF Controller: OTP send failed", error);
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(ApiResponse.<Map<String, Object>>builder()
+                                    .success(false)
+                                    .message("OTP send failed: " + error.getMessage())
+                                    .build()));
                 });
     }
 
-    // -----------------------------------------------------------------------
-    // 7. REJECT REQUEST
-    // -----------------------------------------------------------------------
-    @DeleteMapping("/admin/reject/{id}")
-    @Operation(summary = "Reject admin registration request")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public CompletableFuture<ResponseEntity<Response<Void>>> rejectRequest(
-            @PathVariable Long id,
-            @RequestHeader("Authorization") String authorization) {
-
-        String token = extractToken(authorization);
-
-        log.info("BFF: Rejecting admin registration ID: {}", id);
-
-        return registrationClient.rejectRequest(id, token)
-                .thenApply(resp -> {
-                    boolean isSuccess = resp.getStatusCode() == 200;
-
-                    return isSuccess
-                            ? ResponseEntity.ok(Response.<Void>builder()
-                            .statusCode(200)
-                            .message("Rejected successfully")
-                            .data(null)
-                            .build())
-                            : ResponseEntity.status(400)
-                            .body(Response.<Void>builder()
-                                    .statusCode(400)
-                                    .message("Rejection failed")
-                                    .data(null)
-                                    .build());
-                })
-                .exceptionally(ex -> {
-                    log.error("Rejection error", ex);
-                    return ResponseEntity.status(500)
-                            .body(Response.<Void>builder()
-                                    .statusCode(500)
-                                    .message("Error: " + ex.getMessage())
-                                    .data(null)
-                                    .build());
-                });
-    }
-
-    // -----------------------------------------------------------------------
-    // HEALTH CHECK
-    // -----------------------------------------------------------------------
+    /**
+     * Health check endpoint
+     * GET /api/bff/registration/health
+     */
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
-        Map<String, String> h = new HashMap<>();
-        h.put("service", "Registration BFF");
-        h.put("status", "UP");
-        return ResponseEntity.ok(h);
+        return ResponseEntity.ok(Map.of(
+                "status", "UP",
+                "service", "Registration BFF",
+                "version", "1.0.0"
+        ));
     }
 
-    // -----------------------------------------------------------------------
-    // TOKEN EXTRACTOR
-    // -----------------------------------------------------------------------
-    private String extractToken(String header) {
-        return header != null && header.startsWith("Bearer ")
-                ? header.substring(7)
-                : header;
+    /**
+     * Extract Bearer token from Authorization header
+     */
+    private String extractToken(String authorization) {
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            return authorization.substring(7);
+        }
+        return authorization;
     }
 }

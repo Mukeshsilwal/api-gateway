@@ -23,99 +23,160 @@ public class RegistrationBffService {
 
     private final RegistrationServiceClient registrationServiceClient;
 
-    // ============================
-    // Admin Registration
-    // ============================
-
+    /**
+     * Register new admin
+     */
     public Mono<ApiResponse<String>> registerAdmin(AdminRegistrationRequestWeb request) {
         log.info("BFF: Processing admin registration request for email: {}", request.getEmail());
 
         return Mono.fromFuture(() -> registrationServiceClient.registerAdmin(request))
-                .map(resp -> ApiResponse.<String>builder().message(resp.getMessage()).data(null).build())
+                .map(resp -> ApiResponse.<String>builder()
+                        .success(true)
+                        .message(resp.getMessage())
+                        .data(resp.getData() != null ? resp.getData().toString() : null)
+                        .build())
                 .doOnSuccess(r -> log.info("BFF: Registration request successful for: {}", request.getEmail()))
                 .doOnError(e -> log.error("BFF: Registration request failed: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
+    /**
+     * Approve registration request
+     */
     public Mono<ApiResponse<String>> approveRequest(Long requestId, String bearerToken) {
         log.info("BFF: Approving registration request ID: {}", requestId);
 
         return Mono.fromFuture(() -> registrationServiceClient.approveRequest(requestId, bearerToken))
-                .map(resp -> ApiResponse.<String>builder().message(resp.getMessage()).data(null).build())
+                .map(resp -> ApiResponse.<String>builder()
+                        .success(true)
+                        .message(resp.getMessage())
+                        .data(null)
+                        .build())
                 .doOnSuccess(r -> log.info("BFF: Registration approved for ID: {}", requestId))
                 .doOnError(e -> log.error("BFF: Approval failed: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
+    /**
+     * Reject registration request
+     */
     public Mono<ApiResponse<String>> rejectRequest(Long requestId, String bearerToken) {
         log.info("BFF: Rejecting registration request ID: {}", requestId);
 
         return Mono.fromFuture(() -> registrationServiceClient.rejectRequest(requestId, bearerToken))
-                .map(resp -> ApiResponse.<String>builder().message(resp.getMessage()).data(null).build())
+                .map(resp -> ApiResponse.<String>builder()
+                        .success(true)
+                        .message(resp.getMessage())
+                        .data(null)
+                        .build())
                 .doOnSuccess(r -> log.info("BFF: Registration rejected for ID: {}", requestId))
                 .doOnError(e -> log.error("BFF: Rejection failed: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
-    // ============================
-    // Fetch Requests
-    // ============================
-
-    public Mono<ApiResponse> getAllRequests(String bearerToken) {
+    /**
+     * Get all registration requests
+     */
+    public Mono<ApiResponse<List<?>>> getAllRequests(String bearerToken) {
         log.info("BFF: Fetching all registration requests");
 
         return Mono.fromFuture(() -> registrationServiceClient.getAllRequests(bearerToken))
-                .map(list -> ApiResponse.<List<Map<String, Object>>>builder().data((List) list).message("Success").build())
-                .doOnSuccess(r -> log.info("BFF: Retrieved {} requests", r.getData()))
+                .map(list -> ApiResponse.<List<?>>builder()
+                        .success(true)
+                        .message("Requests retrieved successfully")
+                        .data(list)
+                        .count(list != null ? list.size() : 0)
+                        .build())
+                .doOnSuccess(r -> log.info("BFF: Retrieved {} requests",
+                        r.getCount() != null ? r.getCount() : 0))
                 .doOnError(e -> log.error("BFF: Failed to fetch requests: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
+    /**
+     * Get registration request by ID
+     */
     public Mono<ApiResponse<Map<String, Object>>> getRequestById(Long requestId, String bearerToken) {
         log.info("BFF: Fetching registration request ID: {}", requestId);
 
         return Mono.fromFuture(() -> registrationServiceClient.getRequestById(requestId, bearerToken))
-                .map(dto -> ApiResponse.<Map<String, Object>>builder().data(dto != null ? Map.of("request", dto) : Collections.emptyMap()).message("Success").build())
+                .map(dto -> {
+                    Map<String, Object> data = dto != null ?
+                            Map.of("request", dto) : Collections.emptyMap();
+
+                    return ApiResponse.<Map<String, Object>>builder()
+                            .success(dto != null)
+                            .message(dto != null ? "Request retrieved successfully" : "Request not found")
+                            .data(data)
+                            .build();
+                })
                 .doOnSuccess(r -> log.info("BFF: Retrieved request details for ID: {}", requestId))
                 .doOnError(e -> log.error("BFF: Failed to fetch request: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
-    // ============================
-    // Password / OTP
-    // ============================
-
+    /**
+     * Change user password
+     */
     public Mono<ApiResponse<String>> changePassword(ChangePasswordRequest request, String bearerToken) {
         log.info("BFF: Processing password change for user: {}", request.getUsername());
 
         return Mono.fromFuture(() -> registrationServiceClient.changePassword(request, bearerToken))
-                .map(resp -> ApiResponse.<String>builder().message(resp.getMessage()).data(null).build())
-                .doOnSuccess(r -> log.info("BFF: Password changed successfully"))
+                .map(resp -> ApiResponse.<String>builder()
+                        .success(true)
+                        .message(resp.getMessage())
+                        .data(null)
+                        .build())
+                .doOnSuccess(r -> log.info("BFF: Password changed successfully for user: {}",
+                        request.getUsername()))
                 .doOnError(e -> log.error("BFF: Password change failed: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
-    public Mono<ApiResponse<String>> sendOtp(OtpRequestWeb request) {
+    /**
+     * Send OTP to user
+     */
+    public Mono<ApiResponse<Map<String, Object>>> sendOtp(OtpRequestWeb request) {
         log.info("BFF: Sending OTP to user: {}", request.getUsername());
 
         return Mono.fromFuture(() -> registrationServiceClient.sendOtp(request.getUsername()))
-                .map(resp -> ApiResponse.<String>builder().message(resp.getMessage()).data(null).build())
-                .doOnSuccess(r -> log.info("BFF: OTP sent successfully"))
+                .map(resp -> {
+                    Map<String, Object> otpData = Map.of(
+                            "username", request.getUsername(),
+                            "sentAt", System.currentTimeMillis()
+                    );
+
+                    return ApiResponse.<Map<String, Object>>builder()
+                            .success(true)
+                            .message(resp.getMessage())
+                            .data(otpData)
+                            .build();
+                })
+                .doOnSuccess(r -> log.info("BFF: OTP sent successfully to: {}", request.getUsername()))
                 .doOnError(e -> log.error("BFF: OTP send failed: {}", e.getMessage()))
                 .onErrorResume(this::handleError);
     }
 
-    // ============================
-    // Error Handling
-    // ============================
-
+    /**
+     * Handle errors and convert to ApiResponse
+     */
     private <T> Mono<ApiResponse<T>> handleError(Throwable error) {
-        log.error("BFF: Unexpected error: {}", error.getMessage());
+        log.error("BFF: Error occurred: {}", error.getMessage(), error);
+
+        String errorMessage = "Service unavailable";
+
         if (error instanceof ResourceNotFoundException) {
-            return Mono.just(ApiResponse.<T>builder().message("Resource not found").data(null).build());
+            errorMessage = "Resource not found: " + error.getMessage();
         } else if (error instanceof BadRequestException) {
-            return Mono.just(ApiResponse.<T>builder().message("Bad request").data(null).build());
+            errorMessage = "Bad request: " + error.getMessage();
+        } else if (error.getMessage() != null) {
+            errorMessage = error.getMessage();
         }
-        return Mono.just(ApiResponse.<T>builder().message("Service unavailable").data(null).build());
+
+        return Mono.just(ApiResponse.<T>builder()
+                .success(false)
+                .message(errorMessage)
+                .data(null)
+                .build());
     }
 }

@@ -1,13 +1,9 @@
 package com.ticketkatum.controller;
 
-import com.ticketkatum.model.CreateRegistrationRequest;
-import com.ticketkatum.model.JwtRequest;
-import com.ticketkatum.model.LoginResponse;
-import com.ticketkatum.model.UserDto;
+import com.ticketkatum.model.*;
 import com.ticketkatum.security.JwtService;
 import com.ticketkatum.service.UserSessionService;
 import com.ticketkatum.service.serviceimpl.RegistrationService;
-import com.ticketkatum.service.serviceimpl.UserService;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.utils.ResponseHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,21 +14,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Authentication Controller
@@ -47,7 +39,6 @@ public class AuthController {
 
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
     private final UserSessionService sessionService;
     private final AuthenticationManager authenticationManager;
     private final RegistrationService registrationService;
@@ -57,7 +48,7 @@ public class AuthController {
      * Creates JWT token and session
      */
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
+    public ResponseEntity<Response<LoginResponse>> login(
             @Valid @RequestBody JwtRequest loginRequest,
             HttpServletRequest request) {
 
@@ -97,8 +88,12 @@ public class AuthController {
                 .activeSessionCount(sessionService.getUserSessionCount(loginRequest.getUsername()))
                 .tokenType("Bearer")
                 .build();
+        Response<LoginResponse> response = ResponseHandler.success(
+                "User login successfully",
+                loginResponse
+        );
 
-        return  ResponseEntity.status(HttpStatus.CREATED).body(loginResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**
@@ -106,7 +101,7 @@ public class AuthController {
      * Invalidates the current session
      */
     @PostMapping("/logout")
-    public ResponseEntity<Response<Map<String, Object>>> logout(
+    public ResponseEntity<Response<LogoutResponse>> logout(
             @RequestHeader("Session-Id") String sessionId) {
 
         try {
@@ -120,24 +115,23 @@ public class AuthController {
             sessionService.invalidateSession(sessionId);
 
             log.info("User {} logged out. Session: {}", username, sessionId);
+            LogoutResponse logoutResponse = LogoutResponse.builder().
+                    sessionId(sessionId).message("Successfully logged out").build();
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("sessionId", sessionId);
-            data.put("message", "Successfully logged out");
 
-            Response<Map<String, Object>> response = ResponseHandler.success(
+            Response<LogoutResponse> response = ResponseHandler.success(
                     "Logged out successfully",
-                    data
+                    logoutResponse
             );
-            return ResponseEntity.ok(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (IllegalArgumentException e) {
-            Response<Map<String, Object>> response = ResponseHandler.failure(e.getMessage());
+            Response<LogoutResponse> response = ResponseHandler.failure(e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 
         } catch (Exception e) {
             log.error("Error during logout for session: {}", sessionId, e);
-            Response<Map<String, Object>> response = ResponseHandler.failure(
+            Response<LogoutResponse> response = ResponseHandler.failure(
                     "Logout failed. Please try again."
             );
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

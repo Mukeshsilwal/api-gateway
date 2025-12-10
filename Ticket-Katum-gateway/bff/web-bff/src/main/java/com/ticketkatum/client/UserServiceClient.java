@@ -40,7 +40,7 @@ public class UserServiceClient {
 
         return getWebClient()
                 .get()
-                .uri("/user/{id}", userId)
+                .uri("/api/users/{id}", userId)
                 .retrieve()
                 .bodyToMono(UserDto.class)
                 .toFuture();
