@@ -22,7 +22,7 @@ import java.util.Map;
  * Backend for Frontend layer for Registration Service
  */
 @RestController
-@RequestMapping("/api/bff/registration")
+@RequestMapping("/api/bff/v1/registration")
 @RequiredArgsConstructor
 @Slf4j
 @CrossOrigin(origins = "*", maxAge = 3600)

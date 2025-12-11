@@ -41,63 +41,63 @@ public class AdminBffController {
      * Create bus with seats
      * Aggregates: bus creation, seat generation
      */
-    @PostMapping("/buses/create-with-seats")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create bus with seats",
-            description = "Create bus and generate seats in one operation. Requires ADMIN role.")
-    public CompletableFuture<ResponseEntity<Response<BusCreationResponse>>> createBusWithSeats(
-            @Valid @RequestBody BusCreationRequest request) {
-
-        String correlationId = UUID.randomUUID().toString();
-        log.info("[{}] BFF: Creating bus with {} seats for route: {}",
-                correlationId, request.getNumberOfSeats(), request.getRouteId());
-
-        // Input validation
-        if (request.getNumberOfSeats() == null || request.getNumberOfSeats() <= 0) {
-            log.warn("[{}] Invalid seat count: {}", correlationId, request.getNumberOfSeats());
-            return CompletableFuture.completedFuture(
-                    ResponseEntity.badRequest().body(
-                            Response.<BusCreationResponse>builder()
-                                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                                    .message("Number of seats must be greater than 0")
-                                    .data(null)
-                                    .build()
-                    )
-            );
-        }
-
-        if (request.getNumberOfSeats() > 100) {
-            log.warn("[{}] Seat count exceeds maximum: {}", correlationId, request.getNumberOfSeats());
-            return CompletableFuture.completedFuture(
-                    ResponseEntity.badRequest().body(
-                            Response.<BusCreationResponse>builder()
-                                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                                    .message("Number of seats cannot exceed 100")
-                                    .data(null)
-                                    .build()
-                    )
-            );
-        }
-
-        return adminAggregator.createBusWithSeats(
-                        request.getBusDto(),
-                        request.getRouteId(),
-                        request.getNumberOfSeats()
-                )
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(response -> {
-                    log.info("[{}] Bus created successfully: busId={}",
-                            correlationId, response.getBus().getId());
-                    return ResponseEntity.status(HttpStatus.CREATED).body(
-                            Response.<BusCreationResponse>builder()
-                                    .statusCode(HttpStatus.CREATED.value())
-                                    .message("Bus and seats created successfully")
-                                    .data(response)
-                                    .build()
-                    );
-                })
-                .exceptionally(ex -> handleException(ex, correlationId, "Bus creation"));
-    }
+//    @PostMapping("/buses/create-with-seats")
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @Operation(summary = "Create bus with seats",
+//            description = "Create bus and generate seats in one operation. Requires ADMIN role.")
+//    public CompletableFuture<ResponseEntity<Response<BusCreationResponse>>> createBusWithSeats(
+//            @Valid @RequestBody BusCreationRequest request) {
+//
+//        String correlationId = UUID.randomUUID().toString();
+//        log.info("[{}] BFF: Creating bus with {} seats for route: {}",
+//                correlationId, request.getNumberOfSeats(), request.getRouteId());
+//
+//        // Input validation
+//        if (request.getNumberOfSeats() == null || request.getNumberOfSeats() <= 0) {
+//            log.warn("[{}] Invalid seat count: {}", correlationId, request.getNumberOfSeats());
+//            return CompletableFuture.completedFuture(
+//                    ResponseEntity.badRequest().body(
+//                            Response.<BusCreationResponse>builder()
+//                                    .statusCode(HttpStatus.BAD_REQUEST.value())
+//                                    .message("Number of seats must be greater than 0")
+//                                    .data(null)
+//                                    .build()
+//                    )
+//            );
+//        }
+//
+//        if (request.getNumberOfSeats() > 100) {
+//            log.warn("[{}] Seat count exceeds maximum: {}", correlationId, request.getNumberOfSeats());
+//            return CompletableFuture.completedFuture(
+//                    ResponseEntity.badRequest().body(
+//                            Response.<BusCreationResponse>builder()
+//                                    .statusCode(HttpStatus.BAD_REQUEST.value())
+//                                    .message("Number of seats cannot exceed 100")
+//                                    .data(null)
+//                                    .build()
+//                    )
+//            );
+//        }
+//
+//        return adminAggregator.createBusWithSeats(
+//                        request.getBusDto(),
+//                        request.getRouteId(),
+//                        request.getNumberOfSeats()
+//                )
+//                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+//                .thenApply(response -> {
+//                    log.info("[{}] Bus created successfully: busId={}",
+//                            correlationId, response.getBus().getId());
+//                    return ResponseEntity.status(HttpStatus.CREATED).body(
+//                            Response.<BusCreationResponse>builder()
+//                                    .statusCode(HttpStatus.CREATED.value())
+//                                    .message("Bus and seats created successfully")
+//                                    .data(response)
+//                                    .build()
+//                    );
+//                })
+//                .exceptionally(ex -> handleException(ex, correlationId, "Bus creation"));
+//    }
 
     /**
      * Delete bus with all seats

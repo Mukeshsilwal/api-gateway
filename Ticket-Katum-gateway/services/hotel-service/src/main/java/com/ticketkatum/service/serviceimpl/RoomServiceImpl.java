@@ -2,21 +2,36 @@ package com.ticketkatum.service.serviceimpl;
 
 import com.ticketkatum.entity.Hotel;
 import com.ticketkatum.entity.Room;
+import com.ticketkatum.exception.HotelNotFoundException;
+import com.ticketkatum.exception.RoomAlreadyExistsException;
+import com.ticketkatum.exception.RoomNotFoundException;
 import com.ticketkatum.mapper.HotelMapper;
 import com.ticketkatum.model.CreateRoomRequest;
 import com.ticketkatum.model.RoomDTO;
 import com.ticketkatum.repository.HotelRepository;
 import com.ticketkatum.repository.RoomRepository;
 import com.ticketkatum.service.RoomService;
+import com.ticketkatum.utils.ValidationUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
+import org.slf4j.MDC;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Room Service Implementation
+ * Enhanced with caching, custom exceptions, and business validation
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -34,34 +49,55 @@ public class RoomServiceImpl implements RoomService {
      * @return Created room DTO
      */
     @Override
-    @Transactional // Write operation needs @Transactional
+    @Transactional
+    @CacheEvict(value = { "hotel-rooms", "rooms" }, allEntries = true)
     public RoomDTO addRoom(String hotelCode, CreateRoomRequest req) {
-        log.info("Adding room to hotel: {}", hotelCode);
+        MDC.put("hotelCode", hotelCode);
+        MDC.put("roomNumber", req.getRoomNumber());
 
-        Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with code: " + hotelCode));
+        try {
+            log.info("Adding room {} to hotel: {}", req.getRoomNumber(), hotelCode);
 
-        Room room = Room.builder()
-                .roomNumber(req.getRoomNumber())
-                .roomType(req.getType())
-                .description(req.getDescription())
-                .capacity(req.getCapacity())
-                .basePrice(req.getBasePrice())
-                .maxPrice(req.getMaxPrice())
-                .amenities(req.getAmenities())
-                .active(req.isActive())
-                .hotel(hotel)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+            // Validate input data
+            validateRoomData(req);
 
-        Room savedRoom = roomRepository.save(room);
+            // Find hotel
+            Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
+                    .orElseThrow(() -> {
+                        log.warn("Hotel not found with code: {}", hotelCode);
+                        return new HotelNotFoundException(hotelCode);
+                    });
 
-        // Initialize amenities before mapping (still inside transaction)
-        Hibernate.initialize(savedRoom.getAmenities());
+            // Check for duplicate room number
+            if (roomRepository.existsByHotelIdAndRoomNumber(hotel.getId(), req.getRoomNumber())) {
+                log.warn("Room {} already exists in hotel {}", req.getRoomNumber(), hotelCode);
+                throw new RoomAlreadyExistsException(req.getRoomNumber(), hotelCode);
+            }
 
-        log.info("Room added successfully: {} to hotel: {}", savedRoom.getId(), hotelCode);
-        return hotelMapper.toRoomDTO(savedRoom);
+            Room room = Room.builder()
+                    .roomNumber(req.getRoomNumber())
+                    .roomType(req.getRoomType())
+                    .description(req.getDescription())
+                    .capacity(req.getCapacity())
+                    .basePrice(req.getBasePrice())
+                    .maxPrice(req.getMaxPrice())
+                    .amenities(req.getAmenities())
+                    .active(req.getActive() != null ? req.getActive() : true)
+                    .hotel(hotel)
+                    .createdAt(LocalDateTime.now())
+                    .updatedAt(LocalDateTime.now())
+                    .build();
+
+            Room savedRoom = roomRepository.save(room);
+
+            // Initialize amenities before mapping (still inside transaction)
+            Hibernate.initialize(savedRoom.getAmenities());
+
+            log.info("Room added successfully: {} to hotel: {}", savedRoom.getId(), hotelCode);
+            return hotelMapper.toRoomDTO(savedRoom);
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -72,29 +108,50 @@ public class RoomServiceImpl implements RoomService {
      * @return Updated room DTO
      */
     @Override
-    @Transactional // Write operation needs @Transactional
+    @Transactional
+    @CachePut(value = "rooms", key = "#result.id")
+    @CacheEvict(value = "hotel-rooms", allEntries = true)
     public RoomDTO updateRoom(Long roomId, CreateRoomRequest req) {
-        log.info("Updating room: {}", roomId);
+        MDC.put("roomId", String.valueOf(roomId));
 
-        Room room = getRoomEntity(roomId);
+        try {
+            log.info("Updating room: {}", roomId);
 
-        room.setRoomNumber(req.getRoomNumber());
-        room.setRoomType(req.getType());
-        room.setDescription(req.getDescription());
-        room.setCapacity(req.getCapacity());
-        room.setBasePrice(req.getBasePrice());
-        room.setMaxPrice(req.getMaxPrice());
-        room.setAmenities(req.getAmenities());
-        room.setActive(req.isActive());
-        room.setUpdatedAt(LocalDateTime.now());
+            // Validate input data
+            validateRoomData(req);
 
-        Room updatedRoom = roomRepository.save(room);
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> {
+                        log.warn("Room not found with id: {}", roomId);
+                        return new RoomNotFoundException(roomId);
+                    });
 
-        // Initialize amenities before mapping (still inside transaction)
-        Hibernate.initialize(updatedRoom.getAmenities());
+            // Check for duplicate room number (excluding current room)
+            if (!room.getRoomNumber().equals(req.getRoomNumber()) &&
+                    roomRepository.existsByHotelIdAndRoomNumber(room.getHotel().getId(), req.getRoomNumber())) {
+                log.warn("Room {} already exists in hotel", req.getRoomNumber());
+                throw new RoomAlreadyExistsException(req.getRoomNumber(), room.getHotel().getHotelCode());
+            }
 
-        log.info("Room updated successfully: {}", updatedRoom.getId());
-        return hotelMapper.toRoomDTO(updatedRoom);
+            room.setRoomNumber(req.getRoomNumber());
+            room.setRoomType(req.getRoomType());
+            room.setDescription(req.getDescription());
+            room.setCapacity(req.getCapacity());
+            room.setBasePrice(req.getBasePrice());
+            room.setMaxPrice(req.getMaxPrice());
+            room.setAmenities(req.getAmenities());
+            room.setUpdatedAt(LocalDateTime.now());
+
+            Room updatedRoom = roomRepository.save(room);
+
+            // Initialize amenities before mapping (still inside transaction)
+            Hibernate.initialize(updatedRoom.getAmenities());
+
+            log.info("Room updated successfully: {}", updatedRoom.getId());
+            return hotelMapper.toRoomDTO(updatedRoom);
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -104,21 +161,33 @@ public class RoomServiceImpl implements RoomService {
      * @return Room DTO
      */
     @Override
-    @Transactional(readOnly = true) // CRITICAL: Read operation needs @Transactional
+    @Transactional(readOnly = true)
+    @Cacheable(value = "rooms", key = "#roomId", unless = "#result == null")
     public RoomDTO getRoom(Long roomId) {
-        log.info("Fetching room: {}", roomId);
+        MDC.put("roomId", String.valueOf(roomId));
 
-        Room room = getRoomEntity(roomId);
+        try {
+            log.debug("Fetching room from database: {}", roomId);
 
-        // Initialize amenities while still in transaction
-        Hibernate.initialize(room.getAmenities());
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> {
+                        log.warn("Room not found with id: {}", roomId);
+                        return new RoomNotFoundException(roomId);
+                    });
 
-        // Initialize hotel if needed for the DTO
-        if (room.getHotel() != null) {
-            Hibernate.initialize(room.getHotel());
+            // Initialize amenities while still in transaction
+            Hibernate.initialize(room.getAmenities());
+
+            // Initialize hotel if needed for the DTO
+            if (room.getHotel() != null) {
+                Hibernate.initialize(room.getHotel());
+            }
+
+            log.debug("Room retrieved successfully: {}", roomId);
+            return hotelMapper.toRoomDTO(room);
+        } finally {
+            MDC.clear();
         }
-
-        return hotelMapper.toRoomDTO(room);
     }
 
     /**
@@ -128,23 +197,30 @@ public class RoomServiceImpl implements RoomService {
      * @return List of room DTOs
      */
     @Override
-    @Transactional(readOnly = true) // CRITICAL: Read operation needs @Transactional
+    @Transactional(readOnly = true)
+    @Cacheable(value = "hotel-rooms", key = "#hotelCode")
     public List<RoomDTO> getRoomsByHotel(String hotelCode) {
-        log.info("Fetching rooms for hotel: {}", hotelCode);
+        MDC.put("hotelCode", hotelCode);
 
-        List<Room> rooms = roomRepository.findByHotelHotelCode(hotelCode);
+        try {
+            log.debug("Fetching rooms for hotel: {}", hotelCode);
 
-        // Initialize amenities for ALL rooms while still in transaction
-        rooms.forEach(room -> {
-            Hibernate.initialize(room.getAmenities());
-            // Also initialize hotel reference if needed
-            if (room.getHotel() != null) {
-                Hibernate.initialize(room.getHotel());
-            }
-        });
+            List<Room> rooms = roomRepository.findByHotelHotelCode(hotelCode);
 
-        log.info("Found {} rooms for hotel: {}", rooms.size(), hotelCode);
-        return hotelMapper.toRoomDTOList(rooms);
+            // Initialize amenities for ALL rooms while still in transaction
+            rooms.forEach(room -> {
+                Hibernate.initialize(room.getAmenities());
+                // Also initialize hotel reference if needed
+                if (room.getHotel() != null) {
+                    Hibernate.initialize(room.getHotel());
+                }
+            });
+
+            log.info("Found {} rooms for hotel: {}", rooms.size(), hotelCode);
+            return hotelMapper.toRoomDTOList(rooms);
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -153,26 +229,53 @@ public class RoomServiceImpl implements RoomService {
      * @param roomId The room ID
      */
     @Override
-    @Transactional // Delete operation needs @Transactional
+    @Transactional
+    @CacheEvict(value = { "rooms", "hotel-rooms" }, allEntries = true)
     public void deleteRoom(Long roomId) {
-        log.info("Deleting room: {}", roomId);
+        MDC.put("roomId", String.valueOf(roomId));
 
-        Room room = getRoomEntity(roomId);
-        roomRepository.delete(room);
+        try {
+            log.info("Deleting room: {}", roomId);
 
-        log.info("Room deleted successfully: {}", roomId);
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> {
+                        log.warn("Room not found for deletion with id: {}", roomId);
+                        return new RoomNotFoundException(roomId);
+                    });
+
+            roomRepository.delete(room);
+
+            log.info("Room deleted successfully: {}", roomId);
+        } finally {
+            MDC.clear();
+        }
+    }
+
+    @Override
+    public Page<RoomDTO> getRoomsByHotel(String hotelCode, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public Page<RoomDTO> searchRooms(Long hotelId, String roomType, Integer minCapacity, BigDecimal maxPrice, Boolean active, Pageable pageable) {
+        return null;
     }
 
     /**
-     * Helper method to get room entity
-     * This should be called within a @Transactional method
+     * Validate room data
      *
-     * @param roomId The room ID
-     * @return Room entity
+     * @param req Room creation/update request
      */
-    private Room getRoomEntity(Long roomId) {
-        return roomRepository.findById(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found with id: " + roomId));
+    private void validateRoomData(CreateRoomRequest req) {
+        // Validate required fields
+        ValidationUtils.validateRoomNumber(req.getRoomNumber());
+        ValidationUtils.validateRequiredField(req.getRoomType(), "Room type");
+
+        // Validate capacity
+        ValidationUtils.validateCapacity(req.getCapacity());
+
+        // Validate price range
+        ValidationUtils.validatePriceRange(req.getBasePrice(), req.getMaxPrice());
     }
 
     /**
@@ -182,16 +285,23 @@ public class RoomServiceImpl implements RoomService {
      * @return List of room DTOs
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "hotel-rooms", key = "'hotel-id-' + #hotelId")
     public List<RoomDTO> getRoomsByHotelId(Long hotelId) {
-        log.info("Fetching rooms for hotel ID: {}", hotelId);
+        MDC.put("hotelId", String.valueOf(hotelId));
 
-        List<Room> rooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
+        try {
+            log.debug("Fetching rooms for hotel ID: {}", hotelId);
 
-        // Initialize amenities for all rooms
-        rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+            List<Room> rooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
 
-        log.info("Found {} active rooms for hotel ID: {}", rooms.size(), hotelId);
-        return hotelMapper.toRoomDTOList(rooms);
+            // Initialize amenities for all rooms
+            rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+
+            log.info("Found {} active rooms for hotel ID: {}", rooms.size(), hotelId);
+            return hotelMapper.toRoomDTOList(rooms);
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -202,15 +312,21 @@ public class RoomServiceImpl implements RoomService {
      */
     @Transactional(readOnly = true)
     public List<RoomDTO> getAllRoomsByHotelId(Long hotelId) {
-        log.info("Fetching all rooms (including inactive) for hotel ID: {}", hotelId);
+        MDC.put("hotelId", String.valueOf(hotelId));
 
-        List<Room> rooms = roomRepository.findByHotelId(hotelId);
+        try {
+            log.debug("Fetching all rooms (including inactive) for hotel ID: {}", hotelId);
 
-        // Initialize amenities for all rooms
-        rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+            List<Room> rooms = roomRepository.findByHotelId(hotelId);
 
-        log.info("Found {} total rooms for hotel ID: {}", rooms.size(), hotelId);
-        return hotelMapper.toRoomDTOList(rooms);
+            // Initialize amenities for all rooms
+            rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+
+            log.info("Found {} total rooms for hotel ID: {}", rooms.size(), hotelId);
+            return hotelMapper.toRoomDTOList(rooms);
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -221,22 +337,32 @@ public class RoomServiceImpl implements RoomService {
      * @return List of room DTOs
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "hotel-rooms", key = "#hotelCode + '-' + #roomType")
     public List<RoomDTO> getRoomsByHotelAndType(String hotelCode, String roomType) {
-        log.info("Fetching {} type rooms for hotel: {}", roomType, hotelCode);
+        MDC.put("hotelCode", hotelCode);
+        MDC.put("roomType", roomType);
 
-        Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with code: " + hotelCode));
+        try {
+            log.debug("Fetching {} type rooms for hotel: {}", roomType, hotelCode);
 
-        List<Room> rooms = roomRepository.findByHotelIdAndRoomTypeAndActiveTrue(
-                hotel.getId(),
-                roomType
-        );
+            Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
+                    .orElseThrow(() -> {
+                        log.warn("Hotel not found with code: {}", hotelCode);
+                        return new HotelNotFoundException(hotelCode);
+                    });
 
-        // Initialize amenities for all rooms
-        rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+            List<Room> rooms = roomRepository.findByHotelIdAndRoomTypeAndActiveTrue(
+                    hotel.getId(),
+                    roomType);
 
-        log.info("Found {} {} type rooms", rooms.size(), roomType);
-        return hotelMapper.toRoomDTOList(rooms);
+            // Initialize amenities for all rooms
+            rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+
+            log.info("Found {} {} type rooms", rooms.size(), roomType);
+            return hotelMapper.toRoomDTOList(rooms);
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -247,15 +373,24 @@ public class RoomServiceImpl implements RoomService {
      */
     @Transactional(readOnly = true)
     public boolean hasAvailableRooms(String hotelCode) {
-        log.info("Checking availability for hotel: {}", hotelCode);
+        MDC.put("hotelCode", hotelCode);
 
-        Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with code: " + hotelCode));
+        try {
+            log.debug("Checking availability for hotel: {}", hotelCode);
 
-        boolean hasRooms = roomRepository.existsByHotelIdAndActiveTrue(hotel.getId());
-        log.info("Hotel {} has available rooms: {}", hotelCode, hasRooms);
+            Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
+                    .orElseThrow(() -> {
+                        log.warn("Hotel not found with code: {}", hotelCode);
+                        return new HotelNotFoundException(hotelCode);
+                    });
 
-        return hasRooms;
+            boolean hasRooms = roomRepository.existsByHotelIdAndActiveTrue(hotel.getId());
+            log.info("Hotel {} has available rooms: {}", hotelCode, hasRooms);
+
+            return hasRooms;
+        } finally {
+            MDC.clear();
+        }
     }
 
     /**
@@ -266,14 +401,23 @@ public class RoomServiceImpl implements RoomService {
      */
     @Transactional(readOnly = true)
     public Long countAvailableRooms(String hotelCode) {
-        log.info("Counting available rooms for hotel: {}", hotelCode);
+        MDC.put("hotelCode", hotelCode);
 
-        Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
-                .orElseThrow(() -> new RuntimeException("Hotel not found with code: " + hotelCode));
+        try {
+            log.debug("Counting available rooms for hotel: {}", hotelCode);
 
-        Long count = roomRepository.countAvailableRoomsByHotelId(hotel.getId());
-        log.info("Hotel {} has {} available rooms", hotelCode, count);
+            Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
+                    .orElseThrow(() -> {
+                        log.warn("Hotel not found with code: {}", hotelCode);
+                        return new HotelNotFoundException(hotelCode);
+                    });
 
-        return count;
+            Long count = roomRepository.countAvailableRoomsByHotelId(hotel.getId());
+            log.info("Hotel {} has {} available rooms", hotelCode, count);
+
+            return count;
+        } finally {
+            MDC.clear();
+        }
     }
 }

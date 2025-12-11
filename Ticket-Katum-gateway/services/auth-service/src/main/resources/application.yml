@@ -2,11 +2,10 @@
 # JWT Configuration
 # ============================
 jwt:
-  secret: ${JWT_SECRET:YourSuperSecretKeyThatIsAtLeast32CharactersLongAndRandomlyGenerated}
+  secret: ${JWT_SECRET:dMbz7o4YE45aAyT6BUYMsO_ireJ00J96Xxbv6AQ65xb0Ajauql1fScOEP4hEb7oyBtjHfTjvkeXBfpSjE8uyoA}
 
   expiration:
     time: ${JWT_EXPIRATION:3600000}          # 1 hour
-
   refresh:
     expiration:
       time: ${JWT_REFRESH_EXPIRATION:86400000}   # 24 hours
@@ -23,12 +22,12 @@ spring:
   session:
     store-type: redis
 
-    data:
-      redis:
-        host: localhost       # Redis host
-        port: 6379            # Redis port
-        password: ""          # Redis password if any
-        timeout: 6000ms
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      timeout: 6000ms
   # DATABASE (PostgreSQL)
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/auth_db}
@@ -61,7 +60,7 @@ logging:
 # Server Configuration
 # ============================
 server:
-  port: ${SERVER_PORT:8082}
+  port: ${AUTH_SERVICE_PORT:8089}
   error:
     include-message: always
     include-binding-errors: always
@@ -82,7 +81,22 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
+      base-path: /actuator
   endpoint:
     health:
-      show-details: when-authorized
+      show-details: always
+      show-components: always
+  health:
+    livenessstate:
+      enabled: true
+    readinessstate:
+      enabled: true
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true

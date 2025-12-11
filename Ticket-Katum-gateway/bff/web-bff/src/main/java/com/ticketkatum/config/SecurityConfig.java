@@ -44,7 +44,8 @@ public class SecurityConfig {
                                 "/health/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/v1/hotels/**"
                         ).permitAll()
 
                         // Public API endpoints

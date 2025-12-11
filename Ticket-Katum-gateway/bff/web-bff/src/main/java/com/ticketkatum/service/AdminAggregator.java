@@ -26,32 +26,32 @@ public class AdminAggregator {
     private final BusStopServiceClient busStopClient;
     private final SeatServiceClient seatClient;
 
-    /**
-     * Create bus with seats
-     */
-    public CompletableFuture<BusCreationResponse> createBusWithSeats(
-            BusDto busDto, Integer routeId, Integer numberOfSeats) {
-
-        log.info("Creating bus with {} seats for route: {}", numberOfSeats, routeId);
-
-        return busClient.createBusInRoute(busDto, routeId)
-                .thenCompose(createdBus -> {
-                    // Create seats for the bus
-                    return seatClient.createSeatsForBus(createdBus.getId(), numberOfSeats)
-                            .thenApply(seats ->
-                                    BusCreationResponse.builder()
-                                            .bus(createdBus)
-                                            .seatsCreated(seats.size())
-                                            .routeId(routeId)
-                                            .message("Bus and seats created successfully")
-                                            .build()
-                            );
-                })
-                .exceptionally(ex -> {
-                    log.error("Error creating bus with seats", ex);
-                    throw new AggregationException("Bus creation failed", ex);
-                });
-    }
+//    /**
+//     * Create bus with seats
+//     */
+//    public CompletableFuture<BusCreationResponse> createBusWithSeats(
+//            BusDto busDto, Integer routeId, Integer numberOfSeats) {
+//
+//        log.info("Creating bus with {} seats for route: {}", numberOfSeats, routeId);
+//
+//        return busClient.createBusInRoute(busDto, routeId)
+//                .thenCompose(createdBus -> {
+//                    // Create seats for the bus
+//                    return seatClient.createSeatsForBus(createdBus.getId(), numberOfSeats)
+//                            .thenApply(seats ->
+//                                    BusCreationResponse.builder()
+//                                            .bus(createdBus)
+//                                            .seatsCreated(seats.size())
+//                                            .routeId(routeId)
+//                                            .message("Bus and seats created successfully")
+//                                            .build()
+//                            );
+//                })
+//                .exceptionally(ex -> {
+//                    log.error("Error creating bus with seats", ex);
+//                    throw new AggregationException("Bus creation failed", ex);
+//                });
+//    }
 
     /**
      * Delete bus with all seats

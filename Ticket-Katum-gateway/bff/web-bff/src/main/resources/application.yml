@@ -7,24 +7,26 @@
 spring:
   application:
     name: ticket-katum-web-bff
+  zipkin:
+    enabled: false
 
-  # Server Configuration
-  server:
-    port: ${SERVER_PORT:8080}
+    # Server Configuration
+    server:
+      port: ${SERVER_PORT:8080}
+      servlet:
+        context-path: /
+      compression:
+        enabled: true
+        mime-types: application/json,application/xml,text/html,text/xml,text/plain
+      error:
+        include-message: always
+        include-binding-errors: always
     servlet:
-      context-path: /
-    compression:
-      enabled: true
-      mime-types: application/json,application/xml,text/html,text/xml,text/plain
-    error:
-      include-message: always
-      include-binding-errors: always
-  servlet:
-    multipart:
-          enabled: true
-          max-file-size: 10MB
-          max-request-size: 20MB
-          file-size-threshold: 2KB
+      multipart:
+        enabled: true
+        max-file-size: 10MB
+        max-request-size: 20MB
+        file-size-threshold: 2KB
 
 # ============================================================
 # MICROSERVICES URLs
@@ -39,8 +41,8 @@ microservices:
   image-service-url: ${IMAGE_SERVICE_URL:http://localhost:8086}
 
   # ========== Authentication & User Services ==========
-  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8082}
-  user-service-url: ${USER_SERVICE_URL:http://localhost:8082}
+  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8089}
+  user-service-url: ${USER_SERVICE_URL:http://localhost:8089}
 
   # ========== Booking Services ==========
   booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8091}
@@ -327,13 +329,7 @@ springdoc:
 # Cross-Origin Resource Sharing
 # ============================================================
 cors:
-  allowed-origins:
-    - http://localhost:3000          # React dev
-    - http://localhost:4200          # Angular dev
-    - http://localhost:8080          # Local testing
-    - https://ticketkatum.com        # Production
-    - https://www.ticketkatum.com    # Production www
-    - https://admin.ticketkatum.com  # Admin portal
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:4200}
   allowed-methods:
     - GET
     - POST
@@ -341,7 +337,11 @@ cors:
     - DELETE
     - PATCH
     - OPTIONS
-  allowed-headers: "*"
+  allowed-headers:
+    - Content-Type
+    - Authorization
+    - X-Requested-With
+    - X-API-Key
   exposed-headers:
     - Content-Disposition
     - X-Total-Count
@@ -423,7 +423,7 @@ features:
 # ============================================================
 security:
   jwt:
-    secret: ${JWT_SECRET:655468576D5A7133743677397A24432646294A404E635266556A586E32723575}
+    secret: ${JWT_SECRET:dMbz7o4YE45aAyT6BUYMsO_ireJ00J96Xxbv6AQ65xb0Ajauql1fScOEP4hEb7oyBtjHfTjvkeXBfpSjE8uyoA}
     expiration: 86400000 # 24 hours
     refresh-expiration: 604800000 # 7 days
 

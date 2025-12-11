@@ -48,53 +48,53 @@ public class BusBffController {
                             new Response<>(500, "Failed to fetch bus info", null));
                 });
     }
-
-    /**
-     * Search buses with complete details
-     * Aggregates: search results, route info, seat availability
-     */
-    @PostMapping("/search")
-    @Operation(summary = "Search buses with details",
-            description = "Advanced bus search with complete information")
-    public CompletableFuture<ResponseEntity<Response<AggregatedBusSearchResults>>> searchBuses(
-            @Valid @RequestBody BusSearchRequest searchRequest) {
-
-        log.info("BFF: Searching buses from {} to {} on {}",
-                searchRequest.getSource(),
-                searchRequest.getDestination(),
-                searchRequest.getDate());
-
-        return busAggregator.searchBusesWithDetails(searchRequest)
-                .thenApply(results -> ResponseEntity.ok(
-                        new Response<>(200, "Search completed successfully", results)))
-                .exceptionally(ex -> {
-                    log.error("Bus search failed", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Search failed", null));
-                });
-    }
-
-    /**
-     * Get complete route information
-     * Aggregates: route, bus stops, buses on route
-     */
-    @GetMapping("/routes/{routeId}/complete")
-    @Operation(summary = "Get complete route info",
-            description = "Returns route with bus stops and buses")
-    public CompletableFuture<ResponseEntity<Response<CompleteRouteInfo>>> getCompleteRouteInfo(
-            @PathVariable Integer routeId) {
-
-        log.info("BFF: Fetching complete route info for: {}", routeId);
-
-        return busAggregator.getCompleteRouteInfo(routeId)
-                .thenApply(info -> ResponseEntity.ok(
-                        new Response<>(200, "Route info retrieved", info)))
-                .exceptionally(ex -> {
-                    log.error("Error fetching route info", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Failed to fetch route", null));
-                });
-    }
+//
+//    /**
+//     * Search buses with complete details
+//     * Aggregates: search results, route info, seat availability
+//     */
+//    @PostMapping("/search")
+//    @Operation(summary = "Search buses with details",
+//            description = "Advanced bus search with complete information")
+//    public CompletableFuture<ResponseEntity<Response<AggregatedBusSearchResults>>> searchBuses(
+//            @Valid @RequestBody BusSearchRequest searchRequest) {
+//
+//        log.info("BFF: Searching buses from {} to {} on {}",
+//                searchRequest.getSource(),
+//                searchRequest.getDestination(),
+//                searchRequest.getDate());
+//
+//        return busAggregator.searchBusesWithDetails(searchRequest)
+//                .thenApply(results -> ResponseEntity.ok(
+//                        new Response<>(200, "Search completed successfully", results)))
+//                .exceptionally(ex -> {
+//                    log.error("Bus search failed", ex);
+//                    return ResponseEntity.status(500).body(
+//                            new Response<>(500, "Search failed", null));
+//                });
+//    }
+//
+//    /**
+//     * Get complete route information
+//     * Aggregates: route, bus stops, buses on route
+//     */
+//    @GetMapping("/routes/{routeId}/complete")
+//    @Operation(summary = "Get complete route info",
+//            description = "Returns route with bus stops and buses")
+//    public CompletableFuture<ResponseEntity<Response<CompleteRouteInfo>>> getCompleteRouteInfo(
+//            @PathVariable Integer routeId) {
+//
+//        log.info("BFF: Fetching complete route info for: {}", routeId);
+//
+//        return busAggregator.getCompleteRouteInfo(routeId)
+//                .thenApply(info -> ResponseEntity.ok(
+//                        new Response<>(200, "Route info retrieved", info)))
+//                .exceptionally(ex -> {
+//                    log.error("Error fetching route info", ex);
+//                    return ResponseEntity.status(500).body(
+//                            new Response<>(500, "Failed to fetch route", null));
+//                });
+//    }
 
     /**
      * Get all bus stops with routes

@@ -286,7 +286,6 @@ public class HotelAggregator {
 
     private List<String> extractAmenities(HotelDTO hotel, List<RoomDTO> rooms) {
         Set<String> amenities = new HashSet<>();
-        if (hotel.getAmenities() != null) amenities.addAll(hotel.getAmenities());
         rooms.stream()
                 .filter(r -> r.getAmenities() != null)
                 .flatMap(r -> r.getAmenities().stream())
@@ -330,7 +329,8 @@ public class HotelAggregator {
 
     private Comparator<EnrichedHotelDTO> getSortComparator(String sortBy) {
         if ("price_asc".equalsIgnoreCase(sortBy)) {
-            return Comparator.comparing(h -> h.getHotel().getMinPrice());
+
+            return Comparator.comparing(h -> h.getHotel().getRooms().get(0).getMaxPrice());
         }
         return Comparator.comparing(h -> h.getHotel().getId());
     }
@@ -346,13 +346,13 @@ public class HotelAggregator {
         if (hotels.isEmpty()) return new PriceRange(BigDecimal.ZERO, BigDecimal.ZERO);
 
         BigDecimal min = hotels.stream()
-                .map(h -> h.getHotel().getMinPrice())
+                .map(h -> h.getHotel().getRooms().get(0).getMaxPrice())
                 .filter(Objects::nonNull)
                 .min(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
 
         BigDecimal max = hotels.stream()
-                .map(h -> h.getHotel().getMaxPrice())
+                .map(h -> h.getHotel().getRooms().get(0).getMaxPrice())
                 .filter(Objects::nonNull)
                 .max(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);

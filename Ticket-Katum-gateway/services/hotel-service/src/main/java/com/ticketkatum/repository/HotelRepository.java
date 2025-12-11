@@ -14,42 +14,46 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
 @Repository
-public interface HotelRepository extends JpaRepository<Hotel, Long> {
+public interface HotelRepository extends JpaRepository<Hotel, Long>, JpaSpecificationExecutor<Hotel> {
 
     Optional<Hotel> findByHotelCode(String hotelCode);
 
-    @EntityGraph(attributePaths = {"images"})
+    @EntityGraph(attributePaths = { "images" })
     @Query("SELECT DISTINCT h FROM Hotel h")
     List<Hotel> findAllWithImages();
 
-    @EntityGraph(attributePaths = {"rooms"})
+    @EntityGraph(attributePaths = { "images" })
+    @Query("SELECT DISTINCT h FROM Hotel h WHERE h.active = true")
+    List<Hotel> findByActiveTrueWithImages();
+
+    @EntityGraph(attributePaths = { "rooms" })
     @Query("SELECT DISTINCT h FROM Hotel h WHERE h.id IN :ids")
     List<Hotel> findWithRoomsByIds(@Param("ids") List<Long> ids);
 
     boolean existsByHotelCode(String hotelCode);
 
-
-    @Query(
-            value = "SELECT h.id AS id, h.name AS name, h.address AS address, " +
-                    "h.latitude AS latitude, h.longitude AS longitude, " +
-                    "STRING_AGG(hi.url, ',') AS images " +
-                    "FROM hotels h " +
-                    "LEFT JOIN hotel_images hi ON hi.hotel_id = h.id " +
-                    "WHERE h.id IN (:hotelIds) " +
-                    "GROUP BY h.id",
-            nativeQuery = true
-    )
+    @Query(value = "SELECT h.id AS id, h.name AS name, h.address AS address, " +
+            "h.latitude AS latitude, h.longitude AS longitude, " +
+            "STRING_AGG(hi.url, ',') AS images " +
+            "FROM hotels h " +
+            "LEFT JOIN hotel_images hi ON hi.hotel_id = h.id " +
+            "WHERE h.id IN (:hotelIds) " +
+            "GROUP BY h.id", nativeQuery = true)
     List<Map<String, Object>> findHotelWithImagesNative(@Param("hotelIds") List<Long> hotelIds);
 
-
-
-
     List<Hotel> findByActiveTrue();
+
     List<Hotel> findByCityIgnoreCaseAndActiveTrue(String city);
+
     Optional<Hotel> findByIdAndActiveTrue(Long id);
+
     List<Hotel> findByFeaturedTrueAndActiveTrue();
+
     Page<Hotel> findByFeaturedTrueAndActiveTrue(Pageable pageable);
+
     List<Hotel> findByStarRatingAndActiveTrue(Integer starRating);
 
     @Query("SELECT h FROM Hotel h WHERE h.active = true AND h.starRating >= :minRating ORDER BY h.starRating DESC")
@@ -78,16 +82,14 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             @Param("maxStarRating") Integer maxStarRating,
             @Param("minPrice") BigDecimal minPrice,
             @Param("maxPrice") BigDecimal maxPrice,
-            Pageable pageable
-    );
+            Pageable pageable);
 
     @Query("SELECT h FROM Hotel h WHERE h.active = true " +
             "AND h.minPrice BETWEEN :minPrice AND :maxPrice " +
             "ORDER BY h.minPrice ASC")
     List<Hotel> findByPriceRange(
             @Param("minPrice") BigDecimal minPrice,
-            @Param("maxPrice") BigDecimal maxPrice
-    );
+            @Param("maxPrice") BigDecimal maxPrice);
 
     @Query("SELECT h FROM Hotel h WHERE h.active = true " +
             "AND h.minPrice <= :maxPrice " +
@@ -134,6 +136,7 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
     List<Object[]> countHotelsByStarRating();
 
     boolean existsByIdAndActiveTrue(Long id);
+
     long countByActiveTrue();
 
     @Query("SELECT DISTINCT h FROM Hotel h " +
@@ -145,22 +148,19 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     @Query(value = "SELECT * FROM hotels h " +
             "WHERE h.active = true " +
-            "AND h.amenities LIKE CONCAT('%', :amenity, '%')",
-            nativeQuery = true)
+            "AND h.amenities LIKE CONCAT('%', :amenity, '%')", nativeQuery = true)
     List<Hotel> findByAmenity(@Param("amenity") String amenity);
 
     @Query(value = "SELECT * FROM hotels h " +
             "WHERE h.active = true " +
             "AND h.amenities LIKE CONCAT('%', :amenity1, '%') " +
-            "AND h.amenities LIKE CONCAT('%', :amenity2, '%')",
-            nativeQuery = true)
+            "AND h.amenities LIKE CONCAT('%', :amenity2, '%')", nativeQuery = true)
     List<Hotel> findByMultipleAmenities(
             @Param("amenity1") String amenity1,
-            @Param("amenity2") String amenity2
-    );
+            @Param("amenity2") String amenity2);
 
     // For admin - fetch all data at once
-    @EntityGraph(attributePaths = {"images"})
+    @EntityGraph(attributePaths = { "images" })
     List<Hotel> findAll();
 
     List<Hotel> findByActiveFalse();
@@ -175,58 +175,57 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
 
     // Your native queries with distance calculation
     @Query(value = """
-        SELECT * FROM (
-            SELECT h.*, 
-                   (6371 * acos(
-                       cos(radians(:latitude)) * cos(radians(h.latitude)) 
-                       * cos(radians(h.longitude) - radians(:longitude)) 
-                       + sin(radians(:latitude)) * sin(radians(h.latitude))
-                   )) AS distance
-            FROM hotels h
-            WHERE h.active = true
-              AND h.latitude IS NOT NULL
-              AND h.longitude IS NOT NULL
-        ) AS hotels_with_distance
-        WHERE distance <= :radiusKm
-        ORDER BY distance ASC
-        LIMIT :limit OFFSET :offset
-        """, nativeQuery = true)
+            SELECT * FROM (
+                SELECT h.*,
+                       (6371 * acos(
+                           cos(radians(:latitude)) * cos(radians(h.latitude))
+                           * cos(radians(h.longitude) - radians(:longitude))
+                           + sin(radians(:latitude)) * sin(radians(h.latitude))
+                       )) AS distance
+                FROM hotels h
+                WHERE h.active = true
+                  AND h.latitude IS NOT NULL
+                  AND h.longitude IS NOT NULL
+            ) AS hotels_with_distance
+            WHERE distance <= :radiusKm
+            ORDER BY distance ASC
+            LIMIT :limit OFFSET :offset
+            """, nativeQuery = true)
     List<Hotel> findHotelsWithinRadius(
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude,
             @Param("radiusKm") Double radiusKm,
             @Param("limit") Integer limit,
-            @Param("offset") Integer offset
-    );
+            @Param("offset") Integer offset);
 
     @Query(value = """
-        SELECT * FROM (
-            SELECT h.*, 
-                   (6371 * acos(
-                       cos(radians(:latitude)) * cos(radians(h.latitude)) 
-                       * cos(radians(h.longitude) - radians(:longitude)) 
-                       + sin(radians(:latitude)) * sin(radians(h.latitude))
-                   )) AS distance
-            FROM hotels h
-            WHERE h.active = true
-              AND h.latitude IS NOT NULL
-              AND h.longitude IS NOT NULL
-              AND (:minStarRating IS NULL OR h.star_rating >= :minStarRating)
-              AND (:maxPrice IS NULL OR h.min_price <= :maxPrice)
-        ) AS hotels_with_distance
-        WHERE distance <= :radiusKm
-        ORDER BY 
-          CASE 
-            WHEN :sortBy = 'price' THEN min_price 
-            ELSE NULL 
-          END ASC NULLS LAST,
-          CASE 
-            WHEN :sortBy = 'rating' THEN average_rating 
-            ELSE NULL 
-          END DESC NULLS LAST,
-          distance ASC
-        LIMIT :limit OFFSET :offset
-        """, nativeQuery = true)
+            SELECT * FROM (
+                SELECT h.*,
+                       (6371 * acos(
+                           cos(radians(:latitude)) * cos(radians(h.latitude))
+                           * cos(radians(h.longitude) - radians(:longitude))
+                           + sin(radians(:latitude)) * sin(radians(h.latitude))
+                       )) AS distance
+                FROM hotels h
+                WHERE h.active = true
+                  AND h.latitude IS NOT NULL
+                  AND h.longitude IS NOT NULL
+                  AND (:minStarRating IS NULL OR h.star_rating >= :minStarRating)
+                  AND (:maxPrice IS NULL OR h.min_price <= :maxPrice)
+            ) AS hotels_with_distance
+            WHERE distance <= :radiusKm
+            ORDER BY
+              CASE
+                WHEN :sortBy = 'price' THEN min_price
+                ELSE NULL
+              END ASC NULLS LAST,
+              CASE
+                WHEN :sortBy = 'rating' THEN average_rating
+                ELSE NULL
+              END DESC NULLS LAST,
+              distance ASC
+            LIMIT :limit OFFSET :offset
+            """, nativeQuery = true)
     List<Hotel> findHotelsWithFilters(
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude,
@@ -235,49 +234,46 @@ public interface HotelRepository extends JpaRepository<Hotel, Long> {
             @Param("maxPrice") BigDecimal maxPrice,
             @Param("sortBy") String sortBy,
             @Param("limit") Integer limit,
-            @Param("offset") Integer offset
-    );
+            @Param("offset") Integer offset);
 
     @Query(value = """
-        SELECT COUNT(*) FROM (
-            SELECT h.id,
-                   (6371 * acos(
-                       cos(radians(:latitude)) * cos(radians(h.latitude)) 
-                       * cos(radians(h.longitude) - radians(:longitude)) 
-                       + sin(radians(:latitude)) * sin(radians(h.latitude))
-                   )) AS distance
-            FROM hotels h
-            WHERE h.active = true
-              AND h.latitude IS NOT NULL
-              AND h.longitude IS NOT NULL
-        ) AS hotels_with_distance
-        WHERE distance <= :radiusKm
-        """, nativeQuery = true)
+            SELECT COUNT(*) FROM (
+                SELECT h.id,
+                       (6371 * acos(
+                           cos(radians(:latitude)) * cos(radians(h.latitude))
+                           * cos(radians(h.longitude) - radians(:longitude))
+                           + sin(radians(:latitude)) * sin(radians(h.latitude))
+                       )) AS distance
+                FROM hotels h
+                WHERE h.active = true
+                  AND h.latitude IS NOT NULL
+                  AND h.longitude IS NOT NULL
+            ) AS hotels_with_distance
+            WHERE distance <= :radiusKm
+            """, nativeQuery = true)
     Long countHotelsWithinRadius(
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude,
-            @Param("radiusKm") Double radiusKm
-    );
+            @Param("radiusKm") Double radiusKm);
 
     @Query(value = """
-        SELECT * FROM (
-            SELECT h.*, 
-                   (6371 * acos(
-                       cos(radians(:latitude)) * cos(radians(h.latitude)) 
-                       * cos(radians(h.longitude) - radians(:longitude)) 
-                       + sin(radians(:latitude)) * sin(radians(h.latitude))
-                   )) AS distance
-            FROM hotels h
-            WHERE h.active = true
-              AND h.latitude IS NOT NULL
-              AND h.longitude IS NOT NULL
-        ) AS hotels_with_distance
-        ORDER BY distance ASC
-        LIMIT :limit
-        """, nativeQuery = true)
+            SELECT * FROM (
+                SELECT h.*,
+                       (6371 * acos(
+                           cos(radians(:latitude)) * cos(radians(h.latitude))
+                           * cos(radians(h.longitude) - radians(:longitude))
+                           + sin(radians(:latitude)) * sin(radians(h.latitude))
+                       )) AS distance
+                FROM hotels h
+                WHERE h.active = true
+                  AND h.latitude IS NOT NULL
+                  AND h.longitude IS NOT NULL
+            ) AS hotels_with_distance
+            ORDER BY distance ASC
+            LIMIT :limit
+            """, nativeQuery = true)
     List<Hotel> findNearestHotels(
             @Param("latitude") Double latitude,
             @Param("longitude") Double longitude,
-            @Param("limit") Integer limit
-    );
+            @Param("limit") Integer limit);
 }
