@@ -42,7 +42,8 @@ public class HotelRecommendationService {
     public void init() {
         log.info("Initializing Redis hotel cache...");
         try {
-            List<Hotel> allHotels = hotelRepository.findByActiveTrue();
+            // Use method that eagerly loads images to prevent LazyInitializationException
+            List<Hotel> allHotels = hotelRepository.findByActiveTrueWithImages();
             redisCache.warmUpCache(allHotels);
             log.info("Redis cache initialized with {} hotels", allHotels.size());
         } catch (Exception e) {
@@ -65,8 +66,7 @@ public class HotelRecommendationService {
                 request.getLatitude(),
                 request.getLongitude(),
                 request.getRadiusKm(),
-                sortBy
-        );
+                sortBy);
 
         List<HotelRecommendation> recommendations;
 
@@ -86,8 +86,7 @@ public class HotelRecommendationService {
             List<String> nearbyHotelIds = redisCache.getNearbyHotelIds(
                     request.getLatitude(),
                     request.getLongitude(),
-                    request.getRadiusKm()
-            );
+                    request.getRadiusKm());
 
             if (nearbyHotelIds.isEmpty()) {
                 log.info("No hotels found in Redis geo index, falling back to database");
@@ -105,8 +104,7 @@ public class HotelRecommendationService {
                     .map(hotel -> buildHotelRecommendation(
                             hotel,
                             request.getLatitude(),
-                            request.getLongitude()
-                    ))
+                            request.getLongitude()))
                     .collect(Collectors.toList());
 
             calculateRecommendationScores(recommendations);
@@ -118,8 +116,7 @@ public class HotelRecommendationService {
                     request.getLongitude(),
                     request.getRadiusKm(),
                     sortBy,
-                    recommendations
-            );
+                    recommendations);
 
             // Apply pagination
             int start = (request.getPage() - 1) * request.getLimit();
@@ -130,8 +127,7 @@ public class HotelRecommendationService {
         Long totalCount = hotelRepository.countHotelsWithinRadius(
                 request.getLatitude(),
                 request.getLongitude(),
-                request.getRadiusKm()
-        );
+                request.getRadiusKm());
 
         return NearbyHotelResponse.builder()
                 .hotels(recommendations)
@@ -157,8 +153,7 @@ public class HotelRecommendationService {
                 .map(hotel -> buildHotelRecommendation(
                         hotel,
                         request.getLatitude(),
-                        request.getLongitude()
-                ))
+                        request.getLongitude()))
                 .collect(Collectors.toList());
 
         calculateRecommendationScores(recommendations);
@@ -167,8 +162,7 @@ public class HotelRecommendationService {
         Long totalCount = hotelRepository.countHotelsWithinRadius(
                 request.getLatitude(),
                 request.getLongitude(),
-                request.getRadiusKm()
-        );
+                request.getRadiusKm());
 
         return NearbyHotelResponse.builder()
                 .hotels(recommendations)
@@ -219,7 +213,6 @@ public class HotelRecommendationService {
 
         return hotels;
     }
-
 
     /**
      * Apply filters to hotel list
@@ -313,13 +306,11 @@ public class HotelRecommendationService {
                     if (userLat != null && userLon != null) {
                         return Double.compare(
                                 h1.getDistanceKm() != null ? h1.getDistanceKm() : Double.MAX_VALUE,
-                                h2.getDistanceKm() != null ? h2.getDistanceKm() : Double.MAX_VALUE
-                        );
+                                h2.getDistanceKm() != null ? h2.getDistanceKm() : Double.MAX_VALUE);
                     }
                     return Double.compare(
                             h2.getAverageRating() != null ? h2.getAverageRating() : 0.0,
-                            h1.getAverageRating() != null ? h1.getAverageRating() : 0.0
-                    );
+                            h1.getAverageRating() != null ? h1.getAverageRating() : 0.0);
                 })
                 .collect(Collectors.toList());
     }
@@ -337,15 +328,13 @@ public class HotelRecommendationService {
             hotels = hotelRepository.findNearestHotels(
                     searchRequest.getLatitude(),
                     searchRequest.getLongitude(),
-                    searchRequest.getLimit()
-            );
+                    searchRequest.getLimit());
         } else if (searchRequest.getCity() != null) {
             hotels = hotelRepository.findByCityIgnoreCaseAndActiveTrue(searchRequest.getCity());
         } else if (searchRequest.getSearchQuery() != null) {
             hotels = hotelRepository.searchHotels(
                     searchRequest.getSearchQuery(),
-                    PageRequest.of(searchRequest.getPage() - 1, searchRequest.getLimit())
-            ).getContent();
+                    PageRequest.of(searchRequest.getPage() - 1, searchRequest.getLimit())).getContent();
         } else {
             hotels = hotelRepository.findByActiveTrue();
         }
@@ -356,8 +345,7 @@ public class HotelRecommendationService {
                 .map(hotel -> buildHotelRecommendation(
                         hotel,
                         searchRequest.getLatitude(),
-                        searchRequest.getLongitude()
-                ))
+                        searchRequest.getLongitude()))
                 .collect(Collectors.toList());
     }
 
@@ -400,7 +388,8 @@ public class HotelRecommendationService {
         return getHotelRecommendations(city, limit, userLat, userLon, hotels);
     }
 
-    private List<HotelRecommendation> getHotelRecommendations(String city, Integer limit, Double userLat, Double userLon, List<Hotel> hotels) {
+    private List<HotelRecommendation> getHotelRecommendations(String city, Integer limit, Double userLat,
+            Double userLon, List<Hotel> hotels) {
         if (city != null && !city.isEmpty()) {
             hotels = hotels.stream()
                     .filter(h -> h.getCity().equalsIgnoreCase(city))
@@ -513,13 +502,20 @@ public class HotelRecommendationService {
     /**
      * Add or update hotel - invalidates cache
      */
-    @CacheEvict(value = {"nearbyHotels", "featuredHotels"}, allEntries = true)
+    @CacheEvict(value = { "nearbyHotels", "featuredHotels" }, allEntries = true)
     public void addOrUpdateHotel(Hotel hotel) {
         Hotel savedHotel = hotelRepository.save(hotel);
 
+        // Reload with images eagerly loaded to prevent LazyInitializationException
+        // during caching
+        Hotel hotelWithImages = hotelRepository.findAllWithImages().stream()
+                .filter(h -> h.getId().equals(savedHotel.getId()))
+                .findFirst()
+                .orElse(savedHotel);
+
         // Update Redis geo index and cache
-        redisCache.updateHotelLocation(savedHotel);
-        redisCache.cacheHotelDetails(savedHotel);
+        redisCache.updateHotelLocation(hotelWithImages);
+        redisCache.cacheHotelDetails(hotelWithImages);
 
         log.info("Hotel {} added/updated in cache", savedHotel.getId());
     }
@@ -527,7 +523,7 @@ public class HotelRecommendationService {
     /**
      * Delete hotel - invalidates cache
      */
-    @CacheEvict(value = {"nearbyHotels", "featuredHotels"}, allEntries = true)
+    @CacheEvict(value = { "nearbyHotels", "featuredHotels" }, allEntries = true)
     public void deleteHotel(Long hotelId) {
         hotelRepository.deleteById(hotelId);
         redisCache.removeHotelFromGeoIndex(hotelId);
@@ -548,16 +544,14 @@ public class HotelRecommendationService {
                     request.getMaxPrice(),
                     request.getSortBy(),
                     request.getLimit(),
-                    offset
-            );
+                    offset);
         } else {
             return hotelRepository.findHotelsWithinRadius(
                     request.getLatitude(),
                     request.getLongitude(),
                     request.getRadiusKm(),
                     request.getLimit(),
-                    offset
-            );
+                    offset);
         }
     }
 
@@ -631,30 +625,27 @@ public class HotelRecommendationService {
     }
 
     private void sortRecommendations(List<HotelRecommendation> recommendations, String sortBy) {
-        if (sortBy == null) sortBy = "distance";
+        if (sortBy == null)
+            sortBy = "distance";
 
         switch (sortBy.toLowerCase()) {
             case "price":
                 recommendations.sort(Comparator.comparing(
-                        r -> r.getMinPrice() != null ? r.getMinPrice() : BigDecimal.valueOf(Double.MAX_VALUE)
-                ));
+                        r -> r.getMinPrice() != null ? r.getMinPrice() : BigDecimal.valueOf(Double.MAX_VALUE)));
                 break;
             case "rating":
                 recommendations.sort(Comparator.comparing(
                         HotelRecommendation::getAverageRating,
-                        Comparator.nullsLast(Comparator.reverseOrder())
-                ));
+                        Comparator.nullsLast(Comparator.reverseOrder())));
                 break;
             case "distance":
                 recommendations.sort(Comparator.comparing(
-                        r -> r.getDistanceKm() != null ? r.getDistanceKm() : Double.MAX_VALUE
-                ));
+                        r -> r.getDistanceKm() != null ? r.getDistanceKm() : Double.MAX_VALUE));
                 break;
             default:
                 recommendations.sort(Comparator.comparing(
                         HotelRecommendation::getRecommendationScore,
-                        Comparator.nullsLast(Comparator.reverseOrder())
-                ));
+                        Comparator.nullsLast(Comparator.reverseOrder())));
         }
     }
 
@@ -678,7 +669,8 @@ public class HotelRecommendationService {
     }
 
     private String formatDistance(Double distanceKm) {
-        if (distanceKm == null) return null;
+        if (distanceKm == null)
+            return null;
         if (distanceKm < 1) {
             return String.format("%.0f m away", distanceKm * 1000);
         } else {
@@ -691,7 +683,8 @@ public class HotelRecommendationService {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue(json, new TypeReference<List<String>>() {});
+            return objectMapper.readValue(json, new TypeReference<List<String>>() {
+            });
         } catch (Exception e) {
             log.warn("Failed to parse JSON array: {}", json);
             return new ArrayList<>();
@@ -703,7 +696,8 @@ public class HotelRecommendationService {
             return new ArrayList<>();
         }
         try {
-            return objectMapper.readValue((JsonParser) json, new TypeReference<List<String>>() {});
+            return objectMapper.readValue((JsonParser) json, new TypeReference<List<String>>() {
+            });
         } catch (Exception e) {
             log.warn("Failed to parse JSON array: {}", json);
             return new ArrayList<>();

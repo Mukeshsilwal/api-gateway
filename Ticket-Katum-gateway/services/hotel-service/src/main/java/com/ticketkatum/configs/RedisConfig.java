@@ -18,6 +18,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableCaching
@@ -53,37 +55,53 @@ public class RedisConfig {
     }
 
     @Bean
-    public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.activateDefaultTyping(
-                LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
-                JsonTypeInfo.As.PROPERTY
-        );
-
-        GenericJackson2JsonRedisSerializer serializer =
-                new GenericJackson2JsonRedisSerializer(objectMapper);
-
+    public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+        // Default cache configuration
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(30))
-                .serializeKeysWith(RedisSerializationContext.SerializationPair
-                        .fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair
-                        .fromSerializer(serializer))
+                .entryTtl(Duration.ofMinutes(10))
+                .serializeKeysWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new StringRedisSerializer()))
+                .serializeValuesWith(
+                        RedisSerializationContext.SerializationPair.fromSerializer(
+                                new GenericJackson2JsonRedisSerializer()))
                 .disableCachingNullValues();
+
+        // Specific cache configurations
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+
+        // Hotels cache - 10 minutes
+        cacheConfigurations.put("hotels",
+                defaultConfig.entryTtl(Duration.ofMinutes(10)));
+
+        // Hotel search cache - 5 minutes
+        cacheConfigurations.put("hotel-search",
+                defaultConfig.entryTtl(Duration.ofMinutes(5)));
+
+        // Featured hotels cache - 1 hour
+        cacheConfigurations.put("featured-hotels",
+                defaultConfig.entryTtl(Duration.ofHours(1)));
+
+        // Hotel recommendations cache - 30 minutes
+        cacheConfigurations.put("hotel-recommendations",
+                defaultConfig.entryTtl(Duration.ofMinutes(30)));
+
+        // Cities cache - 24 hours (rarely changes)
+        cacheConfigurations.put("cities",
+                defaultConfig.entryTtl(Duration.ofHours(24)));
+
+        // Room availability cache - 2 minutes (frequently changes)
+        cacheConfigurations.put("room-availability",
+                defaultConfig.entryTtl(Duration.ofMinutes(2)));
+
+        // Hotel reviews cache - 15 minutes
+        cacheConfigurations.put("hotel-reviews",
+                defaultConfig.entryTtl(Duration.ofMinutes(15)));
 
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
-                .withCacheConfiguration("nearbyHotels",
-                        RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofMinutes(30)))
-                .withCacheConfiguration("hotelDetails",
-                        RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofHours(24)))
-                .withCacheConfiguration("featuredHotels",
-                        RedisCacheConfiguration.defaultCacheConfig()
-                                .entryTtl(Duration.ofHours(6)))
+                .withInitialCacheConfigurations(cacheConfigurations)
+                .transactionAware()
                 .build();
     }
 

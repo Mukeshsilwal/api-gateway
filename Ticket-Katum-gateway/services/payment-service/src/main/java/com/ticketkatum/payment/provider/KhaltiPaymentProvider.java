@@ -1,7 +1,7 @@
 package com.ticketkatum.payment.provider;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketkatum.configs.config.KhaltiConfig;
+import com.ticketkatum.configs.KhaltiConfig;
 import com.ticketkatum.entity.PaymentTransaction;
 import com.ticketkatum.utils.Request;
 import com.ticketkatum.utils.Response;

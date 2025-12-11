@@ -1,0 +1,233 @@
+# ============================================================
+# Redis Cache Configuration
+# ============================================================
+
+spring:
+  # ========== Redis Connection ==========
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      database: ${REDIS_DATABASE:0}
+      
+      # Connection timeout
+      timeout: ${REDIS_TIMEOUT:6000ms}
+      
+      # Connection pool (Lettuce)
+      lettuce:
+        pool:
+          max-active: ${REDIS_POOL_MAX_ACTIVE:20}
+          max-idle: ${REDIS_POOL_MAX_IDLE:10}
+          min-idle: ${REDIS_POOL_MIN_IDLE:5}
+          max-wait: ${REDIS_POOL_MAX_WAIT:2000ms}
+        
+        # Shutdown timeout
+        shutdown-timeout: 100ms
+      
+      # Cluster configuration (for production)
+      cluster:
+        nodes: ${REDIS_CLUSTER_NODES:}
+        max-redirects: 3
+      
+      # Sentinel configuration (for HA)
+      sentinel:
+        master: ${REDIS_SENTINEL_MASTER:}
+        nodes: ${REDIS_SENTINEL_NODES:}
+
+  # ========== Cache Configuration ==========
+  cache:
+    type: redis
+    redis:
+      # Default TTL
+      time-to-live: ${CACHE_DEFAULT_TTL:600000}  # 10 minutes
+      
+      # Cache null values
+      cache-null-values: false
+      
+      # Key prefix
+      key-prefix: ${spring.application.name}:
+      
+      # Use key prefix
+      use-key-prefix: true
+
+# ============================================================
+# Cache-Specific TTL Configuration
+# ============================================================
+cache:
+  ttl:
+    # Hotel Service
+    hotels: 600000              # 10 minutes
+    hotel-search: 300000        # 5 minutes
+    featured-hotels: 3600000    # 1 hour
+    hotel-recommendations: 1800000  # 30 minutes
+    cities: 86400000            # 24 hours
+    room-availability: 120000   # 2 minutes
+    hotel-reviews: 900000       # 15 minutes
+    
+    # Booking Service
+    user-bookings: 300000       # 5 minutes
+    booking-details: 600000     # 10 minutes
+    booking-status: 60000       # 1 minute
+    
+    # Bus Service
+    bus-routes: 3600000         # 1 hour
+    bus-schedules: 1800000      # 30 minutes
+    seat-availability: 60000    # 1 minute
+    bus-operators: 86400000     # 24 hours
+    
+    # Payment Service
+    payment-methods: 3600000    # 1 hour
+    payment-status: 30000       # 30 seconds
+    transaction-history: 600000 # 10 minutes
+    
+    # Auth Service
+    user-sessions: 1800000      # 30 minutes
+    user-profiles: 900000       # 15 minutes
+    user-permissions: 3600000   # 1 hour
+
+# ============================================================
+# Cache Warming Configuration
+# ============================================================
+cache:
+  warming:
+    enabled: ${CACHE_WARMING_ENABLED:true}
+    
+    # Warm cache on startup
+    on-startup: true
+    
+    # Scheduled warming (cron)
+    schedule:
+      featured-hotels: "0 0 * * * *"      # Every hour
+      cities: "0 0 0 * * *"                # Daily at midnight
+      bus-routes: "0 0 */6 * * *"          # Every 6 hours
+      bus-operators: "0 0 0 * * *"         # Daily
+    
+    # Batch size for warming
+    batch-size: 100
+
+# ============================================================
+# Cache Eviction Configuration
+# ============================================================
+cache:
+  eviction:
+    # Eviction policy
+    policy: ${CACHE_EVICTION_POLICY:LRU}  # LRU, LFU, FIFO
+    
+    # Max memory
+    max-memory: ${CACHE_MAX_MEMORY:512mb}
+    
+    # Max memory policy
+    max-memory-policy: ${CACHE_MAX_MEMORY_POLICY:allkeys-lru}
+    
+    # Eviction sample size
+    sample-size: 5
+
+# ============================================================
+# Cache Monitoring Configuration
+# ============================================================
+management:
+  metrics:
+    enable:
+      cache: true
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+  
+  health:
+    redis:
+      enabled: true
+  
+  endpoint:
+    caches:
+      enabled: true
+
+# ============================================================
+# Logging Configuration
+# ============================================================
+logging:
+  level:
+    org.springframework.cache: ${CACHE_LOG_LEVEL:INFO}
+    org.springframework.data.redis: ${REDIS_LOG_LEVEL:INFO}
+    io.lettuce.core: ${LETTUCE_LOG_LEVEL:WARN}
+
+# ============================================================
+# Profile-Specific Overrides
+# ============================================================
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  data:
+    redis:
+      lettuce:
+        pool:
+          max-active: 10
+          max-idle: 5
+          min-idle: 2
+
+cache:
+  warming:
+    enabled: false
+  
+  ttl:
+    # Shorter TTLs for development
+    hotels: 60000               # 1 minute
+    hotel-search: 30000         # 30 seconds
+
+logging:
+  level:
+    org.springframework.cache: DEBUG
+    org.springframework.data.redis: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: staging
+
+  data:
+    redis:
+      lettuce:
+        pool:
+          max-active: 15
+          max-idle: 8
+          min-idle: 3
+
+cache:
+  warming:
+    enabled: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  data:
+    redis:
+      # Use cluster in production
+      cluster:
+        nodes: ${REDIS_CLUSTER_NODES}
+      
+      lettuce:
+        pool:
+          max-active: 30
+          max-idle: 15
+          min-idle: 10
+
+cache:
+  warming:
+    enabled: true
+  
+  eviction:
+    max-memory: 2gb
+
+logging:
+  level:
+    org.springframework.cache: WARN
+    org.springframework.data.redis: WARN

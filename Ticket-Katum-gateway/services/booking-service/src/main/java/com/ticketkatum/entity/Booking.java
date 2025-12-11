@@ -18,7 +18,6 @@ public class Booking {
 
     @Column(nullable = false)
     private String customerId;
-
     @Column(nullable = false)
     private String category; // BUS, PLANE, CINEMA, HOTEL
 

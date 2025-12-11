@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
  * 7. Use appropriate HTTP status codes
  */
 @Slf4j
-@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @Value("${app.debug-mode:false}")

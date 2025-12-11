@@ -1,6 +1,6 @@
 package com.ticketkatum.service;
 
-import com.ticketkatum.configs.config.KhaltiConfig;
+import com.ticketkatum.configs.KhaltiConfig;
 import com.ticketkatum.entity.PaymentTransaction;
 import com.ticketkatum.enums.TransactionStatus;
 import com.ticketkatum.repository.PaymentTransactionRepository;

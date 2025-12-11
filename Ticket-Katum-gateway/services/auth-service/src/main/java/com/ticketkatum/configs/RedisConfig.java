@@ -18,6 +18,8 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 @Configuration
 @EnableCaching
@@ -62,6 +64,8 @@ public class RedisConfig {
                 JsonTypeInfo.As.PROPERTY
         );
 
+
+
         GenericJackson2JsonRedisSerializer serializer =
                 new GenericJackson2JsonRedisSerializer(objectMapper);
 
@@ -73,8 +77,17 @@ public class RedisConfig {
                         .fromSerializer(serializer))
                 .disableCachingNullValues();
 
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+
+        cacheConfigurations.put("users", defaultConfig.entryTtl(Duration.ofMinutes(15)));
+        cacheConfigurations.put("user-sessions", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("refresh-tokens", defaultConfig.entryTtl(Duration.ofHours(1)));
+        cacheConfigurations.put("user-permissions", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("otp-codes", defaultConfig.entryTtl(Duration.ofMinutes(5)));
+
         return RedisCacheManager.builder(connectionFactory)
                 .cacheDefaults(defaultConfig)
+                .withInitialCacheConfigurations(cacheConfigurations)
                 .withCacheConfiguration("nearbyHotels",
                         RedisCacheConfiguration.defaultCacheConfig()
                                 .entryTtl(Duration.ofMinutes(30)))
