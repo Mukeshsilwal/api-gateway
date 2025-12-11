@@ -17,9 +17,13 @@ import org.slf4j.MDC;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -167,6 +171,36 @@ public class HotelServiceImpl implements HotelService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    // Caching paginated results is complex due to combinations.
+    // For now, we rely on database performance or specific cache keys if needed.
+    // @Cacheable(value = "hotel-search-paged", key = "{#city, #minStars, #maxPrice,
+    // #pageable.pageNumber, #pageable.pageSize}")
+    public Page<HotelDTO> getAllHotels(String city, Integer minStars, Integer maxPrice, Pageable pageable) {
+        log.debug("Fetching hotels with filters - city: {}, stars: {}, price: {}, page: {}",
+                city, minStars, maxPrice, pageable.getPageNumber());
+
+        Specification<Hotel> spec = Specification.where(HotelSpecification.isActive())
+                .and(HotelSpecification.hasCity(city))
+                .and(HotelSpecification.hasMinStars(minStars))
+                .and(HotelSpecification.hasMaxPrice(maxPrice != null ? BigDecimal.valueOf(maxPrice) : null));
+
+        Page<Hotel> hotelPage = hotelRepository.findAll(spec, pageable);
+
+        // Initialize collections for the page content
+        hotelPage.getContent().forEach(hotel -> {
+            Hibernate.initialize(hotel.getImages());
+            Hibernate.initialize(hotel.getRooms());
+            hotel.getRooms().forEach(room -> Hibernate.initialize(room.getAmenities()));
+        });
+
+        log.info("Found {} hotels (page {} of {})",
+                hotelPage.getNumberOfElements(), hotelPage.getNumber(), hotelPage.getTotalPages());
+
+        return hotelPage.map(hotelMapper::toDTO);
+    }
+
+    @Override
     @Transactional
     @CachePut(value = "hotels", key = "#result.id")
     @CacheEvict(value = { "hotel-search", "featured-hotels" }, allEntries = true)
@@ -257,56 +291,5 @@ public class HotelServiceImpl implements HotelService {
         // Validate contact information
         ValidationUtils.validateEmail(request.getEmail());
         ValidationUtils.validatePhoneNumber(request.getPhone());
-    }
-
-    /**
-     * Get all hotels with pagination
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<HotelDTO> getAllHotels(
-            org.springframework.data.domain.Pageable pageable) {
-        log.debug("Fetching hotels with pagination - page: {}, size: {}",
-                pageable.getPageNumber(), pageable.getPageSize());
-
-        org.springframework.data.domain.Page<Hotel> hotelPage = hotelRepository.findAll(
-                HotelSpecification.isActive(), pageable);
-
-        // Initialize collections for all hotels
-        hotelPage.getContent().forEach(hotel -> {
-            org.hibernate.Hibernate.initialize(hotel.getImages());
-            org.hibernate.Hibernate.initialize(hotel.getRooms());
-        });
-
-        return hotelPage.map(hotelMapper::toDTO);
-    }
-
-    /**
-     * Search hotels with filters and pagination
-     */
-    @Override
-    @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<HotelDTO> searchHotels(
-            String city, Integer minStars, Integer maxStars,
-            java.math.BigDecimal minPrice, java.math.BigDecimal maxPrice,
-            Boolean featured, String searchQuery,
-            org.springframework.data.domain.Pageable pageable) {
-
-        log.debug("Searching hotels - city: {}, stars: {}-{}, price: {}-{}, featured: {}, query: {}",
-                city, minStars, maxStars, minPrice, maxPrice, featured, searchQuery);
-
-        org.springframework.data.jpa.domain.Specification<Hotel> spec = HotelSpecification.withFilters(city, minStars,
-                maxStars,
-                minPrice, maxPrice, featured, true, searchQuery);
-
-        org.springframework.data.domain.Page<Hotel> hotelPage = hotelRepository.findAll(spec, pageable);
-
-        // Initialize collections for all hotels
-        hotelPage.getContent().forEach(hotel -> {
-            org.hibernate.Hibernate.initialize(hotel.getImages());
-            org.hibernate.Hibernate.initialize(hotel.getRooms());
-        });
-
-        return hotelPage.map(hotelMapper::toDTO);
     }
 }
