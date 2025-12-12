@@ -89,7 +89,8 @@ public class SecurityConfiguration {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/error",
-                                "/api/users/**"
+                                "/api/users/**",
+                                "/api/registration/**"
                         ).permitAll()
 
                         // API documentation

@@ -4,6 +4,7 @@ import com.ticketkatum.dto.auth.AdminRegistrationRequestWeb;
 import com.ticketkatum.dto.auth.request.ApiResponse;
 import com.ticketkatum.dto.auth.request.ChangePasswordRequest;
 import com.ticketkatum.dto.auth.request.OtpRequestWeb;
+import com.ticketkatum.dto.auth.response.RegistrationResponse;
 import com.ticketkatum.service.RegistrationBffService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class RegistrationBffController {
      * POST /api/bff/registration/admin/request
      */
     @PostMapping("/admin/request")
-    public Mono<ResponseEntity<ApiResponse<String>>> registerAdmin(
+    public Mono<ResponseEntity<ApiResponse<RegistrationResponse>>> registerAdmin(
             @Valid @RequestBody AdminRegistrationRequestWeb request) {
 
         log.info("BFF Controller: Received admin registration request for: {}", request.getEmail());
@@ -48,7 +49,7 @@ public class RegistrationBffController {
                     log.error("BFF Controller: Registration failed", error);
                     return Mono.just(ResponseEntity
                             .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(ApiResponse.<String>builder()
+                            .body(ApiResponse.<RegistrationResponse>builder()
                                     .success(false)
                                     .message("Registration failed: " + error.getMessage())
                                     .build()));
@@ -62,7 +63,7 @@ public class RegistrationBffController {
     @PostMapping("/admin/approve/{requestId}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public Mono<ResponseEntity<ApiResponse<String>>> approveRequest(
-            @PathVariable Long requestId,
+            @PathVariable("requestId") Long requestId,
             @RequestHeader("Authorization") String authorization) {
 
         log.info("BFF Controller: Approving request ID: {}", requestId);

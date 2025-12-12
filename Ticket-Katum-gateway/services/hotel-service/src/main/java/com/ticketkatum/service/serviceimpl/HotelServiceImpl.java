@@ -95,7 +95,7 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "hotels", key = "#hotelId", unless = "#result == null")
+    @Cacheable(value = "hotels", key = "#root.args[0]", unless = "#result == null")
     public HotelDTO getHotel(Long hotelId) {
         MDC.put("hotelId", String.valueOf(hotelId));
 
@@ -124,7 +124,7 @@ public class HotelServiceImpl implements HotelService {
 
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "hotels", key = "#hotelCode", unless = "#result == null")
+    @Cacheable(value = "hotels", key = "#root.args[0]", unless = "#result == null")
     public HotelDTO getHotelByCode(String hotelCode) {
         MDC.put("hotelCode", hotelCode);
 

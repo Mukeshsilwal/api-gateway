@@ -251,16 +251,6 @@ public class RoomServiceImpl implements RoomService {
         }
     }
 
-    @Override
-    public Page<RoomDTO> getRoomsByHotel(String hotelCode, Pageable pageable) {
-        return null;
-    }
-
-    @Override
-    public Page<RoomDTO> searchRooms(Long hotelId, String roomType, Integer minCapacity, BigDecimal maxPrice, Boolean active, Pageable pageable) {
-        return null;
-    }
-
     /**
      * Validate room data
      *

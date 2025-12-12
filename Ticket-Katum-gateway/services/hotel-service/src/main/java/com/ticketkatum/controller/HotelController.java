@@ -64,7 +64,7 @@ public class HotelController {
         })
         @GetMapping("/{hotelId}")
         public ResponseEntity<Response<HotelDTO>> getHotel(
-                        @Parameter(description = "Hotel ID", required = true, example = "1") @PathVariable @Min(value = 1, message = "Hotel ID must be positive") Long hotelId) {
+                        @Parameter(description = "Hotel ID", required = true, example = "1") @PathVariable("hotelId") @Min(value = 1, message = "Hotel ID must be positive") Long hotelId) {
 
                 log.info("Fetching hotel with ID: {}", hotelId);
 
@@ -75,20 +75,13 @@ public class HotelController {
 
         @Operation(summary = "Get all hotels", description = "Retrieves all hotels with optional filters and pagination")
         @GetMapping
-        public ResponseEntity<Response<org.springframework.data.domain.Page<HotelDTO>>> getAllHotels(
-                        @Parameter(description = "Filter by city") @RequestParam(required = false) String city,
-                        @Parameter(description = "Minimum stars rating") @RequestParam(required = false) @Min(1) Integer minStars,
-                        @Parameter(description = "Maximum price") @RequestParam(required = false) Integer maxPrice,
-                        @Parameter(description = "Pagination information") @org.springframework.data.web.PageableDefault(size = 10, sort = "name", direction = org.springframework.data.domain.Sort.Direction.ASC) org.springframework.data.domain.Pageable pageable) {
+        public ResponseEntity<Response<List<HotelDTO>>> getAllHotels(
+                        ) {
 
-                log.info("Fetching all hotels - city: {}, minStars: {}, maxPrice: {}, page: {}", city, minStars,
-                                maxPrice, pageable.getPageNumber());
+                List<HotelDTO> hotels = hotelService.getAllHotels();
 
-                org.springframework.data.domain.Page<HotelDTO> hotels = hotelService.getAllHotels(city, minStars,
-                                maxPrice, pageable);
-
-                Response<org.springframework.data.domain.Page<HotelDTO>> response = ResponseHandler.success(
-                                "Found " + hotels.getTotalElements() + " hotels",
+                Response<List<HotelDTO>> response = ResponseHandler.success(
+                                "Found " + hotels.size() + " hotels",
                                 hotels);
                 return ResponseEntity.ok(response);
         }
@@ -101,7 +94,7 @@ public class HotelController {
         })
         @PutMapping("/{hotelId}")
         public ResponseEntity<Response<HotelDTO>> updateHotel(
-                        @Parameter(description = "Hotel ID", required = true) @PathVariable @Min(1) Long hotelId,
+                        @Parameter(description = "Hotel ID", required = true) @PathVariable("hotelId") @Min(1) Long hotelId,
                         @Valid @RequestBody CreateHotelRequest request) {
 
                 log.info("Updating hotel: {}", hotelId);
@@ -118,7 +111,7 @@ public class HotelController {
         })
         @DeleteMapping("/{hotelId}")
         public ResponseEntity<Response<Void>> deleteHotel(
-                        @Parameter(description = "Hotel ID", required = true) @PathVariable @Min(1) Long hotelId) {
+                        @Parameter(description = "Hotel ID", required = true) @PathVariable("hotelId") @Min(1) Long hotelId) {
 
                 log.info("Deleting hotel: {}", hotelId);
 
@@ -132,7 +125,7 @@ public class HotelController {
         @Operation(summary = "Add room to hotel", description = "Adds a new room to an existing hotel")
         @PostMapping("/{hotelCode}/rooms")
         public ResponseEntity<Response<RoomDTO>> addRoomToHotel(
-                        @Parameter(description = "Hotel code", required = true) @PathVariable String hotelCode,
+                        @Parameter(description = "Hotel code", required = true) @PathVariable("hotelCode") String hotelCode,
                         @Valid @RequestBody CreateRoomRequest request) {
 
                 log.info("Adding room to hotel: {}", hotelCode);
@@ -145,7 +138,7 @@ public class HotelController {
         @Operation(summary = "Get rooms by hotel", description = "Retrieves all rooms for a specific hotel")
         @GetMapping("/{hotelCode}/rooms")
         public ResponseEntity<Response<List<RoomDTO>>> getRoomsByHotel(
-                        @PathVariable String hotelCode,
+                        @PathVariable("hotelCode") String hotelCode,
                         @RequestParam(required = false) String roomType,
                         @RequestParam(required = false) Boolean active) {
 
@@ -175,7 +168,7 @@ public class HotelController {
         @Operation(summary = "Get room by ID", description = "Retrieves room details by ID")
         @GetMapping("/rooms/{roomId}")
         public ResponseEntity<Response<RoomDTO>> getRoomById(
-                        @PathVariable @Min(1) Long roomId) {
+                        @PathVariable("roomId") @Min(1) Long roomId) {
 
                 log.info("Fetching room with ID: {}", roomId);
 
@@ -187,7 +180,7 @@ public class HotelController {
         @Operation(summary = "Update room", description = "Updates an existing room")
         @PutMapping("/rooms/{roomId}")
         public ResponseEntity<Response<RoomDTO>> updateRoom(
-                        @PathVariable @Min(1) Long roomId,
+                        @PathVariable("roomId") @Min(1) Long roomId,
                         @Valid @RequestBody CreateRoomRequest request) {
 
                 log.info("Updating room: {}", roomId);
@@ -200,7 +193,7 @@ public class HotelController {
         @Operation(summary = "Delete room", description = "Deletes a room by ID")
         @DeleteMapping("/rooms/{roomId}")
         public ResponseEntity<Response<Void>> deleteRoom(
-                        @PathVariable @Min(1) Long roomId) {
+                        @PathVariable("roomId") @Min(1) Long roomId) {
 
                 log.info("Deleting room: {}", roomId);
 
@@ -212,7 +205,7 @@ public class HotelController {
         @Operation(summary = "Search hotels by city", description = "Searches for hotels in a specific city")
         @GetMapping("/search/city/name/{city}")
         public ResponseEntity<Response<List<HotelDTO>>> searchHotelsByCity(
-                        @Parameter(description = "City name", required = true) @PathVariable String city) {
+                        @Parameter(description = "City name", required = true) @PathVariable("city") String city) {
 
                 log.info("Searching hotels in city: {}", city);
 
@@ -229,7 +222,7 @@ public class HotelController {
         @Operation(summary = "Get hotel by code", description = "Retrieves hotel details by hotel code")
         @GetMapping("/code/{hotelCode}")
         public ResponseEntity<Response<HotelDTO>> getHotelByCode(
-                        @Parameter(description = "Hotel code", required = true) @PathVariable String hotelCode) {
+                        @Parameter(description = "Hotel code", required = true) @PathVariable("hotelCode") String hotelCode) {
 
                 log.info("Fetching hotel with code: {}", hotelCode);
 

@@ -30,14 +30,13 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);
 
-        // String serializer for keys
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
         template.setKeySerializer(stringSerializer);
         template.setHashKeySerializer(stringSerializer);
 
-        // JSON serializer for values
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
                 ObjectMapper.DefaultTyping.NON_FINAL,
@@ -54,47 +53,50 @@ public class RedisConfig {
         return template;
     }
 
+
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-        // Default cache configuration
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+        );
+
+        GenericJackson2JsonRedisSerializer serializer =
+                new GenericJackson2JsonRedisSerializer(objectMapper);
+
         RedisCacheConfiguration defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
                 .entryTtl(Duration.ofMinutes(10))
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(
                                 new StringRedisSerializer()))
                 .serializeValuesWith(
-                        RedisSerializationContext.SerializationPair.fromSerializer(
-                                new GenericJackson2JsonRedisSerializer()))
+                        RedisSerializationContext.SerializationPair.fromSerializer(serializer))
                 .disableCachingNullValues();
 
-        // Specific cache configurations
         Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
 
-        // Hotels cache - 10 minutes
         cacheConfigurations.put("hotels",
                 defaultConfig.entryTtl(Duration.ofMinutes(10)));
 
-        // Hotel search cache - 5 minutes
         cacheConfigurations.put("hotel-search",
                 defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
-        // Featured hotels cache - 1 hour
         cacheConfigurations.put("featured-hotels",
                 defaultConfig.entryTtl(Duration.ofHours(1)));
 
-        // Hotel recommendations cache - 30 minutes
         cacheConfigurations.put("hotel-recommendations",
                 defaultConfig.entryTtl(Duration.ofMinutes(30)));
 
-        // Cities cache - 24 hours (rarely changes)
         cacheConfigurations.put("cities",
                 defaultConfig.entryTtl(Duration.ofHours(24)));
 
-        // Room availability cache - 2 minutes (frequently changes)
         cacheConfigurations.put("room-availability",
                 defaultConfig.entryTtl(Duration.ofMinutes(2)));
 
-        // Hotel reviews cache - 15 minutes
         cacheConfigurations.put("hotel-reviews",
                 defaultConfig.entryTtl(Duration.ofMinutes(15)));
 
@@ -104,6 +106,7 @@ public class RedisConfig {
                 .transactionAware()
                 .build();
     }
+
 
     @Bean
     public ChannelTopic bookingUpdatesTopic() {

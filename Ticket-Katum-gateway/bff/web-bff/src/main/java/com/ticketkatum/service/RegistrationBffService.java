@@ -5,6 +5,7 @@ import com.ticketkatum.dto.auth.AdminRegistrationRequestWeb;
 import com.ticketkatum.dto.auth.request.ApiResponse;
 import com.ticketkatum.dto.auth.request.ChangePasswordRequest;
 import com.ticketkatum.dto.auth.request.OtpRequestWeb;
+import com.ticketkatum.dto.auth.response.RegistrationResponse;
 import com.ticketkatum.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +27,14 @@ public class RegistrationBffService {
     /**
      * Register new admin
      */
-    public Mono<ApiResponse<String>> registerAdmin(AdminRegistrationRequestWeb request) {
+    public Mono<ApiResponse<RegistrationResponse>> registerAdmin(AdminRegistrationRequestWeb request) {
         log.info("BFF: Processing admin registration request for email: {}", request.getEmail());
 
         return Mono.fromFuture(() -> registrationServiceClient.registerAdmin(request))
-                .map(resp -> ApiResponse.<String>builder()
+                .map(resp -> ApiResponse.<RegistrationResponse>builder()
                         .success(true)
                         .message(resp.getMessage())
-                        .data(resp.getData() != null ? resp.getData().toString() : null)
+                        .data(resp.getData() != null ? resp.getData(): null)
                         .build())
                 .doOnSuccess(r -> log.info("BFF: Registration request successful for: {}", request.getEmail()))
                 .doOnError(e -> log.error("BFF: Registration request failed: {}", e.getMessage()))

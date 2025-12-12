@@ -5,7 +5,10 @@ import com.ticketkatum.entity.User;
 import com.ticketkatum.model.AdminRegistrationRequestDto;
 import com.ticketkatum.model.ChangePasswordRequest;
 import com.ticketkatum.model.CreateRegistrationRequest;
+import com.ticketkatum.model.RegistrationResponse;
 import com.ticketkatum.service.serviceimpl.RegistrationService;
+import com.ticketkatum.utils.Response;
+import com.ticketkatum.utils.ResponseHandler;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,19 +35,16 @@ public class RegistrationController {
      * Creates a new admin registration request that requires super admin approval
      */
     @PostMapping("/admin/request")
-    public ResponseEntity<Map<String, Object>> registerAdmin(
+    public ResponseEntity<Response<RegistrationResponse>> registerAdmin(
             @Valid @RequestBody CreateRegistrationRequest request) {
 
         log.info("Received admin registration request for email: {}", request.getEmail());
-
-        registrationService.registerAdmin(request);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("message", "Registration request submitted successfully. Please wait for approval.");
-        response.put("email", request.getEmail());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        RegistrationResponse registrationResponse = registrationService.registerAdmin(request);
+        Response<RegistrationResponse> registrationResponseResponse = ResponseHandler.success(
+                "Registration request submitted successfully. Please wait for approval.",
+                registrationResponse
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(registrationResponseResponse);
     }
 
     /**
@@ -54,7 +54,7 @@ public class RegistrationController {
      */
     @PostMapping("/admin/approve/{requestId}")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<Map<String, Object>> approveRequest(@PathVariable Long requestId) {
+    public ResponseEntity<Map<String, Object>> approveRequest(@PathVariable("requestId") Long requestId) {
 
         log.info("Received approval request for registration ID: {}", requestId);
 

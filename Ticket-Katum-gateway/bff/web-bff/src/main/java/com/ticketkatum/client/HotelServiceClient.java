@@ -86,15 +86,12 @@ public class HotelServiceClient {
      */
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getAllHotelsFallback")
     @Retry(name = SERVICE_NAME)
-    public CompletableFuture<List<HotelDTO>> getAllHotels(String city, Integer minStars) {
-        log.debug("Fetching all hotels - city: {}, minStars: {}", city, minStars);
+    public CompletableFuture<List<HotelDTO>> getAllHotels() {
 
         return getWebClient()
                 .get()
                 .uri(uriBuilder -> {
                     var builder = uriBuilder.path("/api/v1/hotels");
-                    if (city != null) builder.queryParam("city", city);
-                    if (minStars != null) builder.queryParam("minStars", minStars);
                     return builder.build();
                 })
                 .retrieve()

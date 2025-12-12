@@ -32,10 +32,7 @@ public class HotelMapper {
                 .phone(hotel.getPhone())
                 .email(hotel.getEmail())
                 .stars(hotel.getStars())
-                .rating(hotel.getRating())
-                .createdAt(hotel.getCreatedAt())
-                .updatedAt(hotel.getUpdatedAt());
-
+                .rating(hotel.getRating());
         // SAFE: Only access images if initialized
         if (Hibernate.isInitialized(hotel.getImages())) {
             builder.images(new HashSet<>(hotel.getImages()));
@@ -171,8 +168,6 @@ public class HotelMapper {
                 .rooms(hotel.getRooms().stream()
                         .map(this::roomToDTOWithCollections)
                         .collect(Collectors.toList()))
-                .createdAt(hotel.getCreatedAt())
-                .updatedAt(hotel.getUpdatedAt())
                 .build();
     }
 

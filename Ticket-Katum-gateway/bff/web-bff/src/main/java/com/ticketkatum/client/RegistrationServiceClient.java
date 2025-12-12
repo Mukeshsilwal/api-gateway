@@ -6,6 +6,7 @@ import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.auth.AdminRegistrationRequestDto;
 import com.ticketkatum.dto.auth.AdminRegistrationRequestWeb;
 import com.ticketkatum.dto.auth.request.ChangePasswordRequest;
+import com.ticketkatum.dto.auth.response.RegistrationResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class RegistrationServiceClient {
 
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "registerAdminFallback")
     @Retry(name = SERVICE_NAME)
-    public CompletableFuture<Response<Void>> registerAdmin(AdminRegistrationRequestWeb request) {
+    public CompletableFuture<Response<RegistrationResponse>> registerAdmin(AdminRegistrationRequestWeb request) {
         log.debug("Registering admin: {}", request.getEmail());
 
         return getWebClient()
@@ -49,7 +50,7 @@ public class RegistrationServiceClient {
                 .uri("/api/registration/admin/request")
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<Void>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<RegistrationResponse>>() {})
                 .toFuture();
     }
 

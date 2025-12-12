@@ -1,4 +1,4 @@
-package com.ticketkatum.config;
+package com.ticketkatum.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

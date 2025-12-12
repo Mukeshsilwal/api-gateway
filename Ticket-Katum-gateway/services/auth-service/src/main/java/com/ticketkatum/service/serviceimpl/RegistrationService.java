@@ -12,6 +12,7 @@ import com.ticketkatum.exceotions.ResourceNotFoundException;
 import com.ticketkatum.model.AdminRegistrationRequestDto;
 import com.ticketkatum.model.ChangePasswordRequest;
 import com.ticketkatum.model.CreateRegistrationRequest;
+import com.ticketkatum.model.RegistrationResponse;
 import com.ticketkatum.repository.OtpRepository;
 import com.ticketkatum.repository.RegistrationRequestRepo;
 import com.ticketkatum.repository.UserRepo;
@@ -42,10 +43,9 @@ public class RegistrationService {
     private static final String UPLOAD_DIR = "uploads/documents/";
 
     @Transactional
-    public void registerAdmin(CreateRegistrationRequest dto) {
+    public RegistrationResponse registerAdmin(CreateRegistrationRequest dto) {
         log.info("Processing admin registration request for email: {}", dto.getEmail());
 
-        // Validate email uniqueness
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new BadRequestException("Email already exists");
         }
@@ -54,8 +54,6 @@ public class RegistrationService {
             throw new BadRequestException("A pending request already exists for this email");
         }
 
-
-        // Create registration request
         RegistrationRequest request = RegistrationRequest.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
@@ -66,11 +64,17 @@ public class RegistrationService {
                 .requestedAt(LocalDateTime.now())
                 .build();
 
-        requestRepository.save(request);
+        RegistrationRequest savedRequest = requestRepository.save(request);
         log.info("Admin registration request saved with ID: {}", request.getId());
 
-        // Notify super admin
-        emailService.sendCredentials("", dto.getEmail(),"" );
+        emailService.sendCredentials(dto.getEmail(), dto.getOrganizationName(),"" );
+        RegistrationResponse  registrationResponse = RegistrationResponse.builder()
+                .status(RequestStatus.PENDING)
+                .email(request.getEmail())
+                .requestId(savedRequest.getId())
+                .build();
+
+        return registrationResponse;
     }
 
     @Transactional

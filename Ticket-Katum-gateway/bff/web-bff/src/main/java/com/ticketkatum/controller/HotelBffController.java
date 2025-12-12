@@ -66,7 +66,7 @@ public class HotelBffController {
      */
     @GetMapping("/{hotelId}")
     public CompletableFuture<ResponseEntity<Response<HotelDTO>>> getHotel(
-            @PathVariable Long hotelId) {
+            @PathVariable("hotelId") Long hotelId) {
 
         log.info("Fetching hotel with ID: {}", hotelId);
 
@@ -95,7 +95,7 @@ public class HotelBffController {
      */
     @GetMapping("/code/{hotelCode}")
     public CompletableFuture<ResponseEntity<Response<HotelDTO>>> getHotelByCode(
-            @PathVariable String hotelCode) {
+            @PathVariable("hotelCode") String hotelCode) {
 
         log.info("Fetching hotel with code: {}", hotelCode);
 
@@ -123,13 +123,9 @@ public class HotelBffController {
      * GET /api/v1/hotels?city=Kathmandu&minStars=4
      */
     @GetMapping
-    public CompletableFuture<ResponseEntity<Response<List<HotelDTO>>>> getAllHotels(
-            @RequestParam(required = false) String city,
-            @RequestParam(required = false) Integer minStars) {
+    public CompletableFuture<ResponseEntity<Response<List<HotelDTO>>>> getAllHotels() {
 
-        log.info("Fetching all hotels - city: {}, minStars: {}", city, minStars);
-
-        return hotelClient.getAllHotels(city, minStars)
+        return hotelClient.getAllHotels()
                 .thenApply(hotels -> {
                     Response<List<HotelDTO>> response = Response.<List<HotelDTO>>builder()
                             .statusCode(200)

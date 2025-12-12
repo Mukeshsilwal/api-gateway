@@ -43,6 +43,7 @@ microservices:
   # ========== Authentication & User Services ==========
   auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8089}
   user-service-url: ${USER_SERVICE_URL:http://localhost:8089}
+  registration-service-url: ${REGISTRATION_SERVICE_URL:http://localhost:8089}
 
   # ========== Booking Services ==========
   booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8091}

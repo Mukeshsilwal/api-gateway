@@ -26,7 +26,5 @@ public class HotelDTO {
     private Integer stars;
     private Double rating;
     private Set<String> images;
-    private List<RoomDTO> rooms; // Include rooms without circular reference
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private List<RoomDTO> rooms;
 }
