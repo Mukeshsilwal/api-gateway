@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 50Gi
-  storageClassName: manual
+  storageClassName: standard-rwo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -22,6 +22,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: standard-rwo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -34,7 +35,7 @@ spec:
   resources:
     requests:
       storage: 20Gi
-  storageClassName: manual
+  storageClassName: standard-rwo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -47,7 +48,7 @@ spec:
   resources:
     requests:
       storage: 30Gi
-  storageClassName: manual
+  storageClassName: standard-rwo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -60,6 +61,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
+  storageClassName: standard-rwo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -72,6 +74,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
+  storageClassName: standard-rwo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -84,3 +87,4 @@ spec:
   resources:
     requests:
       storage: 100Gi
+  storageClassName: standard-rwo
