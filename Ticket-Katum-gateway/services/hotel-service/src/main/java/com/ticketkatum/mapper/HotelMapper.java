@@ -82,7 +82,8 @@ public class HotelMapper {
 
         // SAFE: Only access hotel if initialized
         if (room.getHotel() != null && Hibernate.isInitialized(room.getHotel())) {
-            builder.hotelId(room.getHotel().getHotelCode());
+            builder.hotelId(room.getHotel().getId());
+            builder.hotelCode(room.getHotel().getHotelCode());
             builder.hotelName(room.getHotel().getName());
         }
 

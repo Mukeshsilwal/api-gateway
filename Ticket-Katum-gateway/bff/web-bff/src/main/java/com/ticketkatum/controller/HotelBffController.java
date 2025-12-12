@@ -239,7 +239,7 @@ public class HotelBffController {
      */
     @PostMapping("/{hotelCode}/rooms")
     public CompletableFuture<ResponseEntity<Response<RoomDTO>>> addRoomToHotel(
-            @PathVariable String hotelCode,
+            @PathVariable("hotelCode") String hotelCode,
             @Valid @RequestBody CreateRoomRequest request) {
 
         log.info("Adding room to hotel: {}", hotelCode);

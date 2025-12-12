@@ -46,7 +46,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/hotels/search/**",
             "/api/hotels/*",
             "/api/bff/v1/hotels/**",
-            "/api/bff/v1/registration/**"
+            "/api/bff/v1/registration/**",
+            "/api/bff/market/**",
+            "/api/bff/v1/**"
+
 
     };
 

@@ -185,6 +185,16 @@ services:
     networks:
       - ticket-katum-network
 
+  market-service:
+    build:
+      context: ../services/market-service
+      dockerfile: Dockerfile
+    container_name: market-service
+    ports:
+      - "8092:8092"
+    networks:
+      - ticket-katum-network
+
 # =========================
 # Networks & Volumes
 # =========================

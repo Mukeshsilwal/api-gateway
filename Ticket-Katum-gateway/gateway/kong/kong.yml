@@ -121,6 +121,18 @@ upstreams:
       - target: movies-service:8094
         weight: 100
 
+  - name: market-upstream
+    algorithm: round-robin
+    healthchecks:
+      active:
+        http_path: /actuator/health
+        healthy:
+          interval: 10
+          successes: 2
+    targets:
+      - target: market-service:8092
+        weight: 100
+
 # ================================================================
 # SERVICES DEFINITIONS
 # ================================================================
@@ -409,6 +421,30 @@ services:
         config:
           allowed_payload_size: 1
           size_unit: megabytes
+
+  # ============================================================
+  # MARKET SERVICE
+  # ============================================================
+  - name: market-service
+    host: market-upstream
+    protocol: http
+    port: 8092
+    path: /
+    tags:
+      - market
+      - public
+    
+    routes:
+      - name: market-routes
+        paths:
+          - /api/v1/market
+        methods:
+          - GET
+          - POST
+          - OPTIONS
+        strip_path: false
+        tags:
+          - public
 
   # ============================================================
   # INTERNAL SERVICES (Protected)

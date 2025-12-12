@@ -54,7 +54,7 @@ public class RoomMaintenanceController {
      */
     @PostMapping("/assign/{maintenanceId}")
     public ResponseEntity<Response<RoomMaintenanceResponse>> assignStaff(
-            @PathVariable Long maintenanceId,
+            @PathVariable("maintenanceId") Long maintenanceId,
             @RequestParam String staffName) {
 
         log.info("Assigning staff '{}' to maintenance record {}", staffName, maintenanceId);
@@ -87,7 +87,7 @@ public class RoomMaintenanceController {
      */
     @GetMapping("/room/{roomId}")
     public ResponseEntity<Response<RoomMaintenanceResponse>> getByRoomId(
-            @PathVariable Long roomId) {
+            @PathVariable("roomId") Long roomId) {
 
         log.info("Fetching maintenance for room: {}", roomId);
 

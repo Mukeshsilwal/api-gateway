@@ -1,5 +1,6 @@
 package com.ticketkatum.dto.hotel;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -10,6 +11,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RoomDTO {
 
     private Long id;
@@ -25,9 +27,8 @@ public class RoomDTO {
     private Set<String> amenities;
 
     private boolean active;
-
-    private Long hotelId;  // Extracted from Room.hotel.id
-
+    private long hotelId;
+    private String hotelCode;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

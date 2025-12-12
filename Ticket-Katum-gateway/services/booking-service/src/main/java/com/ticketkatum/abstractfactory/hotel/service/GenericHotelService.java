@@ -64,7 +64,6 @@ public class GenericHotelService implements BookingProvider {
 
             if (req.getHotelName() == null) req.setHotelName(config.getHotelName());
 
-            // calculate price from JSON config
             BigDecimal totalAmount = calculateDynamicPrice(req, config);
 
             String bookingId = generateBookingId();

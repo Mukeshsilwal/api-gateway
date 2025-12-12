@@ -46,7 +46,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/api/bff/v1/hotels/**",
-                                "/api/bff/v1/registration/**"
+                                "/api/bff/v1/registration/**",
+                                "/api/bff/market/**",
+                                "/api/bff/v1/**"
                         ).permitAll()
 
                         // Public API endpoints

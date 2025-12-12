@@ -6,8 +6,11 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "seat")
 public class Seat {
 
@@ -15,9 +18,15 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean reserved;
+    @Enumerated(EnumType.STRING)
+    private com.ticketkatum.enums.SeatStatus status;
+
+    private java.time.LocalDateTime holdExpiresAt;
+
+    private Long holdByUserId;
 
     private BigDecimal price;
+    private boolean isReserved;
 
     private String seatNumber;
 

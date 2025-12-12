@@ -1,5 +1,6 @@
 package com.ticketkatum.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CreateRoomRequest {
 
     @NotBlank(message = "Room number is required")
@@ -26,9 +28,6 @@ public class CreateRoomRequest {
     @Pattern(regexp = "^[A-Z0-9-]+$", message = "Room number must contain only uppercase letters, numbers, and hyphens")
     private String roomNumber;
 
-    @NotBlank(message = "Room type is required")
-    @Size(min = 2, max = 50, message = "Room type must be between 2 and 50 characters")
-    @Pattern(regexp = "^(Standard|Deluxe|Suite|Executive|Presidential|Family)$", message = "Room type must be one of: Standard, Deluxe, Suite, Executive, Presidential, Family")
     private String roomType;
 
     // FIXED: Renamed from pricePerNight to basePrice to match Room entity

@@ -31,8 +31,7 @@ public class SeatController {
             List<SeatDto> seatDto = seatService.getAllSeat();
             Response<List<SeatDto>> response = ResponseHandler.success(
                     "Found " + seatDto.size() + " seats",
-                    seatDto
-            );
+                    seatDto);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error fetching seats", e);
@@ -72,13 +71,50 @@ public class SeatController {
             List<SeatDto> dtos = seatService.findSeatRelatedToBus(busName);
             Response<List<SeatDto>> response = ResponseHandler.success(
                     "Found " + dtos.size() + " seats for bus " + busName,
-                    dtos
-            );
+                    dtos);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error fetching seats for bus: {}", busName, e);
             Response<List<SeatDto>> response = ResponseHandler.failure("Failed to fetch seats: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Termporary Hold (Soft Lock)
+     * POST /seat/select?seatId=1&userId=101
+     */
+    @PostMapping("/select")
+    public ResponseEntity<Response<SeatDto>> selectSeat(@RequestParam Long seatId, @RequestParam Long userId) {
+        log.info("User {} selecting seat {}", userId, seatId);
+        try {
+            SeatDto dto = seatService.selectSeat(seatId, userId);
+            return ResponseEntity.ok(ResponseHandler.success("Seat held for 10 minutes", dto));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ResponseHandler.failure(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseHandler.failure(e.getMessage()));
+        }
+    }
+
+    /**
+     * Confirm Booking (Hard Lock)
+     * POST /seat/confirm?seatId=1&userId=101
+     */
+    @PostMapping("/confirm")
+    public ResponseEntity<Response<SeatDto>> confirmSeat(@RequestParam Long seatId, @RequestParam Long userId) {
+        log.info("User {} confirming seat {}", userId, seatId);
+        try {
+            SeatDto dto = seatService.confirmSeat(seatId, userId);
+            return ResponseEntity.ok(ResponseHandler.success("Seat booked successfully", dto));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ResponseHandler.failure(e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ResponseHandler.failure(e.getMessage()));
         }
     }
 }

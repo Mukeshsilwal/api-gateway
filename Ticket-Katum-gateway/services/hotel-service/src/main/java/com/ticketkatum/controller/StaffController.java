@@ -26,7 +26,7 @@ public class StaffController {
      * GET /staff/hotel/{hotelId}
      */
     @GetMapping("/hotel/{hotelId}")
-    public ResponseEntity<Response<List<StaffResponse>>> getStaffByHotel(@PathVariable Long hotelId) {
+    public ResponseEntity<Response<List<StaffResponse>>> getStaffByHotel(@PathVariable("hotelId") Long hotelId) {
         log.info("Fetching staff for hotelId: {}", hotelId);
 
         try {
@@ -77,7 +77,7 @@ public class StaffController {
      */
     @PutMapping("/{id}/status")
     public ResponseEntity<Response<StaffResponse>> updateStaffStatus(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestParam String status) {
 
         log.info("Updating status for staffId: {} -> {}", id, status);

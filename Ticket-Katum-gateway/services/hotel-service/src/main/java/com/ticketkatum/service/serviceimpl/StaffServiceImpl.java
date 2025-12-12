@@ -32,7 +32,7 @@ public class StaffServiceImpl implements StaffService {
 
         Staff staff = StaffMapper.toEntity(request);
         staff.setHotel(hotel);
-        staff.setStatus(StaffStatus.AVAILABLE);
+        staff.setStatus(StaffStatus.ACTIVE);
 
         staffRepository.save(staff);
 
@@ -66,7 +66,7 @@ public class StaffServiceImpl implements StaffService {
         return staffRepository.findFirstAvailableStaff(
                 hotelId,
                 staffType.toUpperCase(),
-                StaffStatus.AVAILABLE.name()
+                StaffStatus.ACTIVE.name()
         );
 
     }

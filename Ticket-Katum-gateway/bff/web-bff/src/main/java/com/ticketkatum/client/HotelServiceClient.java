@@ -1,5 +1,6 @@
 package com.ticketkatum.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketkatum.config.ServiceUrlConfig;
 import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.hotel.HotelDTO;
@@ -11,6 +12,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -31,6 +33,9 @@ public class HotelServiceClient {
 
     private final WebClient.Builder webClientBuilder;
     private final ServiceUrlConfig serviceUrls;
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     private static final String SERVICE_NAME = "hotel-service";
     private static final String CIRCUIT_BREAKER_NAME = "hotelService";
@@ -358,9 +363,10 @@ public class HotelServiceClient {
     }
 
     private <T> List<T> objectMapperList(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
-        return mapper.convertValue(data,
-                mapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        return objectMapper.convertValue(
+                data,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)
+        );
     }
+
 }

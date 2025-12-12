@@ -1,6 +1,5 @@
 package com.ticketkatum.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class SeatDto {
     private Long id;
-    private boolean reserved;
+    private boolean reserved; // Deprecated, use status
+    private String status; // AVAILABLE, HELD, BOOKED
+    private String holdExpiresAt;
     private String seatNumber;
     private BigDecimal price;
 }

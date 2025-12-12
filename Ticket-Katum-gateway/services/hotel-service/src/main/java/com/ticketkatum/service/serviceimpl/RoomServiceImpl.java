@@ -259,7 +259,6 @@ public class RoomServiceImpl implements RoomService {
     private void validateRoomData(CreateRoomRequest req) {
         // Validate required fields
         ValidationUtils.validateRoomNumber(req.getRoomNumber());
-        ValidationUtils.validateRequiredField(req.getRoomType(), "Room type");
 
         // Validate capacity
         ValidationUtils.validateCapacity(req.getCapacity());

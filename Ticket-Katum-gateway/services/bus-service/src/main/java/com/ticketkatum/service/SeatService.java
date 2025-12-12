@@ -21,5 +21,10 @@ public interface SeatService {
     List<SeatDto> findSeatRelatedToBus(String busName);
 
     SeatDto reserveSeat(long seatId);
-}
 
+    SeatDto selectSeat(long seatId, Long userId);
+
+    SeatDto confirmSeat(long seatId, Long userId);
+
+    void releaseExpiredSeats();
+}

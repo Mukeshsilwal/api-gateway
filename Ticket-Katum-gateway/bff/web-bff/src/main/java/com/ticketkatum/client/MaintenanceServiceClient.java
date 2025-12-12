@@ -1,5 +1,6 @@
 package com.ticketkatum.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketkatum.config.ServiceUrlConfig;
 import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.hotel.request.RoomMaintenanceRequest;
@@ -8,6 +9,7 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -20,6 +22,8 @@ public class MaintenanceServiceClient {
 
     private final WebClient.Builder webClientBuilder;
     private final ServiceUrlConfig serviceUrls;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final String CIRCUIT_BREAKER_NAME = "maintenanceService";
 
@@ -99,8 +103,9 @@ public class MaintenanceServiceClient {
     }
 
     private <T> T objectMapper(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
-        return mapper.convertValue(data, clazz);
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        objectMapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return objectMapper.convertValue(data, clazz);
     }
+
 }

@@ -20,7 +20,16 @@ public class SeatMapper {
     }
 
     public SeatDto toDto(Seat entity) {
-        return mapper.map(entity, SeatDto.class);
+        SeatDto dto = mapper.map(entity, SeatDto.class);
+        if (entity.getStatus() != null) {
+            dto.setStatus(entity.getStatus().name());
+            // Backward compatibility: HELD or BOOKED means reserved
+            dto.setReserved(entity.getStatus() != com.ticketkatum.enums.SeatStatus.AVAILABLE);
+        }
+        if (entity.getHoldExpiresAt() != null) {
+            dto.setHoldExpiresAt(entity.getHoldExpiresAt().toString());
+        }
+        return dto;
     }
 
     public List<Seat> toEntityList(List<SeatDto> dtoList) {
@@ -35,4 +44,3 @@ public class SeatMapper {
                 .collect(Collectors.toList());
     }
 }
-

@@ -100,7 +100,7 @@ public class MaintenanceBffController {
      */
     @GetMapping("/room/{roomId}")
     public CompletableFuture<ResponseEntity<Response<RoomMaintenanceResponse>>> getMaintenanceByRoomId(
-            @PathVariable Long roomId) {
+            @PathVariable("roomId") Long roomId) {
 
         log.info("Fetching maintenance record for room ID: {}", roomId);
 

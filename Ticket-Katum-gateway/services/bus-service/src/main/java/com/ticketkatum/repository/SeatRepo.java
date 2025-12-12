@@ -15,24 +15,29 @@ import java.util.Optional;
 @Repository
 public interface SeatRepo extends JpaRepository<Seat, Long> {
 
-    @Query("SELECT s FROM Seat s WHERE s.reserved = false ORDER BY s.id ASC")
-    List<Seat> findFirstByReservedFalse();
+    @Query("SELECT s FROM Seat s WHERE s.status = 'AVAILABLE' ORDER BY s.id ASC")
+    List<Seat> findFirstByAvailable();
 
     List<Seat> findByBusBusName(String busName);
 
-    List<Seat> findByBusAndReserved(Bus busInfo, boolean reserved);
+    // List<Seat> findByBusAndReserved(Bus busInfo, boolean reserved); // Removed as
+    // reserved is gone
 
     int countByBus(Bus bus);
+
     Optional<Seat> findByBusIdAndSeatNumber(Long busId, String seatNumber);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Seat s where s.bus.id = :busId and s.seatNumber in :seatNumbers")
     List<Seat> findAndLockByBusIdAndSeatNumbers(@Param("busId") Long busId,
-                                                @Param("seatNumbers") List<String> seatNumbers);
+            @Param("seatNumbers") List<String> seatNumbers);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select s from Seat s where s.id = :seatId")
     Optional<Seat> findSeatForUpdate(Long seatId);
 
+    // For Auto-Release Scheduler
+    List<Seat> findByStatusAndHoldExpiresAtBefore(com.ticketkatum.enums.SeatStatus status,
+            java.time.LocalDateTime dateTime);
 
 }

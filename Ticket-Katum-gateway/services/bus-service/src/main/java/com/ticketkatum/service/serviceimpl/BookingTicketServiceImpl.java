@@ -23,6 +23,7 @@ public class BookingTicketServiceImpl implements BookingTicketService {
 
     private final BookingTicketRepo bookingTicketRepo;
     private final SeatRepo seatRepo;
+    private final com.ticketkatum.service.SeatService seatService; // Added dependency
     private final BookingMapper mapper;
 
     @Override
@@ -35,8 +36,7 @@ public class BookingTicketServiceImpl implements BookingTicketService {
     @Override
     public BookingTicketDto getBooking(long bookingId) {
         BookingTicket booking = bookingTicketRepo.findById(bookingId)
-                .orElseThrow(() ->
-                        new RuntimeException("BookingTicket"+ bookingId));
+                .orElseThrow(() -> new RuntimeException("BookingTicket" + bookingId));
 
         return mapper.toDto(booking);
     }
@@ -53,37 +53,29 @@ public class BookingTicketServiceImpl implements BookingTicketService {
             throw new IllegalArgumentException("Seat List contains null IDs");
         }
 
-        List<Seat> seats = seatRepo.findAllById(dto.getSeatIds());
-
-        if (seats.size() != dto.getSeatIds().size()) {
-            throw new RuntimeException(
-                    "Seat"+ dto.getSeatIds().size());
-        }
-
-        seats.forEach(seat -> {
-            if (seat.isReserved()) {
-                throw new RuntimeException(
-                        "Seat " + seat.getSeatNumber() + " is already reserved."
-                );
-            }
-        });
-
-        seats.forEach(seat -> seat.setReserved(true));
-        seatRepo.saveAll(seats);
+        // 1. Validate and Confirm Seats (Hard Lock)
+        // This relies on the "Soft Hold" being present.
+        // If not held by this user, confirmSeat will throw exception.
+        List<Seat> confirmedSeats = dto.getSeatIds().stream()
+                .map(seatId -> {
+                    // This call will convert HELD -> BOOKED and verify ownership
+                    com.ticketkatum.model.SeatDto seatDto = seatService.confirmSeat(seatId, dto.getUserId());
+                    return seatRepo.findById(seatId).orElseThrow();
+                })
+                .collect(Collectors.toList());
 
         BookingTicket booking = new BookingTicket();
         booking.setFullName(dto.getFullName());
         booking.setEmail(dto.getEmail());
         booking.setBookingTime(LocalDateTime.now());
 
-        List<Ticket> tickets = seats.stream()
-                .map(seat ->
-                        Ticket.builder()
-                                .seat(seat)
-                                .status(TicketStatus.SOLD)
-                                .bookingTicket(booking)
-                                .build()
-                ).collect(Collectors.toList());
+        List<Ticket> tickets = confirmedSeats.stream()
+                .map(seat -> Ticket.builder()
+                        .seat(seat)
+                        .status(TicketStatus.SOLD)
+                        .bookingTicket(booking)
+                        .build())
+                .collect(Collectors.toList());
 
         booking.setTickets(tickets);
 

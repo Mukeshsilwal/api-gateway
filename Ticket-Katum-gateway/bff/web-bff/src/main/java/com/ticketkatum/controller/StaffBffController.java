@@ -35,7 +35,7 @@ public class StaffBffController {
      */
     @GetMapping("/hotel/{hotelId}")
     public CompletableFuture<ResponseEntity<Response<List<StaffResponse>>>> getStaffByHotel(
-            @PathVariable Long hotelId) {
+            @PathVariable("hotelId") Long hotelId) {
 
         log.info("Fetching staff for hotel ID: {}", hotelId);
 
@@ -100,7 +100,7 @@ public class StaffBffController {
      */
     @PutMapping("/{staffId}/status")
     public CompletableFuture<ResponseEntity<Response<StaffResponse>>> updateStaffStatus(
-            @PathVariable Long staffId,
+            @PathVariable("staffId") Long staffId,
             @RequestParam String status) {
 
         log.info("Updating staff {} status to: {}", staffId, status);
