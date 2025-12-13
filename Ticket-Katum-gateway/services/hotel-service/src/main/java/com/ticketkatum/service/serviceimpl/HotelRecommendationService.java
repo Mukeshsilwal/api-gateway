@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -428,12 +429,15 @@ public class HotelRecommendationService {
 
         List<Room> availableRooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
 
-        LocalDate checkIn = LocalDate.parse(request.getCheckInDate());
-        LocalDate checkOut = LocalDate.parse(request.getCheckOutDate());
+        LocalDate checkIn = request.getCheckIn();
+        LocalDate checkOut = request.getCheckOut();
+
         long numberOfNights = ChronoUnit.DAYS.between(checkIn, checkOut);
 
         List<RoomAvailability> roomAvailabilities = availableRooms.stream()
-                .collect(Collectors.groupingBy(Room::getRoomType))
+                .collect(Collectors.groupingBy(
+                        room -> Objects.requireNonNull(room.getRoomType(), "RoomType must not be null")
+                ))
                 .entrySet().stream()
                 .map(entry -> {
                     String roomType = entry.getKey();
@@ -457,9 +461,10 @@ public class HotelRecommendationService {
                 .hotelName(hotel.getName())
                 .available(available)
                 .availableRooms(roomAvailabilities)
-                .checkInDate(request.getCheckInDate())
-                .checkOutDate(request.getCheckOutDate())
+                .checkInDate(request.getCheckIn())
+                .checkOutDate(request.getCheckOut())
                 .numberOfNights((int) numberOfNights)
+                .totalEstimatedCost(hotel.getMinPrice() != null ? hotel.getMinPrice() : BigDecimal.ZERO)
                 .build();
     }
 
@@ -564,8 +569,6 @@ public class HotelRecommendationService {
         }
 
         List<String> amenities = parseJsonArray(hotel.getAmenities());
-        List<String> images = parseJsonArray(hotel.getImages());
-
         List<Room> availableRooms = roomRepository.findByHotelIdAndActiveTrue(hotel.getId());
         boolean available = !availableRooms.isEmpty();
 
@@ -587,7 +590,11 @@ public class HotelRecommendationService {
                 .averageRating(hotel.getAverageRating())
                 .totalReviews(hotel.getTotalReviews())
                 .amenities(amenities)
-                .images(images)
+                .images(
+                        hotel.getImages() == null
+                                ? List.of()
+                                : new ArrayList<>(hotel.getImages())
+                )
                 .minPrice(hotel.getMinPrice())
                 .maxPrice(hotel.getMaxPrice())
                 .priceLabel(priceLabel)
@@ -597,6 +604,7 @@ public class HotelRecommendationService {
                 .email(hotel.getEmail())
                 .website(hotel.getWebsite())
                 .build();
+
     }
 
     private void calculateRecommendationScores(List<HotelRecommendation> recommendations) {
@@ -684,19 +692,6 @@ public class HotelRecommendationService {
         }
         try {
             return objectMapper.readValue(json, new TypeReference<List<String>>() {
-            });
-        } catch (Exception e) {
-            log.warn("Failed to parse JSON array: {}", json);
-            return new ArrayList<>();
-        }
-    }
-
-    private List<String> parseJsonArray(Set<String> json) {
-        if (json == null || json.isEmpty()) {
-            return new ArrayList<>();
-        }
-        try {
-            return objectMapper.readValue((JsonParser) json, new TypeReference<List<String>>() {
             });
         } catch (Exception e) {
             log.warn("Failed to parse JSON array: {}", json);

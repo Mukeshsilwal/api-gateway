@@ -6,6 +6,7 @@ import com.ticketkatum.model.UserDto;
 import com.ticketkatum.service.serviceimpl.UserService;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.utils.ResponseHandler;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<Response<UserDto>> createUser(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<Response<UserDto>> createUser(@Valid @RequestBody CreateUserRequest request) {
         log.info("Creating user: {}", request.getEmail());
         UserDto user = userService.createUser(request);
         Response<UserDto> response = ResponseHandler.success(

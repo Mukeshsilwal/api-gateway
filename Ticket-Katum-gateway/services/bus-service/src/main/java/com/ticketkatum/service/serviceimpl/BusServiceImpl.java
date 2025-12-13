@@ -44,7 +44,7 @@ public class BusServiceImpl implements BusService {
         Route route = routeRepo.findById(routeId)
                 .orElseThrow(() -> new RuntimeException());
 
-        bus.setBusType(BusType.fromString(busDto.getBusName()));
+        bus.setBusType(BusType.valueOf(busDto.getBusName()));
         bus.setDepartureDateTime(busDto.getDepartureDateTime());
         bus.setRoute(route);
 

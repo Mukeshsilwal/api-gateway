@@ -1,9 +1,11 @@
 package com.ticketkatum.controller;
 
+import com.ticketkatum.model.PaymentProviderDTO;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.payment.PaymentOrchestrator;
 import com.ticketkatum.payment.request.InitiatePaymentRequest;
 import com.ticketkatum.payment.request.VerifyPaymentRequest;
+import com.ticketkatum.utils.ResponseHandler;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -13,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 
 @RestController
@@ -32,7 +37,7 @@ public class PaymentController {
             description = "Initiate a new payment transaction with the specified provider")
     public ResponseEntity<Response> initiatePayment(
             @Parameter(description = "Payment provider (esewa, khalti, imepay, mobile_banking)")
-            @PathVariable String provider,
+            @PathVariable("provider") String provider,
             @Valid @RequestBody InitiatePaymentRequest request,
             HttpServletRequest httpRequest) {
 
@@ -59,7 +64,7 @@ public class PaymentController {
             description = "Verify payment status after gateway callback")
     public ResponseEntity<Response> verifyPayment(
             @Parameter(description = "Payment provider (esewa, khalti, imepay, mobile_banking)")
-            @PathVariable String provider,
+            @PathVariable("provider") String provider,
             @Valid @RequestBody VerifyPaymentRequest request) {
 
         log.info("Payment verification request - Provider: {}, TxnId: {}",
@@ -81,7 +86,7 @@ public class PaymentController {
             description = "Get the current status of a payment transaction")
     public ResponseEntity<Response> getTransactionStatus(
             @Parameter(description = "Internal transaction ID")
-            @PathVariable String transactionId) {
+            @PathVariable("transactionId") String transactionId) {
 
         log.info("Transaction status request - TxnId: {}", transactionId);
 
@@ -135,51 +140,55 @@ public class PaymentController {
      * Get list of available payment providers
      */
     @GetMapping("/providers")
-    @Operation(summary = "Get Payment Providers",
-            description = "Get list of available payment gateway providers")
-    public ResponseEntity<Response> getProviders() {
+    @Operation(
+            summary = "Get Payment Providers",
+            description = "Get list of available payment gateway providers"
+    )
+    public ResponseEntity<Response<List<PaymentProviderDTO>>> getProviders() {
+
         log.info("Payment providers list requested");
 
-        java.util.Map<String, Object> providers = java.util.Map.of(
-                "providers", java.util.List.of(
-                        java.util.Map.of(
-                                "id", "esewa",
-                                "name", "eSewa",
-                                "logo", "/assets/esewa-logo.png",
-                                "enabled", true,
-                                "maxAmount", 100000,
-                                "currency", "NPR"
-                        ),
-                        java.util.Map.of(
-                                "id", "khalti",
-                                "name", "Khalti",
-                                "logo", "/assets/khalti-logo.png",
-                                "enabled", true,
-                                "maxAmount", 100000,
-                                "currency", "NPR"
-                        ),
-                        java.util.Map.of(
-                                "id", "imepay",
-                                "name", "IME Pay",
-                                "logo", "/assets/imepay-logo.png",
-                                "enabled", true,
-                                "maxAmount", 200000,
-                                "currency", "NPR"
-                        ),
-                        java.util.Map.of(
-                                "id", "mobile_banking",
-                                "name", "Mobile Banking",
-                                "logo", "/assets/mobile-banking-logo.png",
-                                "enabled", true,
-                                "maxAmount", 500000,
-                                "currency", "NPR"
-                        )
-                )
+        List<PaymentProviderDTO> providers = List.of(
+                PaymentProviderDTO.builder()
+                        .id("esewa")
+                        .name("eSewa")
+                        .logo("/assets/esewa-logo.png")
+                        .enabled(true)
+                        .maxAmount(BigDecimal.valueOf(100_000))
+                        .currency("NPR")
+                        .build(),
+                PaymentProviderDTO.builder()
+                        .id("khalti")
+                        .name("Khalti")
+                        .logo("/assets/khalti-logo.png")
+                        .enabled(true)
+                        .maxAmount(BigDecimal.valueOf(100_000))
+                        .currency("NPR")
+                        .build(),
+                PaymentProviderDTO.builder()
+                        .id("imepay")
+                        .name("IME Pay")
+                        .logo("/assets/imepay-logo.png")
+                        .enabled(true)
+                        .maxAmount(BigDecimal.valueOf(200_000))
+                        .currency("NPR")
+                        .build(),
+                PaymentProviderDTO.builder()
+                        .id("mobile_banking")
+                        .name("Mobile Banking")
+                        .logo("/assets/mobile-banking-logo.png")
+                        .enabled(true)
+                        .maxAmount(BigDecimal.valueOf(500_000))
+                        .currency("NPR")
+                        .build()
         );
 
-        Response response = new Response(200, "Providers retrieved successfully", providers);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                ResponseHandler.success("Providers retrieved successfully", providers)
+        );
     }
+
+
 
     /**
      * Health check endpoint for payment gateway

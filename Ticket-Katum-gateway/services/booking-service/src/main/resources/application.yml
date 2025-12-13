@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create   # Flyway is enabled → keep this as NONE
+      ddl-auto: none   # Flyway is enabled → keep this as NONE
     show-sql: false
     properties:
       hibernate:

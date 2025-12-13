@@ -64,12 +64,17 @@ public class HotelRecommendationController {
 
     @GetMapping("/featured")
     @Operation(summary = "Get featured hotels")
-    public ResponseEntity<List<HotelRecommendation>> getFeaturedHotels(
+    public ResponseEntity<Response<List<HotelRecommendation>>> getFeaturedHotels(
             @RequestParam(defaultValue = "10") Integer limit) {
+
         log.info("Getting featured hotels");
         List<HotelRecommendation> hotels = hotelService.getFeaturedHotels(limit);
-        return ResponseEntity.ok(hotels);
+
+        return ResponseEntity.ok(
+                ResponseHandler.success("Featured hotels fetched", hotels)
+        );
     }
+
 
     @GetMapping("/city/{city}")
     @Operation(summary = "Search hotels by city")
@@ -95,15 +100,21 @@ public class HotelRecommendationController {
 
     @GetMapping("/top-rated")
     @Operation(summary = "Get top-rated hotels")
-    public ResponseEntity<List<HotelRecommendation>> getTopRatedHotels(
+    public ResponseEntity<Response<List<HotelRecommendation>>> getTopRatedHotels(
             @RequestParam(defaultValue = "10") Integer limit,
             @RequestParam(required = false) Double userLat,
             @RequestParam(required = false) Double userLon) {
+
         log.info("Getting top-rated hotels");
+
         List<HotelRecommendation> hotels =
                 hotelService.getTopRatedHotels(limit, userLat, userLon);
-        return ResponseEntity.ok(hotels);
+
+        return ResponseEntity.ok(
+                ResponseHandler.success("Top-rated hotels fetched", hotels)
+        );
     }
+
 
     @GetMapping("/budget")
     @Operation(summary = "Get budget hotels")
@@ -135,16 +146,22 @@ public class HotelRecommendationController {
 
     @GetMapping("/cities")
     @Operation(summary = "Get available cities")
-    public ResponseEntity<List<String>> getAvailableCities() {
+    public ResponseEntity<Response<List<String>>> getAvailableCities() {
+
         log.info("Getting available cities");
+
         List<String> cities = hotelService.getAvailableCities();
-        return ResponseEntity.ok(cities);
+
+        return ResponseEntity.ok(
+                ResponseHandler.success("Available cities fetched", cities)
+        );
     }
+
 
     @PostMapping("/{id}/availability")
     @Operation(summary = "Check hotel availability")
     public ResponseEntity<HotelAvailabilityResponse> checkAvailability(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody HotelAvailabilityRequest request) {
         log.info("Checking availability for hotel: {}", id);
         HotelAvailabilityResponse response =

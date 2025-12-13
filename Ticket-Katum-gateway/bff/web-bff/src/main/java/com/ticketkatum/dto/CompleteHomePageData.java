@@ -1,5 +1,6 @@
 package com.ticketkatum.dto;
 
+import com.ticketkatum.dto.payment.PaymentProviderDTO;
 import com.ticketkatum.dto.payment.response.PaymentProvider;
 
 import java.util.List;
@@ -11,6 +12,6 @@ import java.util.List;
 public class CompleteHomePageData {
     private HomePageData hotelData;
     private Long onlineUserCount;
-    private List<PaymentProvider> paymentProviders;
+    private List<PaymentProviderDTO> paymentProviders;
     private boolean isAuthenticated;
 }

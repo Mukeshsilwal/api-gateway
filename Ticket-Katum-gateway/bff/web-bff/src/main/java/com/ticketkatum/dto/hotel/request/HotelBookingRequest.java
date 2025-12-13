@@ -1,29 +1,25 @@
 package com.ticketkatum.dto.hotel.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @Data
-@Builder
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class HotelBookingRequest {
-    private Long hotelId;
-    private String hotelCode;
-    private List<Long> roomIds;
-    private String checkIn;
-    private String checkOut;
+    private long hotelId;
+    private String hotelName;
+    private String roomType;
+    private Integer numberOfRooms;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
     private Integer numberOfGuests;
-    private String guestName;
-    private String guestEmail;
-    private String guestPhone;
+    private List<GuestDetails> guests;
+    private ContactDetails contactDetails;
+    private PaymentDetails paymentDetails;
     private String specialRequests;
-    private String category;
-    private String service;
-    private Map<String, Object> metadata;
 }

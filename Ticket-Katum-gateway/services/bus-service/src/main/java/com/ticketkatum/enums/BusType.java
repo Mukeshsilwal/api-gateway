@@ -1,7 +1,7 @@
 package com.ticketkatum.enums;
 
 public enum BusType {
-    DELUXE("Delux"),
+    DELUXE("Deluxe"),
     STANDARD( "Standard"),
     SEMI_DELUXE( "Semi Deluxe"),
     VIP("Vip");

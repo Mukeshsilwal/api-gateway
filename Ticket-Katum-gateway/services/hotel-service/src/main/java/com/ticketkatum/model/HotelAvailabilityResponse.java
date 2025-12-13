@@ -3,6 +3,7 @@ package com.ticketkatum.model;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -15,8 +16,8 @@ public class HotelAvailabilityResponse {
     private String hotelName;
     private Boolean available;
     private List<RoomAvailability> availableRooms;
-    private String checkInDate;
-    private String checkOutDate;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
     private Integer numberOfNights;
     private BigDecimal totalEstimatedCost;
 }

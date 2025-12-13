@@ -30,8 +30,8 @@ public class SeatServiceImpl implements SeatService {
     private final DynamicPricingAlgorithm pricingAlgorithm;
 
     @Override
-    public SeatDto createSeatForBus(SeatDto dto, long busId) {
-        Bus bus = busRepo.findById(busId)
+    public SeatDto createSeatForBus(SeatDto dto) {
+        Bus bus = busRepo.findById(dto.getBusId())
                 .orElseThrow(() -> new RuntimeException("Bus not found"));
 
         Seat seat = seatMapper.toEntity(dto);

@@ -1,7 +1,7 @@
 package com.ticketkatum.client;
 
 import com.ticketkatum.dto.Response;
-import com.ticketkatum.dto.bus.BusDto;
+import com.ticketkatum.dto.bus.*;
 import com.ticketkatum.dto.bus.BusStopDto;
 import com.ticketkatum.dto.bus.RouteDto;
 import com.ticketkatum.dto.bus.SeatDto;
@@ -59,14 +59,14 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/api/v1/buses")
                 .bodyValue(busDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(bus -> log.info("Bus created successfully: {}", bus.getId()))
                 .doOnError(error -> log.error("Failed to create bus: {}", error.getMessage()))
                 .onErrorMap(this::mapError)
                 .toFuture();
     }
-
 
     // ==================== Admin / Bus Stop Operations ====================
 
@@ -81,7 +81,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/admin/post")
                 .bodyValue(busStopDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<BusStopDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<BusStopDto>>() {
+                })
                 .map(Response::getData)
                 .toFuture();
     }
@@ -97,7 +98,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/admin/updateBusStop/{id}", id)
                 .bodyValue(busStopDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<BusStopDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<BusStopDto>>() {
+                })
                 .map(Response::getData)
                 .toFuture();
     }
@@ -116,7 +118,7 @@ public class BusServiceClient {
                 .toFuture();
     }
 
-// ==================== Admin / Route Operations ====================
+    // ==================== Admin / Route Operations ====================
 
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createRouteFallback")
     @Retry(name = CIRCUIT_BREAKER_NAME)
@@ -129,7 +131,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/admin/busStopRoute/{id1}/{id2}", id1, id2)
                 .bodyValue(routeDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<RouteDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<RouteDto>>() {
+                })
                 .map(Response::getData)
                 .toFuture();
     }
@@ -148,7 +151,7 @@ public class BusServiceClient {
                 .toFuture();
     }
 
-// ==================== Admin / Bus-Route Operations ====================
+    // ==================== Admin / Bus-Route Operations ====================
 
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createBusInRouteFallback")
     @Retry(name = CIRCUIT_BREAKER_NAME)
@@ -177,7 +180,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/admin/bus/{id}/route/{routeId}", busId, routeId)
                 .bodyValue(busDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {
+                })
                 .map(Response::getData)
                 .toFuture();
     }
@@ -196,7 +200,7 @@ public class BusServiceClient {
                 .toFuture();
     }
 
-// ==================== Admin / Seat Operations ====================
+    // ==================== Admin / Seat Operations ====================
 
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createSeatFallback")
     @Retry(name = CIRCUIT_BREAKER_NAME)
@@ -209,7 +213,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/admin/postSeat/{id}", busId)
                 .bodyValue(seatDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {
+                })
                 .map(Response::getData)
                 .toFuture();
     }
@@ -225,11 +230,11 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/admin/updateSeat/{id}", seatId)
                 .bodyValue(seatDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {
+                })
                 .map(Response::getData)
                 .toFuture();
     }
-
 
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "deleteSeatFallback")
     @Retry(name = CIRCUIT_BREAKER_NAME)
@@ -255,7 +260,8 @@ public class BusServiceClient {
                 .get()
                 .uri(busServiceUrl + "/api/v1/buses/{id}", busId)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(bus -> log.debug("Bus retrieved: {}", bus.getId()))
                 .onErrorMap(this::mapError)
@@ -273,7 +279,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/api/v1/buses/{id}", busId)
                 .bodyValue(busDto)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<BusDto>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(bus -> log.info("Bus updated successfully: {}", bus.getId()))
                 .onErrorMap(this::mapError)
@@ -304,11 +311,50 @@ public class BusServiceClient {
 
         return webClientBuilder.build()
                 .get()
-                .uri(busServiceUrl + "/api/v1/buses")
+                .uri(busServiceUrl + "/bus/route")
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<List<BusDto>>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<List<BusDto>>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(buses -> log.debug("Retrieved {} buses", buses.size()))
+                .onErrorMap(this::mapError)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "searchBusesFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BusSearchResponse> searchBuses(BusSearchRequest searchRequest) {
+        log.info("Searching buses: {} to {} on {}",
+                searchRequest.getSource(), searchRequest.getDestination(), searchRequest.getDate());
+
+        return webClientBuilder.build()
+                .post()
+                .uri(busServiceUrl + "/bus/search")
+                .bodyValue(searchRequest)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BusSearchResponse>>() {
+                })
+                .map(Response::getData)
+                .doOnSuccess(response -> log.info("Found {} buses", response.getBuses().size()))
+                .onErrorMap(this::mapError)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getBusesByRouteFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<List<BusDto>> getBusesByRoute(Integer routeId) {
+        log.info("Fetching buses for route: {}", routeId);
+
+        return webClientBuilder.build()
+                .get()
+                .uri(busServiceUrl + "/api/v1/buses/route/{routeId}", routeId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<List<BusDto>>>() {
+                })
+                .map(Response::getData)
+                .doOnSuccess(buses -> log.debug("Retrieved {} buses for route {}", buses.size(), routeId))
                 .onErrorMap(this::mapError)
                 .toFuture();
     }
@@ -326,7 +372,8 @@ public class BusServiceClient {
                 .uri(busServiceUrl + "/api/v1/buses/{busId}/seats/generate?numberOfSeats={count}",
                         busId, numberOfSeats)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<List<SeatDto>>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<List<SeatDto>>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(seats -> log.info("Generated {} seats for bus {}", seats.size(), busId))
                 .onErrorMap(this::mapError)
@@ -343,7 +390,8 @@ public class BusServiceClient {
                 .get()
                 .uri(busServiceUrl + "/api/v1/buses/{busId}/seats", busId)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<List<SeatDto>>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<List<SeatDto>>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(seats -> log.debug("Retrieved {} seats for bus {}", seats.size(), busId))
                 .onErrorMap(this::mapError)
@@ -360,12 +408,14 @@ public class BusServiceClient {
                 .delete()
                 .uri(busServiceUrl + "/api/v1/buses/{busId}/seats", busId)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<Integer>>() {})
+                .bodyToMono(new ParameterizedTypeReference<Response<Integer>>() {
+                })
                 .map(Response::getData)
                 .doOnSuccess(count -> log.info("Deleted {} seats for bus {}", count, busId))
                 .onErrorMap(this::mapError)
                 .toFuture();
     }
+
     private CompletableFuture<BusDto> createBusFallback(BusDto busDto, Exception ex) {
         log.error("Fallback triggered for createBus", ex);
         return CompletableFuture.failedFuture(
@@ -426,8 +476,21 @@ public class BusServiceClient {
                 new ServiceUnavailableException(SERVICE_NAME));
     }
 
-    private CompletableFuture<List<RouteDto>> searchRoutesFallback(String source, String destination, LocalDate date, Exception ex) {
+    private CompletableFuture<List<RouteDto>> searchRoutesFallback(String source, String destination, LocalDate date,
+            Exception ex) {
         log.error("Fallback triggered for searchRoutes: {} to {} on {}", source, destination, date, ex);
+        return CompletableFuture.failedFuture(
+                new ServiceUnavailableException(SERVICE_NAME));
+    }
+
+    private CompletableFuture<BusSearchResponse> searchBusesFallback(BusSearchRequest request, Exception ex) {
+        log.error("Fallback triggered for searchBuses", ex);
+        return CompletableFuture.failedFuture(
+                new ServiceUnavailableException(SERVICE_NAME));
+    }
+
+    private CompletableFuture<List<BusDto>> getBusesByRouteFallback(Integer routeId, Exception ex) {
+        log.error("Fallback triggered for getBusesByRoute: {}", routeId, ex);
         return CompletableFuture.failedFuture(
                 new ServiceUnavailableException(SERVICE_NAME));
     }
@@ -450,8 +513,7 @@ public class BusServiceClient {
         if (throwable instanceof WebClientResponseException webEx) {
             log.error("WebClient error: status={}, body={}",
                     webEx.getStatusCode(), webEx.getResponseBodyAsString());
-            return new ServiceUnavailableException(SERVICE_NAME
-            );
+            return new ServiceUnavailableException(SERVICE_NAME);
         }
         return throwable;
     }

@@ -68,7 +68,7 @@ public class Hotel {
             name = "hotel_images",
             joinColumns = @JoinColumn(name = "hotel_id")
     )
-    @Column(name = "url")
+    @Column(name = "url"    )
     @Builder.Default
     private Set<String> images = new HashSet<>();
 

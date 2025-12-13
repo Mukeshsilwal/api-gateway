@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RouteDto {
-    private int id;
+    private long id;
     private BusStopDto sourceBusStop;
     private BusStopDto destinationBusStop;
 }

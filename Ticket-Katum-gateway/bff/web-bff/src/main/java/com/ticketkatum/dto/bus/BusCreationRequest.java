@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BusCreationRequest {
-    private BusDto busDto;
-    private Integer routeId;
-    private Integer numberOfSeats;
+    private long busId;
+    private String  sourceName;
+    private String destinationName;
 }

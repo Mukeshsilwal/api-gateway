@@ -10,11 +10,11 @@ import com.ticketkatum.dto.hotel.request.HotelBookingRequest;
 import com.ticketkatum.dto.hotel.request.RefundRequest;
 import com.ticketkatum.dto.hotel.response.BookingResponse;
 import com.ticketkatum.dto.hotel.response.CancellationResponse;
+import com.ticketkatum.dto.hotel.response.HotelBookingResponse;
 import com.ticketkatum.dto.hotel.response.RefundResponse;
 import com.ticketkatum.exception.*;
 import com.ticketkatum.service.BookingAggregator;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -36,7 +36,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Booking BFF", description = "Booking management aggregated APIs")
-@SecurityRequirement(name = "bearer-jwt")
 public class BookingBffController {
 
     private final BookingAggregator bookingAggregator;
@@ -44,7 +43,6 @@ public class BookingBffController {
     private static final long OPERATION_TIMEOUT_SECONDS = 30;
 
     @PostMapping("/complete")
-    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Complete booking flow",
             description = "Book hotel with payment in a single transaction. Requires authentication.")
     public CompletableFuture<ResponseEntity<Response<CompleteBookingResponse>>> completeBooking(
@@ -72,7 +70,7 @@ public class BookingBffController {
     @PostMapping("/{category}/{service}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Book ticket", description = "Create new booking. Requires authentication.")
-    public CompletableFuture<ResponseEntity<Response<BookingResponse>>> bookTicket(
+    public CompletableFuture<ResponseEntity<Response<HotelBookingResponse>>> bookTicket(
             @PathVariable String category,
             @PathVariable String service,
             @Valid @RequestBody HotelBookingRequest request) {
@@ -87,7 +85,7 @@ public class BookingBffController {
                     log.info("[{}] Booking created successfully: bookingId={}",
                             correlationId, response.getBookingId());
                     return ResponseEntity.status(HttpStatus.CREATED).body(
-                            Response.<BookingResponse>builder()
+                            Response.<HotelBookingResponse>builder()
                                     .statusCode(HttpStatus.CREATED.value())
                                     .message("Booking created successfully")
                                     .data(response)

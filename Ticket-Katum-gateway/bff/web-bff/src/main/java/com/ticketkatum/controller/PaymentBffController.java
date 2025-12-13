@@ -2,6 +2,7 @@ package com.ticketkatum.controller;
 
 import com.ticketkatum.client.PaymentServiceClient;
 import com.ticketkatum.dto.Response;
+import com.ticketkatum.dto.payment.PaymentProviderDTO;
 import com.ticketkatum.dto.payment.PaymentVerificationWithBooking;
 import com.ticketkatum.dto.payment.TransactionDetailsResponse;
 import com.ticketkatum.dto.payment.request.PaymentRequest;
@@ -109,7 +110,7 @@ public class PaymentBffController {
     @GetMapping("/providers")
     @Operation(summary = "Get payment providers",
             description = "Get list of available payment providers with status")
-    public CompletableFuture<ResponseEntity<Response<List<PaymentProvider>>>> getProviders() {
+    public CompletableFuture<ResponseEntity<Response<List<PaymentProviderDTO>>>> getProviders() {
         log.info("BFF: Fetching payment providers");
 
         return paymentAggregator.getAvailableProviders()

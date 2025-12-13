@@ -3,6 +3,7 @@ package com.ticketkatum.controller;
 import com.ticketkatum.abstractfactory.provider.BookingProvider;
 import com.ticketkatum.abstractfactory.provider.factory.BookingProviderFactory;
 import com.ticketkatum.model.HotelBookingRequest;
+import com.ticketkatum.model.HotelBookingResponse;
 import com.ticketkatum.utils.Request;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.utils.ResponseHandler;
@@ -25,7 +26,7 @@ public class BookingTicketController {
      * POST /api/booking/{category}/{service}
      */
     @PostMapping("/{category}/{service}")
-    public ResponseEntity<Response> bookTicket(
+    public ResponseEntity<Response<HotelBookingResponse>> bookTicket(
             @PathVariable String category,
             @PathVariable String service,
             @RequestBody HotelBookingRequest request) {
@@ -34,11 +35,11 @@ public class BookingTicketController {
 
         try {
             BookingProvider provider = bookingProviderFactory.getProvider(category, service);
-            Response response = provider.bookTicket(request);
+            Response<HotelBookingResponse> response = provider.bookTicket(request);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error booking ticket: category={}, service={}", category, service, e);
-            Response response = ResponseHandler.failure("Booking failed: " + e.getMessage());
+            Response<HotelBookingResponse> response = ResponseHandler.failure("Booking failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }

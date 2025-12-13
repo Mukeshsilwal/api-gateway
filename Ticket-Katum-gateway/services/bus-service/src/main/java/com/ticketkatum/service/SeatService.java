@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface SeatService {
 
-    SeatDto createSeatForBus(SeatDto seatDto, long busId);
+    SeatDto createSeatForBus(SeatDto seatDto);
 
     List<SeatDto> createMultipleSeatsForBus(List<SeatDto> seatDtos, long busId);
 

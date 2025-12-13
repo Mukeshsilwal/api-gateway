@@ -96,8 +96,8 @@ public class SingleAdminController {
     @PostMapping("/busStopRoute/{id}/{id1}")
     public ResponseEntity<Response<RouteDto>> createRouteWithBusStop(
             @Valid @RequestBody RouteDto routeDto,
-            @PathVariable long id,
-            @PathVariable long id1) {
+            @PathVariable("id") long id,
+            @PathVariable("id1") long id1) {
         log.info("Creating route with bus stops ID: {} and ID: {}", id, id1);
 
         try {
@@ -198,18 +198,17 @@ public class SingleAdminController {
      * Create seat for bus
      * POST /admin/postSeat/{id}
      */
-    @PostMapping("/postSeat/{id}")
+    @PostMapping("/postSeat")
     public ResponseEntity<Response<SeatDto>> createSeatForBus(
-            @Valid @RequestBody SeatDto seatDto,
-            @PathVariable long id) {
-        log.info("Creating seat for bus ID: {}", id);
+            @Valid @RequestBody SeatDto seatDto) {
+        log.info("Creating seat for bus ID: {}", seatDto.getBusId());
 
         try {
-            SeatDto seatDto1 = seatService.createSeatForBus(seatDto, id);
+            SeatDto seatDto1 = seatService.createSeatForBus(seatDto);
             Response<SeatDto> response = ResponseHandler.success("Seat created successfully", seatDto1);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
-            log.error("Error creating seat for bus: {}", id, e);
+            log.error("Error creating seat for bus:", e);
             Response<SeatDto> response = ResponseHandler.failure("Failed to create seat: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

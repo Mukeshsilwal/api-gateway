@@ -56,7 +56,7 @@ public class BookingSeatAggregator {
                                             bookingTicket.getBookingId()
                                     ).thenCompose(ticket -> {
                                         // Step 5: Get complete bus info
-                                        return busClient.getBusById(seat.getId())
+                                        return busClient.getBusById(seat.getBusId())
                                                 .thenApply(bus ->
                                                         CompleteBookingResponse.builder()
                                                                 .reservation(reservation)

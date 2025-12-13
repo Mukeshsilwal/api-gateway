@@ -43,7 +43,7 @@ public class TicketAggregator {
                             .thenCompose(v -> {
                                 SeatDto seat = seatFuture.join();
 
-                                return busClient.getBusById(seat.getId())
+                                return busClient.getBusById(seat.getBusId())
                                         .thenCompose(bus -> {
                                             return routeClient.getRouteById(bus.getRouteDto().getId())
                                                     .thenCompose(route -> {
@@ -89,7 +89,7 @@ public class TicketAggregator {
                             .thenCompose(v -> {
                                 SeatDto seat = seatFuture.join();
 
-                                return busClient.getBusById(seat.getId())
+                                return busClient.getBusById(seat.getBusId())
                                         .thenCompose(bus -> {
                                             return routeClient.getRouteById(bus.getRouteDto().getId())
                                                     .thenApply(route ->

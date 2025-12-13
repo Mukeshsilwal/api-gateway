@@ -125,6 +125,7 @@ public class RecommendationServiceClient {
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getFeaturedHotelsFallback")
     @Retry(name = SERVICE_NAME)
     public CompletableFuture<List<HotelRecommendation>> getFeaturedHotels(Integer limit) {
+
         log.debug("Getting featured hotels");
 
         return getWebClient()
@@ -134,10 +135,11 @@ public class RecommendationServiceClient {
                         .queryParam("limit", limit)
                         .build())
                 .retrieve()
-                .bodyToMono(Response.class)
-                .map(response -> objectMapperList(response.getData(), HotelRecommendation.class))
+                .bodyToFlux(HotelRecommendation.class)
+                .collectList()
                 .toFuture();
     }
+
 
     /**
      * Search hotels by city
@@ -206,8 +208,8 @@ public class RecommendationServiceClient {
                     return builder.build();
                 })
                 .retrieve()
-                .bodyToMono(Response.class)
-                .map(response -> objectMapperList(response.getData(), HotelRecommendation.class))
+                .bodyToFlux(HotelRecommendation.class)
+                .collectList()
                 .toFuture();
     }
 
@@ -367,7 +369,7 @@ public class RecommendationServiceClient {
         log.warn("Fallback: getHotelRecommendation for ID: {}", hotelId);
         return CompletableFuture.completedFuture(
                 HotelRecommendation.builder()
-                        .id(hotelId)
+                        .active(false)
                         .name("Hotel recommendation temporarily unavailable")
                         .build()
         );
@@ -427,7 +429,6 @@ public class RecommendationServiceClient {
                 HotelAvailabilityResponse.builder()
                         .hotelId(hotelId)
                         .available(false)
-                        .message("Availability check temporarily unavailable")
                         .build()
         );
     }

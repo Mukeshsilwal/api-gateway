@@ -22,7 +22,7 @@ public class BookingRequestMapper {
 
         if (dto.getSeat() != null) {
             Seat seat = new Seat();
-            seat.setId(dto.getSeat().getId());
+            seat.setId(dto.getSeat().getBusId());
             booking.setSeat(seat);
         }
 
@@ -42,7 +42,7 @@ public class BookingRequestMapper {
 
         if (entity.getSeat() != null) {
             SeatDto seatDto = new SeatDto();
-            seatDto.setId(entity.getSeat().getId());
+            seatDto.setBusId(entity.getSeat().getId());
             dto.setSeat(seatDto);
         }
 

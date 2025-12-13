@@ -1,7 +1,9 @@
 package com.ticketkatum.dto.hotel;
 
 import lombok.*;
+
 import java.math.BigDecimal;
+import java.util.List;
 
 @Getter
 @Setter
@@ -9,27 +11,48 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class HotelRecommendation {
-
-    private Long id;
-    private String hotelCode;
+    // Basic info
+    private Long hotelId;
     private String name;
+    private String description;
+    private String address;
     private String city;
+    private String country;
+    private String zipCode;
 
+    // Location
     private Double latitude;
     private Double longitude;
 
+    // Distance from search location
+    private Double distanceKm;
+    private String distanceLabel; // "1.2 km away"
+
+    // Hotel details
+    private Integer starRating; // 1-5
+    private Double averageRating; // 0.00 to 5.00
+    private Integer totalReviews;
+    private List<String> amenities;
+    private List<String> images;
+
+    // Pricing
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
+    private String priceLabel; // "From NPR 5,000/night"
 
-    private Double averageRating;
-    private Double totalReviews;
+    // Availability
+    private Boolean available;
+    private Integer availableRooms;
 
-    // distance from user (in KM)
-    private Double distance;
+    // Recommendation score (0-100)
+    private Double recommendationScore;
 
-    // First or primary image
-    private String featuredImage;
+    // Contact info
+    private String phoneNumber;
+    private String email;
+    private String website;
 
-    // Short description for cards
-    private String shortDescription;
+    // Status
+    private Boolean featured;
+    private Boolean active;
 }

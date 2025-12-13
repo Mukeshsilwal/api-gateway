@@ -1,9 +1,11 @@
 package com.ticketkatum.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketkatum.config.ServiceUrlConfig;
 import com.ticketkatum.dto.HealthCheckResponse;
 import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.WebhookProcessingResponse;
+import com.ticketkatum.dto.payment.PaymentProviderDTO;
 import com.ticketkatum.dto.payment.request.PaymentRequest;
 import com.ticketkatum.dto.payment.request.VerifyPaymentRequest;
 import com.ticketkatum.dto.payment.response.*;
@@ -11,11 +13,13 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -29,6 +33,8 @@ public class PaymentServiceClient {
 
     private final WebClient.Builder webClientBuilder;
     private final ServiceUrlConfig serviceUrls;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final String SERVICE_NAME = "payment-service";
     private static final String CIRCUIT_BREAKER_NAME = "paymentService";
@@ -128,7 +134,7 @@ public class PaymentServiceClient {
      */
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getPaymentProvidersFallback")
     @Retry(name = SERVICE_NAME)
-    public CompletableFuture<List<PaymentProvider>> getPaymentProviders() {
+    public CompletableFuture<List<PaymentProviderDTO>> getPaymentProviders() {
         log.debug("Getting payment providers");
 
         return getWebClient()
@@ -136,12 +142,10 @@ public class PaymentServiceClient {
                 .uri("/api/v1/payment/providers")
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(response -> {
-                    Object providersData = ((java.util.Map<?, ?>) response.getData()).get("providers");
-                    return objectMapperList(providersData, PaymentProvider.class);
-                })
+                .map(response -> objectMapperList(response.getData(), PaymentProviderDTO.class))
                 .toFuture();
     }
+
 
     /**
      * Health check for payment service
@@ -262,15 +266,24 @@ public class PaymentServiceClient {
 
     // Helper methods
     private <T> T objectMapper(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
-        return mapper.convertValue(data, clazz);
+        return objectMapper.convertValue(data, clazz);
     }
 
     private <T> List<T> objectMapperList(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
-        return mapper.convertValue(data,
-                mapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        if (data == null) {
+            return Collections.emptyList();
+        }
+
+        if (data instanceof List<?>) {
+            return objectMapper.convertValue(data,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+        } else if (data instanceof Map<?, ?>) {
+            T singleObject = objectMapper.convertValue(data, clazz);
+            return Collections.singletonList(singleObject);
+        } else {
+            return Collections.emptyList();
+        }
     }
+
+
 }

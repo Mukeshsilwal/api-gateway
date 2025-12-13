@@ -3,6 +3,7 @@ package com.ticketkatum.controller;
 import com.ticketkatum.dto.*;
 import com.ticketkatum.dto.auth.CompleteUserProfile;
 import com.ticketkatum.dto.booking.response.BookingHistoryResponse;
+import com.ticketkatum.dto.payment.PaymentProviderDTO;
 import com.ticketkatum.dto.payment.response.PaymentProvider;
 import com.ticketkatum.service.AuthAggregator;
 import com.ticketkatum.service.BookingAggregator;
@@ -57,7 +58,7 @@ public class MainBffController {
 //        CompletableFuture<Long> onlineCountFuture =
 //                authAggregator.getUserActivitySummary();
 
-        CompletableFuture<List<PaymentProvider>> providersFuture =
+        CompletableFuture<List<PaymentProviderDTO>> providersFuture =
                 paymentAggregator.getAvailableProviders();
 
         return CompletableFuture.allOf(hotelDataFuture, providersFuture)

@@ -59,7 +59,7 @@ public class GenericHotelService implements BookingProvider {
 
             validate(req);
 
-            HotelConfig config = hotelConfigRepo.findByHotelCode(req.getHotelId())
+            HotelConfig config = hotelConfigRepo.findByHotelName(req.getHotelName())
                     .orElseThrow(() -> new RuntimeException("Hotel configuration not found"));
 
             if (req.getHotelName() == null) req.setHotelName(config.getHotelName());
@@ -133,7 +133,7 @@ public class GenericHotelService implements BookingProvider {
             if (booking.getStatus() == BookingStatus.CANCELLED)
                 return ResponseHandler.failureWildcard("Booking already cancelled");
 
-            HotelConfig config = hotelConfigRepo.findByHotelCode(booking.getHotelId())
+            HotelConfig config = hotelConfigRepo.findByHotelName(booking.getHotelName())
                     .orElseThrow(() -> new RuntimeException("Hotel config not found"));
 
             BigDecimal cancellationCharge = calculateDynamicCancellation(config, booking);

@@ -56,7 +56,7 @@ public class BookingAggregator {
                 hotelClient.getHotelById(bookingReq.getHotelId());
 
         CompletableFuture<List<RoomDTO>> roomsFuture =
-                hotelClient.getRoomsByIds(bookingReq.getRoomIds());
+                hotelClient.getRoomsByIds(request.getRoomIds());
 
         return CompletableFuture.allOf(hotelFuture, roomsFuture)
                 .thenCompose(v -> {
@@ -66,23 +66,28 @@ public class BookingAggregator {
                     // Step 2: Check availability
                     return recommendationClient.checkAvailability(
                             bookingReq.getHotelId(),
-                            LocalDate.parse(bookingReq.getCheckIn()),
-                            LocalDate.parse(bookingReq.getCheckOut()),
-                            bookingReq.getRoomIds()
+                            bookingReq.getCheckInDate(),
+                           bookingReq.getCheckOutDate(),
+                            request.getRoomIds()
                     ).thenCompose(availability -> {
-                        if (!availability.isAvailable()) {
+                        if (!availability.getAvailable()) {
                             throw new AggregationException("Rooms not available");
                         }
 
                         // Step 3: Create booking
                         return bookingClient.bookTicket(
-                                bookingReq.getCategory(),
-                                bookingReq.getService(),
+                                request.getCategory(),
+                               request.getService(),
                                 bookingReq
                         ).thenCompose(bookingResponse -> {
                             // Step 4: Initiate payment
                             PaymentRequest paymentReq = request.getPaymentRequest();
-                            paymentReq.setAmount(availability.getTotalPrice());
+                            paymentReq.setSuccessUrl(request.getPaymentRequest().getSuccessUrl());
+                            paymentReq.setFailureUrl(request.getPaymentRequest().getFailureUrl());
+                            paymentReq.setAmount(availability.getAvailableRooms().stream().map(roomAvailability -> {
+                                return roomAvailability.getPricePerNight();
+                            }).reduce(BigDecimal.ZERO, BigDecimal::add));
+
                             paymentReq.getMetadata().put("bookingId", bookingResponse.getBookingId());
 
                             return paymentClient.initiatePayment(
@@ -93,9 +98,9 @@ public class BookingAggregator {
                                             .paymentData(paymentResponse)
                                             .hotelDetails(hotel)
                                             .bookedRooms(rooms)
-                                            .totalAmount(availability.getTotalPrice())
-                                            .confirmationEmail("Sent to " + bookingReq.getGuestEmail())
-                                            .confirmationSms("Sent to " + bookingReq.getGuestPhone())
+                                            .totalAmount(availability.getTotalEstimatedCost())
+                                            .confirmationEmail("Sent to " + bookingReq.getContactDetails().getEmail())
+                                            .confirmationSms("Sent to " + bookingReq.getContactDetails().getPhone())
                                             .build()
                             );
                         });

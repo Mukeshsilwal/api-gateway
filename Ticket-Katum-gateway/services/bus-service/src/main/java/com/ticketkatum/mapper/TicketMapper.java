@@ -29,7 +29,7 @@ public class TicketMapper {
 
         if (ticket.getSeat() != null) {
             SeatDto seatDto = new SeatDto();
-            seatDto.setId(ticket.getSeat().getId());
+            seatDto.setBusId(ticket.getSeat().getBus().getId());
             seatDto.setSeatNumber(ticket.getSeat().getSeatNumber());
             seatDto.setReserved(ticket.getSeat().isReserved());
             seatDto.setPrice(ticket.getSeat().getPrice());

@@ -2,6 +2,7 @@ package com.ticketkatum.service;
 
 import com.ticketkatum.client.BookingServiceClient;
 import com.ticketkatum.client.PaymentServiceClient;
+import com.ticketkatum.dto.payment.PaymentProviderDTO;
 import com.ticketkatum.dto.payment.PaymentVerificationWithBooking;
 import com.ticketkatum.dto.payment.TransactionDetailsResponse;
 import com.ticketkatum.dto.payment.request.PaymentRequest;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 /**
  * Payment Domain Aggregator
@@ -76,15 +78,17 @@ public class PaymentAggregator {
     /**
      * Get payment providers with status
      */
-    public CompletableFuture<List<PaymentProvider>> getAvailableProviders() {
+    public CompletableFuture<List<PaymentProviderDTO>> getAvailableProviders() {
         log.info("Fetching available payment providers");
 
         return paymentClient.getPaymentProviders()
                 .thenApply(providers -> {
-                    // Can add additional provider status checks here
-                    return providers;
+                    return providers.stream()
+                            .filter(PaymentProviderDTO::isEnabled)
+                            .collect(Collectors.toList());
                 });
     }
+
 
     /**
      * Get transaction details with booking info

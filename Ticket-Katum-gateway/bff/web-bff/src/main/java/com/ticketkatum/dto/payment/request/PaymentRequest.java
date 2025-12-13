@@ -16,7 +16,7 @@ public class PaymentRequest {
     private BigDecimal amount;
     private String currency;
     private String provider;
-    private String returnUrl;
-    private String cancelUrl;
+    private String failureUrl;
+    private String successUrl;
     private Map<String, String> metadata;
 }

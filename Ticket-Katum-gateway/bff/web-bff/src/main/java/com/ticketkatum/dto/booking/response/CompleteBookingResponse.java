@@ -2,7 +2,7 @@ package com.ticketkatum.dto.booking.response;
 
 import com.ticketkatum.dto.hotel.HotelDTO;
 import com.ticketkatum.dto.hotel.RoomDTO;
-import com.ticketkatum.dto.hotel.response.BookingResponse;
+import com.ticketkatum.dto.hotel.response.HotelBookingResponse;
 import com.ticketkatum.dto.payment.response.PaymentResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompleteBookingResponse {
-    private BookingResponse bookingData;
+    private HotelBookingResponse bookingData;
     private PaymentResponse paymentData;
     private HotelDTO hotelDetails;
     private List<RoomDTO> bookedRooms;

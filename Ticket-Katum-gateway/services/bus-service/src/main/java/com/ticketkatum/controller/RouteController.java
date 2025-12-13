@@ -28,7 +28,7 @@ public class RouteController {
      * GET /api/route/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Response<RouteDto>> getRouteById(@PathVariable int id) {
+    public ResponseEntity<Response<RouteDto>> getRouteById(@PathVariable("id") int id) {
         log.info("📌 Fetching route by ID: {}", id);
 
         try {

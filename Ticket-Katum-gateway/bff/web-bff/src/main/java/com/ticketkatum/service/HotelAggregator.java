@@ -299,9 +299,9 @@ public class HotelAggregator {
             List<HotelRecommendation> nearby) {
 
         Map<Long, HotelRecommendation> recMap = recommendations.stream()
-                .collect(Collectors.toMap(HotelRecommendation::getId, r -> r));
+                .collect(Collectors.toMap(HotelRecommendation::getHotelId, r -> r));
         Map<Long, HotelRecommendation> nearbyMap = nearby.stream()
-                .collect(Collectors.toMap(HotelRecommendation::getId, r -> r));
+                .collect(Collectors.toMap(HotelRecommendation::getHotelId, r -> r));
 
         return hotels.stream()
                 .map(hotel -> EnrichedHotelDTO.builder()
@@ -309,7 +309,7 @@ public class HotelAggregator {
                         .recommendation(recMap.get(hotel.getId()))
                         .isNearby(nearbyMap.containsKey(hotel.getId()))
                         .distance(nearbyMap.containsKey(hotel.getId())
-                                ? nearbyMap.get(hotel.getId()).getDistance() : null)
+                                ? nearbyMap.get(hotel.getId()).getDistanceKm() : null)
                         .build())
                 .collect(Collectors.toList());
     }

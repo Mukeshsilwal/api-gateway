@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -15,8 +16,11 @@ import java.util.List;
 @AllArgsConstructor
 public class HotelAvailabilityResponse {
     private Long hotelId;
-    private boolean available;
-    private String message;
-    private List<RoomAvailability> roomAvailabilities;
-    private BigDecimal totalPrice;
+    private String hotelName;
+    private Boolean available;
+    private List<RoomAvailability> availableRooms;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+    private Integer numberOfNights;
+    private BigDecimal totalEstimatedCost;
 }

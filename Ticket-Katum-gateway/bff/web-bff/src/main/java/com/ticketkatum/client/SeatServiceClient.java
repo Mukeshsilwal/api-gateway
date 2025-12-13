@@ -55,8 +55,8 @@ public class SeatServiceClient {
 
     @CircuitBreaker(name = "busService")
     @Retry(name = "bus-service")
-    public CompletableFuture<SeatDto> createSeatForBus(SeatDto seatDto, Long busId) {
-        return getWebClient().post().uri("/admin/postSeat/{id}", busId)
+    public CompletableFuture<SeatDto> createSeatForBus(SeatDto seatDto) {
+        return getWebClient().post().uri("/admin/postSeat")
                 .bodyValue(seatDto).retrieve().bodyToMono(Response.class)
                 .map(r -> map(r.getData(), SeatDto.class)).toFuture();
     }
@@ -85,7 +85,7 @@ public class SeatServiceClient {
                     SeatDto seat = new SeatDto();
                     seat.setSeatNumber("S" + (i + 1));
                     seat.setReserved(false);
-                    return createSeatForBus(seat, busId);
+                    return createSeatForBus(seat);
                 })
                 .collect(Collectors.toList());
 
@@ -102,7 +102,7 @@ public class SeatServiceClient {
         // This would need bus name lookup first
         return getAllSeats()
                 .thenApply(seats -> seats.stream()
-                        .filter(seat -> seat.getId() != null && seat.getId().equals(busId))
+                        .filter(seat -> seat.getBusId() != null && seat.getBusId().equals(busId))
                         .collect(Collectors.toList()));
     }
 

@@ -1,16 +1,19 @@
 package com.ticketkatum.client;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketkatum.config.ServiceUrlConfig;
 import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.hotel.request.HotelBookingRequest;
 import com.ticketkatum.dto.hotel.request.RefundRequest;
 import com.ticketkatum.dto.hotel.response.BookingResponse;
 import com.ticketkatum.dto.hotel.response.CancellationResponse;
+import com.ticketkatum.dto.hotel.response.HotelBookingResponse;
 import com.ticketkatum.dto.hotel.response.RefundResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -27,6 +30,8 @@ public class BookingServiceClient {
 
     private final WebClient.Builder webClientBuilder;
     private final ServiceUrlConfig serviceUrls;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final String CIRCUIT_BREAKER_NAME = "bookingService";
 
@@ -41,18 +46,18 @@ public class BookingServiceClient {
      */
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "bookTicketFallback")
     @Retry(name = "booking-service")
-    public CompletableFuture<BookingResponse> bookTicket(
+    public CompletableFuture<HotelBookingResponse> bookTicket(
             String category, String service, HotelBookingRequest request) {
 
         log.debug("Booking ticket: category={}, service={}", category, service);
 
         return getWebClient()
                 .post()
-                .uri("/api/booking/{category}/{service}", category, service)
+                .uri("/api/booking/{service}/{category}",service,category)
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(Response.class)
-                .map(response -> objectMapper(response.getData(), BookingResponse.class))
+                .map(response -> objectMapper(response.getData(), HotelBookingResponse.class))
                 .toFuture();
     }
 
@@ -131,8 +136,6 @@ public class BookingServiceClient {
     }
 
     private <T> T objectMapper(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
-        return mapper.convertValue(data, clazz);
+        return objectMapper.convertValue(data, clazz);
     }
 }
