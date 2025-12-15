@@ -34,16 +34,14 @@ public class PaymentAggregator {
      * Initiate payment with booking validation
      */
     public CompletableFuture<PaymentInitiationResponse> initiatePaymentWithValidation(
-            String provider, PaymentRequest paymentRequest, String bookingId) {
+            String provider, PaymentRequest paymentRequest) {
 
-        log.info("Initiating payment with validation for booking: {}", bookingId);
 
         // Can add booking validation here if needed
         return paymentClient.initiatePayment(provider, paymentRequest)
                 .thenApply(paymentResponse ->
                         PaymentInitiationResponse.builder()
                                 .paymentResponse(paymentResponse)
-                                .bookingId(bookingId)
                                 .provider(provider)
                                 .build()
                 )

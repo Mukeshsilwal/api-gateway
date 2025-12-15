@@ -11,6 +11,12 @@ spring:
     password: admin
     driver-class-name: org.postgresql.Driver
 
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+    pub-sub-domain: true
+
   jpa:
     hibernate:
       ddl-auto: none

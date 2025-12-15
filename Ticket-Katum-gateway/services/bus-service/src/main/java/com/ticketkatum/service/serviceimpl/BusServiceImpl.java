@@ -13,6 +13,8 @@ import com.ticketkatum.service.BusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -74,13 +76,20 @@ public class BusServiceImpl implements BusService {
     @Override
     public BusSearchResponse searchBuses(BusSearchRequest req) {
 
+        LocalDate date = req.getDate();
+
+        LocalDateTime startDateTime = date.atStartOfDay();
+        LocalDateTime endDateTime = date.plusDays(1).atStartOfDay();
+
         List<Bus> buses = busRepo.searchBuses(
                 req.getSource(),
                 req.getDestination(),
-                req.getDate(),
+                startDateTime,
+                endDateTime,
                 req.getCursor(),
                 req.getPageSize()
         );
+
 
         List<BusDto> result = buses.stream()
                 .map(busMapper::toDto)

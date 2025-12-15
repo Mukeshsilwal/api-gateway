@@ -19,6 +19,38 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 @Repository
 public interface HotelRepository extends JpaRepository<Hotel, Long>, JpaSpecificationExecutor<Hotel> {
 
+    /**
+     * Optimized query to fetch hotel with aggregated room statistics
+     * This prevents loading all room entities individually
+     */
+    @Query(value = """
+        SELECT 
+            h.id as hotelId,
+            h.name as hotelName,
+            h.min_price as minPrice,
+            h.active as active,
+            r.room_type as roomType,
+            COUNT(r.id) as roomCount,
+            r.base_price as basePrice
+        FROM hotels h
+        LEFT JOIN rooms r ON r.hotel_id = h.id AND r.active = true
+        WHERE h.id = :hotelId AND h.active = true
+        GROUP BY h.id, h.name, h.min_price, h.active, r.room_type, r.base_price
+        """, nativeQuery = true)
+    List<Map<String, Object>> findHotelWithRoomStats(@Param("hotelId") Long hotelId);
+
+    /**
+     * Quick check if hotel exists and is active
+     */
+    @Query("SELECT CASE WHEN COUNT(h) > 0 THEN true ELSE false END FROM Hotel h WHERE h.id = :hotelId AND h.active = true")
+    boolean existsByIdAndActive(@Param("hotelId") Long hotelId);
+
+    /**
+     * Get basic hotel info without loading relationships
+     */
+    @Query("SELECT h.id, h.name, h.minPrice FROM Hotel h WHERE h.id = :hotelId AND h.active = true")
+    Optional<Object[]> findBasicHotelInfo(@Param("hotelId") Long hotelId);
+
     Optional<Hotel> findByHotelCode(String hotelCode);
 
     @EntityGraph(attributePaths = { "images" })

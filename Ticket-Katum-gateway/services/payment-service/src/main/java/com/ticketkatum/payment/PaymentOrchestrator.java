@@ -1,8 +1,12 @@
 package com.ticketkatum.payment;
 
+import com.ticketkatum.dto.PaymentVerifiedEvent;
 import com.ticketkatum.entity.PaymentTransaction;
 import com.ticketkatum.enums.TransactionStatus;
 import com.ticketkatum.jms.EmailService;
+import com.ticketkatum.model.PaymentEvent;
+import com.ticketkatum.payment.request.PaymentResponse;
+import com.ticketkatum.service.PaymentEventPublisher;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.model.ResponseHandler;
 import com.ticketkatum.payment.factory.PaymentProviderFactory;
@@ -30,6 +34,7 @@ public class PaymentOrchestrator {
     private final PaymentProviderFactory factory;
     private final TicketNotificationService notificationService;
     private final EmailService emailService;
+    private final PaymentEventPublisher publisher;
 
     /**
      * Initiate payment with idempotency and duplicate check
@@ -37,33 +42,27 @@ public class PaymentOrchestrator {
     @Transactional
     public Response initiatePayment(String provider, InitiatePaymentRequest req) {
         try {
-            // Validate provider
             if (!isValidProvider(provider)) {
                 log.error("Invalid payment provider: {}", provider);
                 return ResponseHandler.failureWildcard("Invalid provider",
                         "Provider '" + provider + "' is not supported");
             }
 
-            // Generate or validate transaction ID
-            String transactionId = req.getMetadata().get("tid") != null
-                    ? req.getMetadata().get("tid").toString()
-                    : generateTransactionId();
+            String transactionId = generateTransactionId();
 
-            // Check for duplicate transaction (idempotency)
             Optional<PaymentTransaction> existingTxn = txnRepo.findByInternalTxnId(transactionId);
             if (existingTxn.isPresent()) {
                 PaymentTransaction txn = existingTxn.get();
 
-                // If already successful, return existing result
                 if (txn.getStatus() == TransactionStatus.SUCCESS) {
                     log.warn("Duplicate transaction detected: {}", transactionId);
+//                    publisher.publishPaymentSuccess(txn.getBookingId(),txn.getAmount());
                     return ResponseHandler.successWildcard(
                             "Transaction already completed",
                             buildPaymentResponse(txn)
                     );
                 }
 
-                // If failed or expired, allow retry
                 if (txn.getStatus() == TransactionStatus.FAILED ||
                         txn.getStatus() == TransactionStatus.EXPIRED) {
                     log.info("Retrying failed transaction: {}", transactionId);
@@ -71,7 +70,6 @@ public class PaymentOrchestrator {
                     txn.setStatus(TransactionStatus.INITIATED);
                     txnRepo.save(txn);
                 } else {
-                    // Transaction is still processing
                     log.warn("Transaction already in progress: {}", transactionId);
                     return ResponseHandler.failureWildcard(
                             "Transaction already in progress",
@@ -80,27 +78,15 @@ public class PaymentOrchestrator {
                 }
             }
 
-            // Validate amount
-            if (req.getAmount() <= 0) {
-                log.error("Invalid amount: {}", req.getAmount());
-                return ResponseHandler.failureWildcard("Invalid amount",
-                        "Amount must be greater than 0");
-            }
 
             // Create new transaction
             PaymentTransaction txn = PaymentTransaction.builder()
                     .internalTxnId(transactionId)
                     .provider(provider)
+                    .bookingId((String) req.getMetadata().get("booking_id"))
                     .amount(BigDecimal.valueOf(req.getAmount()))
                     .currency("NPR")
                     .status(TransactionStatus.INITIATED)
-                    .userId(req.getMetadata().getOrDefault("userId", "").toString())
-                    .description(req.getMetadata().getOrDefault("description", "").toString())
-                    .successUrl(req.getSuccessUrl())
-                    .failureUrl(req.getFailureUrl())
-                    .callbackUrl(req.getMetadata().getOrDefault("callbackurl", "").toString())
-                    .ipAddress(req.getMetadata().getOrDefault("ipAddress", "").toString())
-                    .userAgent(req.getMetadata().getOrDefault("userAgent", "").toString())
                     .retryCount(0)
                     .expiredAt(LocalDateTime.now().plusMinutes(30)) // 30 min expiry
                     .build();
@@ -110,7 +96,7 @@ public class PaymentOrchestrator {
 
             // Get provider and process payment
             PaymentProvider paymentProvider = factory.get(provider);
-            Response response = paymentProvider.doPayment(req, txn);
+            Response<PaymentResponse> response = paymentProvider.doPayment(req, txn);
 
             // Update transaction status based on response
             if (response.getStatusCode() == 200) {

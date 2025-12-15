@@ -1,6 +1,7 @@
 package com.ticketkatum.controller;
 
 import com.ticketkatum.model.PaymentProviderDTO;
+import com.ticketkatum.payment.request.PaymentResponse;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.payment.PaymentOrchestrator;
 import com.ticketkatum.payment.request.InitiatePaymentRequest;
@@ -44,14 +45,10 @@ public class PaymentController {
         log.info("Payment initiation request - Provider: {}, Amount: {}",
                 provider, request.getAmount());
 
-        // Add IP address and user agent to metadata
-        request.getMetadata().put("ipAddress", getClientIP(httpRequest));
-        request.getMetadata().put("userAgent", httpRequest.getHeader("User-Agent"));
-
-        Response response = orchestrator.initiatePayment(provider, request);
+        Response<PaymentResponse> response = orchestrator.initiatePayment(provider, request);
 
         log.info("Payment initiation response - Status: {}, Message: {}",
-                response.getStatusCode(), response.getMessage());
+                response.getStatusCode(), response.getData());
 
         return ResponseEntity.status(response.getStatusCode()).body(response);
     }

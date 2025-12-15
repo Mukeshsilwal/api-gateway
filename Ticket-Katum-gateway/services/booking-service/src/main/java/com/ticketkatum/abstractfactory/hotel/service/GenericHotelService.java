@@ -2,6 +2,7 @@ package com.ticketkatum.abstractfactory.hotel.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ticketkatum.abstractfactory.provider.BookingProvider;
+import com.ticketkatum.config.EsewaProperties;
 import com.ticketkatum.entity.HotelBooking;
 import com.ticketkatum.entity.HotelConfig;
 import com.ticketkatum.enums.BookingStatus;
@@ -41,6 +42,7 @@ public class GenericHotelService implements BookingProvider {
     private final HotelConfigRepository hotelConfigRepo;
     private final ObjectMapper mapper;
     private final HotelEmailService emailService;
+    private final EsewaProperties esewaProperties;
 
     @Setter
     private String hotelCode;
@@ -90,7 +92,7 @@ public class GenericHotelService implements BookingProvider {
                     .transactionId(req.getPaymentDetails().getTransactionId())
                     .specialRequests(req.getSpecialRequests())
                     .bookingDateTime(LocalDateTime.now())
-                    .status(BookingStatus.CONFIRMED)
+                    .status(BookingStatus.PENDING)
                     .build();
 
             hotelBookingRepo.save(booking);
@@ -100,7 +102,7 @@ public class GenericHotelService implements BookingProvider {
             HotelBookingResponse response = HotelBookingResponse.builder()
                     .bookingId(booking.getBookingId())
                     .confirmationNumber(booking.getConfirmationNumber())
-                    .bookingStatus(BookingStatus.CONFIRMED)
+                    .bookingStatus(BookingStatus.PENDING)
                     .hotelName(booking.getHotelName())
                     .roomType(booking.getRoomType())
                     .numberOfRooms(booking.getNumberOfRooms())
@@ -120,6 +122,19 @@ public class GenericHotelService implements BookingProvider {
         }
     }
 
+
+    @Transactional
+    public void confirmBooking(String bookingId) {
+
+        HotelBooking booking = hotelBookingRepo.findByBookingId(bookingId)
+                .orElseThrow();
+
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            return; // idempotent
+        }
+
+        // confirm rooms + release redis
+    }
 
     @Override
     @Transactional
@@ -180,6 +195,37 @@ public class GenericHotelService implements BookingProvider {
         } catch (Exception e) {
             return ResponseHandler.failureWildcard("Refund failed", e.getMessage());
         }
+    }
+
+    @Override
+    public String getBooking(String bookingId) {
+        HotelBooking booking = hotelBookingRepo.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+            return """
+            <html>
+              <body onload="document.forms[0].submit()">
+                <form action="%s" method="GET">
+                  <input type="hidden" name="amt" value="%s"/>
+                  <input type="hidden" name="psc" value="0"/>
+                  <input type="hidden" name="pdc" value="0"/>
+                  <input type="hidden" name="tAmt" value="%s"/>
+                  <input type="hidden" name="pid" value="%s"/>
+                  <input type="hidden" name="scd" value="%s"/>
+                  <input type="hidden" name="su" value="%s"/>
+                  <input type="hidden" name="fu" value="%s"/>
+                </form>
+              </body>
+            </html>
+            """.formatted(
+                    esewaProperties.getBaseUrl(),
+                    booking.getTotalAmount(),
+                    booking.getTotalAmount(),
+                    booking.getId(),
+                    esewaProperties.getMerchantCode(),
+                    esewaProperties.getSuccessUrl(),
+                    esewaProperties.getFailureUrl()
+            );
     }
 
     private BigDecimal calculateDynamicPrice(HotelBookingRequest request, HotelConfig config) {

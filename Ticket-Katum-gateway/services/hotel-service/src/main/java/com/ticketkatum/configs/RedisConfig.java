@@ -13,6 +13,8 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -52,7 +54,6 @@ public class RedisConfig {
         template.afterPropertiesSet();
         return template;
     }
-
 
     @Bean
     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
@@ -107,10 +108,47 @@ public class RedisConfig {
                 .build();
     }
 
+    // ============ Redis Pub/Sub Configuration ============
 
+    /**
+     * Channel for booking updates
+     */
     @Bean
     public ChannelTopic bookingUpdatesTopic() {
         return new ChannelTopic("booking-updates");
     }
 
+    /**
+     * Channel for payment status updates from payment microservice
+     */
+    @Bean
+    public ChannelTopic paymentStatusTopic() {
+        return new ChannelTopic("payment-status");
+    }
+
+    /**
+     * Message listener adapter for payment status
+     */
+//    @Bean
+//    public MessageListenerAdapter paymentMessageListenerAdapter(PaymentMessageListener listener) {
+//        return new MessageListenerAdapter(listener);
+//    }
+
+    /**
+     * Redis message listener container for pub/sub
+     */
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory connectionFactory,
+//            MessageListenerAdapter paymentMessageListenerAdapter,
+            ChannelTopic paymentStatusTopic) {
+
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+
+        // Subscribe to payment status topic
+//        container.addMessageListener(paymentMessageListenerAdapter, paymentStatusTopic);
+
+        return container;
+    }
 }

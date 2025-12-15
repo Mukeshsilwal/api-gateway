@@ -10,9 +10,11 @@ import com.ticketkatum.model.*;
 import com.ticketkatum.redis.RedisHotelCacheService;
 import com.ticketkatum.repository.HotelRepository;
 import com.ticketkatum.repository.RoomRepository;
+import com.ticketkatum.service.RedisRoomHoldService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +37,8 @@ public class HotelRecommendationService {
     private final ObjectMapper objectMapper;
     private final RedisHotelCacheService redisCache;
     private final HotelMapper hotelMapper;
+    @Autowired
+    private RedisRoomHoldService roomHoldService;
 
     /**
      * Initialize Redis cache on startup
@@ -427,12 +431,26 @@ public class HotelRecommendationService {
         Hotel hotel = hotelRepository.findByIdAndActiveTrue(hotelId)
                 .orElseThrow(() -> new RuntimeException("Hotel not found"));
 
-        List<Room> availableRooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
+        List<Room> allRooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
 
         LocalDate checkIn = request.getCheckIn();
         LocalDate checkOut = request.getCheckOut();
 
         long numberOfNights = ChronoUnit.DAYS.between(checkIn, checkOut);
+
+        // Filter out rooms that are currently held by other booking sessions
+        List<Room> availableRooms = allRooms.stream()
+                .filter(room -> {
+                    // Check if room is held in Redis
+                    boolean isHeld = !roomHoldService.areRoomsAvailable(
+                            List.of(room.getId()),
+                            checkIn,
+                            checkOut,
+                            null // Don't exclude any session
+                    );
+                    return !isHeld;
+                })
+                .collect(Collectors.toList());
 
         List<RoomAvailability> roomAvailabilities = availableRooms.stream()
                 .collect(Collectors.groupingBy(

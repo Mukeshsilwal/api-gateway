@@ -71,6 +71,8 @@ public class PaymentTransaction {
     @Column(length = 500)
     private String failureReason;
 
+    private String bookingId;
+
     private Integer retryCount = 0;
 
     private LocalDateTime createdAt;

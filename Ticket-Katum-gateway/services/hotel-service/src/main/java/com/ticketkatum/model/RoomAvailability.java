@@ -2,21 +2,17 @@ package com.ticketkatum.model;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.List;
-
-/**
- * Room availability details
- */
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class RoomAvailability {
+public class RoomAvailability implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String roomType;
     private Integer availableCount;
     private BigDecimal pricePerNight;
     private BigDecimal totalPrice;
-    private List<String> amenities;
 }

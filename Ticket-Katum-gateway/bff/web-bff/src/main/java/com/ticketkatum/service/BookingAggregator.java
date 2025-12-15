@@ -11,6 +11,7 @@ import com.ticketkatum.dto.booking.response.BookingDetailsResponse;
 import com.ticketkatum.dto.booking.response.BookingHistoryResponse;
 import com.ticketkatum.dto.booking.response.CompleteBookingResponse;
 import com.ticketkatum.dto.hotel.HotelDTO;
+import com.ticketkatum.dto.hotel.RoomAvailability;
 import com.ticketkatum.dto.hotel.RoomDTO;
 import com.ticketkatum.dto.hotel.request.HotelBookingRequest;
 import com.ticketkatum.dto.hotel.request.RefundRequest;
@@ -51,7 +52,6 @@ public class BookingAggregator {
 
         HotelBookingRequest bookingReq = request.getBookingRequest();
 
-        // Step 1: Validate hotel and rooms
         CompletableFuture<HotelDTO> hotelFuture =
                 hotelClient.getHotelById(bookingReq.getHotelId());
 
@@ -60,49 +60,51 @@ public class BookingAggregator {
 
         return CompletableFuture.allOf(hotelFuture, roomsFuture)
                 .thenCompose(v -> {
+
                     HotelDTO hotel = hotelFuture.join();
                     List<RoomDTO> rooms = roomsFuture.join();
 
-                    // Step 2: Check availability
                     return recommendationClient.checkAvailability(
                             bookingReq.getHotelId(),
                             bookingReq.getCheckInDate(),
-                           bookingReq.getCheckOutDate(),
+                            bookingReq.getCheckOutDate(),
                             request.getRoomIds()
                     ).thenCompose(availability -> {
+
                         if (!availability.getAvailable()) {
                             throw new AggregationException("Rooms not available");
                         }
 
-                        // Step 3: Create booking
                         return bookingClient.bookTicket(
                                 request.getCategory(),
-                               request.getService(),
+                                request.getService(),
                                 bookingReq
                         ).thenCompose(bookingResponse -> {
-                            // Step 4: Initiate payment
-                            PaymentRequest paymentReq = request.getPaymentRequest();
-                            paymentReq.setSuccessUrl(request.getPaymentRequest().getSuccessUrl());
-                            paymentReq.setFailureUrl(request.getPaymentRequest().getFailureUrl());
-                            paymentReq.setAmount(availability.getAvailableRooms().stream().map(roomAvailability -> {
-                                return roomAvailability.getPricePerNight();
-                            }).reduce(BigDecimal.ZERO, BigDecimal::add));
 
+                            BigDecimal totalAmount =
+                                    availability.getAvailableRooms().stream()
+                                            .map(RoomAvailability::getPricePerNight)
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                            PaymentRequest paymentReq = new PaymentRequest();
+                            paymentReq.setProvider("ESEWA");
                             paymentReq.getMetadata().put("bookingId", bookingResponse.getBookingId());
+                            paymentReq.setAmount(totalAmount);
 
-                            return paymentClient.initiatePayment(
-                                    paymentReq.getProvider(), paymentReq
-                            ).thenApply(paymentResponse ->
-                                    CompleteBookingResponse.builder()
-                                            .bookingData(bookingResponse)
-                                            .paymentData(paymentResponse)
-                                            .hotelDetails(hotel)
-                                            .bookedRooms(rooms)
-                                            .totalAmount(availability.getTotalEstimatedCost())
-                                            .confirmationEmail("Sent to " + bookingReq.getContactDetails().getEmail())
-                                            .confirmationSms("Sent to " + bookingReq.getContactDetails().getPhone())
-                                            .build()
-                            );
+                            // ❌ DO NOT SET success/failure URLs here
+
+                            return paymentClient.initiatePayment("ESEWA", paymentReq)
+                                    .thenApply(paymentResponse ->
+                                            CompleteBookingResponse.builder()
+                                                    .bookingData(bookingResponse)
+                                                    .paymentData(paymentResponse) // contains txnId
+                                                    .hotelDetails(hotel)
+                                                    .bookedRooms(rooms)
+                                                    .totalAmount(totalAmount)
+                                                    .confirmationEmail("Sent to " + bookingReq.getContactDetails().getEmail())
+                                                    .confirmationSms("Sent to " + bookingReq.getContactDetails().getPhone())
+                                                    .build()
+                                    );
                         });
                     });
                 })

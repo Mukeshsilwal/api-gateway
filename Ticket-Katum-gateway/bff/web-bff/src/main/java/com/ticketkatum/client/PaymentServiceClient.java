@@ -201,7 +201,6 @@ public class PaymentServiceClient {
                         .status("FAILED")
                         .message("Payment service temporarily unavailable. Please try again later.")
                         .transactionId(null)
-                        .paymentUrl(null)
                         .build()
         );
     }

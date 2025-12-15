@@ -14,9 +14,15 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+    pub-sub-domain: true
+
   jpa:
     hibernate:
-      ddl-auto: none   # Flyway is enabled → keep this as NONE
+      ddl-auto: update   # Flyway is enabled → keep this as NONE
     show-sql: false
     properties:
       hibernate:
@@ -30,6 +36,13 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+esewa:
+  merchant-code: ESEWATEST
+  success-url: https://localhost:3000/payments/esewa/success
+  failure-url: https://localhost:3000/payments/esewa/failure
+  base-url: https://esewa.com.np/epay/main
+
+
 
   redis:
     lettuce:
@@ -53,7 +66,7 @@ spring:
     listener:
       simple:
         retry:
-          enabled: true
+          enabled: false
           initial-interval: 2000
           max-attempts: 3
           multiplier: 2

@@ -16,15 +16,15 @@ public class Route {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "source_id", nullable = false)
     private BusStop sourceBusStop;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "destination_id", nullable = false)
     private BusStop destinationBusStop;
 
-    @OneToMany(mappedBy = "route", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "route", fetch = FetchType.EAGER,
             cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private Set<Bus> buses = new HashSet<>();

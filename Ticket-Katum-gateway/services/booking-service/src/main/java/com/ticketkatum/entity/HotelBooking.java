@@ -67,6 +67,7 @@ public class HotelBooking {
     @Column(nullable = false)
     private String paymentMethod;
 
+    @Column(nullable = false)
     private String transactionId;
 
     @Column(columnDefinition = "TEXT")

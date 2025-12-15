@@ -13,6 +13,5 @@ import java.util.Map;
 @AllArgsConstructor
 public class VerifyPaymentRequest {
     private String transactionId;
-    private String providerTransactionId;
-    private Map<String, String> additionalParams;
+    private String providerToken;
 }

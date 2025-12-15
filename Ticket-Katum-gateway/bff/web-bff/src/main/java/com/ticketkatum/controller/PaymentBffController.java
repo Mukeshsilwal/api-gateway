@@ -46,12 +46,11 @@ public class PaymentBffController {
             description = "Initiate payment after validating booking")
     public CompletableFuture<ResponseEntity<Response<PaymentInitiationResponse>>> initiatePayment(
             @PathVariable String provider,
-            @Valid @RequestBody PaymentRequest paymentRequest,
-            @RequestParam String bookingId) {
+            @Valid @RequestBody PaymentRequest paymentRequest) {
 
-        log.info("BFF: Initiating payment for booking: {}", bookingId);
 
-        return paymentAggregator.initiatePaymentWithValidation(provider, paymentRequest, bookingId)
+
+        return paymentAggregator.initiatePaymentWithValidation(provider, paymentRequest)
                 .thenApply(response -> ResponseEntity.ok(
                         new Response<>(200, "Payment initiated", response)))
                 .exceptionally(ex -> {

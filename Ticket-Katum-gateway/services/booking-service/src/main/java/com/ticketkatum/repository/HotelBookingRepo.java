@@ -13,6 +13,7 @@ public interface HotelBookingRepo extends JpaRepository<HotelBooking, Long> {
 
     Optional<HotelBooking> findByBookingId(String bookingId);
 
+
     Optional<HotelBooking> findByConfirmationNumber(String confirmationNumber);
 
     List<HotelBooking> findByContactEmail(String email);

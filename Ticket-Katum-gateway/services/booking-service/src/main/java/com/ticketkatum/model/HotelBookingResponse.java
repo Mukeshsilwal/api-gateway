@@ -28,6 +28,7 @@ public class HotelBookingResponse extends Response<HotelBookingResponse> {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
     private BigDecimal totalAmount;
+    private String txnId;
     private String currency;
     private LocalDateTime bookingDateTime;
     private BookingStatus bookingStatus;
