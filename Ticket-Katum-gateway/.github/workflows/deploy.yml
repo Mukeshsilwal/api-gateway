@@ -1,19 +1,19 @@
-name: Build, Push and Deploy to AWS EKS
+name: Build, Push and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
+      packages: write
       id-token: write
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -27,15 +27,12 @@ jobs:
           chmod +x mvnw
           ./mvnw -T1C -DskipTests clean package
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        uses: aws-actions/amazon-ecr-login@v2
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build & push web-bff image
         uses: docker/build-push-action@v4
@@ -43,7 +40,7 @@ jobs:
           context: .
           file: bff/web-bff/Dockerfile
           push: true
-          tags: ${{ secrets.ECR_WEB_BFF }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/web-bff:${{ github.sha }}
 
       - name: Build & push booking-service image
         uses: docker/build-push-action@v4
@@ -51,7 +48,7 @@ jobs:
           context: .
           file: services/booking-service/Dockerfile
           push: true
-          tags: ${{ secrets.ECR_BOOKING_SERVICE }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/booking-service:${{ github.sha }}
 
       - name: Build & push payment-service image
         uses: docker/build-push-action@v4
@@ -59,7 +56,7 @@ jobs:
           context: .
           file: services/payment-service/Dockerfile
           push: true
-          tags: ${{ secrets.ECR_PAYMENT_SERVICE }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }}
 
       - name: Build & push hotel-service image
         uses: docker/build-push-action@v4
@@ -67,7 +64,7 @@ jobs:
           context: .
           file: services/hotel-service/Dockerfile
           push: true
-          tags: ${{ secrets.ECR_HOTEL_SERVICE }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/hotel-service:${{ github.sha }}
 
       - name: Build & push auth-service image
         uses: docker/build-push-action@v4
@@ -75,26 +72,26 @@ jobs:
           context: .
           file: services/auth-service/Dockerfile
           push: true
-          tags: ${{ secrets.ECR_AUTH_SERVICE }}:${{ github.sha }}
+          tags: ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }}
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.29.0'
 
-      - name: Update kubeconfig for EKS
-        run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name ticket-katum-cluster
-
       - name: Deploy to Kubernetes (kustomize image patch)
         env:
-          REGISTRY_WEB_BFF: ${{ secrets.ECR_WEB_BFF }}
-          REGISTRY_BOOKING: ${{ secrets.ECR_BOOKING_SERVICE }}
-          REGISTRY_PAYMENT: ${{ secrets.ECR_PAYMENT_SERVICE }}
-          REGISTRY_HOTEL: ${{ secrets.ECR_HOTEL_SERVICE }}
-          REGISTRY_AUTH: ${{ secrets.ECR_AUTH_SERVICE }}
+          KUBECONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          if [ -z "$KUBECONFIG_DATA" ]; then
+            echo "KUBE_CONFIG_DATA secret is not set"
+            exit 1
+          fi
+
+          echo "$KUBECONFIG_DATA" | base64 --decode > kubeconfig
+
           mkdir -p k8s-deploy
           if [ -d infra/k8s ]; then
             cp infra/k8s/* k8s-deploy/ || true
@@ -108,34 +105,37 @@ jobs:
 
           cat >> k8s-deploy/kustomization.yaml <<KUSTOMIZE_IMAGES
 images:
-  - name: web-bff
-    newName: ${REGISTRY_WEB_BFF}
+  - name: ticketkatum/booking-service
+    newName: ${REGISTRY}/booking-service
     newTag: ${IMAGE_TAG}
-  - name: booking-service
-    newName: ${REGISTRY_BOOKING}
+  - name: web-bff
+    newName: ${REGISTRY}/web-bff
     newTag: ${IMAGE_TAG}
   - name: payment-service
-    newName: ${REGISTRY_PAYMENT}
+    newName: ${REGISTRY}/payment-service
     newTag: ${IMAGE_TAG}
   - name: hotel-service
-    newName: ${REGISTRY_HOTEL}
+    newName: ${REGISTRY}/hotel-service
     newTag: ${IMAGE_TAG}
   - name: auth-service
-    newName: ${REGISTRY_AUTH}
+    newName: ${REGISTRY}/auth-service
     newTag: ${IMAGE_TAG}
   KUSTOMIZE_IMAGES
   
-  kubectl apply -k k8s-deploy || {
-  echo "Kustomize apply failed; using kubectl set image fallback"
-  kubectl set image deployment/web-bff web-bff=${REGISTRY_WEB_BFF}:${IMAGE_TAG} --record || true
-  kubectl set image deployment/booking-service booking-service=${REGISTRY_BOOKING}:${IMAGE_TAG} --record || true
-  kubectl set image deployment/payment-service payment-service=${REGISTRY_PAYMENT}:${IMAGE_TAG} --record || true
-  kubectl set image deployment/hotel-service hotel-service=${REGISTRY_HOTEL}:${IMAGE_TAG} --record || true
-  kubectl set image deployment/auth-service auth-service=${REGISTRY_AUTH}:${IMAGE_TAG} --record || true
+  kubectl --kubeconfig=kubeconfig apply -k k8s-deploy || {
+  echo "kustomize apply failed or no k8s manifests found; falling back to kubectl set image";
+  kubectl --kubeconfig=kubeconfig set image deployment/web-bff web-bff=${REGISTRY}/web-bff:${IMAGE_TAG} --record || true
+  kubectl --kubeconfig=kubeconfig set image deployment/booking-service booking-service=${REGISTRY}/booking-service:${IMAGE_TAG} --record || true
+  kubectl --kubeconfig=kubeconfig set image deployment/payment-service payment-service=${REGISTRY}/payment-service:${IMAGE_TAG} --record || true
+  kubectl --kubeconfig=kubeconfig set image deployment/hotel-service hotel-service=${REGISTRY}/hotel-service:${IMAGE_TAG} --record || true
+  kubectl --kubeconfig=kubeconfig set image deployment/auth-service auth-service=${REGISTRY}/auth-service:${IMAGE_TAG} --record || true
   }
 
-  kubectl rollout status deployment/web-bff --timeout=120s || true
-  kubectl rollout status deployment/booking-service --timeout=120s || true
-  kubectl rollout status deployment/payment-service --timeout=120s || true
-  kubectl rollout status deployment/hotel-service --timeout=120s || true
-  kubectl rollout status deployment/auth-service --timeout=120s || true
+  kubectl --kubeconfig=kubeconfig rollout status deployment/web-bff --timeout=120s || true
+  kubectl --kubeconfig=kubeconfig rollout status deployment/booking-service --timeout=120s || true
+  kubectl --kubeconfig=kubeconfig rollout status deployment/payment-service --timeout=120s || true
+  kubectl --kubeconfig=kubeconfig rollout status deployment/hotel-service --timeout=120s || true
+  kubectl --kubeconfig=kubeconfig rollout status deployment/auth-service --timeout=120s || true
+
+  - name: Cleanup kubeconfig
+    run: rm -f kubeconfig || true
