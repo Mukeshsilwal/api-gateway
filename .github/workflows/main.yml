@@ -24,6 +24,13 @@ jobs:
 
       - name: Build artifacts (Maven)
         run: |
+          # Check if pom.xml exists in root
+          if [ ! -f pom.xml ]; then
+            echo "No pom.xml found in root directory. Skipping Maven build."
+            echo "Docker builds will use pre-built artifacts or build within Dockerfile."
+            exit 0
+          fi
+          
           if [ -f mvnw ]; then
             chmod +x mvnw
             ./mvnw -T1C -DskipTests clean package
