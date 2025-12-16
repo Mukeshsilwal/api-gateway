@@ -213,7 +213,6 @@ public class AuthController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
-            // Extend session on successful validation
             sessionService.extendSession(sessionId);
 
             Map<String, Object> responseData = new HashMap<>();
