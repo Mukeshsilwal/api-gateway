@@ -18,5 +18,7 @@ public class PaymentRequest {
     private String provider;
     private String failureUrl;
     private String successUrl;
+    private String bookingId;
+    private long hotelId;
     private Map<String, String> metadata;
 }

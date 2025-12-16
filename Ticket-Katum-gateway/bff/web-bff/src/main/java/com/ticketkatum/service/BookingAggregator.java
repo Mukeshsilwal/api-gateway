@@ -88,8 +88,9 @@ public class BookingAggregator {
 
                             PaymentRequest paymentReq = new PaymentRequest();
                             paymentReq.setProvider("ESEWA");
-                            paymentReq.getMetadata().put("bookingId", bookingResponse.getBookingId());
+                            paymentReq.setBookingId(bookingResponse.getBookingId());
                             paymentReq.setAmount(totalAmount);
+                            paymentReq.setHotelId(availability.getHotelId());
 
                             // ❌ DO NOT SET success/failure URLs here
 

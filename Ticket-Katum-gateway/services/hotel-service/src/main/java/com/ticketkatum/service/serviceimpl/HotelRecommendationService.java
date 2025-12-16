@@ -147,6 +147,17 @@ public class HotelRecommendationService {
                 .build();
     }
 
+    @Transactional
+    public void bookedSeat(Long hotelId) {
+        List<Room> rooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
+
+        // Mark each room as inactive (booked) and save
+        rooms.forEach(room -> {
+            room.setActive(false);
+            roomRepository.save(room);
+        });
+    }
+
     /**
      * Fallback to database query if Redis cache is empty
      */

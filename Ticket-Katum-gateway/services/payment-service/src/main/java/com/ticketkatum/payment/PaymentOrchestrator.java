@@ -6,7 +6,6 @@ import com.ticketkatum.enums.TransactionStatus;
 import com.ticketkatum.jms.EmailService;
 import com.ticketkatum.model.PaymentEvent;
 import com.ticketkatum.payment.request.PaymentResponse;
-import com.ticketkatum.service.PaymentEventPublisher;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.model.ResponseHandler;
 import com.ticketkatum.payment.factory.PaymentProviderFactory;
@@ -34,8 +33,6 @@ public class PaymentOrchestrator {
     private final PaymentProviderFactory factory;
     private final TicketNotificationService notificationService;
     private final EmailService emailService;
-    private final PaymentEventPublisher publisher;
-
     /**
      * Initiate payment with idempotency and duplicate check
      */
@@ -83,7 +80,8 @@ public class PaymentOrchestrator {
             PaymentTransaction txn = PaymentTransaction.builder()
                     .internalTxnId(transactionId)
                     .provider(provider)
-                    .bookingId((String) req.getMetadata().get("booking_id"))
+                    .bookingId(req.getBookingId())
+                    .merchantId(req.getHotelId())
                     .amount(BigDecimal.valueOf(req.getAmount()))
                     .currency("NPR")
                     .status(TransactionStatus.INITIATED)

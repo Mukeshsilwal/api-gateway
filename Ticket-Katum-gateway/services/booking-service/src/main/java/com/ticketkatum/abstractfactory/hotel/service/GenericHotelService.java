@@ -34,7 +34,6 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Qualifier("hotelGenericProvider")
-@RequestScope
 @Component
 public class GenericHotelService implements BookingProvider {
 
@@ -127,14 +126,18 @@ public class GenericHotelService implements BookingProvider {
     public void confirmBooking(String bookingId) {
 
         HotelBooking booking = hotelBookingRepo.findByBookingId(bookingId)
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         if (booking.getStatus() == BookingStatus.CONFIRMED) {
-            return; // idempotent
+            return;
         }
 
-        // confirm rooms + release redis
+        booking.setStatus(BookingStatus.CONFIRMED);
+        hotelBookingRepo.save(booking);
+
+        log.info("Booking {} confirmed successfully", bookingId);
     }
+
 
     @Override
     @Transactional

@@ -199,19 +199,18 @@ public class EsewaPaymentProvider implements PaymentProvider {
             responseData.put("status", "SUCCESS");
             responseData.put("verifiedAt", new Date());
 
-            if (result.isSuccess()) {
                 this.markSuccess(txn.getInternalTxnId(), result.getRefId());
 
                 paymentEventPublisher.publishPaymentVerified(
                         new PaymentVerifiedEvent(
                                 txn.getBookingId(),
                                 txn.getInternalTxnId(),
+                                txn.getMerchantId(),
                                 txn.getAmount(),
                                 "ESEWA",
                                 LocalDateTime.now()
                         )
                 );
-            }
 
             return ResponseHandler.successWildcard(
                     "Payment verified successfully",

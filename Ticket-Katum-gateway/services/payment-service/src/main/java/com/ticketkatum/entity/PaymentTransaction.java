@@ -57,7 +57,7 @@ public class PaymentTransaction {
     private String userId; // Who initiated the payment
 
     @Column(length = 100)
-    private String merchantId; // If applicable
+    private long merchantId; // If applicable
 
     @Column(length = 500)
     private String description;

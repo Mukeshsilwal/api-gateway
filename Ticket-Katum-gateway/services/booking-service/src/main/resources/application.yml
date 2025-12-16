@@ -14,11 +14,10 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
-  activemq:
-    broker-url: tcp://localhost:61616
-    user: admin
-    password: admin
-    pub-sub-domain: true
+    activemq:
+      broker-url: tcp://localhost:61616
+      user: admin
+      password: admin
 
   jpa:
     hibernate:
