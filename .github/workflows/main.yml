@@ -1,0 +1,120 @@
+name: Build, Push and Deploy
+
+on:
+  push:
+    branches: [ main, master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build artifacts (Maven)
+        run: |
+          if [ -f mvnw ]; then
+            chmod +x mvnw
+            ./mvnw -T1C -DskipTests clean package
+          else
+            mvn -T1C -DskipTests clean package
+          fi
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push Docker images
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/web-bff:${{ github.sha }} -f bff/web-bff/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/web-bff:${{ github.sha }}
+
+          docker build -t ghcr.io/${{ github.repository_owner }}/booking-service:${{ github.sha }} -f services/booking-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/booking-service:${{ github.sha }}
+
+          docker build -t ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }} -f services/payment-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }}
+
+          docker build -t ghcr.io/${{ github.repository_owner }}/hotel-service:${{ github.sha }} -f services/hotel-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/hotel-service:${{ github.sha }}
+
+          docker build -t ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }} -f services/auth-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.29.0'
+
+      - name: Deploy to Kubernetes
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          REGISTRY: ghcr.io/${{ github.repository_owner }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          if [ -z "$KUBECONFIG_DATA" ]; then
+            echo "KUBE_CONFIG_DATA secret is not set"
+            exit 1
+          fi
+          echo "$KUBECONFIG_DATA" | base64 --decode > kubeconfig
+
+          mkdir -p k8s-deploy
+          if [ -d infra/k8s ]; then
+            cp infra/k8s/* k8s-deploy/ || true
+          fi
+
+          # Generate kustomization.yaml
+          echo "resources:" > k8s-deploy/kustomization.yaml
+          for f in k8s-deploy/*.yaml; do
+            if [ -f "$f" ]; then
+              echo "  - $(basename "$f")" >> k8s-deploy/kustomization.yaml
+            fi
+          done
+
+          echo "images:" >> k8s-deploy/kustomization.yaml
+          
+          echo "  - name: ticketkatum/booking-service" >> k8s-deploy/kustomization.yaml
+          echo "    newName: ${REGISTRY}/booking-service" >> k8s-deploy/kustomization.yaml
+          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          echo "  - name: web-bff" >> k8s-deploy/kustomization.yaml
+          echo "    newName: ${REGISTRY}/web-bff" >> k8s-deploy/kustomization.yaml
+          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          echo "  - name: payment-service" >> k8s-deploy/kustomization.yaml
+          echo "    newName: ${REGISTRY}/payment-service" >> k8s-deploy/kustomization.yaml
+          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          echo "  - name: hotel-service" >> k8s-deploy/kustomization.yaml
+          echo "    newName: ${REGISTRY}/hotel-service" >> k8s-deploy/kustomization.yaml
+          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          echo "  - name: auth-service" >> k8s-deploy/kustomization.yaml
+          echo "    newName: ${REGISTRY}/auth-service" >> k8s-deploy/kustomization.yaml
+          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          # Apply deployment
+          kubectl --kubeconfig=kubeconfig apply -k k8s-deploy
+
+          # Wait for rollout
+          for deploy in web-bff booking-service payment-service hotel-service auth-service; do
+            kubectl --kubeconfig=kubeconfig rollout status deployment/$deploy --timeout=120s || true
+          done
+
+      - name: Cleanup kubeconfig
+        if: always()
+        run: rm -f kubeconfig
