@@ -34,52 +34,29 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push web-bff image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: bff/web-bff/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/web-bff:${{ github.sha }}
+      - name: Build & push Docker images
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/web-bff:${{ github.sha }} -f bff/web-bff/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/web-bff:${{ github.sha }}
 
-      - name: Build & push booking-service image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: services/booking-service/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/booking-service:${{ github.sha }}
+          docker build -t ghcr.io/${{ github.repository_owner }}/booking-service:${{ github.sha }} -f services/booking-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/booking-service:${{ github.sha }}
 
-      - name: Build & push payment-service image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: services/payment-service/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }}
+          docker build -t ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }} -f services/payment-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/payment-service:${{ github.sha }}
 
-      - name: Build & push hotel-service image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: services/hotel-service/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/hotel-service:${{ github.sha }}
+          docker build -t ghcr.io/${{ github.repository_owner }}/hotel-service:${{ github.sha }} -f services/hotel-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/hotel-service:${{ github.sha }}
 
-      - name: Build & push auth-service image
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: services/auth-service/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }}
+          docker build -t ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }} -f services/auth-service/Dockerfile .
+          docker push ghcr.io/${{ github.repository_owner }}/auth-service:${{ github.sha }}
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
           version: 'v1.29.0'
 
-      - name: Deploy to Kubernetes (kustomize image patch)
+      - name: Deploy to Kubernetes
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
           REGISTRY: ghcr.io/${{ github.repository_owner }}
@@ -89,52 +66,47 @@ jobs:
             echo "KUBE_CONFIG_DATA secret is not set"
             exit 1
           fi
-
           echo "$KUBECONFIG_DATA" | base64 --decode > kubeconfig
+
           mkdir -p k8s-deploy
           if [ -d infra/k8s ]; then
             cp infra/k8s/* k8s-deploy/ || true
           fi
 
+          # Generate kustomization.yaml without heredoc
           echo "resources:" > k8s-deploy/kustomization.yaml
           for f in k8s-deploy/*.yaml; do
-            [ -f "$f" ] || continue
-            echo "  - $(basename "$f")" >> k8s-deploy/kustomization.yaml
+            [ -f "$f" ] && echo "  - $(basename "$f")" >> k8s-deploy/kustomization.yaml
           done
 
-          cat >> k8s-deploy/kustomization.yaml <<EOF
-images:
-  - name: ticketkatum/booking-service
-    newName: ${REGISTRY}/booking-service
-    newTag: ${IMAGE_TAG}
-  - name: web-bff
-    newName: ${REGISTRY}/web-bff
-    newTag: ${IMAGE_TAG}
-  - name: payment-service
-    newName: ${REGISTRY}/payment-service
-    newTag: ${IMAGE_TAG}
-  - name: hotel-service
-    newName: ${REGISTRY}/hotel-service
-    newTag: ${IMAGE_TAG}
-  - name: auth-service
-    newName: ${REGISTRY}/auth-service
-    newTag: ${IMAGE_TAG}
-EOF
+          echo "images:" >> k8s-deploy/kustomization.yaml
+          echo "- name: ticketkatum/booking-service" >> k8s-deploy/kustomization.yaml
+          echo "  newName: ${REGISTRY}/booking-service" >> k8s-deploy/kustomization.yaml
+          echo "  newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
 
-          kubectl --kubeconfig=kubeconfig apply -k k8s-deploy || {
-            echo "kustomize apply failed; falling back to kubectl set image"
-            kubectl --kubeconfig=kubeconfig set image deployment/web-bff web-bff=${REGISTRY}/web-bff:${IMAGE_TAG} --record || true
-            kubectl --kubeconfig=kubeconfig set image deployment/booking-service booking-service=${REGISTRY}/booking-service:${IMAGE_TAG} --record || true
-            kubectl --kubeconfig=kubeconfig set image deployment/payment-service payment-service=${REGISTRY}/payment-service:${IMAGE_TAG} --record || true
-            kubectl --kubeconfig=kubeconfig set image deployment/hotel-service hotel-service=${REGISTRY}/hotel-service:${IMAGE_TAG} --record || true
-            kubectl --kubeconfig=kubeconfig set image deployment/auth-service auth-service=${REGISTRY}/auth-service:${IMAGE_TAG} --record || true
-          }
+          echo "- name: web-bff" >> k8s-deploy/kustomization.yaml
+          echo "  newName: ${REGISTRY}/web-bff" >> k8s-deploy/kustomization.yaml
+          echo "  newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
 
-          kubectl --kubeconfig=kubeconfig rollout status deployment/web-bff --timeout=120s || true
-          kubectl --kubeconfig=kubeconfig rollout status deployment/booking-service --timeout=120s || true
-          kubectl --kubeconfig=kubeconfig rollout status deployment/payment-service --timeout=120s || true
-          kubectl --kubeconfig=kubeconfig rollout status deployment/hotel-service --timeout=120s || true
-          kubectl --kubeconfig=kubeconfig rollout status deployment/auth-service --timeout=120s || true
+          echo "- name: payment-service" >> k8s-deploy/kustomization.yaml
+          echo "  newName: ${REGISTRY}/payment-service" >> k8s-deploy/kustomization.yaml
+          echo "  newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          echo "- name: hotel-service" >> k8s-deploy/kustomization.yaml
+          echo "  newName: ${REGISTRY}/hotel-service" >> k8s-deploy/kustomization.yaml
+          echo "  newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          echo "- name: auth-service" >> k8s-deploy/kustomization.yaml
+          echo "  newName: ${REGISTRY}/auth-service" >> k8s-deploy/kustomization.yaml
+          echo "  newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+
+          # Apply deployment
+          kubectl --kubeconfig=kubeconfig apply -k k8s-deploy
+
+          # Wait for rollout
+          for deploy in web-bff booking-service payment-service hotel-service auth-service; do
+            kubectl --kubeconfig=kubeconfig rollout status deployment/$deploy --timeout=120s || true
+          done
 
       - name: Cleanup kubeconfig
         run: rm -f kubeconfig || true
