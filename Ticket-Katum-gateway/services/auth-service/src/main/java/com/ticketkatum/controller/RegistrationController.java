@@ -100,7 +100,6 @@ public class RegistrationController {
 
         log.info("Fetching registration request details for ID: {}", requestId);
 
-        // Note: You'll need to add a getRequestById method in the service
         // AdminRegistrationRequestDto request = registrationService.getRequestById(requestId);
 
         Map<String, Object> response = new HashMap<>();
