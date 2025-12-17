@@ -15,7 +15,7 @@ $ErrorActionPreference = "Stop"
 
 # Configuration
 $Namespace = "ticket-katum"
-$K8sDir = "k8s"
+$K8sDir = "k8s-deploy"
 
 Write-Host "========================================" -ForegroundColor Green
 Write-Host "Ticket Katum - Kubernetes Deployment" -ForegroundColor Green

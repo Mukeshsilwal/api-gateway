@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: payment-service
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/payment-service:latest
+          image: ticketkatum/payment-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8091

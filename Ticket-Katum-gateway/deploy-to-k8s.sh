@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 # Configuration
 ENVIRONMENT=${1:-dev}
 NAMESPACE="ticket-katum"
-K8S_DIR="k8s"
+K8S_DIR="k8s-deploy"
 
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Ticket Katum - Kubernetes Deployment${NC}"

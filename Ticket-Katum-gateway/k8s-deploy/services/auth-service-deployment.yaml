@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: auth-service
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/auth-service:latest
+          image: ticketkatum/auth-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8089

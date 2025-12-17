@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
         - name: eureka-server
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/eureka-server:latest
+          image: ticketkatum/eureka-server:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8761

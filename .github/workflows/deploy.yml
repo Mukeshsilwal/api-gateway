@@ -76,67 +76,72 @@ jobs:
             fi
           done
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: 'v1.29.0'
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Update Kubeconfig
+        run: aws eks update-kubeconfig --name ticket-katum-cluster --region us-east-1
 
       - name: Deploy to Kubernetes
         env:
-          KUBECONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
           OWNER_LC: ${{ github.repository_owner }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
           OWNER_LC=$(echo "$OWNER_LC" | tr '[:upper:]' '[:lower:]')
           REGISTRY="ghcr.io/${OWNER_LC}"
           
-          if [ -z "$KUBECONFIG_DATA" ]; then
-            echo "KUBE_CONFIG_DATA secret is not set"
-            exit 1
-          fi
-          echo "$KUBECONFIG_DATA" | base64 --decode > kubeconfig
-
-          mkdir -p k8s-deploy
-          if [ -d infra/k8s ]; then
-            cp -r infra/k8s/* k8s-deploy/ || true
-          fi
-
-          # Generate kustomization.yaml recursively
-          echo "resources:" > k8s-deploy/kustomization.yaml
-          find k8s-deploy -name '*.yaml' -print | while read f; do
-            echo "  - ${f#k8s-deploy/}" >> k8s-deploy/kustomization.yaml
-          done
-
-          echo "images:" >> k8s-deploy/kustomization.yaml
+          # Generate kustomization.yaml recursively if not exists or needs update
+          # Note: We are using k8s-deploy directory directly as it contains the manifests
           
-          echo "  - name: ticketkatum/booking-service" >> k8s-deploy/kustomization.yaml
-          echo "    newName: ${REGISTRY}/booking-service" >> k8s-deploy/kustomization.yaml
-          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+          # Check if kustomization.yaml exists, if not create basic structure
+          if [ ! -f k8s-deploy/kustomization.yaml ]; then
+             echo "resources:" > k8s-deploy/kustomization.yaml
+             find k8s-deploy -name '*deployment.yaml' -o -name 'service.yaml' -o -name 'ingress.yaml' -o -name 'configmaps.yaml' -o -name 'secrets.yaml' | grep -v "kustomization.yaml" | while read f; do
+               echo "  - ${f#k8s-deploy/}" >> k8s-deploy/kustomization.yaml
+             done
+          fi
 
-          echo "  - name: web-bff" >> k8s-deploy/kustomization.yaml
-          echo "    newName: ${REGISTRY}/web-bff" >> k8s-deploy/kustomization.yaml
-          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+          # Update kustomization.yaml with new images
+          cd k8s-deploy
+          
+          # Ensure kustomization.yaml has images section if not present
+          if ! grep -q "images:" kustomization.yaml; then
+            echo -e "\nimages:" >> kustomization.yaml
+          fi
 
-          echo "  - name: payment-service" >> k8s-deploy/kustomization.yaml
-          echo "    newName: ${REGISTRY}/payment-service" >> k8s-deploy/kustomization.yaml
-          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
-
-          echo "  - name: hotel-service" >> k8s-deploy/kustomization.yaml
-          echo "    newName: ${REGISTRY}/hotel-service" >> k8s-deploy/kustomization.yaml
-          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
-
-          echo "  - name: auth-service" >> k8s-deploy/kustomization.yaml
-          echo "    newName: ${REGISTRY}/auth-service" >> k8s-deploy/kustomization.yaml
-          echo "    newTag: ${IMAGE_TAG}" >> k8s-deploy/kustomization.yaml
+          # We need to use kustomize edit or manual append. Let's append to avoid dependency issues if kustomize isn't perfect
+          # Actually, let's just append the image overrides. 
+          # Warning: This simple appending assumes standard kustomize structure. 
+          # A safer way using pure bash without kustomize CLI edit:
+          
+          cat <<EOF >> kustomization.yaml
+            - name: ticketkatum/booking-service
+              newName: ${REGISTRY}/booking-service
+              newTag: ${IMAGE_TAG}
+            - name: web-bff
+              newName: ${REGISTRY}/web-bff
+              newTag: ${IMAGE_TAG}
+            - name: payment-service
+              newName: ${REGISTRY}/payment-service
+              newTag: ${IMAGE_TAG}
+            - name: hotel-service
+              newName: ${REGISTRY}/hotel-service
+              newTag: ${IMAGE_TAG}
+            - name: auth-service
+              newName: ${REGISTRY}/auth-service
+              newTag: ${IMAGE_TAG}
+          EOF
+          
+          cd ..
 
           # Apply deployment
-          kubectl --kubeconfig=kubeconfig apply -k k8s-deploy
+          kubectl apply -k k8s-deploy
 
           # Wait for rollout
           for deploy in web-bff booking-service payment-service hotel-service auth-service; do
-            kubectl --kubeconfig=kubeconfig rollout status deployment/$deploy --timeout=120s || true
+            kubectl rollout status deployment/$deploy --timeout=120s || true
           done
-
-      - name: Cleanup kubeconfig
-        if: always()
-        run: rm -f kubeconfig

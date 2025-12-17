@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
         - name: hotel-service
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/hotel-service:latest
+          image: ticketkatum/hotel-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8087

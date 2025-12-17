@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: web-bff
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/web-bff:latest
+          image: ticketkatum/web-bff:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

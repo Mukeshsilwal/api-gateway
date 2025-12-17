@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: booking-service
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/booking-service:latest
+          image: ticketkatum/booking-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8090

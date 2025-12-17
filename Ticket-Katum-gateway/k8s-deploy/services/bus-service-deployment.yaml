@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: bus-service
-          image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/bus-service:latest
+          image: ticketkatum/bus-service:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8088
