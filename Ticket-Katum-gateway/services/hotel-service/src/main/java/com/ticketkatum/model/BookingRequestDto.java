@@ -1,15 +1,15 @@
 package com.ticketkatum.model;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class BookingRequestDto {
     @NotNull(message = "Hotel ID is required")
     private Long hotelId;
