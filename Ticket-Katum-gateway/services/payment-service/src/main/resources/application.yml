@@ -6,9 +6,9 @@ spring:
     name: payment-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/payment_db
-    username: postgres
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/payment_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -21,8 +21,8 @@ spring:
 
     activemq:
       broker-url: tcp://localhost:61616
-      user: admin
-      password: admin
+      user: ${ACTIVEMQ_USER:admin}
+      password: ${ACTIVEMQ_PASSWORD:admin}
 
 
 esewa:
@@ -31,7 +31,7 @@ esewa:
   failure-url: http://localhost:3000/payments/esewa/failure
   base-url: https://rc-epay.esewa.com.np/api/epay/main/v2/form
   verify-url: https://rc-epay.esewa.com.np/api/epay/transaction/status
-  secret-key: "8gBm/:&EnhH.1/q"
+  secret-key: ${ESEWA_SECRET_KEY:"8gBm/:&EnhH.1/q"}
 
   kafka:
     kafka:

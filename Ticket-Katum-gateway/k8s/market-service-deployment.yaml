@@ -27,11 +27,20 @@ spec:
         - name: EUREKA_SERVER_URL
           value: "http://eureka-server:8761/eureka/"
         - name: DB_URL
-          value: "jdbc:postgresql://postgres-service:5432/market_db"
+          valueFrom:
+            secretKeyRef:
+              name: market-db-secret
+              key: url
         - name: DB_USERNAME
-          value: "postgres"
+          valueFrom:
+            secretKeyRef:
+              name: market-db-secret
+              key: username
         - name: DB_PASSWORD
-          value: "password"
+          valueFrom:
+            secretKeyRef:
+              name: market-db-secret
+              key: password
         resources:
           requests:
             memory: "256Mi"

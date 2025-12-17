@@ -6,9 +6,9 @@ spring:
     name: bus-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/bus_db
-    username: postgres
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bus_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
 
   jpa:

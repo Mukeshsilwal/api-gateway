@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
       - name: hotel-service
-        image: ticketkatum/hotel-service:latest
+        image: 572638914672.dkr.ecr.us-east-1.amazonaws.com/hotel-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8087
@@ -80,11 +80,21 @@ spec:
             configMapKeyRef:
               name: redis-config
               key: host
-        - name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: redis-secret
-              key: password
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: password
+            - name: ACTIVEMQ_USER
+              valueFrom:
+                secretKeyRef:
+                  name: activemq-secret
+                  key: username
+            - name: ACTIVEMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: activemq-secret
+                  key: password
         resources:
           requests:
             memory: "512Mi"

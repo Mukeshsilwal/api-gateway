@@ -6,15 +6,15 @@ spring:
     name: hotel-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/hotel_db
-    username: postgres
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/hotel_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
 
   activemq:
     broker-url: tcp://localhost:61616
-    user: admin
-    password: admin
+    user: ${ACTIVEMQ_USER:admin}
+    password: ${ACTIVEMQ_PASSWORD:admin}
     pub-sub-domain: true
 
   jpa:
