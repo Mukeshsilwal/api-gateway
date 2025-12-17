@@ -98,15 +98,13 @@ jobs:
 
           mkdir -p k8s-deploy
           if [ -d infra/k8s ]; then
-            cp infra/k8s/* k8s-deploy/ || true
+            cp -r infra/k8s/* k8s-deploy/ || true
           fi
 
-          # Generate kustomization.yaml
+          # Generate kustomization.yaml recursively
           echo "resources:" > k8s-deploy/kustomization.yaml
-          for f in k8s-deploy/*.yaml; do
-            if [ -f "$f" ]; then
-              echo "  - $(basename "$f")" >> k8s-deploy/kustomization.yaml
-            fi
+          find k8s-deploy -name '*.yaml' -print | while read f; do
+            echo "  - ${f#k8s-deploy/}" >> k8s-deploy/kustomization.yaml
           done
 
           echo "images:" >> k8s-deploy/kustomization.yaml
