@@ -1,7 +1,6 @@
 package com.ticketkatum.controller;
 
 import com.ticketkatum.abstractfactory.hotel.service.GenericHotelService;
-import com.ticketkatum.config.EsewaProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class EsewaBookingController {
 
-    private final EsewaProperties esewaProperties;
     private final GenericHotelService genericHotelService;
 
     @GetMapping(
