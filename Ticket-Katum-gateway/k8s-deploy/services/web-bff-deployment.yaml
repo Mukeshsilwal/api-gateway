@@ -43,7 +43,7 @@ spec:
       containers:
         - name: web-bff
           image: ticketkatum/web-bff:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
               name: http

@@ -50,7 +50,7 @@ spec:
       containers:
         - name: hotel-service
           image: ticketkatum/hotel-service:latest
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8087
               name: http

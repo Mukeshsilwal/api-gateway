@@ -7,6 +7,8 @@ import com.ticketkatum.mapper.HotelMapper;
 import com.ticketkatum.model.CreateHotelRequest;
 import com.ticketkatum.model.HotelDTO;
 import com.ticketkatum.repository.HotelRepository;
+import com.ticketkatum.repository.RentTypeRepository;
+import com.ticketkatum.repository.MealPlanRepository;
 import com.ticketkatum.service.HotelService;
 import com.ticketkatum.specification.HotelSpecification;
 import com.ticketkatum.utils.ValidationUtils;
@@ -37,6 +39,8 @@ import java.util.List;
 public class HotelServiceImpl implements HotelService {
 
     private final HotelRepository hotelRepository;
+    private final RentTypeRepository rentTypeRepository;
+    private final MealPlanRepository mealPlanRepository;
     private final HotelMapper hotelMapper;
 
     @Override
@@ -291,5 +295,35 @@ public class HotelServiceImpl implements HotelService {
         // Validate contact information
         ValidationUtils.validateEmail(request.getEmail());
         ValidationUtils.validatePhoneNumber(request.getPhone());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "rent-types")
+    public List<com.ticketkatum.model.RentTypeDto> getAllRentTypes() {
+        return rentTypeRepository.findAll().stream()
+                .filter(rentType -> Boolean.TRUE.equals(rentType.getIsActive()))
+                .map(rentType -> com.ticketkatum.model.RentTypeDto.builder()
+                        .id(rentType.getId())
+                        .name(rentType.getName())
+                        .code(rentType.getCode())
+                        .durationHours(rentType.getDurationHours())
+                        .build())
+                .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @Cacheable(value = "meal-plans")
+    public List<com.ticketkatum.model.MealPlanDto> getAllMealPlans() {
+        return mealPlanRepository.findAll().stream()
+                .filter(mealPlan -> Boolean.TRUE.equals(mealPlan.getIsActive()))
+                .map(mealPlan -> com.ticketkatum.model.MealPlanDto.builder()
+                        .id(mealPlan.getId())
+                        .name(mealPlan.getName())
+                        .code(mealPlan.getCode())
+                        .description(mealPlan.getDescription())
+                        .build())
+                .toList();
     }
 }

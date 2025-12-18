@@ -21,4 +21,8 @@ public interface HotelService {
     HotelDTO updateHotel(Long hotelId, CreateHotelRequest request);
 
     void deleteHotel(Long hotelId);
+
+    List<com.ticketkatum.model.RentTypeDto> getAllRentTypes();
+
+    List<com.ticketkatum.model.MealPlanDto> getAllMealPlans();
 }

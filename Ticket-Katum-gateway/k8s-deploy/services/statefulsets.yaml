@@ -30,12 +30,15 @@ spec:
               key: password
         - name: POSTGRES_DB
           value: ticketkatum
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         ports:
         - containerPort: 5432
           name: postgres
         volumeMounts:
         - name: postgres-data
           mountPath: /var/lib/postgresql/data
+          subPath: postgres-data
         - name: db-init-script
           mountPath: /docker-entrypoint-initdb.d/init.sql
           subPath: init.sql
@@ -211,6 +214,13 @@ spec:
         ports:
         - containerPort: 2181
           name: client
+        volumeMounts:
+        - name: zookeeper-data
+          mountPath: /var/lib/zookeeper/data
+      initContainers:
+      - name: init-permissions
+        image: busybox:latest
+        command: ["sh", "-c", "chown -R 1000:1000 /var/lib/zookeeper/data"]
         volumeMounts:
         - name: zookeeper-data
           mountPath: /var/lib/zookeeper/data

@@ -75,8 +75,7 @@ public class HotelController {
 
         @Operation(summary = "Get all hotels", description = "Retrieves all hotels with optional filters and pagination")
         @GetMapping
-        public ResponseEntity<Response<List<HotelDTO>>> getAllHotels(
-                        ) {
+        public ResponseEntity<Response<List<HotelDTO>>> getAllHotels() {
 
                 List<HotelDTO> hotels = hotelService.getAllHotels();
 
@@ -228,6 +227,26 @@ public class HotelController {
 
                 HotelDTO hotel = hotelService.getHotelByCode(hotelCode);
                 Response<HotelDTO> response = ResponseHandler.success("Hotel retrieved successfully", hotel);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get all rent types", description = "Retrieves all available rent types")
+        @GetMapping("/rent-types")
+        public ResponseEntity<Response<List<com.ticketkatum.model.RentTypeDto>>> getAllRentTypes() {
+                log.info("Fetching all rent types");
+                List<com.ticketkatum.model.RentTypeDto> rentTypes = hotelService.getAllRentTypes();
+                Response<List<com.ticketkatum.model.RentTypeDto>> response = ResponseHandler
+                                .success("Found " + rentTypes.size() + " rent types", rentTypes);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get all meal plans", description = "Retrieves all available meal plans")
+        @GetMapping("/meal-plans")
+        public ResponseEntity<Response<List<com.ticketkatum.model.MealPlanDto>>> getAllMealPlans() {
+                log.info("Fetching all meal plans");
+                List<com.ticketkatum.model.MealPlanDto> mealPlans = hotelService.getAllMealPlans();
+                Response<List<com.ticketkatum.model.MealPlanDto>> response = ResponseHandler
+                                .success("Found " + mealPlans.size() + " meal plans", mealPlans);
                 return ResponseEntity.ok(response);
         }
 }

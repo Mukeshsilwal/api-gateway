@@ -23771,3 +23771,1314 @@ This generated password is for development use only. Your security configuration
 2025-12-18 09:00:31 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
 2025-12-18 09:00:37 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
 2025-12-18 09:00:53 [main] INFO  com.ticketkatum.WebBffApplication - Started WebBffApplication in 45.531 seconds (process running for 48.817)
+2025-12-18 12:49:47 [main] INFO  com.ticketkatum.WebBffApplication - Starting WebBffApplication using Java 17.0.12 with PID 25104 (C:\New folder (2)\api-gateway\Ticket-Katum-gateway\bff\web-bff\target\classes started by User in C:\New folder (2)\api-gateway\Ticket-Katum-gateway)
+2025-12-18 12:49:47 [main] DEBUG com.ticketkatum.WebBffApplication - Running with Spring Boot v3.2.0, Spring v6.1.1
+2025-12-18 12:49:47 [main] INFO  com.ticketkatum.WebBffApplication - No active profile set, falling back to 1 default profile: "default"
+2025-12-18 12:49:50 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:50 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:50 [main] DEBUG i.g.r.s.u.RxJava2OnClasspathCondition - RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2025-12-18 12:49:50 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:50 [main] DEBUG i.g.r.s.u.RxJava2OnClasspathCondition - RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2025-12-18 12:49:50 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.RxJava2OnClasspathCondition - RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.RxJava2OnClasspathCondition - RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.RxJava2OnClasspathCondition - RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.RxJava2OnClasspathCondition - RxJava2 related Aspect extensions are not activated, because RxJava2 is not on the classpath.
+2025-12-18 12:49:51 [main] DEBUG i.g.r.s.u.AspectJOnClasspathCondition - Aspects are not activated because AspectJ is not on the classpath.
+2025-12-18 12:49:52 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-12-18 12:49:52 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-12-18 12:49:52 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 291 ms. Found 0 Redis repository interfaces.
+2025-12-18 12:49:53 [main] INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=53ad1061-ec9c-3b8c-9761-b744897bbe6b
+2025-12-18 12:49:55 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-12-18 12:49:55 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-12-18 12:49:55 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.16]
+2025-12-18 12:49:55 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-12-18 12:49:55 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 7859 ms
+2025-12-18 12:49:56 [main] DEBUG c.t.security.JwtAuthenticationFilter - Filter 'jwtAuthenticationFilter' configured for use
+2025-12-18 12:49:56 [main] DEBUG o.s.w.f.ServerHttpObservationFilter - Filter 'webMvcObservationFilter' configured for use
+2025-12-18 12:49:58 [main] INFO  c.t.service.LiveTrackingService - Initializing LiveTrackingService with simulated bus data
+2025-12-18 12:49:58 [main] INFO  c.t.service.LiveTrackingService - Initialized 5 buses for live tracking
+2025-12-18 12:49:58 [main] INFO  com.ticketkatum.config.AsyncConfig - Async executor initialized with core pool size: 10
+2025-12-18 12:50:09 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 7 endpoint(s) beneath base path '/actuator'
+2025-12-18 12:50:09 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+
+Using generated security password: ad38ef55-5524-42f8-b8e3-3be6a1f56d45
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-12-18 12:50:10 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - 124 mappings in 'requestMappingHandlerMapping'
+2025-12-18 12:50:10 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Patterns [/webjars/**, /**, /swagger-ui*/*swagger-initializer.js, /swagger-ui*/**] in 'resourceHandlerMapping'
+2025-12-18 12:50:10 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7f9b851c, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@6a8ab98f, org.springframework.security.web.context.SecurityContextHolderFilter@497c1d78, org.springframework.security.web.header.HeaderWriterFilter@7343d843, org.springframework.web.filter.CorsFilter@4d529bc0, org.springframework.security.web.authentication.logout.LogoutFilter@35975b05, com.ticketkatum.security.JwtAuthenticationFilter@4dffff9, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@71db6703, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@470ad01c, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@429dde4d, org.springframework.security.web.session.SessionManagementFilter@38318d67, org.springframework.security.web.access.ExceptionTranslationFilter@390978, org.springframework.security.web.access.intercept.AuthorizationFilter@65fe1f47]
+2025-12-18 12:50:11 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2025-12-18 12:50:11 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver - ControllerAdvice beans: 2 @ExceptionHandler, 1 ResponseBodyAdvice
+2025-12-18 12:50:15 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path ''
+2025-12-18 12:50:30 [main] INFO  com.ticketkatum.WebBffApplication - Started WebBffApplication in 46.476 seconds (process running for 49.914)
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] DEBUG o.s.web.servlet.DispatcherServlet - Detected StandardServletMultipartResolver
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] DEBUG o.s.web.servlet.DispatcherServlet - Detected AcceptHeaderLocaleResolver
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] DEBUG o.s.web.servlet.DispatcherServlet - Detected FixedThemeResolver
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@4960b819
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] DEBUG o.s.web.servlet.DispatcherServlet - Detected org.springframework.web.servlet.support.SessionFlashMapManager@52a605c3
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] DEBUG o.s.web.servlet.DispatcherServlet - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2025-12-18 12:50:31 [RMI TCP Connection(34)-10.35.37.0] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 12 ms
+2025-12-18 12:52:51 [http-nio-8080-exec-3] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/home
+2025-12-18 12:52:51 [http-nio-8080-exec-3] WARN  o.s.w.s.h.HandlerMappingIntrospector - Cache miss for REQUEST dispatch to '/api/bff/v1/home' (previous null). Performing MatchableHandlerMapping lookup. This is logged once only at WARN level, and every time at TRACE.
+2025-12-18 12:52:51 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:52:51 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.MainBffController#getCompleteHomePageData(String, String, Double, Double)
+2025-12-18 12:52:51 [http-nio-8080-exec-3] INFO  c.t.controller.MainBffController - BFF: Fetching complete home page data for user: null
+2025-12-18 12:52:51 [http-nio-8080-exec-3] INFO  c.t.service.HotelAggregator - Fetching home page hotel data
+2025-12-18 12:52:51 [http-nio-8080-exec-3] DEBUG c.t.c.RecommendationServiceClient - Getting featured hotels
+2025-12-18 12:52:51 [http-nio-8080-exec-3] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:52:51 [http-nio-8080-exec-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [4d2fbe3e] HTTP GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG c.t.c.RecommendationServiceClient - Getting top-rated hotels
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [1bd6b177] HTTP GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG c.t.c.RecommendationServiceClient - Getting available cities
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [408973c0] HTTP GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:52:52 [http-nio-8080-exec-3] INFO  c.t.service.PaymentAggregator - Fetching available payment providers
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG c.t.client.PaymentServiceClient - Getting payment providers
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [51e91259] HTTP GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:52:52 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:52:52 [reactor-http-nio-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [1bd6b177] [70739d90-1] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-4] DEBUG o.s.w.r.f.client.ExchangeFunctions - [408973c0] [966189a3-1] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-4] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-3] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [4d2fbe3e] [42f9a322-1] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-2] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [51e91259] [4b2264bb-1] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG org.springframework.web.HttpLogging - [51e91259] [4b2264bb-1] Decoded [Response(statusCode=200, message=Providers retrieved successfully, data=[{id=esewa, name=eSewa, logo (truncated)...]
+2025-12-18 12:52:52 [reactor-http-nio-4] DEBUG org.springframework.web.HttpLogging - [408973c0] [966189a3-1] Decoded [Response(statusCode=200, message=Available cities fetched, data=[Pokhara])]
+2025-12-18 12:52:52 [reactor-http-nio-2] DEBUG org.springframework.web.HttpLogging - [4d2fbe3e] [42f9a322-1] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@73199050]
+2025-12-18 12:52:52 [reactor-http-nio-3] DEBUG org.springframework.web.HttpLogging - [1bd6b177] [70739d90-1] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@72b36db8]
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/home
+2025-12-18 12:52:52 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:52:52 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hote (truncated)...]
+2025-12-18 12:52:52 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:52:52 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hotelData=HomeP (truncated)...]
+2025-12-18 12:52:52 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/home
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.MainBffController#getCompleteHomePageData(String, String, Double, Double)
+2025-12-18 12:52:52 [http-nio-8080-exec-5] INFO  c.t.controller.MainBffController - BFF: Fetching complete home page data for user: null
+2025-12-18 12:52:52 [http-nio-8080-exec-5] INFO  c.t.service.HotelAggregator - Fetching home page hotel data
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.t.c.RecommendationServiceClient - Getting featured hotels
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [5b6f9845] HTTP GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.t.c.RecommendationServiceClient - Getting top-rated hotels
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [c8821d8] HTTP GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.t.c.RecommendationServiceClient - Getting available cities
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [74b2c0bb] HTTP GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:52:52 [http-nio-8080-exec-5] INFO  c.t.service.PaymentAggregator - Fetching available payment providers
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.t.client.PaymentServiceClient - Getting payment providers
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [37360547] HTTP GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:52:52 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [37360547] [4b2264bb-2] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-5] DEBUG org.springframework.web.HttpLogging - [37360547] [4b2264bb-2] Decoded [Response(statusCode=200, message=Providers retrieved successfully, data=[{id=esewa, name=eSewa, logo (truncated)...]
+2025-12-18 12:52:52 [reactor-http-nio-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [74b2c0bb] [70739d90-2] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-3] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-3] DEBUG org.springframework.web.HttpLogging - [74b2c0bb] [70739d90-2] Decoded [Response(statusCode=200, message=Available cities fetched, data=[Pokhara])]
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:52:52 [http-nio-8080-exec-7] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/find/cities
+2025-12-18 12:52:52 [reactor-http-nio-4] DEBUG o.s.w.r.f.client.ExchangeFunctions - [c8821d8] [966189a3-2] Response 200 OK
+2025-12-18 12:52:52 [reactor-http-nio-4] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:52:52 [reactor-http-nio-4] DEBUG org.springframework.web.HttpLogging - [c8821d8] [966189a3-2] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@7c0322b2]
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.BusBffController#getBusStopsWithRoutes()
+2025-12-18 12:52:52 [http-nio-8080-exec-8] INFO  c.t.controller.BusBffController - BFF: Fetching bus stops with routes
+2025-12-18 12:52:52 [http-nio-8080-exec-8] INFO  c.ticketkatum.service.BusAggregator - Fetching all bus stops with routes
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8083/busStop/get
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG o.s.w.r.f.client.ExchangeFunctions - [590a159c] HTTP GET http://localhost:8083/busStop/get
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:52:52 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/find/cities", parameters={}
+2025-12-18 12:52:52 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:52:52 [http-nio-8080-exec-7] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2025-12-18 12:52:52 [http-nio-8080-exec-7] DEBUG o.s.w.s.r.ResourceHttpRequestHandler - Resource not found
+2025-12-18 12:52:52 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/bff/v1/find/cities.]
+2025-12-18 12:52:52 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Completed 404 NOT_FOUND
+2025-12-18 12:52:52 [reactor-http-nio-6] ERROR c.t.controller.BusBffController - Error fetching bus stops
+java.util.concurrent.CompletionException: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:332)
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:347)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1141)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2162)
+	at reactor.core.publisher.MonoToCompletableFuture.onError(MonoToCompletableFuture.java:77)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onError(FluxMapFuseable.java:142)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxDoFinally$DoFinallySubscriber.onError(FluxDoFinally.java:119)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onError(MonoPeekTerminal.java:258)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onError(FluxPeekFuseable.java:903)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2236)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onError(FluxOnAssembly.java:544)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+	at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+	at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+	at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+	at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+	at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+	at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+	at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+	at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+	at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Request to GET http://localhost:8083/busStop/get [DefaultWebClient]
+Original Stack Trace:
+		at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+		at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+		at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+		at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+		at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+		at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+		at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+		at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+		at reactor.core.publisher.Operators.error(Operators.java:198)
+		at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+		at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+		at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+		at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+		at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+		at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+		at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8083
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:334)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-12-18 12:52:52 [reactor-http-nio-6] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:52:52 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:52:52 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<500 INTERNAL_SERVER_ERROR Internal Server Error,Response(statusCode=500, message=Failed to fetch st (truncated)...]
+2025-12-18 12:52:52 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:52:52 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=500, message=Failed to fetch stops, data=null)]
+2025-12-18 12:52:52 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 500
+2025-12-18 12:52:53 [reactor-http-nio-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [5b6f9845] [42f9a322-2] Response 200 OK
+2025-12-18 12:52:53 [reactor-http-nio-2] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:52:53 [reactor-http-nio-2] DEBUG org.springframework.web.HttpLogging - [5b6f9845] [42f9a322-2] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@38e5223d]
+2025-12-18 12:52:53 [reactor-http-nio-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/home
+2025-12-18 12:52:53 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:52:53 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hote (truncated)...]
+2025-12-18 12:52:53 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:52:53 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hotelData=HomeP (truncated)...]
+2025-12-18 12:52:53 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.BusBffController#getBusStopsWithRoutes()
+2025-12-18 12:52:54 [http-nio-8080-exec-2] INFO  c.t.controller.BusBffController - BFF: Fetching bus stops with routes
+2025-12-18 12:52:54 [http-nio-8080-exec-2] INFO  c.ticketkatum.service.BusAggregator - Fetching all bus stops with routes
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8083/busStop/get
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [6221467a] HTTP GET http://localhost:8083/busStop/get
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:52:54 [reactor-http-nio-7] ERROR c.t.controller.BusBffController - Error fetching bus stops
+java.util.concurrent.CompletionException: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:332)
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:347)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1141)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2162)
+	at reactor.core.publisher.MonoToCompletableFuture.onError(MonoToCompletableFuture.java:77)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onError(FluxMapFuseable.java:142)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxDoFinally$DoFinallySubscriber.onError(FluxDoFinally.java:119)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onError(MonoPeekTerminal.java:258)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onError(FluxPeekFuseable.java:903)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2236)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onError(FluxOnAssembly.java:544)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+	at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+	at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+	at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+	at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+	at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+	at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+	at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+	at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+	at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Request to GET http://localhost:8083/busStop/get [DefaultWebClient]
+Original Stack Trace:
+		at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+		at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+		at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+		at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+		at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+		at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+		at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+		at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+		at reactor.core.publisher.Operators.error(Operators.java:198)
+		at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+		at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+		at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+		at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+		at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+		at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+		at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8083
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:334)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-12-18 12:52:54 [reactor-http-nio-7] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<500 INTERNAL_SERVER_ERROR Internal Server Error,Response(statusCode=500, message=Failed to fetch st (truncated)...]
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=500, message=Failed to fetch stops, data=null)]
+2025-12-18 12:52:54 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 500
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/hotels/search
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/hotels/search
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.HotelBffController#searchHotels(HotelSearchCriteria)
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.HotelBffController#searchHotels(HotelSearchCriteria)
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=nul (truncated)...]
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=nul (truncated)...]
+2025-12-18 12:52:54 [http-nio-8080-exec-4] INFO  c.t.controller.HotelBffController - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:52:54 [http-nio-8080-exec-5] INFO  c.t.controller.HotelBffController - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG c.t.client.HotelServiceClient - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG c.t.client.HotelServiceClient - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG o.s.w.r.f.client.ExchangeFunctions - [bcf7dc8] HTTP GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [5c78fe09] HTTP GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:52:54 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:52:54 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:04 [reactor-http-nio-4] WARN  r.n.http.client.HttpClientConnect - [966189a3-3, L:/127.0.0.1:59494 - R:localhost/127.0.0.1:8087] The connection observed an error
+io.netty.handler.timeout.ReadTimeoutException: null
+2025-12-18 12:53:04 [reactor-http-nio-3] WARN  r.n.http.client.HttpClientConnect - [70739d90-3, L:/127.0.0.1:59493 - R:localhost/127.0.0.1:8087] The connection observed an error
+io.netty.handler.timeout.ReadTimeoutException: null
+2025-12-18 12:53:04 [reactor-http-nio-4] ERROR c.t.controller.HotelBffController - Error searching hotels
+java.util.concurrent.CompletionException: org.springframework.web.reactive.function.client.WebClientRequestException
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:332)
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:347)
+	at java.base/java.util.concurrent.CompletableFuture$UniApply.tryFire(CompletableFuture.java:636)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2162)
+	at reactor.core.publisher.MonoToCompletableFuture.onError(MonoToCompletableFuture.java:77)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onError(FluxMapFuseable.java:142)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxDoFinally$DoFinallySubscriber.onError(FluxDoFinally.java:119)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onError(MonoPeekTerminal.java:258)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onError(FluxPeekFuseable.java:903)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2236)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onError(FluxOnAssembly.java:544)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+	at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+	at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+	at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+	at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.http.client.HttpClientConnect$HttpObserver.onUncaughtException(HttpClientConnect.java:403)
+	at reactor.netty.ReactorNetty$CompositeConnectionObserver.onUncaughtException(ReactorNetty.java:703)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onUncaughtException(DefaultPooledConnectionProvider.java:213)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnection.onUncaughtException(DefaultPooledConnectionProvider.java:466)
+	at reactor.netty.channel.FluxReceive.drainReceiver(FluxReceive.java:247)
+	at reactor.netty.channel.FluxReceive.onInboundError(FluxReceive.java:468)
+	at reactor.netty.channel.ChannelOperations.onInboundError(ChannelOperations.java:515)
+	at reactor.netty.channel.ChannelOperationsHandler.exceptionCaught(ChannelOperationsHandler.java:145)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:346)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:325)
+	at io.netty.channel.AbstractChannelHandlerContext.fireExceptionCaught(AbstractChannelHandlerContext.java:317)
+	at io.netty.handler.timeout.ReadTimeoutHandler.readTimedOut(ReadTimeoutHandler.java:98)
+	at io.netty.handler.timeout.ReadTimeoutHandler.channelIdle(ReadTimeoutHandler.java:90)
+	at io.netty.handler.timeout.IdleStateHandler$ReaderIdleTimeoutTask.run(IdleStateHandler.java:503)
+	at io.netty.handler.timeout.IdleStateHandler$AbstractIdleTask.run(IdleStateHandler.java:475)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask$$$capture(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute$$$capture(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.web.reactive.function.client.WebClientRequestException: null
+	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Request to GET http://localhost:8087/api/v1/hotels [DefaultWebClient]
+Original Stack Trace:
+		at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+		at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+		at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+		at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+		at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.http.client.HttpClientConnect$HttpObserver.onUncaughtException(HttpClientConnect.java:403)
+		at reactor.netty.ReactorNetty$CompositeConnectionObserver.onUncaughtException(ReactorNetty.java:703)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onUncaughtException(DefaultPooledConnectionProvider.java:213)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnection.onUncaughtException(DefaultPooledConnectionProvider.java:466)
+		at reactor.netty.channel.FluxReceive.drainReceiver(FluxReceive.java:247)
+		at reactor.netty.channel.FluxReceive.onInboundError(FluxReceive.java:468)
+		at reactor.netty.channel.ChannelOperations.onInboundError(ChannelOperations.java:515)
+		at reactor.netty.channel.ChannelOperationsHandler.exceptionCaught(ChannelOperationsHandler.java:145)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:346)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:325)
+		at io.netty.channel.AbstractChannelHandlerContext.fireExceptionCaught(AbstractChannelHandlerContext.java:317)
+		at io.netty.handler.timeout.ReadTimeoutHandler.readTimedOut(ReadTimeoutHandler.java:98)
+		at io.netty.handler.timeout.ReadTimeoutHandler.channelIdle(ReadTimeoutHandler.java:90)
+		at io.netty.handler.timeout.IdleStateHandler$ReaderIdleTimeoutTask.run(IdleStateHandler.java:503)
+		at io.netty.handler.timeout.IdleStateHandler$AbstractIdleTask.run(IdleStateHandler.java:475)
+		at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+		at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+		at io.netty.util.concurrent.AbstractEventExecutor.runTask$$$capture(AbstractEventExecutor.java:173)
+		at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java)
+		at io.netty.util.concurrent.AbstractEventExecutor.safeExecute$$$capture(AbstractEventExecutor.java:166)
+		at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java)
+		at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.netty.handler.timeout.ReadTimeoutException: null
+2025-12-18 12:53:04 [reactor-http-nio-4] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/hotels/search
+2025-12-18 12:53:04 [reactor-http-nio-3] ERROR c.t.controller.HotelBffController - Error searching hotels
+java.util.concurrent.CompletionException: org.springframework.web.reactive.function.client.WebClientRequestException
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:332)
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:347)
+	at java.base/java.util.concurrent.CompletableFuture$UniApply.tryFire(CompletableFuture.java:636)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2162)
+	at reactor.core.publisher.MonoToCompletableFuture.onError(MonoToCompletableFuture.java:77)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onError(FluxMapFuseable.java:142)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxDoFinally$DoFinallySubscriber.onError(FluxDoFinally.java:119)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onError(MonoPeekTerminal.java:258)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onError(FluxPeekFuseable.java:903)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2236)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onError(FluxOnAssembly.java:544)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+	at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+	at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+	at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+	at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.http.client.HttpClientConnect$HttpObserver.onUncaughtException(HttpClientConnect.java:403)
+	at reactor.netty.ReactorNetty$CompositeConnectionObserver.onUncaughtException(ReactorNetty.java:703)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onUncaughtException(DefaultPooledConnectionProvider.java:213)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnection.onUncaughtException(DefaultPooledConnectionProvider.java:466)
+	at reactor.netty.channel.FluxReceive.drainReceiver(FluxReceive.java:247)
+	at reactor.netty.channel.FluxReceive.onInboundError(FluxReceive.java:468)
+	at reactor.netty.channel.ChannelOperations.onInboundError(ChannelOperations.java:515)
+	at reactor.netty.channel.ChannelOperationsHandler.exceptionCaught(ChannelOperationsHandler.java:145)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:346)
+	at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:325)
+	at io.netty.channel.AbstractChannelHandlerContext.fireExceptionCaught(AbstractChannelHandlerContext.java:317)
+	at io.netty.handler.timeout.ReadTimeoutHandler.readTimedOut(ReadTimeoutHandler.java:98)
+	at io.netty.handler.timeout.ReadTimeoutHandler.channelIdle(ReadTimeoutHandler.java:90)
+	at io.netty.handler.timeout.IdleStateHandler$ReaderIdleTimeoutTask.run(IdleStateHandler.java:503)
+	at io.netty.handler.timeout.IdleStateHandler$AbstractIdleTask.run(IdleStateHandler.java:475)
+	at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+	at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask$$$capture(AbstractEventExecutor.java:173)
+	at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute$$$capture(AbstractEventExecutor.java:166)
+	at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java)
+	at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.web.reactive.function.client.WebClientRequestException: null
+	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Request to GET http://localhost:8087/api/v1/hotels [DefaultWebClient]
+Original Stack Trace:
+		at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+		at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+		at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+		at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+		at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.http.client.HttpClientConnect$HttpObserver.onUncaughtException(HttpClientConnect.java:403)
+		at reactor.netty.ReactorNetty$CompositeConnectionObserver.onUncaughtException(ReactorNetty.java:703)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onUncaughtException(DefaultPooledConnectionProvider.java:213)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnection.onUncaughtException(DefaultPooledConnectionProvider.java:466)
+		at reactor.netty.channel.FluxReceive.drainReceiver(FluxReceive.java:247)
+		at reactor.netty.channel.FluxReceive.onInboundError(FluxReceive.java:468)
+		at reactor.netty.channel.ChannelOperations.onInboundError(ChannelOperations.java:515)
+		at reactor.netty.channel.ChannelOperationsHandler.exceptionCaught(ChannelOperationsHandler.java:145)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:346)
+		at io.netty.channel.AbstractChannelHandlerContext.invokeExceptionCaught(AbstractChannelHandlerContext.java:325)
+		at io.netty.channel.AbstractChannelHandlerContext.fireExceptionCaught(AbstractChannelHandlerContext.java:317)
+		at io.netty.handler.timeout.ReadTimeoutHandler.readTimedOut(ReadTimeoutHandler.java:98)
+		at io.netty.handler.timeout.ReadTimeoutHandler.channelIdle(ReadTimeoutHandler.java:90)
+		at io.netty.handler.timeout.IdleStateHandler$ReaderIdleTimeoutTask.run(IdleStateHandler.java:503)
+		at io.netty.handler.timeout.IdleStateHandler$AbstractIdleTask.run(IdleStateHandler.java:475)
+		at io.netty.util.concurrent.PromiseTask.runTask(PromiseTask.java:98)
+		at io.netty.util.concurrent.ScheduledFutureTask.run(ScheduledFutureTask.java:153)
+		at io.netty.util.concurrent.AbstractEventExecutor.runTask$$$capture(AbstractEventExecutor.java:173)
+		at io.netty.util.concurrent.AbstractEventExecutor.runTask(AbstractEventExecutor.java)
+		at io.netty.util.concurrent.AbstractEventExecutor.safeExecute$$$capture(AbstractEventExecutor.java:166)
+		at io.netty.util.concurrent.AbstractEventExecutor.safeExecute(AbstractEventExecutor.java)
+		at io.netty.util.concurrent.SingleThreadEventExecutor.runAllTasks(SingleThreadEventExecutor.java:470)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:569)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.netty.handler.timeout.ReadTimeoutException: null
+2025-12-18 12:53:04 [reactor-http-nio-3] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/hotels/search
+2025-12-18 12:53:04 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:53:04 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<500 INTERNAL_SERVER_ERROR Internal Server Error,Response(statusCode=500, message=Search failed: org (truncated)...]
+2025-12-18 12:53:04 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:53:04 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<500 INTERNAL_SERVER_ERROR Internal Server Error,Response(statusCode=500, message=Search failed: org (truncated)...]
+2025-12-18 12:53:04 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:04 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:04 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=500, message=Search failed: org.springframework.web.reactive.function.client.Web (truncated)...]
+2025-12-18 12:53:04 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=500, message=Search failed: org.springframework.web.reactive.function.client.Web (truncated)...]
+2025-12-18 12:53:04 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 500
+2025-12-18 12:53:04 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 500
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/home
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.MainBffController#getCompleteHomePageData(String, String, Double, Double)
+2025-12-18 12:53:24 [http-nio-8080-exec-9] INFO  c.t.controller.MainBffController - BFF: Fetching complete home page data for user: null
+2025-12-18 12:53:24 [http-nio-8080-exec-9] INFO  c.t.service.HotelAggregator - Fetching home page hotel data
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.t.c.RecommendationServiceClient - Getting featured hotels
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.w.r.f.client.ExchangeFunctions - [436e0e9f] HTTP GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.t.c.RecommendationServiceClient - Getting top-rated hotels
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.w.r.f.client.ExchangeFunctions - [25304a4] HTTP GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.t.c.RecommendationServiceClient - Getting available cities
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.w.r.f.client.ExchangeFunctions - [7890a679] HTTP GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:53:24 [http-nio-8080-exec-9] INFO  c.t.service.PaymentAggregator - Fetching available payment providers
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.t.client.PaymentServiceClient - Getting payment providers
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.w.r.f.client.ExchangeFunctions - [1ecab7da] HTTP GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:24 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:24 [reactor-http-nio-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [436e0e9f] [42f9a322-3] Response 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-2] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-2] DEBUG org.springframework.web.HttpLogging - [436e0e9f] [42f9a322-3] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@4c2d076f]
+2025-12-18 12:53:24 [reactor-http-nio-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [1ecab7da] [4b2264bb-3] Response 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-5] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-5] DEBUG org.springframework.web.HttpLogging - [1ecab7da] [4b2264bb-3] Decoded [Response(statusCode=200, message=Providers retrieved successfully, data=[{id=esewa, name=eSewa, logo (truncated)...]
+2025-12-18 12:53:24 [reactor-http-nio-1] DEBUG o.s.w.r.f.client.ExchangeFunctions - [7890a679] [3ec90a46-1] Response 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-1] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-1] DEBUG org.springframework.web.HttpLogging - [7890a679] [3ec90a46-1] Decoded [Response(statusCode=200, message=Available cities fetched, data=[Pokhara])]
+2025-12-18 12:53:24 [reactor-http-nio-8] DEBUG o.s.w.r.f.client.ExchangeFunctions - [25304a4] [99654a94-1] Response 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-8] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-8] DEBUG org.springframework.web.HttpLogging - [25304a4] [99654a94-1] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@2c846141]
+2025-12-18 12:53:24 [reactor-http-nio-8] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/home
+2025-12-18 12:53:24 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:53:24 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hote (truncated)...]
+2025-12-18 12:53:24 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:24 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hotelData=HomeP (truncated)...]
+2025-12-18 12:53:24 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/home
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.MainBffController#getCompleteHomePageData(String, String, Double, Double)
+2025-12-18 12:53:24 [http-nio-8080-exec-10] INFO  c.t.controller.MainBffController - BFF: Fetching complete home page data for user: null
+2025-12-18 12:53:24 [http-nio-8080-exec-10] INFO  c.t.service.HotelAggregator - Fetching home page hotel data
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.t.c.RecommendationServiceClient - Getting featured hotels
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.w.r.f.client.ExchangeFunctions - [31471121] HTTP GET http://localhost:8087/api/v1/find/featured?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.t.c.RecommendationServiceClient - Getting top-rated hotels
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.w.r.f.client.ExchangeFunctions - [707a1b1a] HTTP GET http://localhost:8087/api/v1/find/top-rated?limit=10
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.t.c.RecommendationServiceClient - Getting available cities
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.w.r.f.client.ExchangeFunctions - [41406e6c] HTTP GET http://localhost:8087/api/v1/find/cities
+2025-12-18 12:53:24 [http-nio-8080-exec-10] INFO  c.t.service.PaymentAggregator - Fetching available payment providers
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.t.client.PaymentServiceClient - Getting payment providers
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.w.r.f.client.ExchangeFunctions - [1055e455] HTTP GET http://localhost:8086/api/v1/payment/providers
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:24 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:24 [reactor-http-nio-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [1055e455] [4b2264bb-4] Response 200 OK
+2025-12-18 12:53:24 [reactor-http-nio-5] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:25 [reactor-http-nio-5] DEBUG org.springframework.web.HttpLogging - [1055e455] [4b2264bb-4] Decoded [Response(statusCode=200, message=Providers retrieved successfully, data=[{id=esewa, name=eSewa, logo (truncated)...]
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:53:25 [http-nio-8080-exec-1] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/find/cities
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.BusBffController#getBusStopsWithRoutes()
+2025-12-18 12:53:25 [http-nio-8080-exec-2] INFO  c.t.controller.BusBffController - BFF: Fetching bus stops with routes
+2025-12-18 12:53:25 [http-nio-8080-exec-2] INFO  c.ticketkatum.service.BusAggregator - Fetching all bus stops with routes
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8083/busStop/get
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [31ee7774] HTTP GET http://localhost:8083/busStop/get
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:25 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:25 [reactor-http-nio-2] ERROR c.t.controller.BusBffController - Error fetching bus stops
+java.util.concurrent.CompletionException: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:332)
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:347)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1141)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2162)
+	at reactor.core.publisher.MonoToCompletableFuture.onError(MonoToCompletableFuture.java:77)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onError(FluxMapFuseable.java:142)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxDoFinally$DoFinallySubscriber.onError(FluxDoFinally.java:119)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onError(MonoPeekTerminal.java:258)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onError(FluxPeekFuseable.java:903)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2236)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onError(FluxOnAssembly.java:544)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+	at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+	at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+	at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+	at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+	at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+	at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+	at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+	at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+	at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Request to GET http://localhost:8083/busStop/get [DefaultWebClient]
+Original Stack Trace:
+		at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+		at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+		at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+		at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+		at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+		at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+		at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+		at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+		at reactor.core.publisher.Operators.error(Operators.java:198)
+		at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+		at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+		at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+		at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+		at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+		at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+		at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8083
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:334)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-12-18 12:53:25 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/find/cities", parameters={}
+2025-12-18 12:53:25 [reactor-http-nio-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:53:25 [http-nio-8080-exec-1] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping - Mapped to ResourceHttpRequestHandler [classpath [META-INF/resources/], classpath [resources/], classpath [static/], classpath [public/], ServletContext [/]]
+2025-12-18 12:53:25 [reactor-http-nio-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [31471121] [42f9a322-4] Response 200 OK
+2025-12-18 12:53:25 [reactor-http-nio-2] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:25 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:53:25 [reactor-http-nio-2] DEBUG org.springframework.web.HttpLogging - [31471121] [42f9a322-4] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@7973dc08]
+2025-12-18 12:53:25 [http-nio-8080-exec-1] DEBUG o.s.w.s.r.ResourceHttpRequestHandler - Resource not found
+2025-12-18 12:53:25 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<500 INTERNAL_SERVER_ERROR Internal Server Error,Response(statusCode=500, message=Failed to fetch st (truncated)...]
+2025-12-18 12:53:25 [http-nio-8080-exec-1] DEBUG o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/bff/v1/find/cities.]
+2025-12-18 12:53:25 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:25 [http-nio-8080-exec-1] DEBUG o.s.web.servlet.DispatcherServlet - Completed 404 NOT_FOUND
+2025-12-18 12:53:25 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=500, message=Failed to fetch stops, data=null)]
+2025-12-18 12:53:25 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 500
+2025-12-18 12:53:25 [reactor-http-nio-8] DEBUG o.s.w.r.f.client.ExchangeFunctions - [41406e6c] [99654a94-2] Response 200 OK
+2025-12-18 12:53:25 [reactor-http-nio-8] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:25 [reactor-http-nio-8] DEBUG org.springframework.web.HttpLogging - [41406e6c] [99654a94-2] Decoded [Response(statusCode=200, message=Available cities fetched, data=[Pokhara])]
+2025-12-18 12:53:25 [reactor-http-nio-1] DEBUG o.s.w.r.f.client.ExchangeFunctions - [707a1b1a] [3ec90a46-2] Response 200 OK
+2025-12-18 12:53:25 [reactor-http-nio-1] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:25 [reactor-http-nio-1] DEBUG org.springframework.web.HttpLogging - [707a1b1a] [3ec90a46-2] Decoded [com.ticketkatum.dto.hotel.HotelRecommendation@259cf065]
+2025-12-18 12:53:25 [reactor-http-nio-1] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/home
+2025-12-18 12:53:25 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/home", parameters={}
+2025-12-18 12:53:25 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hote (truncated)...]
+2025-12-18 12:53:25 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:25 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Home page data retrieved, data=CompleteHomePageData(hotelData=HomeP (truncated)...]
+2025-12-18 12:53:25 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.BusBffController#getBusStopsWithRoutes()
+2025-12-18 12:53:26 [http-nio-8080-exec-5] INFO  c.t.controller.BusBffController - BFF: Fetching bus stops with routes
+2025-12-18 12:53:26 [http-nio-8080-exec-5] INFO  c.ticketkatum.service.BusAggregator - Fetching all bus stops with routes
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8083/busStop/get
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG o.s.w.r.f.client.ExchangeFunctions - [4ec05475] HTTP GET http://localhost:8083/busStop/get
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:26 [http-nio-8080-exec-5] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:26 [reactor-http-nio-3] ERROR c.t.controller.BusBffController - Error fetching bus stops
+java.util.concurrent.CompletionException: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at java.base/java.util.concurrent.CompletableFuture.encodeThrowable(CompletableFuture.java:332)
+	at java.base/java.util.concurrent.CompletableFuture.completeThrowable(CompletableFuture.java:347)
+	at java.base/java.util.concurrent.CompletableFuture$UniCompose.tryFire(CompletableFuture.java:1141)
+	at java.base/java.util.concurrent.CompletableFuture.postComplete(CompletableFuture.java:510)
+	at java.base/java.util.concurrent.CompletableFuture.completeExceptionally(CompletableFuture.java:2162)
+	at reactor.core.publisher.MonoToCompletableFuture.onError(MonoToCompletableFuture.java:77)
+	at reactor.core.publisher.FluxMapFuseable$MapFuseableSubscriber.onError(FluxMapFuseable.java:142)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxDoFinally$DoFinallySubscriber.onError(FluxDoFinally.java:119)
+	at reactor.core.publisher.MonoPeekTerminal$MonoTerminalPeekSubscriber.onError(MonoPeekTerminal.java:258)
+	at reactor.core.publisher.FluxPeekFuseable$PeekConditionalSubscriber.onError(FluxPeekFuseable.java:903)
+	at reactor.core.publisher.Operators$MultiSubscriptionSubscriber.onError(Operators.java:2236)
+	at reactor.core.publisher.FluxOnAssembly$OnAssemblySubscriber.onError(FluxOnAssembly.java:544)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.onError(MonoFlatMap.java:180)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxMap$MapSubscriber.onError(FluxMap.java:134)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:56)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+	at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+	at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+	at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+	at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+	at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+	at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+	at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+	at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+	at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+	at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+	at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+	at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+	at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+	at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+	at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+	at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+	at reactor.core.publisher.Operators.error(Operators.java:198)
+	at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+	at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+	at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+	at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+	at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+	at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+	at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+	at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+	at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+	at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+	at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: org.springframework.web.reactive.function.client.WebClientRequestException: Connection refused: no further information: localhost/127.0.0.1:8083
+	at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+	Suppressed: reactor.core.publisher.FluxOnAssembly$OnAssemblyException: 
+Error has been observed at the following site(s):
+	*__checkpoint ⇢ Request to GET http://localhost:8083/busStop/get [DefaultWebClient]
+Original Stack Trace:
+		at org.springframework.web.reactive.function.client.ExchangeFunctions$DefaultExchangeFunction.lambda$wrapException$9(ExchangeFunctions.java:136)
+		at reactor.core.publisher.MonoErrorSupplied.subscribe(MonoErrorSupplied.java:55)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.FluxPeek$PeekSubscriber.onError(FluxPeek.java:222)
+		at reactor.core.publisher.MonoNext$NextSubscriber.onError(MonoNext.java:93)
+		at reactor.core.publisher.MonoFlatMapMany$FlatMapManyMain.onError(MonoFlatMapMany.java:204)
+		at reactor.core.publisher.SerializedSubscriber.onError(SerializedSubscriber.java:124)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.whenError(FluxRetryWhen.java:228)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenOtherSubscriber.onError(FluxRetryWhen.java:278)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onError(FluxContextWrite.java:121)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.maybeOnError(FluxConcatMapNoPrefetch.java:326)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.onNext(FluxConcatMapNoPrefetch.java:211)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.onNext(FluxContextWrite.java:107)
+		at reactor.core.publisher.SinkManyEmitterProcessor.drain(SinkManyEmitterProcessor.java:476)
+		at reactor.core.publisher.SinkManyEmitterProcessor$EmitterInner.drainParent(SinkManyEmitterProcessor.java:620)
+		at reactor.core.publisher.FluxPublish$PubSubInner.request(FluxPublish.java:874)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.FluxConcatMapNoPrefetch$FluxConcatMapNoPrefetchSubscriber.request(FluxConcatMapNoPrefetch.java:336)
+		at reactor.core.publisher.FluxContextWrite$ContextWriteSubscriber.request(FluxContextWrite.java:136)
+		at reactor.core.publisher.Operators$DeferredSubscription.request(Operators.java:1743)
+		at reactor.core.publisher.FluxRetryWhen$RetryWhenMainSubscriber.onError(FluxRetryWhen.java:195)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.http.client.HttpClientConnect$MonoHttpConnect$ClientTransportSubscriber.onError(HttpClientConnect.java:311)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$DisposableAcquire.onError(DefaultPooledConnectionProvider.java:162)
+		at reactor.netty.internal.shaded.reactor.pool.AbstractPool$Borrower.fail(AbstractPool.java:475)
+		at reactor.netty.internal.shaded.reactor.pool.SimpleDequePool.lambda$drainLoop$9(SimpleDequePool.java:433)
+		at reactor.core.publisher.FluxDoOnEach$DoOnEachSubscriber.onError(FluxDoOnEach.java:186)
+		at reactor.core.publisher.MonoCreate$DefaultMonoSink.error(MonoCreate.java:205)
+		at reactor.netty.resources.DefaultPooledConnectionProvider$PooledConnectionAllocator$PooledConnectionInitializer.onError(DefaultPooledConnectionProvider.java:560)
+		at reactor.core.publisher.MonoFlatMap$FlatMapMain.secondError(MonoFlatMap.java:241)
+		at reactor.core.publisher.MonoFlatMap$FlatMapInner.onError(MonoFlatMap.java:315)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:106)
+		at reactor.core.publisher.Operators.error(Operators.java:198)
+		at reactor.core.publisher.MonoError.subscribe(MonoError.java:53)
+		at reactor.core.publisher.Mono.subscribe(Mono.java:4512)
+		at reactor.core.publisher.FluxOnErrorResume$ResumeSubscriber.onError(FluxOnErrorResume.java:103)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.tryFailure(TransportConnector.java:576)
+		at reactor.netty.transport.TransportConnector$MonoChannelPromise.setFailure(TransportConnector.java:522)
+		at reactor.netty.transport.TransportConnector.lambda$doConnect$7(TransportConnector.java:261)
+		at io.netty.util.concurrent.DefaultPromise.notifyListener0(DefaultPromise.java:590)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners0(DefaultPromise.java:583)
+		at io.netty.util.concurrent.DefaultPromise.notifyListenersNow(DefaultPromise.java:559)
+		at io.netty.util.concurrent.DefaultPromise.notifyListeners(DefaultPromise.java:492)
+		at io.netty.util.concurrent.DefaultPromise.setValue0(DefaultPromise.java:636)
+		at io.netty.util.concurrent.DefaultPromise.setFailure0(DefaultPromise.java:629)
+		at io.netty.util.concurrent.DefaultPromise.tryFailure(DefaultPromise.java:118)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.fulfillConnectPromise(AbstractNioChannel.java:321)
+		at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:337)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+		at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+		at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+		at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+		at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+		at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+		at java.base/java.lang.Thread.run(Thread.java:842)
+Caused by: io.netty.channel.AbstractChannel$AnnotatedConnectException: Connection refused: no further information: localhost/127.0.0.1:8083
+Caused by: java.net.ConnectException: Connection refused: no further information
+	at java.base/sun.nio.ch.Net.pollConnect(Native Method)
+	at java.base/sun.nio.ch.Net.pollConnectNow(Net.java:672)
+	at java.base/sun.nio.ch.SocketChannelImpl.finishConnect(SocketChannelImpl.java:946)
+	at io.netty.channel.socket.nio.NioSocketChannel.doFinishConnect(NioSocketChannel.java:337)
+	at io.netty.channel.nio.AbstractNioChannel$AbstractNioUnsafe.finishConnect(AbstractNioChannel.java:334)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKey(NioEventLoop.java:776)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeysOptimized(NioEventLoop.java:724)
+	at io.netty.channel.nio.NioEventLoop.processSelectedKeys(NioEventLoop.java:650)
+	at io.netty.channel.nio.NioEventLoop.run(NioEventLoop.java:562)
+	at io.netty.util.concurrent.SingleThreadEventExecutor$4.run(SingleThreadEventExecutor.java:997)
+	at io.netty.util.internal.ThreadExecutorMap$2.run(ThreadExecutorMap.java:74)
+	at io.netty.util.concurrent.FastThreadLocalRunnable.run(FastThreadLocalRunnable.java:30)
+	at java.base/java.lang.Thread.run(Thread.java:842)
+2025-12-18 12:53:26 [reactor-http-nio-3] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/buses/stops/with-routes
+2025-12-18 12:53:26 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/buses/stops/with-routes", parameters={}
+2025-12-18 12:53:26 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<500 INTERNAL_SERVER_ERROR Internal Server Error,Response(statusCode=500, message=Failed to fetch st (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:26 [http-nio-8080-exec-6] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=500, message=Failed to fetch stops, data=null)]
+2025-12-18 12:53:26 [http-nio-8080-exec-6] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 500
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/hotels/search
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/hotels/search
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.HotelBffController#searchHotels(HotelSearchCriteria)
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=nul (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-8] INFO  c.t.controller.HotelBffController - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG c.t.client.HotelServiceClient - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.HotelBffController#searchHotels(HotelSearchCriteria)
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG o.s.w.r.f.client.ExchangeFunctions - [645d6845] HTTP GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor - Read "application/json;charset=UTF-8" to [HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=nul (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-9] INFO  c.t.controller.HotelBffController - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG c.t.client.HotelServiceClient - Searching hotels with criteria: HotelSearchCriteria(city=null, minPrice=0, maxPrice=null, minStars=null, maxStars=null, latitude=null, longitude=null, radius=null, checkIn=null, checkOut=null, guests=null, amenities=[], sortBy=PRICE_ASC, limit=50, offset=0)
+2025-12-18 12:53:26 [http-nio-8080-exec-8] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG o.s.w.r.f.client.ExchangeFunctions - [6632652e] HTTP GET http://localhost:8087/api/v1/hotels
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:26 [http-nio-8080-exec-9] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:26 [reactor-http-nio-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [645d6845] [42f9a322-5] Response 200 OK
+2025-12-18 12:53:26 [reactor-http-nio-2] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:26 [reactor-http-nio-2] DEBUG org.springframework.web.HttpLogging - [645d6845] [42f9a322-5] Decoded [Response(statusCode=200, message=Found 2 hotels, data=[{id=1, hotelCode=SRdddHddd1, name=Sunrise Hot (truncated)...]
+2025-12-18 12:53:26 [reactor-http-nio-8] DEBUG o.s.w.r.f.client.ExchangeFunctions - [6632652e] [99654a94-3] Response 200 OK
+2025-12-18 12:53:26 [reactor-http-nio-8] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:26 [reactor-http-nio-8] DEBUG org.springframework.web.HttpLogging - [6632652e] [99654a94-3] Decoded [Response(statusCode=200, message=Found 2 hotels, data=[{id=1, hotelCode=SRdddHddd1, name=Sunrise Hot (truncated)...]
+2025-12-18 12:53:26 [reactor-http-nio-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/hotels/search
+2025-12-18 12:53:26 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:53:26 [reactor-http-nio-8] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/hotels/search
+2025-12-18 12:53:26 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for POST "/api/bff/v1/hotels/search", parameters={}
+2025-12-18 12:53:26 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Found 2 hotels, data=[HotelDTO(id=1, hotelCode=SRdddHddd (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Found 2 hotels, data=[HotelDTO(id=1, hotelCode=SRdddHddd (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:26 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2025-12-18 12:53:26 [http-nio-8080-exec-7] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Found 2 hotels, data=[HotelDTO(id=1, hotelCode=SRdddHddd1, name=Sun (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-10] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Found 2 hotels, data=[HotelDTO(id=1, hotelCode=SRdddHddd1, name=Sun (truncated)...]
+2025-12-18 12:53:26 [http-nio-8080-exec-7] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:53:26 [http-nio-8080-exec-10] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/hotels/code/SRdddHddd1", parameters={}
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.HotelBffController#getHotelByCode(String)
+2025-12-18 12:53:29 [http-nio-8080-exec-2] INFO  c.t.controller.HotelBffController - Fetching hotel with code: SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG c.t.client.HotelServiceClient - Fetching hotel by code: SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [4e3712ff] HTTP GET http://localhost:8087/api/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:29 [http-nio-8080-exec-2] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:29 [reactor-http-nio-1] DEBUG o.s.w.r.f.client.ExchangeFunctions - [4e3712ff] [3ec90a46-3] Response 200 OK
+2025-12-18 12:53:29 [reactor-http-nio-1] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:29 [reactor-http-nio-1] DEBUG org.springframework.web.HttpLogging - [4e3712ff] [3ec90a46-3] Decoded [Response(statusCode=200, message=Hotel retrieved successfully, data={id=1, hotelCode=SRdddHddd1, nam (truncated)...]
+2025-12-18 12:53:29 [reactor-http-nio-1] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/hotels/code/SRdddHddd1", parameters={}
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Hotel retrieved successfully, data=HotelDTO(id=1, hotelC (truncated)...]
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Hotel retrieved successfully, data=HotelDTO(id=1, hotelCode=SRdddHd (truncated)...]
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG c.t.security.JwtAuthenticationFilter - Skipping JWT validation for public endpoint: /api/bff/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - GET "/api/bff/v1/hotels/code/SRdddHddd1", parameters={}
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping - Mapped to com.ticketkatum.controller.HotelBffController#getHotelByCode(String)
+2025-12-18 12:53:29 [http-nio-8080-exec-3] INFO  c.t.controller.HotelBffController - Fetching hotel with code: SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG c.t.client.HotelServiceClient - Fetching hotel by code: SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG c.ticketkatum.config.WebClientConfig - Request: GET http://localhost:8087/api/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.w.r.f.client.ExchangeFunctions - [770a3364] HTTP GET http://localhost:8087/api/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.w.c.r.async.WebAsyncManager - Started async request
+2025-12-18 12:53:29 [http-nio-8080-exec-3] DEBUG o.s.web.servlet.DispatcherServlet - Exiting but response remains open for further handling
+2025-12-18 12:53:29 [reactor-http-nio-2] DEBUG o.s.w.r.f.client.ExchangeFunctions - [770a3364] [42f9a322-6] Response 200 OK
+2025-12-18 12:53:29 [reactor-http-nio-2] DEBUG c.ticketkatum.config.WebClientConfig - Response status: 200 OK
+2025-12-18 12:53:29 [reactor-http-nio-2] DEBUG org.springframework.web.HttpLogging - [770a3364] [42f9a322-6] Decoded [Response(statusCode=200, message=Hotel retrieved successfully, data={id=1, hotelCode=SRdddHddd1, nam (truncated)...]
+2025-12-18 12:53:29 [reactor-http-nio-2] DEBUG o.s.w.c.r.async.WebAsyncManager - Async result set, dispatch to /api/bff/v1/hotels/code/SRdddHddd1
+2025-12-18 12:53:29 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - "ASYNC" dispatch for GET "/api/bff/v1/hotels/code/SRdddHddd1", parameters={}
+2025-12-18 12:53:29 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter - Resume with async result [<200 OK OK,Response(statusCode=200, message=Hotel retrieved successfully, data=HotelDTO(id=1, hotelC (truncated)...]
+2025-12-18 12:53:29 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Using 'application/json', given [application/json, text/plain, */*] and supported [application/json, application/*+json]
+2025-12-18 12:53:29 [http-nio-8080-exec-4] DEBUG o.s.w.s.m.m.a.HttpEntityMethodProcessor - Writing [Response(statusCode=200, message=Hotel retrieved successfully, data=HotelDTO(id=1, hotelCode=SRdddHd (truncated)...]
+2025-12-18 12:53:29 [http-nio-8080-exec-4] DEBUG o.s.web.servlet.DispatcherServlet - Exiting from "ASYNC" dispatch, status 200
+2025-12-18 12:53:55 [http-nio-8080-exec-8] ERROR c.t.security.JwtAuthenticationFilter - JWT authentication failed for path /bookings/price: JWT expired at 2025-12-18T03:22:47Z. Current time: 2025-12-18T07:08:55Z, a difference of 13568928 milliseconds.  Allowed clock skew: 0 milliseconds.
+2025-12-18 12:53:55 [http-nio-8080-exec-9] ERROR c.t.security.JwtAuthenticationFilter - JWT authentication failed for path /bookings/price: JWT expired at 2025-12-18T03:22:47Z. Current time: 2025-12-18T07:08:55Z, a difference of 13568928 milliseconds.  Allowed clock skew: 0 milliseconds.
+2025-12-18 12:54:04 [http-nio-8080-exec-7] ERROR c.t.security.JwtAuthenticationFilter - JWT authentication failed for path /bookings/price: JWT expired at 2025-12-18T03:22:47Z. Current time: 2025-12-18T07:09:04Z, a difference of 13577773 milliseconds.  Allowed clock skew: 0 milliseconds.
+2025-12-18 12:54:04 [http-nio-8080-exec-10] ERROR c.t.security.JwtAuthenticationFilter - JWT authentication failed for path /bookings/price: JWT expired at 2025-12-18T03:22:47Z. Current time: 2025-12-18T07:09:04Z, a difference of 13577773 milliseconds.  Allowed clock skew: 0 milliseconds.
+2025-12-18 12:54:09 [http-nio-8080-exec-1] ERROR c.t.security.JwtAuthenticationFilter - JWT authentication failed for path /bookings/price: JWT expired at 2025-12-18T03:22:47Z. Current time: 2025-12-18T07:09:09Z, a difference of 13582647 milliseconds.  Allowed clock skew: 0 milliseconds.
+2025-12-18 12:54:09 [http-nio-8080-exec-2] ERROR c.t.security.JwtAuthenticationFilter - JWT authentication failed for path /bookings/price: JWT expired at 2025-12-18T03:22:47Z. Current time: 2025-12-18T07:09:09Z, a difference of 13582646 milliseconds.  Allowed clock skew: 0 milliseconds.
