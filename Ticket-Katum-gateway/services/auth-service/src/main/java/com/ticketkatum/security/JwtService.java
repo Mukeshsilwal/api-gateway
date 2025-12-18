@@ -1,40 +1,63 @@
 package com.ticketkatum.security;
 
+import com.ticketkatum.entity.Role;
+import com.ticketkatum.entity.Permission;
+import com.ticketkatum.entity.User;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * JWT Token Service
- * Handles token generation, validation, and claims extraction
+ * Handles token generation, validation, and claims extraction using RS256
  */
 @Slf4j
 @Service
 public class JwtService {
 
     private static final String AUTHORITIES_CLAIM = "authorities";
-    private static final int MINIMUM_SECRET_LENGTH = 32; // 256 bits
-
-    @Value("${jwt.secret}")
-    private String jwtSecret;
+    private static final String PERMISSIONS_CLAIM = "permissions";
+    private static final String ROLES_CLAIM = "roles";
+    private static final String USER_ID_CLAIM = "userId";
 
     @Value("${jwt.expiration.time:3600000}")
     private long jwtExpirationTime;
 
     @Value("${jwt.refresh.expiration.time:86400000}")
     private long refreshExpirationTime;
+
+    private final PrivateKey privateKey;
+    private final PublicKey publicKey;
+
+    public JwtService() {
+        // Generate RSA Key Pair on startup (In production, load from Keystore/Vault)
+        try {
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            this.privateKey = keyPair.getPrivate();
+            this.publicKey = keyPair.getPublic();
+            log.info("RSA Key Pair generated successfully");
+        } catch (NoSuchAlgorithmException e) {
+            log.error("Failed to generate RSA keys", e);
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Extract username from JWT token
@@ -80,13 +103,29 @@ public class JwtService {
     /**
      * Generate access token for authenticated user
      */
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateAccessToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put(AUTHORITIES_CLAIM, userDetails.getAuthorities().stream()
+
+        List<String> roles = user.getRoles().stream()
+                .map(Role::getName)
+                .collect(Collectors.toList());
+
+        List<String> permissions = user.getRoles().stream()
+                .flatMap(role -> role.getPermissions().stream())
+                .map(Permission::getName)
+                .distinct()
+                .collect(Collectors.toList());
+
+        claims.put(ROLES_CLAIM, roles);
+        claims.put(PERMISSIONS_CLAIM, permissions);
+        claims.put(USER_ID_CLAIM, user.getId());
+
+        // Also add authorities for standard Spring Security compatibility
+        claims.put(AUTHORITIES_CLAIM, user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
-        return buildToken(claims, userDetails.getUsername(), jwtExpirationTime);
+        return buildToken(claims, user.getUsername(), jwtExpirationTime);
     }
 
     /**
@@ -94,6 +133,21 @@ public class JwtService {
      */
     public String generateRefreshToken(UserDetails userDetails) {
         return buildToken(new HashMap<>(), userDetails.getUsername(), refreshExpirationTime);
+    }
+
+    // Kept for backward compatibility if needed, but prefer
+    // generateAccessToken(User)
+    public String generateAccessToken(UserDetails userDetails) {
+        if (userDetails instanceof User) {
+            return generateAccessToken((User) userDetails);
+        }
+        // Fallback or empty claims
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(AUTHORITIES_CLAIM, userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+
+        return buildToken(claims, userDetails.getUsername(), jwtExpirationTime);
     }
 
     /**
@@ -112,8 +166,8 @@ public class JwtService {
      * Build JWT token
      */
     private String buildToken(Map<String, Object> claims,
-                              String subject,
-                              long expirationTime) {
+            String subject,
+            long expirationTime) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationTime);
 
@@ -122,8 +176,8 @@ public class JwtService {
                 .setSubject(subject)
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .setIssuer("TicketKatum") // Add issuer
-                .signWith(getSigningKey(), SignatureAlgorithm.HS512) // Use HS512 for better security
+                .setIssuer("TicketKatum")
+                .signWith(privateKey, SignatureAlgorithm.RS256)
                 .compact();
     }
 
@@ -132,7 +186,7 @@ public class JwtService {
      */
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(getSigningKey())
+                .setSigningKey(publicKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -143,21 +197,6 @@ public class JwtService {
      */
     private boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
-    }
-
-    /**
-     * Get signing key for JWT
-     * Ensures minimum key length for security
-     */
-    private SecretKey getSigningKey() {
-        if (jwtSecret == null || jwtSecret.length() < MINIMUM_SECRET_LENGTH) {
-            throw new IllegalStateException(
-                    String.format("JWT secret must be at least %d characters long", MINIMUM_SECRET_LENGTH)
-            );
-        }
-
-        byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     /**

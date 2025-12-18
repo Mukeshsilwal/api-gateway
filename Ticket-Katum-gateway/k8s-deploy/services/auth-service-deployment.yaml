@@ -42,7 +42,7 @@ spec:
       containers:
         - name: auth-service
           image: ticketkatum/auth-service:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           ports:
             - containerPort: 8089
               name: http

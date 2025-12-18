@@ -30,6 +30,36 @@ public class BusAggregator {
     private final RouteServiceClient routeClient;
     private final BusStopServiceClient busStopClient;
     private final SeatServiceClient seatClient;
+    private final com.ticketkatum.client.PaymentServiceClient paymentClient;
+
+    /**
+     * Complete booking flow: create booking -> initiate payment
+     */
+    public CompletableFuture<CompleteBookingResponse> completeBookingFlow(
+            CompleteBookingRequest request) {
+        log.info("Starting complete booking flow for user: {}", request.getBookingTicket().getUserId());
+
+        return busClient.createBooking(request.getBookingTicket())
+                .thenCompose(bookingTicket -> {
+                    com.ticketkatum.dto.payment.request.PaymentRequest paymentReq = request.getPaymentDetails();
+                    // Link payment to booking
+                    paymentReq.setBookingId(String.valueOf(bookingTicket.getBookingId()));
+
+                    log.info("Initiating payment for booking: {}", bookingTicket.getBookingId());
+
+                    return paymentClient.initiatePayment(paymentReq.getProvider(), paymentReq)
+                            .thenApply(paymentResp -> CompleteBookingResponse.builder()
+                                    .bookingTicket(bookingTicket)
+                                    .paymentData(paymentResp)
+                                    .status("SUCCESS")
+                                    .message("Booking created and payment initiated")
+                                    .build());
+                })
+                .exceptionally(ex -> {
+                    log.error("Complete booking flow failed", ex);
+                    throw new AggregationException("Booking flow failed: " + ex.getMessage(), ex);
+                });
+    }
 
     /**
      * Get complete bus information with route, stops, and seats
@@ -40,30 +70,30 @@ public class BusAggregator {
         CompletableFuture<BusDto> busFuture = busClient.getBusById(busId);
 
         return busFuture.thenCompose(bus -> {
-                    CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(bus.getRoute().getId());
+            CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(bus.getRoute().getId());
 
-                    CompletableFuture<List<SeatDto>> seatsFuture = seatClient.getSeatsByBusName(bus.getBusName());
+            CompletableFuture<List<SeatDto>> seatsFuture = seatClient.getSeatsByBusName(bus.getBusName());
 
-                    return CompletableFuture.allOf(routeFuture, seatsFuture)
-                            .thenApply(v -> {
-                                RouteDto route = routeFuture.join();
-                                List<SeatDto> seats = seatsFuture.join();
+            return CompletableFuture.allOf(routeFuture, seatsFuture)
+                    .thenApply(v -> {
+                        RouteDto route = routeFuture.join();
+                        List<SeatDto> seats = seatsFuture.join();
 
-                                // Get bus stops for route
-                                List<BusStopDto> busStops = fetchBusStopsForRoute(route);
+                        // Get bus stops for route
+                        List<BusStopDto> busStops = fetchBusStopsForRoute(route);
 
-                                return CompleteBusInfo.builder()
-                                        .bus(bus)
-                                        .route(route)
-                                        .busStops(busStops)
-                                        .seats(seats)
-                                        .totalSeats(seats.size())
-                                        .availableSeats(countAvailableSeats(seats))
-                                        .bookedSeats(countBookedSeats(seats))
-                                        .seatAvailability(calculateSeatAvailability(seats))
-                                        .build();
-                            });
-                })
+                        return CompleteBusInfo.builder()
+                                .bus(bus)
+                                .route(route)
+                                .busStops(busStops)
+                                .seats(seats)
+                                .totalSeats(seats.size())
+                                .availableSeats(countAvailableSeats(seats))
+                                .bookedSeats(countBookedSeats(seats))
+                                .seatAvailability(calculateSeatAvailability(seats))
+                                .build();
+                    });
+        })
                 .exceptionally(ex -> {
                     log.error("Error aggregating bus info", ex);
                     throw new AggregationException("Failed to aggregate bus info", ex);
@@ -96,7 +126,7 @@ public class BusAggregator {
                             .toList();
 
                     return CompletableFuture.allOf(
-                                    enrichedFutures.toArray(new CompletableFuture[0]))
+                            enrichedFutures.toArray(new CompletableFuture[0]))
                             .thenApply(v -> {
                                 List<EnrichedBusDto> enrichedBuses = enrichedFutures
                                         .stream()
@@ -137,19 +167,19 @@ public class BusAggregator {
         CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(routeId);
 
         return routeFuture.thenCompose(route -> {
-                    List<BusStopDto> busStops = fetchBusStopsForRoute(route);
+            List<BusStopDto> busStops = fetchBusStopsForRoute(route);
 
-                    CompletableFuture<List<BusDto>> busesFuture = busClient.getBusesByRoute(routeId);
+            CompletableFuture<List<BusDto>> busesFuture = busClient.getBusesByRoute(routeId);
 
-                    return busesFuture.thenApply(buses -> CompleteRouteInfo.builder()
-                            .route(route)
-                            .busStops(busStops)
-                            .buses(buses)
-                            .totalBuses(buses.size())
-                            .totalDistance(calculateTotalDistance(busStops))
-                            .estimatedDuration(calculateEstimatedDuration(route))
-                            .build());
-                })
+            return busesFuture.thenApply(buses -> CompleteRouteInfo.builder()
+                    .route(route)
+                    .busStops(busStops)
+                    .buses(buses)
+                    .totalBuses(buses.size())
+                    .totalDistance(calculateTotalDistance(busStops))
+                    .estimatedDuration(calculateEstimatedDuration(route))
+                    .build());
+        })
                 .exceptionally(ex -> {
                     log.error("Error aggregating route info", ex);
                     throw new AggregationException("Route aggregation failed", ex);
@@ -249,7 +279,6 @@ public class BusAggregator {
                 });
     }
 
-
     // ==================== Booking Delegates ====================
 
     public CompletableFuture<BookingTicketDto> createBooking(BookingTicketDto bookingTicketDto) {
@@ -281,8 +310,7 @@ public class BusAggregator {
                             .totalSeats(seats.size())
                             .availableSeats(countAvailableSeats(seats))
                             .seatAvailability(calculateSeatAvailability(seats))
-                            .build()
-                    )
+                            .build())
                     .exceptionally(ex -> {
                         log.warn("Error fetching seats for bus {}", bus.getBusName(), ex);
                         return EnrichedBusDto.builder()
@@ -294,11 +322,9 @@ public class BusAggregator {
                     });
         }
 
-        CompletableFuture<RouteDto> routeFuture =
-                routeClient.getRouteById(bus.getRoute().getId());
+        CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(bus.getRoute().getId());
 
-        CompletableFuture<List<SeatDto>> seatsFuture =
-                seatClient.getSeatsByBusName(bus.getBusName());
+        CompletableFuture<List<SeatDto>> seatsFuture = seatClient.getSeatsByBusName(bus.getBusName());
 
         return CompletableFuture.allOf(routeFuture, seatsFuture)
                 .thenApply(v -> {

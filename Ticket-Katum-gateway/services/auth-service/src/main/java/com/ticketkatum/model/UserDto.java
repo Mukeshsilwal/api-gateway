@@ -1,6 +1,5 @@
 package com.ticketkatum.model;
 
-
 import lombok.*;
 import java.time.LocalDateTime;
 
@@ -14,6 +13,8 @@ public class UserDto {
     private String lastName;
     private String email;
     private String phoneNumber;
+    private java.util.List<String> roles;
+    @Deprecated
     private String role;
     private String organizationName;
     private Boolean enabled;

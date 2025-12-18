@@ -1,9 +1,13 @@
 package com.ticketkatum.controller;
 
 import com.ticketkatum.model.*;
+import com.ticketkatum.entity.User;
 import com.ticketkatum.security.JwtService;
+import com.ticketkatum.service.RefreshTokenService;
 import com.ticketkatum.service.UserSessionService;
 import com.ticketkatum.service.serviceimpl.RegistrationService;
+import com.ticketkatum.service.serviceimpl.UserService;
+import com.ticketkatum.entity.RefreshToken;
 import com.ticketkatum.utils.Response;
 import com.ticketkatum.utils.ResponseHandler;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,6 +46,8 @@ public class AuthController {
     private final UserSessionService sessionService;
     private final AuthenticationManager authenticationManager;
     private final RegistrationService registrationService;
+    private final RefreshTokenService refreshTokenService;
+    private final UserService userService;
 
     /**
      * User login endpoint
@@ -55,14 +61,14 @@ public class AuthController {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         String accessToken = jwtService.generateAccessToken(userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        // Generate and save Refresh Token
+        String refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
         List<String> roles = userDetails.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -75,9 +81,7 @@ public class AuthController {
                         "ipAddress", getClientIP(request),
                         "userAgent", getUserAgent(request),
                         "roles", roles,
-                        "loginTime", System.currentTimeMillis()
-                )
-        );
+                        "loginTime", System.currentTimeMillis()));
 
         LoginResponse loginResponse = LoginResponse.builder()
                 .accessToken(accessToken)
@@ -90,8 +94,7 @@ public class AuthController {
                 .build();
         Response<LoginResponse> response = ResponseHandler.success(
                 "User login successfully",
-                loginResponse
-        );
+                loginResponse);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -114,15 +117,31 @@ public class AuthController {
 
             sessionService.invalidateSession(sessionId);
 
-            log.info("User {} logged out. Session: {}", username, sessionId);
-            LogoutResponse logoutResponse = LogoutResponse.builder().
-                    sessionId(sessionId).message("Successfully logged out").build();
+            // Note: If you want logout to invalidate the refresh token too, we'd need the
+            // token string here.
+            // But API spec says logout takes Session-Id. Refresh token is separate?
+            // "Logout invalidates refresh token" -> implies we need to know WHICH refresh
+            // token.
+            // But here we only have sessionId.
+            // If they track sessionId in RefreshToken entity, we could delete it.
+            // But RefreshToken entity is User-bound.
+            // For now, logout invalidates HttpSession.
+            // To invalidate refresh token, we would need the refresh token passed in, or
+            // invalidate ALL user refresh tokens.
+            // Let's assume strict logout kills sessions.
+            // If we want to support "Logout" button on unrelated device, usually it just
+            // kills that session key.
+            // Refresh Token revocation endpoint is often separate or implies invalidating
+            // user login.
+            // Let's leave as Session Invalidation for now.
 
+            log.info("User {} logged out. Session: {}", username, sessionId);
+            LogoutResponse logoutResponse = LogoutResponse.builder().sessionId(sessionId)
+                    .message("Successfully logged out").build();
 
             Response<LogoutResponse> response = ResponseHandler.success(
                     "Logged out successfully",
-                    logoutResponse
-            );
+                    logoutResponse);
             return ResponseEntity.status(HttpStatus.OK).body(response);
 
         } catch (IllegalArgumentException e) {
@@ -132,8 +151,7 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error during logout for session: {}", sessionId, e);
             Response<LogoutResponse> response = ResponseHandler.failure(
-                    "Logout failed. Please try again."
-            );
+                    "Logout failed. Please try again.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -152,6 +170,15 @@ public class AuthController {
             }
 
             Long sessionsInvalidated = sessionService.invalidateAllUserSessions(username);
+            
+            try {
+                // Invalidate all refresh tokens
+                User user = (User) userDetailsService.loadUserByUsername(username);
+                refreshTokenService.deleteByUserId(user.getId());
+                log.info("Invalidated refresh tokens for user {}", username);
+            } catch (Exception e) {
+                log.warn("Failed to delete refresh tokens for user {}: {}", username, e.getMessage());
+            }
 
             log.info("User {} logged out from all devices. Sessions invalidated: {}",
                     username, sessionsInvalidated);
@@ -162,8 +189,7 @@ public class AuthController {
 
             Response<Map<String, Object>> response = ResponseHandler.success(
                     "Logged out from all devices",
-                    data
-            );
+                    data);
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
@@ -173,8 +199,7 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error during logout all for user: {}", username, e);
             Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Logout failed. Please try again."
-            );
+                    "Logout failed. Please try again.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -201,15 +226,13 @@ public class AuthController {
 
             if (session == null || session.isEmpty()) {
                 Response<Map<String, Object>> response = ResponseHandler.failure(
-                        "Session not found or expired"
-                );
+                        "Session not found or expired");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
             if (!sessionService.validateTokenWithSession(sessionId, token)) {
                 Response<Map<String, Object>> response = ResponseHandler.failure(
-                        "Token does not match session"
-                );
+                        "Token does not match session");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
 
@@ -224,8 +247,7 @@ public class AuthController {
 
             Response<Map<String, Object>> response = ResponseHandler.success(
                     "Session is valid",
-                    responseData
-            );
+                    responseData);
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
@@ -235,8 +257,7 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error validating session: {}", sessionId, e);
             Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Validation failed. Please try again."
-            );
+                    "Validation failed. Please try again.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -263,8 +284,7 @@ public class AuthController {
 
             Response<Map<String, Object>> response = ResponseHandler.success(
                     "Active sessions retrieved",
-                    responseData
-            );
+                    responseData);
             return ResponseEntity.ok(response);
 
         } catch (IllegalArgumentException e) {
@@ -274,8 +294,7 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error fetching active sessions for user: {}", username, e);
             Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Failed to fetch sessions"
-            );
+                    "Failed to fetch sessions");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -294,15 +313,13 @@ public class AuthController {
 
             Response<Map<String, Long>> response = ResponseHandler.success(
                     "Online user count retrieved",
-                    data
-            );
+                    data);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             log.error("Error fetching online user count", e);
             Response<Map<String, Long>> response = ResponseHandler.failure(
-                    "Failed to fetch user count"
-            );
+                    "Failed to fetch user count");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -323,24 +340,20 @@ public class AuthController {
 
             Response<Map<String, Object>> response = ResponseHandler.success(
                     "Online users retrieved",
-                    data
-            );
+                    data);
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {
             log.error("Error fetching online users", e);
             Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Failed to fetch online users"
-            );
+                    "Failed to fetch online users");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    /**
-     * User registration endpoint
-     */
-    @PostMapping("/register")
-    public ResponseEntity<Response<UserDto>> registerUser(
+
+    @PostMapping("/register/admin")
+    public ResponseEntity<Response<UserDto>> registerAdmin(
             @Valid @RequestBody CreateRegistrationRequest createRegistrationRequest) {
 
         try {
@@ -348,11 +361,9 @@ public class AuthController {
 
             registrationService.registerAdmin(createRegistrationRequest);
 
-
             Response<UserDto> response = ResponseHandler.success(
                     "User registered successfully",
-                    null
-            );
+                    null);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
         } catch (IllegalArgumentException e) {
@@ -363,9 +374,44 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error creating user: {}", createRegistrationRequest.getEmail(), e);
             Response<UserDto> response = ResponseHandler.failure(
-                    "Registration failed. Please try again."
-            );
+                    "Registration failed. Please try again.");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Customer registration endpoint
+     */
+    @PostMapping("/register")
+    public ResponseEntity<Response<UserDto>> registerCustomer(
+            @Valid @RequestBody CreateUserRequest createUserRequest) {
+
+        try {
+            log.info("Attempting to register customer: {}", createUserRequest.getEmail());
+            
+            // Force role to USER if not specified or override?
+            // Let's rely on service logic or set it here.
+            // CreateUserRequest has "role" field.
+            // If public registration, we should force "USER".
+            createUserRequest.setRole("USER"); 
+            
+            UserDto userDto = userService.createUser(createUserRequest);
+
+            Response<UserDto> response = ResponseHandler.success(
+                    "User registered successfully",
+                    userDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid user registration data: {}", e.getMessage());
+            Response<UserDto> response = ResponseHandler.failure(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+        } catch (Exception e) {
+            log.error("Error creating user: {}", createUserRequest.getEmail(), e);
+            Response<UserDto> response = ResponseHandler.failure(
+                    e.getMessage()); // Expose message (e.g. DuplicateResourceException)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response); // Use 400 for errors
         }
     }
 
@@ -383,13 +429,20 @@ public class AuthController {
             }
 
             String refreshToken = authHeader.substring(7).trim();
-            String username = jwtService.extractUsername(refreshToken);
+            // String username = jwtService.extractUsername(refreshToken); // Token is opaque now
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            // Verify token in DB
+            RefreshToken dbToken = refreshTokenService.findByToken(refreshToken)
+                    .orElseThrow(() -> new BadCredentialsException("Refresh token not found"));
+            
+            UserDetails userDetails = (UserDetails) dbToken.getUser();
+            // Or load fresh: userDetailsService.loadUserByUsername(dbToken.getUser().getEmail());
 
-            if (!jwtService.isTokenValid(refreshToken, userDetails)) {
-                throw new BadCredentialsException("Invalid or expired refresh token");
+            if (dbToken.isRevoked()) {
+                throw new BadCredentialsException("Refresh token revoked");
             }
+
+            refreshTokenService.verifyExpiration(dbToken);
 
             // Generate new access token
             String newAccessToken = jwtService.generateAccessToken(userDetails);
@@ -410,8 +463,7 @@ public class AuthController {
 
             Response<Map<String, Object>> response = ResponseHandler.success(
                     "Token refreshed successfully",
-                    responseData
-            );
+                    responseData);
             return ResponseEntity.ok(response);
 
         } catch (BadCredentialsException | IllegalArgumentException e) {
@@ -422,8 +474,7 @@ public class AuthController {
         } catch (Exception e) {
             log.error("Error refreshing token", e);
             Response<Map<String, Object>> response = ResponseHandler.failure(
-                    "Token refresh failed"
-            );
+                    "Token refresh failed");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

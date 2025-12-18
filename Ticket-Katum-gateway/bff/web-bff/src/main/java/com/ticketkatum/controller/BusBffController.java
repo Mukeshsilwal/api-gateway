@@ -25,191 +25,202 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Bus BFF", description = "Bus management aggregated APIs")
 public class BusBffController {
 
-    private final BusAggregator busAggregator;
+        private final BusAggregator busAggregator;
 
-    /**
-     * Get complete bus information
-     * Aggregates: bus, route, stops, seats, availability
-     */
-    @GetMapping("/{busId}/complete")
-    @Operation(summary = "Get complete bus info",
-            description = "Returns bus with route, stops, and seat availability")
-    public CompletableFuture<ResponseEntity<Response<CompleteBusInfo>>> getCompleteBusInfo(
-            @PathVariable Long busId) {
+        /**
+         * Get complete bus information
+         * Aggregates: bus, route, stops, seats, availability
+         */
+        @GetMapping("/{busId}/complete")
+        @Operation(summary = "Get complete bus info", description = "Returns bus with route, stops, and seat availability")
+        public CompletableFuture<ResponseEntity<Response<CompleteBusInfo>>> getCompleteBusInfo(
+                        @PathVariable Long busId) {
 
-        log.info("BFF: Fetching complete bus info for busId: {}", busId);
+                log.info("BFF: Fetching complete bus info for busId: {}", busId);
 
-        return busAggregator.getCompleteBusInfo(busId)
-                .thenApply(info -> ResponseEntity.ok(
-                        new Response<>(200, "Bus info retrieved successfully", info)))
-                .exceptionally(ex -> {
-                    log.error("Error fetching bus info", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Failed to fetch bus info", null));
-                });
-    }
+                return busAggregator.getCompleteBusInfo(busId)
+                                .thenApply(info -> ResponseEntity.ok(
+                                                new Response<>(200, "Bus info retrieved successfully", info)))
+                                .exceptionally(ex -> {
+                                        log.error("Error fetching bus info", ex);
+                                        return ResponseEntity.status(500).body(
+                                                        new Response<>(500, "Failed to fetch bus info", null));
+                                });
+        }
 
-    /**
-     * Search buses with complete details
-     * Aggregates: search results, route info, seat availability
-     */
-    @PostMapping("/search")
-    @Operation(summary = "Search buses with details",
-            description = "Advanced bus search with complete information")
-    public CompletableFuture<ResponseEntity<Response<AggregatedBusSearchResults>>> searchBuses(
-            @Valid @RequestBody BusSearchRequest searchRequest) {
+        /**
+         * Search buses with complete details
+         * Aggregates: search results, route info, seat availability
+         */
+        @PostMapping("/search")
+        @Operation(summary = "Search buses with details", description = "Advanced bus search with complete information")
+        public CompletableFuture<ResponseEntity<Response<AggregatedBusSearchResults>>> searchBuses(
+                        @Valid @RequestBody BusSearchRequest searchRequest) {
 
-        log.info("BFF: Searching buses from {} to {} on {}",
-                searchRequest.getSource(),
-                searchRequest.getDestination(),
-                searchRequest.getDate());
+                log.info("BFF: Searching buses from {} to {} on {}",
+                                searchRequest.getSource(),
+                                searchRequest.getDestination(),
+                                searchRequest.getDate());
 
-        return busAggregator.searchBusesWithDetails(searchRequest)
-                .thenApply(results -> ResponseEntity.ok(
-                        new Response<>(200, "Search completed successfully", results)))
-                .exceptionally(ex -> {
-                    log.error("Bus search failed", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Search failed", null));
-                });
-    }
+                return busAggregator.searchBusesWithDetails(searchRequest)
+                                .thenApply(results -> ResponseEntity.ok(
+                                                new Response<>(200, "Search completed successfully", results)))
+                                .exceptionally(ex -> {
+                                        log.error("Bus search failed", ex);
+                                        return ResponseEntity.status(500).body(
+                                                        new Response<>(500, "Search failed", null));
+                                });
+        }
 
-    /**
-     * Get complete route information
-     * Aggregates: route, bus stops, buses on route
-     */
-    @GetMapping("/routes/{routeId}/complete")
-    @Operation(summary = "Get complete route info",
-            description = "Returns route with bus stops and buses")
-    public CompletableFuture<ResponseEntity<Response<CompleteRouteInfo>>> getCompleteRouteInfo(
-            @PathVariable Integer routeId) {
+        /**
+         * Get complete route information
+         * Aggregates: route, bus stops, buses on route
+         */
+        @GetMapping("/routes/{routeId}/complete")
+        @Operation(summary = "Get complete route info", description = "Returns route with bus stops and buses")
+        public CompletableFuture<ResponseEntity<Response<CompleteRouteInfo>>> getCompleteRouteInfo(
+                        @PathVariable Integer routeId) {
 
-        log.info("BFF: Fetching complete route info for: {}", routeId);
+                log.info("BFF: Fetching complete route info for: {}", routeId);
 
-        return busAggregator.getCompleteRouteInfo(routeId)
-                .thenApply(info -> ResponseEntity.ok(
-                        new Response<>(200, "Route info retrieved", info)))
-                .exceptionally(ex -> {
-                    log.error("Error fetching route info", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Failed to fetch route", null));
-                });
-    }
+                return busAggregator.getCompleteRouteInfo(routeId)
+                                .thenApply(info -> ResponseEntity.ok(
+                                                new Response<>(200, "Route info retrieved", info)))
+                                .exceptionally(ex -> {
+                                        log.error("Error fetching route info", ex);
+                                        return ResponseEntity.status(500).body(
+                                                        new Response<>(500, "Failed to fetch route", null));
+                                });
+        }
 
-    /**
-     * Get all bus stops with routes
-     */
-    @GetMapping("/stops/with-routes")
-    @Operation(summary = "Get bus stops with routes",
-            description = "Returns all bus stops with their routes")
-    public CompletableFuture<ResponseEntity<Response<List<BusStopWithRoutes>>>> getBusStopsWithRoutes() {
-        log.info("BFF: Fetching bus stops with routes");
+        /**
+         * Get all bus stops with routes
+         */
+        @GetMapping("/stops/with-routes")
+        @Operation(summary = "Get bus stops with routes", description = "Returns all bus stops with their routes")
+        public CompletableFuture<ResponseEntity<Response<List<BusStopWithRoutes>>>> getBusStopsWithRoutes() {
+                log.info("BFF: Fetching bus stops with routes");
 
-        return busAggregator.getAllBusStopsWithRoutes()
-                .thenApply(stops -> ResponseEntity.ok(
-                        new Response<>(200, "Bus stops retrieved", stops)))
-                .exceptionally(ex -> {
-                    log.error("Error fetching bus stops", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Failed to fetch stops", null));
-                });
-    }
+                return busAggregator.getAllBusStopsWithRoutes()
+                                .thenApply(stops -> ResponseEntity.ok(
+                                                new Response<>(200, "Bus stops retrieved", stops)))
+                                .exceptionally(ex -> {
+                                        log.error("Error fetching bus stops", ex);
+                                        return ResponseEntity.status(500).body(
+                                                        new Response<>(500, "Failed to fetch stops", null));
+                                });
+        }
 
-    /**
-     * Get bus management dashboard
-     */
-    @GetMapping("/dashboard")
-    @Operation(summary = "Get bus management dashboard",
-            description = "Returns comprehensive dashboard data")
-    public CompletableFuture<ResponseEntity<Response<BusManagementDashboard>>> getManagementDashboard() {
-        log.info("BFF: Fetching bus management dashboard");
+        /**
+         * Get bus management dashboard
+         */
+        @GetMapping("/dashboard")
+        @Operation(summary = "Get bus management dashboard", description = "Returns comprehensive dashboard data")
+        public CompletableFuture<ResponseEntity<Response<BusManagementDashboard>>> getManagementDashboard() {
+                log.info("BFF: Fetching bus management dashboard");
 
-        return busAggregator.getManagementDashboard()
-                .thenApply(dashboard -> ResponseEntity.ok(
-                        new Response<>(200, "Dashboard retrieved", dashboard)))
-                .exceptionally(ex -> {
-                    log.error("Error fetching dashboard", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Dashboard fetch failed", null));
-                });
-    }
+                return busAggregator.getManagementDashboard()
+                                .thenApply(dashboard -> ResponseEntity.ok(
+                                                new Response<>(200, "Dashboard retrieved", dashboard)))
+                                .exceptionally(ex -> {
+                                        log.error("Error fetching dashboard", ex);
+                                        return ResponseEntity.status(500).body(
+                                                        new Response<>(500, "Dashboard fetch failed", null));
+                                });
+        }
 
-    /**
-     * Get all buses with complete details
-     * Aggregates: buses, routes, seat availability
-     */
-    @GetMapping("/bus-details")
-    @Operation(
-            summary = "Get all buses with complete details",
-            description = "Returns all buses enriched with route and seat availability"
-    )
-    public CompletableFuture<ResponseEntity<Response<List<BusDto>>>> getAllBusesWithDetails() {
+        /**
+         * Get all buses with complete details
+         * Aggregates: buses, routes, seat availability
+         */
+        @GetMapping("/bus-details")
+        @Operation(summary = "Get all buses with complete details", description = "Returns all buses enriched with route and seat availability")
+        public CompletableFuture<ResponseEntity<Response<List<BusDto>>>> getAllBusesWithDetails() {
 
-        log.info("BFF: Fetching all buses with complete details");
+                log.info("BFF: Fetching all buses with complete details");
 
-        return busAggregator.getAllBusesWithDetails()
-                .thenApply(buses -> ResponseEntity.ok(
-                        new Response<>(200, "Buses retrieved successfully", buses)))
-                .exceptionally(ex -> {
-                    log.error("Error fetching all buses with details", ex);
-                    return ResponseEntity.status(500).body(
-                            new Response<>(500, "Failed to fetch buses", null));
-                });
-    }
+                return busAggregator.getAllBusesWithDetails()
+                                .thenApply(buses -> ResponseEntity.ok(
+                                                new Response<>(200, "Buses retrieved successfully", buses)))
+                                .exceptionally(ex -> {
+                                        log.error("Error fetching all buses with details", ex);
+                                        return ResponseEntity.status(500).body(
+                                                        new Response<>(500, "Failed to fetch buses", null));
+                                });
+        }
 
-    /**
-     * Create a new booking
-     */
-    @PostMapping("/bookings")
-    @Operation(summary = "Create booking", description = "Create a new bus ticket booking")
-    public CompletableFuture<ResponseEntity<Response<BookingTicketDto>>> createBooking(
-            @RequestBody BookingTicketDto bookingTicketDto) {
-        return busAggregator.createBooking(bookingTicketDto)
-                .thenApply(ticket -> ResponseEntity.ok(
-                        new Response<>(201, "Booking created successfully", ticket)))
-                .exceptionally(ex -> ResponseEntity.status(500).body(
-                        new Response<>(500, "Booking failed: " + ex.getMessage(), null)));
-    }
+        /**
+         * Create a new booking
+         */
+        @PostMapping("/bookings")
+        @Operation(summary = "Create booking", description = "Create a new bus ticket booking")
+        public CompletableFuture<ResponseEntity<Response<BookingTicketDto>>> createBooking(
+                        @RequestBody BookingTicketDto bookingTicketDto) {
+                return busAggregator.createBooking(bookingTicketDto)
+                                .thenApply(ticket -> ResponseEntity.ok(
+                                                new Response<>(201, "Booking created successfully", ticket)))
+                                .exceptionally(ex -> ResponseEntity.status(500).body(
+                                                new Response<>(500, "Booking failed: " + ex.getMessage(), null)));
+        }
 
-    /**
-     * Get booking by ID
-     */
-    @GetMapping("/bookings/{id}")
-    @Operation(summary = "Get booking", description = "Get booking details by ID")
-    public CompletableFuture<ResponseEntity<Response<BookingTicketDto>>> getBooking(@PathVariable Integer id) {
-        return busAggregator.getBooking(id)
-                .thenApply(ticket -> ResponseEntity.ok(
-                        new Response<>(200, "Booking retrieved", ticket)))
-                .exceptionally(ex -> ResponseEntity.status(500).body(
-                        new Response<>(500, "Failed to fetch booking", null)));
-    }
+        /**
+         * Get booking by ID
+         */
+        @GetMapping("/bookings/{id}")
+        @Operation(summary = "Get booking", description = "Get booking details by ID")
+        public CompletableFuture<ResponseEntity<Response<BookingTicketDto>>> getBooking(@PathVariable Integer id) {
+                return busAggregator.getBooking(id)
+                                .thenApply(ticket -> ResponseEntity.ok(
+                                                new Response<>(200, "Booking retrieved", ticket)))
+                                .exceptionally(ex -> ResponseEntity.status(500).body(
+                                                new Response<>(500, "Failed to fetch booking", null)));
+        }
 
-    /**
-     * Select (Hold) a seat
-     */
-    @PostMapping("/seats/select")
-    @Operation(summary = "Select seat", description = "Temporarily hold a seat (Soft Lock)")
-    public CompletableFuture<ResponseEntity<Response<SeatDto>>> selectSeat(
-            @RequestParam Long seatId, @RequestParam Long userId) {
-        return busAggregator.selectSeat(seatId, userId)
-                .thenApply(seat -> ResponseEntity.ok(
-                        new Response<>(200, "Seat selected successfully", seat)))
-                .exceptionally(ex -> ResponseEntity.status(409).body(
-                        new Response<>(409, "Seat selection failed: " + ex.getMessage(), null)));
-    }
+        /**
+         * Select (Hold) a seat
+         */
+        @PostMapping("/seats/select")
+        @Operation(summary = "Select seat", description = "Temporarily hold a seat (Soft Lock)")
+        public CompletableFuture<ResponseEntity<Response<SeatDto>>> selectSeat(
+                        @RequestParam Long seatId, @RequestParam Long userId) {
+                return busAggregator.selectSeat(seatId, userId)
+                                .thenApply(seat -> ResponseEntity.ok(
+                                                new Response<>(200, "Seat selected successfully", seat)))
+                                .exceptionally(ex -> ResponseEntity.status(409).body(
+                                                new Response<>(409, "Seat selection failed: " + ex.getMessage(),
+                                                                null)));
+        }
 
-    /**
-     * Confirm a seat
-     */
-    @PostMapping("/seats/confirm")
-    @Operation(summary = "Confirm seat", description = "Permanently confirm a seat (Hard Lock)")
-    public CompletableFuture<ResponseEntity<Response<SeatDto>>> confirmSeat(
-            @RequestParam Long seatId, @RequestParam Long userId) {
-        return busAggregator.confirmSeat(seatId, userId)
-                .thenApply(seat -> ResponseEntity.ok(
-                        new Response<>(200, "Seat confirmed successfully", seat)))
-                .exceptionally(ex -> ResponseEntity.status(500).body(
-                        new Response<>(500, "Seat confirmation failed", null)));
-    }
+        /**
+         * Confirm a seat
+         */
+        @PostMapping("/seats/confirm")
+        @Operation(summary = "Confirm seat", description = "Permanently confirm a seat (Hard Lock)")
+        public CompletableFuture<ResponseEntity<Response<SeatDto>>> confirmSeat(
+                        @RequestParam Long seatId, @RequestParam Long userId) {
+                return busAggregator.confirmSeat(seatId, userId)
+                                .thenApply(seat -> ResponseEntity.ok(
+                                                new Response<>(200, "Seat confirmed successfully", seat)))
+                                .exceptionally(ex -> ResponseEntity.status(500).body(
+                                                new Response<>(500, "Seat confirmation failed", null)));
+        }
+
+        /**
+         * Complete booking flow
+         * Aggregates: Create booking -> Initiate Payment
+         */
+        @PostMapping("/complete-booking")
+        @Operation(summary = "Complete booking flow", description = "Creates booking and initiates payment in one flow")
+        public CompletableFuture<ResponseEntity<Response<CompleteBookingResponse>>> completeBooking(
+                        @RequestBody CompleteBookingRequest request) {
+
+                log.info("BFF: Complete bus booking flow");
+
+                return busAggregator.completeBookingFlow(request)
+                                .thenApply(response -> ResponseEntity.ok(
+                                                new Response<>(200, "Booking completed successfully", response)))
+                                .exceptionally(ex -> ResponseEntity.status(500).body(
+                                                new Response<>(500, "Booking flow failed: " + ex.getMessage(), null)));
+        }
 
 }

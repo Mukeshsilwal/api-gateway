@@ -1,9 +1,10 @@
 package com.ticketkatum.service.serviceimpl;
 
 import com.ticketkatum.entity.User;
-import com.ticketkatum.enums.Role;
-import com.ticketkatum.exceotions.DuplicateResourceException;
-import com.ticketkatum.exceotions.ResourceNotFoundException;
+import com.ticketkatum.entity.Role;
+import com.ticketkatum.repository.RoleRepository;
+import com.ticketkatum.exception.DuplicateResourceException;
+import com.ticketkatum.exception.ResourceNotFoundException;
 import com.ticketkatum.model.CreateUserRequest;
 import com.ticketkatum.model.UpdateUserRequest;
 import com.ticketkatum.model.UserDto;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepo userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -34,13 +36,16 @@ public class UserService {
             throw new DuplicateResourceException("User with email already exists: " + request.getEmail());
         }
 
+        Role role = roleRepository.findByName(request.getRole())
+                .orElseGet(() -> roleRepository.save(Role.builder().name(request.getRole()).build()));
+
         User user = User.builder()
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.valueOf(request.getRole()))
+                .roles(java.util.Set.of(role))
                 .organizationName(request.getOrganizationName())
                 .enabled(true)
                 .accountNonLocked(true)
@@ -70,7 +75,7 @@ public class UserService {
         List<User> users;
 
         if (role != null && !role.isEmpty()) {
-            users = userRepository.findByRole(Role.valueOf(role));
+            users = userRepository.findByRoles_Name(role);
         } else {
             users = userRepository.findAll();
         }
@@ -139,7 +144,8 @@ public class UserService {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
-                .role(user.getRole().name())
+                .roles(user.getRoles().stream().map(Role::getName).collect(Collectors.toList()))
+                .role(user.getRoles().stream().findFirst().map(Role::getName).orElse(null))
                 .organizationName(user.getOrganizationName())
                 .enabled(user.getEnabled())
                 .accountNonLocked(user.getAccountNonLocked())

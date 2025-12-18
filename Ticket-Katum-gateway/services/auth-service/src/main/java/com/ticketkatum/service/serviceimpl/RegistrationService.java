@@ -6,9 +6,10 @@ import com.ticketkatum.entity.Otp;
 import com.ticketkatum.entity.RegistrationRequest;
 import com.ticketkatum.entity.User;
 import com.ticketkatum.enums.RequestStatus;
-import com.ticketkatum.enums.Role;
-import com.ticketkatum.exceotions.BadRequestException;
-import com.ticketkatum.exceotions.ResourceNotFoundException;
+import com.ticketkatum.entity.Role;
+import com.ticketkatum.repository.RoleRepository;
+import com.ticketkatum.exception.BadRequestException;
+import com.ticketkatum.exception.ResourceNotFoundException;
 import com.ticketkatum.model.AdminRegistrationRequestDto;
 import com.ticketkatum.model.ChangePasswordRequest;
 import com.ticketkatum.model.CreateRegistrationRequest;
@@ -34,10 +35,11 @@ public class RegistrationService {
 
     private final RegistrationRequestRepo requestRepository;
     private final UserRepo userRepository;
+    private final RoleRepository roleRepository;
     private final OtpRepository otpRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
-    //    private final ImageS fileStorageService;
+    // private final ImageS fileStorageService;
     private final ObjectMapper objectMapper;
 
     private static final String UPLOAD_DIR = "uploads/documents/";
@@ -67,8 +69,8 @@ public class RegistrationService {
         RegistrationRequest savedRequest = requestRepository.save(request);
         log.info("Admin registration request saved with ID: {}", request.getId());
 
-        emailService.sendCredentials(dto.getEmail(), dto.getOrganizationName(),"" );
-        RegistrationResponse  registrationResponse = RegistrationResponse.builder()
+        emailService.sendCredentials(dto.getEmail(), dto.getOrganizationName(), "");
+        RegistrationResponse registrationResponse = RegistrationResponse.builder()
                 .status(RequestStatus.PENDING)
                 .email(request.getEmail())
                 .requestId(savedRequest.getId())
@@ -99,7 +101,9 @@ public class RegistrationService {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .password(encodedPassword)
-                .role(Role.ADMIN)
+                .password(encodedPassword)
+                .roles(java.util.Set.of(roleRepository.findByName("ADMIN")
+                        .orElseGet(() -> roleRepository.save(Role.builder().name("ADMIN").build()))))
                 .organizationName(request.getOrganizationName())
                 .enabled(true)
                 .accountNonLocked(true)
@@ -115,7 +119,7 @@ public class RegistrationService {
         requestRepository.save(request);
 
         // Send credentials via email
-        emailService.sendCredentials(user.getEmail(), user.getEmail(),temporaryPassword);
+        emailService.sendCredentials(user.getEmail(), user.getEmail(), temporaryPassword);
 
         log.info("Admin approved and credentials sent to: {}", user.getEmail());
     }
@@ -155,7 +159,8 @@ public class RegistrationService {
         log.info("Sending OTP to user: {}", userRequest.getUsername());
 
         User user = userRepository.findByEmail(userRequest.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + userRequest.getUsername()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("User not found with email: " + userRequest.getUsername()));
 
         // Generate 6-digit OTP
         String otp = generateOtp();
