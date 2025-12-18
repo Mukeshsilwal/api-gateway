@@ -1,0 +1,144 @@
+name: Build, Push and Deploy
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Ticket-Katum-gateway
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build artifacts (Maven)
+        run: |
+          if [ ! -f pom.xml ]; then
+            echo "No pom.xml found. Skipping Maven build."
+            exit 0
+          fi
+
+          if [ -f mvnw ]; then
+            chmod +x mvnw
+            ./mvnw -T1C -DskipTests clean package
+          else
+            mvn -T1C -DskipTests clean package
+          fi
+
+      # ---------------- GHCR LOGIN ----------------
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------------- AWS CREDENTIALS ----------------
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ---------------- BUILD & PUSH (GHCR + ECR) ----------------
+      - name: Build & push Docker images to GHCR and ECR
+        env:
+          OWNER_LC: ${{ github.repository_owner }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: us-east-1
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          OWNER_LC=$(echo "$OWNER_LC" | tr '[:upper:]' '[:lower:]')
+          ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+          declare -A services=(
+            ["web-bff"]="bff/web-bff/Dockerfile"
+            ["booking-service"]="services/booking-service/Dockerfile"
+            ["payment-service"]="services/payment-service/Dockerfile"
+            ["hotel-service"]="services/hotel-service/Dockerfile"
+            ["auth-service"]="services/auth-service/Dockerfile"
+          )
+
+          for service in "${!services[@]}"; do
+            dockerfile="${services[$service]}"
+
+            if [ -f "$dockerfile" ]; then
+              echo "Building $service..."
+
+              docker build \
+                -t ghcr.io/${OWNER_LC}/${service}:${IMAGE_TAG} \
+                -t ${ECR_REGISTRY}/${service}:${IMAGE_TAG} \
+                -f "$dockerfile" .
+
+              echo "Pushing $service to GHCR..."
+              docker push ghcr.io/${OWNER_LC}/${service}:${IMAGE_TAG}
+
+              echo "Pushing $service to ECR..."
+              docker push ${ECR_REGISTRY}/${service}:${IMAGE_TAG}
+            else
+              echo "Dockerfile not found for $service, skipping"
+            fi
+          done
+
+      # ---------------- EKS DEPLOY ----------------
+      - name: Update Kubeconfig
+        run: aws eks update-kubeconfig --name ticket-katum-cluster --region us-east-1
+
+      - name: Deploy to Kubernetes
+        env:
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+          AWS_REGION: us-east-1
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+          cd k8s-deploy
+
+          if ! grep -q "images:" kustomization.yaml; then
+            echo -e "\nimages:" >> kustomization.yaml
+          fi
+
+          cat <<EOF >> kustomization.yaml
+            - name: booking-service
+              newName: ${REGISTRY}/booking-service
+              newTag: ${IMAGE_TAG}
+            - name: web-bff
+              newName: ${REGISTRY}/web-bff
+              newTag: ${IMAGE_TAG}
+            - name: payment-service
+              newName: ${REGISTRY}/payment-service
+              newTag: ${IMAGE_TAG}
+            - name: hotel-service
+              newName: ${REGISTRY}/hotel-service
+              newTag: ${IMAGE_TAG}
+            - name: auth-service
+              newName: ${REGISTRY}/auth-service
+              newTag: ${IMAGE_TAG}
+          EOF
+
+          cd ..
+
+          kubectl apply -k k8s-deploy
+
+          for deploy in web-bff booking-service payment-service hotel-service auth-service; do
+            kubectl rollout status deployment/$deploy --timeout=120s || true
+          done
