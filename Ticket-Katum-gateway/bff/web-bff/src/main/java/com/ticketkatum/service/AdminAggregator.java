@@ -34,6 +34,7 @@ public class AdminAggregator {
     private final HotelServiceClient hotelClient;
     private final BookingServiceClient bookingClient;
     private final LiveTrackingService liveTrackingService;
+    private final com.ticketkatum.client.AuthServiceClient authClient;
 
     // ==================== DASHBOARD OPERATIONS ====================
 

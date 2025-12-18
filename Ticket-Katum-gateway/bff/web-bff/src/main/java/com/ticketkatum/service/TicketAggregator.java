@@ -45,7 +45,7 @@ public class TicketAggregator {
 
                                 return busClient.getBusById(seat.getBusId())
                                         .thenCompose(bus -> {
-                                            return routeClient.getRouteById(bus.getRouteDto().getId())
+                                            return routeClient.getRouteById(bus.getRoute().getId())
                                                     .thenCompose(route -> {
                                                         // Generate PDF
                                                         return ticketClient.generateTicketPDF(ticketId)
@@ -91,7 +91,7 @@ public class TicketAggregator {
 
                                 return busClient.getBusById(seat.getBusId())
                                         .thenCompose(bus -> {
-                                            return routeClient.getRouteById(bus.getRouteDto().getId())
+                                            return routeClient.getRouteById(bus.getRoute().getId())
                                                     .thenApply(route ->
                                                             TicketDetailsResponse.builder()
                                                                     .ticket(ticket)

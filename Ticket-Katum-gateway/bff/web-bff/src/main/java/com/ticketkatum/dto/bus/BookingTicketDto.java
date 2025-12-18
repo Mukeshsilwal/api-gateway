@@ -14,7 +14,7 @@ import java.util.List;
 public class BookingTicketDto {
     private long bookingId;
     private String fullName;
-    private int userId;
+    private Long userId;
     private String email;
     private String status;
     private List<Long> seatIds;

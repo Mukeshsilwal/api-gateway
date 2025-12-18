@@ -19,18 +19,20 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusDto {
-    // FIXED: Changed from int to Long to match Bus entity
     private Long id;
-    
+
+    @com.fasterxml.jackson.annotation.JsonProperty("busName")
+    @com.fasterxml.jackson.annotation.JsonAlias("name")
     private String busName;
-    
-    // FIXED: Changed from String to BusType enum to match Bus entity
+
+    @com.fasterxml.jackson.annotation.JsonProperty("busType")
+    @com.fasterxml.jackson.annotation.JsonAlias("type")
     private BusType busType;
-    
+
+    @com.fasterxml.jackson.annotation.JsonProperty("departureDateTime")
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime departureDateTime;
-    
-    // REMOVED: date field (not in Bus entity)
-    
+
     private BigDecimal basePrice;
     private BigDecimal maxPrice;
     private List<SeatDto> seats;

@@ -20,9 +20,8 @@ public class BusDto {
     private String busName;
     private String busType;
     private LocalDateTime departureDateTime;
-    private LocalDate date;
     private BigDecimal basePrice;
     private BigDecimal maxPrice;
     private List<SeatDto> seats;
-    private RouteDto routeDto;
+    private RouteDto route;
 }

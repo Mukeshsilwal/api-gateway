@@ -507,6 +507,105 @@ public class BusServiceClient {
                 new ServiceUnavailableException(SERVICE_NAME));
     }
 
+    // ==================== Booking Operations ====================
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "createBookingFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BookingTicketDto> createBooking(BookingTicketDto bookingTicketDto) {
+        log.info("Creating booking for user: {}", bookingTicketDto.getUserId());
+
+        return webClientBuilder.build()
+                .post()
+                .uri(busServiceUrl + "/booking/post")
+                .bodyValue(bookingTicketDto)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BookingTicketDto>>() {
+                })
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getBookingFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<BookingTicketDto> getBooking(Integer id) {
+        log.info("Fetching booking: {}", id);
+
+        return webClientBuilder.build()
+                .get()
+                .uri(busServiceUrl + "/booking/{id}", id)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<BookingTicketDto>>() {
+                })
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    // ==================== Seat Selection Operations ====================
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "selectSeatFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<SeatDto> selectSeat(Long seatId, Long userId) {
+        log.info("User {} selecting seat {}", userId, seatId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(busServiceUrl + "/seat/select")
+                        .queryParam("seatId", seatId)
+                        .queryParam("userId", userId)
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {
+                })
+                .map(Response::getData)
+                .toFuture();
+    }
+
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "confirmSeatFallback")
+    @Retry(name = CIRCUIT_BREAKER_NAME)
+    @TimeLimiter(name = CIRCUIT_BREAKER_NAME)
+    public CompletableFuture<SeatDto> confirmSeat(Long seatId, Long userId) {
+        log.info("User {} confirming seat {}", userId, seatId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(uriBuilder -> uriBuilder
+                        .path(busServiceUrl + "/seat/confirm")
+                        .queryParam("seatId", seatId)
+                        .queryParam("userId", userId)
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<SeatDto>>() {
+                })
+                .map(Response::getData)
+                .toFuture();
+    }
+    
+    // ==================== Fallbacks ====================
+
+    private CompletableFuture<BookingTicketDto> createBookingFallback(BookingTicketDto booking, Exception ex) {
+        log.error("Fallback for createBooking", ex);
+        return CompletableFuture.failedFuture(new ServiceUnavailableException(SERVICE_NAME));
+    }
+
+    private CompletableFuture<BookingTicketDto> getBookingFallback(Integer id, Exception ex) {
+        log.error("Fallback for getBooking {}", id, ex);
+        return CompletableFuture.failedFuture(new ServiceUnavailableException(SERVICE_NAME));
+    }
+
+    private CompletableFuture<SeatDto> selectSeatFallback(Long seatId, Long userId, Exception ex) {
+        log.error("Fallback for selectSeat {} by {}", seatId, userId, ex);
+        return CompletableFuture.failedFuture(new ServiceUnavailableException(SERVICE_NAME));
+    }
+
+    private CompletableFuture<SeatDto> confirmSeatFallback(Long seatId, Long userId, Exception ex) {
+        log.error("Fallback for confirmSeat {} by {}", seatId, userId, ex);
+        return CompletableFuture.failedFuture(new ServiceUnavailableException(SERVICE_NAME));
+    }
+
     // ==================== Error Mapping ====================
 
     private Throwable mapError(Throwable throwable) {

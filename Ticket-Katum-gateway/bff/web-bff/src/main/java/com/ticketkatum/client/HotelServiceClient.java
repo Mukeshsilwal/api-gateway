@@ -36,7 +36,6 @@ public class HotelServiceClient {
     @Autowired
     private ObjectMapper objectMapper;
 
-
     private static final String SERVICE_NAME = "hotel-service";
     private static final String CIRCUIT_BREAKER_NAME = "hotelService";
 
@@ -299,8 +298,6 @@ public class HotelServiceClient {
                 .toFuture();
     }
 
-
-
     // ============ Fallback Methods ============
 
     private CompletableFuture<HotelDTO> getHotelByIdFallback(Long hotelId, Throwable ex) {
@@ -344,6 +341,165 @@ public class HotelServiceClient {
         return CompletableFuture.completedFuture(Collections.emptyList());
     }
 
+    // ============ Booking Operations ============
+
+    /**
+     * Check availability
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<List<com.ticketkatum.dto.hotel.booking.AvailableRoomDto>> checkAvailability(
+            com.ticketkatum.dto.hotel.booking.AvailabilityRequestDto request) {
+        log.debug("Checking availability for hotel: {}", request.getHotelId());
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/bookings/availability")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapperList(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.AvailableRoomDto.class))
+                .toFuture();
+    }
+
+    /**
+     * Calculate price
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<com.ticketkatum.dto.hotel.booking.PricingResponseDto> calculatePrice(
+            com.ticketkatum.dto.hotel.booking.PricingRequestDto request) {
+        log.debug("Calculating price for room: {}", request.getRoomId());
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/bookings/price")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.PricingResponseDto.class))
+                .toFuture();
+    }
+
+    /**
+     * Lock room (Initiate)
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<com.ticketkatum.dto.hotel.booking.BookingResponseDto> lockRoom(
+            com.ticketkatum.dto.hotel.booking.BookingRequestDto request, String userId) {
+        log.debug("Locking room for hotel: {}", request.getHotelId());
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/bookings/lock")
+                .header("X-User-Id", userId)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.BookingResponseDto.class))
+                .toFuture();
+    }
+
+    /**
+     * Confirm Booking
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<com.ticketkatum.dto.hotel.booking.BookingResponseDto> confirmBooking(
+            String reference, String userId) {
+        log.debug("Confirming booking: {}", reference);
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/bookings/{reference}/confirm", reference)
+                .header("X-User-Id", userId)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.BookingResponseDto.class))
+                .toFuture();
+    }
+
+    /**
+     * Create booking (Legacy - Calls Lock+Confirm internally on Service)
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<com.ticketkatum.dto.hotel.booking.BookingResponseDto> createBooking(
+            com.ticketkatum.dto.hotel.booking.BookingRequestDto request, String userId) {
+        log.debug("Creating booking (Legacy) for hotel: {}", request.getHotelId());
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/bookings")
+                .header("X-User-Id", userId)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.BookingResponseDto.class))
+                .toFuture();
+    }
+
+    /**
+     * Get booking by reference
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<com.ticketkatum.dto.hotel.booking.BookingResponseDto> getBooking(String reference) {
+        log.debug("Fetching booking: {}", reference);
+
+        return getWebClient()
+                .get()
+                .uri("/api/v1/bookings/{reference}", reference)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.BookingResponseDto.class))
+                .toFuture();
+    }
+
+    /**
+     * Cancel booking
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<Void> cancelBooking(String reference, String userId) {
+        log.debug("Cancelling booking: {}", reference);
+
+        return getWebClient()
+                .post()
+                .uri("/api/v1/bookings/{reference}/cancel", reference)
+                .header("X-User-Id", userId)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .toFuture();
+    }
+
+    /**
+     * Get customer bookings
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<List<com.ticketkatum.dto.hotel.booking.BookingResponseDto>> getCustomerBookings(
+            String userId) {
+        log.debug("Fetching bookings for user: {}", userId);
+
+        return getWebClient()
+                .get()
+                .uri("/api/v1/bookings/customer")
+                .header("X-User-Id", userId)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapperList(response.getData(),
+                        com.ticketkatum.dto.hotel.booking.BookingResponseDto.class))
+                .toFuture();
+    }
+
     private CompletableFuture<RoomDTO> getRoomByIdFallback(Long roomId, Throwable ex) {
         log.warn("Fallback: getRoomById for ID: {}", roomId);
         return CompletableFuture.completedFuture(RoomDTO.builder()
@@ -353,8 +509,7 @@ public class HotelServiceClient {
     }
 
     private <T> T objectMapper(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
 
         mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
         mapper.disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -365,8 +520,7 @@ public class HotelServiceClient {
     private <T> List<T> objectMapperList(Object data, Class<T> clazz) {
         return objectMapper.convertValue(
                 data,
-                objectMapper.getTypeFactory().constructCollectionType(List.class, clazz)
-        );
+                objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
     }
 
 }

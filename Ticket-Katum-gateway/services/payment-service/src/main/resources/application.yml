@@ -31,7 +31,7 @@ esewa:
   failure-url: http://localhost:3000/payments/esewa/failure
   base-url: https://rc-epay.esewa.com.np/api/epay/main/v2/form
   verify-url: https://rc-epay.esewa.com.np/api/epay/transaction/status
-  secret-key: ${ESEWA_SECRET_KEY:"8gBm/:&EnhH.1/q"}
+  secret-key: "8gBm/:&EnhH.1/q"
 
   kafka:
     kafka:

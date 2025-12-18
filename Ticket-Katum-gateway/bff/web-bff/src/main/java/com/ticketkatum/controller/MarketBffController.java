@@ -2,6 +2,7 @@ package com.ticketkatum.controller;
 
 import com.ticketkatum.client.MarketServiceClient;
 import com.ticketkatum.service.MarketAggregator;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,26 +31,46 @@ public class MarketBffController {
     }
 
     @PostMapping("/resale")
-    public Mono<ResponseEntity<Object>> listTicketForResale(@RequestBody Object request) {
+    @Operation(summary = "List ticket for resale", description = "Create a new resale listing")
+    public Mono<ResponseEntity<com.ticketkatum.dto.market.ResaleListing>> listTicketForResale(@RequestBody com.ticketkatum.dto.market.CreateListingRequest request) {
         return marketClient.listTicketForResale(request)
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/resale/list")
-    public Mono<ResponseEntity<List<Object>>> getResaleTickets() {
-        return marketClient.getResaleTickets().collectList()
+    @Operation(summary = "Get resale tickets", description = "Get active resale listings for an event")
+    public Mono<ResponseEntity<List<com.ticketkatum.dto.market.ResaleListing>>> getResaleTickets(@RequestParam java.util.UUID eventId) {
+        return marketClient.getResaleTickets(eventId).collectList()
+                .map(ResponseEntity::ok);
+    }
+    
+    @PostMapping("/resale/{id}/buy")
+    @Operation(summary = "Buy resale ticket", description = "Purchase a resale listing")
+    public Mono<ResponseEntity<com.ticketkatum.dto.market.ResaleTransaction>> buyListing(
+            @PathVariable java.util.UUID id,
+            @RequestBody com.ticketkatum.dto.market.PurchaseRequest request) {
+        return marketClient.buyListing(id, request)
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/bundles")
-    public Mono<ResponseEntity<List<Object>>> getBundles() {
+    @Operation(summary = "Get bundles", description = "Get all active bundles")
+    public Mono<ResponseEntity<List<com.ticketkatum.dto.market.Bundle>>> getBundles() {
         return marketClient.getBundles().collectList()
                 .map(ResponseEntity::ok);
     }
 
     @PostMapping("/bundles/{bundleId}/book")
-    public Mono<ResponseEntity<Object>> bookBundle(@PathVariable String bundleId, @RequestBody Object request) {
+    @Operation(summary = "Book bundle", description = "Book a specific bundle")
+    public Mono<ResponseEntity<String>> bookBundle(@PathVariable String bundleId, @RequestBody com.ticketkatum.dto.market.BundleBookingRequest request) {
         return marketClient.bookBundle(bundleId, request)
+                .map(ResponseEntity::ok);
+    }
+    
+    @GetMapping("/organizer/dashboard/{eventId}")
+    @Operation(summary = "Organizer dashboard", description = "Get event analytics for organizer")
+    public Mono<ResponseEntity<com.ticketkatum.dto.market.EventAnalytics>> getOrganizerDashboard(@PathVariable java.util.UUID eventId) {
+        return marketClient.getOrganizerDashboard(eventId)
                 .map(ResponseEntity::ok);
     }
 

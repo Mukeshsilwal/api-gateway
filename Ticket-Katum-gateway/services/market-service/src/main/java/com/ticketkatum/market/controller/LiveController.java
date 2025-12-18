@@ -22,7 +22,7 @@ public class LiveController {
 
     // POLLS
     @GetMapping("/polls/{eventId}")
-    public ResponseEntity<List<LivePoll>> getPolls(@PathVariable UUID eventId) {
+    public ResponseEntity<List<LivePoll>> getPolls(@PathVariable("eventId") UUID eventId) {
         return ResponseEntity.ok(interactionService.getActivePolls(eventId));
     }
 
@@ -39,7 +39,7 @@ public class LiveController {
 
     // F&B
     @GetMapping("/products/{eventId}")
-    public ResponseEntity<List<Product>> getMenu(@PathVariable UUID eventId) {
+    public ResponseEntity<List<Product>> getMenu(@PathVariable("eventId") UUID eventId) {
         return ResponseEntity.ok(productService.getMenu(eventId));
     }
 

@@ -26,7 +26,7 @@ public class MarketController {
     }
 
     @PostMapping("/listings/{id}/buy")
-    public ResponseEntity<ResaleTransaction> buyListing(@PathVariable UUID id, @Valid @RequestBody PurchaseRequest request) {
+    public ResponseEntity<ResaleTransaction> buyListing(@PathVariable("id") UUID id, @Valid @RequestBody PurchaseRequest request) {
         return ResponseEntity.ok(resaleService.purchaseListing(id, request));
     }
 

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class BusAggregator {
         CompletableFuture<BusDto> busFuture = busClient.getBusById(busId);
 
         return busFuture.thenCompose(bus -> {
-                    CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(bus.getRouteDto().getId());
+                    CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(bus.getRoute().getId());
 
                     CompletableFuture<List<SeatDto>> seatsFuture = seatClient.getSeatsByBusName(bus.getBusName());
 
@@ -249,10 +250,28 @@ public class BusAggregator {
     }
 
 
+    // ==================== Booking Delegates ====================
+
+    public CompletableFuture<BookingTicketDto> createBooking(BookingTicketDto bookingTicketDto) {
+        return busClient.createBooking(bookingTicketDto);
+    }
+
+    public CompletableFuture<BookingTicketDto> getBooking(Integer id) {
+        return busClient.getBooking(id);
+    }
+
+    public CompletableFuture<SeatDto> selectSeat(Long seatId, Long userId) {
+        return busClient.selectSeat(seatId, userId);
+    }
+
+    public CompletableFuture<SeatDto> confirmSeat(Long seatId, Long userId) {
+        return busClient.confirmSeat(seatId, userId);
+    }
+
     // ============ Helper Methods ============
     private CompletableFuture<EnrichedBusDto> enrichBusWithDetails(BusDto bus) {
 
-        if (bus.getRouteDto() == null || bus.getRouteDto().getId() == 0) {
+        if (bus.getRoute() == null || bus.getRoute().getId() == 0) {
             log.warn("Bus {} has null routeDto, skipping route enrichment", bus.getBusName());
 
             return seatClient.getSeatsByBusName(bus.getBusName())
@@ -276,7 +295,7 @@ public class BusAggregator {
         }
 
         CompletableFuture<RouteDto> routeFuture =
-                routeClient.getRouteById(bus.getRouteDto().getId());
+                routeClient.getRouteById(bus.getRoute().getId());
 
         CompletableFuture<List<SeatDto>> seatsFuture =
                 seatClient.getSeatsByBusName(bus.getBusName());
@@ -374,19 +393,19 @@ public class BusAggregator {
 
     private String findEarliestDeparture(List<EnrichedBusDto> buses) {
         return buses.stream()
-                .map(b -> b.getBus().getDate())
+                .map(b -> b.getBus().getDepartureDateTime())
                 .filter(Objects::nonNull)
                 .min(Comparator.naturalOrder())
-                .map(LocalDate::toString)
+                .map(LocalDateTime::toString)
                 .orElse("N/A");
     }
 
     private String findLatestDeparture(List<EnrichedBusDto> buses) {
         return buses.stream()
-                .map(b -> b.getBus().getDate())
+                .map(b -> b.getBus().getDepartureDateTime())
                 .filter(Objects::nonNull)
                 .max(Comparator.naturalOrder())
-                .map(LocalDate::toString)
+                .map(LocalDateTime::toString)
                 .orElse("N/A");
     }
 
@@ -410,7 +429,7 @@ public class BusAggregator {
     private Map<Integer, Integer> calculateBusesPerRoute(List<BusDto> buses) {
         return buses.stream()
                 .collect(Collectors.groupingBy(
-                        busDto -> busDto.getRouteDto().getId(),
+                        busDto -> busDto.getRoute().getId(),
                         Collectors.reducing(0, e -> 1, Integer::sum)));
     }
 

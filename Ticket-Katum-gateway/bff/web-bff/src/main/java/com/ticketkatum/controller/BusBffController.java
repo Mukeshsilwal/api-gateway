@@ -157,4 +157,59 @@ public class BusBffController {
                 });
     }
 
+    /**
+     * Create a new booking
+     */
+    @PostMapping("/bookings")
+    @Operation(summary = "Create booking", description = "Create a new bus ticket booking")
+    public CompletableFuture<ResponseEntity<Response<BookingTicketDto>>> createBooking(
+            @RequestBody BookingTicketDto bookingTicketDto) {
+        return busAggregator.createBooking(bookingTicketDto)
+                .thenApply(ticket -> ResponseEntity.ok(
+                        new Response<>(201, "Booking created successfully", ticket)))
+                .exceptionally(ex -> ResponseEntity.status(500).body(
+                        new Response<>(500, "Booking failed: " + ex.getMessage(), null)));
+    }
+
+    /**
+     * Get booking by ID
+     */
+    @GetMapping("/bookings/{id}")
+    @Operation(summary = "Get booking", description = "Get booking details by ID")
+    public CompletableFuture<ResponseEntity<Response<BookingTicketDto>>> getBooking(@PathVariable Integer id) {
+        return busAggregator.getBooking(id)
+                .thenApply(ticket -> ResponseEntity.ok(
+                        new Response<>(200, "Booking retrieved", ticket)))
+                .exceptionally(ex -> ResponseEntity.status(500).body(
+                        new Response<>(500, "Failed to fetch booking", null)));
+    }
+
+    /**
+     * Select (Hold) a seat
+     */
+    @PostMapping("/seats/select")
+    @Operation(summary = "Select seat", description = "Temporarily hold a seat (Soft Lock)")
+    public CompletableFuture<ResponseEntity<Response<SeatDto>>> selectSeat(
+            @RequestParam Long seatId, @RequestParam Long userId) {
+        return busAggregator.selectSeat(seatId, userId)
+                .thenApply(seat -> ResponseEntity.ok(
+                        new Response<>(200, "Seat selected successfully", seat)))
+                .exceptionally(ex -> ResponseEntity.status(409).body(
+                        new Response<>(409, "Seat selection failed: " + ex.getMessage(), null)));
+    }
+
+    /**
+     * Confirm a seat
+     */
+    @PostMapping("/seats/confirm")
+    @Operation(summary = "Confirm seat", description = "Permanently confirm a seat (Hard Lock)")
+    public CompletableFuture<ResponseEntity<Response<SeatDto>>> confirmSeat(
+            @RequestParam Long seatId, @RequestParam Long userId) {
+        return busAggregator.confirmSeat(seatId, userId)
+                .thenApply(seat -> ResponseEntity.ok(
+                        new Response<>(200, "Seat confirmed successfully", seat)))
+                .exceptionally(ex -> ResponseEntity.status(500).body(
+                        new Response<>(500, "Seat confirmation failed", null)));
+    }
+
 }

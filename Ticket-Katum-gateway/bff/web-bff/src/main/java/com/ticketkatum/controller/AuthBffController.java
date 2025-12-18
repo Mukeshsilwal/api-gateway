@@ -255,6 +255,26 @@ public class AuthBffController {
     }
 
     /**
+     * Register new admin (Request)
+     */
+    @PostMapping("/register/admin")
+    @Operation(summary = "Register admin", description = "Register new admin account (Pending Approval)")
+    public CompletableFuture<ResponseEntity<Response<com.ticketkatum.dto.auth.response.RegistrationResponse>>> registerAdmin(
+            @Valid @RequestBody com.ticketkatum.dto.auth.request.CreateRegistrationRequest request) {
+
+        log.info("BFF: Registering new admin: {}", request.getEmail());
+
+        return authClient.registerAdmin(request)
+                .thenApply(response -> ResponseEntity.status(201).body(
+                        new Response<>(201, "Admin registration request submitted", response)))
+                .exceptionally(ex -> {
+                    log.error("Admin registration failed", ex);
+                    return ResponseEntity.status(400).body(
+                            new Response<>(400, "Registration failed: " + ex.getMessage(), null));
+                });
+    }
+
+    /**
      * Refresh token
      */
     @PostMapping("/refresh")

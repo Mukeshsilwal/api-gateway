@@ -51,18 +51,47 @@ public class HotelBookingController {
         return ResponseEntity.ok(ResponseHandler.success("Price calculated successfully", pricing));
     }
 
-    @Operation(summary = "Create booking", description = "Creates a new room reservation")
+    @Operation(summary = "Lock room (Initiate Booking)", description = "Locks a room for 15 minutes (Status: PENDING)")
+    @PostMapping("/lock")
+    public ResponseEntity<Response<BookingResponseDto>> lockRoom(
+            @RequestHeader("X-User-Id") Long customerId,
+            @Valid @RequestBody BookingRequestDto request) {
+
+        log.info("Locking room for customer: {}", customerId);
+
+        BookingResponseDto booking = bookingService.lockRoom(request, customerId);
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ResponseHandler.created("Room locked successfully. Complete payment within 15 minutes.",
+                        booking));
+    }
+
+    @Operation(summary = "Confirm booking", description = "Confirms a locked booking")
+    @PostMapping("/{reference}/confirm")
+    public ResponseEntity<Response<BookingResponseDto>> confirmBooking(
+            @RequestHeader("X-User-Id") Long customerId,
+            @PathVariable String reference) {
+
+        log.info("Confirming booking: {}", reference);
+
+        BookingResponseDto booking = bookingService.confirmBooking(reference, customerId);
+
+        return ResponseEntity.ok(ResponseHandler.success("Booking confirmed successfully", booking));
+    }
+
+    // Deprecated or Legacy Support
+    @Operation(summary = "Create booking (Immediate)", description = "Directly creates a CONFIRMED booking (Legacy)")
     @PostMapping
     public ResponseEntity<Response<BookingResponseDto>> createBooking(
             @RequestHeader("X-User-Id") Long customerId,
             @Valid @RequestBody BookingRequestDto request) {
 
-        log.info("Creating booking for customer: {}", customerId);
-
-        BookingResponseDto booking = bookingService.createBooking(request, customerId);
+        // For backward compatibility, calling lock then confirm immediately
+        BookingResponseDto locked = bookingService.lockRoom(request, customerId);
+        BookingResponseDto confirmed = bookingService.confirmBooking(locked.getBookingReference(), customerId);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ResponseHandler.created("Booking created successfully", booking));
+                .body(ResponseHandler.created("Booking created successfully", confirmed));
     }
 
     @Operation(summary = "Get booking", description = "Retrieves booking details by reference")

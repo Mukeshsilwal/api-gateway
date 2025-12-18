@@ -98,11 +98,14 @@ public class RoomBookingService {
                 .build();
     }
 
+    private static final int LOCK_TIMEOUT_MINUTES = 15;
+
     /**
      * Check if room is available (no conflicts)
      */
     public boolean checkAvailability(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        Long conflicts = bookingRepository.countConflictingBookings(roomId, checkIn, checkOut);
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(LOCK_TIMEOUT_MINUTES);
+        Long conflicts = bookingRepository.countConflictingBookings(roomId, checkIn, checkOut, threshold);
         return conflicts == 0;
     }
 
@@ -110,17 +113,30 @@ public class RoomBookingService {
      * Find available rooms with all pricing options
      */
     public List<AvailableRoomDto> findAvailableRooms(AvailabilityRequestDto request) {
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(LOCK_TIMEOUT_MINUTES);
 
         List<Room> availableRooms = bookingRepository.findAvailableRooms(
                 request.getHotelId(),
                 request.getRoomType(),
                 request.getCheckIn(),
                 request.getCheckOut(),
-                request.getGuestsCount());
+                request.getGuestsCount(),
+                threshold);
 
         if (availableRooms.isEmpty()) {
             return Collections.emptyList();
         }
+
+        // ... (rest of the method logic for pricing options remains the same)
+        // Note: Re-implementing the pricing loop here to avoid truncation issues in
+        // replace_file_content
+        // Actually, since I replaced the start of the method, I should probably keep
+        // the rest.
+        // BUT the replace tool works on blocks. I will just replace up to line 120 and
+        // then let existing code run?
+        // No, I need to match valid lines.
+
+        // Let's use existing code references.
 
         // Get all active rent types and meal plans
         List<RentType> rentTypes = rentTypeRepository.findByIsActiveTrue();
@@ -128,53 +144,59 @@ public class RoomBookingService {
 
         return availableRooms.stream()
                 .map(room -> {
-                    List<PricingOptionDto> pricingOptions = new ArrayList<>();
-
-                    // Generate all pricing combinations
-                    for (RentType rentType : rentTypes) {
-                        for (MealPlan mealPlan : mealPlans) {
-                            try {
-                                PricingRequestDto pricingReq = PricingRequestDto.builder()
-                                        .roomId(room.getId())
-                                        .rentTypeId(rentType.getId())
-                                        .mealPlanId(mealPlan.getId())
-                                        .checkIn(request.getCheckIn())
-                                        .checkOut(request.getCheckOut())
-                                        .build();
-
-                                PricingResponseDto pricing = calculatePrice(pricingReq);
-
-                                pricingOptions.add(PricingOptionDto.builder()
-                                        .rentTypeId(rentType.getId())
-                                        .rentTypeName(rentType.getName())
-                                        .mealPlanId(mealPlan.getId())
-                                        .mealPlanName(mealPlan.getName())
-                                        .totalPrice(pricing.getTotal())
-                                        .priceBreakdown(pricing.getPriceBreakdown())
-                                        .build());
-
-                            } catch (Exception e) {
-                                // Skip invalid combinations
-                            }
-                        }
-                    }
-
-                    return AvailableRoomDto.builder()
-                            .roomId(room.getId())
-                            .roomNumber(room.getRoomNumber())
-                            .roomType(room.getRoomType())
-                            .capacity(room.getCapacity())
-                            .amenities(room.getAmenities())
-                            .pricingOptions(pricingOptions)
-                            .build();
+                    // ... logic
+                    // I will trust that the rest of logic is inside the stream which is not being
+                    // replaced yet if I cut short.
+                    // Wait, findAvailableRooms is large.
+                    return mapRoomToAvailableDto(room, request, rentTypes, mealPlans);
                 })
                 .collect(Collectors.toList());
     }
 
+    // Extracted helper to make findAvailableRooms cleaner and safer to replace
+    private AvailableRoomDto mapRoomToAvailableDto(Room room, AvailabilityRequestDto request, List<RentType> rentTypes,
+            List<MealPlan> mealPlans) {
+        List<PricingOptionDto> pricingOptions = new ArrayList<>();
+        for (RentType rentType : rentTypes) {
+            for (MealPlan mealPlan : mealPlans) {
+                try {
+                    PricingRequestDto pricingReq = PricingRequestDto.builder()
+                            .roomId(room.getId())
+                            .rentTypeId(rentType.getId())
+                            .mealPlanId(mealPlan.getId())
+                            .checkIn(request.getCheckIn())
+                            .checkOut(request.getCheckOut())
+                            .build();
+                    PricingResponseDto pricing = calculatePrice(pricingReq);
+                    pricingOptions.add(PricingOptionDto.builder()
+                            .rentTypeId(rentType.getId())
+                            .rentTypeName(rentType.getName())
+                            .mealPlanId(mealPlan.getId())
+                            .mealPlanName(mealPlan.getName())
+                            .totalPrice(pricing.getTotal())
+                            .priceBreakdown(pricing.getPriceBreakdown())
+                            .build());
+                } catch (Exception e) {
+                }
+            }
+        }
+        return AvailableRoomDto.builder()
+                .roomId(room.getId())
+                .roomNumber(room.getRoomNumber())
+                .roomType(room.getRoomType())
+                .capacity(room.getCapacity())
+                .amenities(room.getAmenities())
+                .pricingOptions(pricingOptions)
+                .build();
+    }
+
     /**
-     * Create a new booking with validation
+     * Lock a room (Initiate Booking)
+     * Creates a booking with PENDING status.
+     * Valid for 15 minutes.
      */
-    public BookingResponseDto createBooking(BookingRequestDto request, Long customerId) {
+    public BookingResponseDto lockRoom(BookingRequestDto request, Long customerId) {
+        LocalDateTime threshold = LocalDateTime.now().minusMinutes(LOCK_TIMEOUT_MINUTES);
 
         // Find available rooms
         List<Room> availableRooms = bookingRepository.findAvailableRooms(
@@ -182,17 +204,18 @@ public class RoomBookingService {
                 request.getRoomType(),
                 request.getCheckIn(),
                 request.getCheckOut(),
-                request.getGuestsCount());
+                request.getGuestsCount(),
+                threshold);
 
         if (availableRooms.isEmpty()) {
-            throw new RuntimeException("No rooms available for the selected dates and criteria");
+            throw new RuntimeException("No rooms available for selection");
         }
 
         Room selectedRoom = availableRooms.get(0);
 
-        // Double-check availability (prevent race condition)
+        // Double-check availability
         if (!checkAvailability(selectedRoom.getId(), request.getCheckIn(), request.getCheckOut())) {
-            throw new RuntimeException("Room is no longer available");
+            throw new RuntimeException("Room was just taken");
         }
 
         // Calculate pricing
@@ -206,13 +229,12 @@ public class RoomBookingService {
 
         PricingResponseDto pricing = calculatePrice(pricingRequest);
 
-        // Get rent type and meal plan
         RentType rentType = rentTypeRepository.findById(request.getRentTypeId())
                 .orElseThrow(() -> new RuntimeException("Rent type not found"));
         MealPlan mealPlan = mealPlanRepository.findById(request.getMealPlanId())
                 .orElseThrow(() -> new RuntimeException("Meal plan not found"));
 
-        // Create booking
+        // Create PENDING booking (Lock)
         RoomBooking booking = RoomBooking.builder()
                 .bookingReference(generateBookingReference())
                 .room(selectedRoom)
@@ -232,18 +254,57 @@ public class RoomBookingService {
                 .customerName(request.getCustomerName())
                 .customerEmail(request.getCustomerEmail())
                 .customerPhone(request.getCustomerPhone())
-                .status(BookingStatus.CONFIRMED)
+                .status(BookingStatus.PENDING) // Lock status
                 .build();
 
         booking = bookingRepository.save(booking);
-
-        // Create meal services if meal plan includes meals
-        createMealServices(booking);
-
-        log.info("Booking created successfully: {}", booking.getBookingReference());
+        log.info("Room locked (PENDING): {}", booking.getBookingReference());
 
         return mapToResponseDto(booking);
     }
+
+    /**
+     * Confirm Booking
+     * Transitions PENDING -> CONFIRMED
+     */
+    public BookingResponseDto confirmBooking(String reference, Long customerId) {
+        RoomBooking booking = bookingRepository.findByBookingReference(reference)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (!booking.getCustomerId().equals(customerId)) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            return mapToResponseDto(booking);
+        }
+
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException("Booking cannot be confirmed (Status: " + booking.getStatus() + ")");
+        }
+
+        // Check if lock expired
+        if (booking.getCreatedAt().isBefore(LocalDateTime.now().minusMinutes(LOCK_TIMEOUT_MINUTES))) {
+            booking.setStatus(BookingStatus.CANCELLED);
+            bookingRepository.save(booking);
+            throw new RuntimeException("Booking lock expired");
+        }
+
+        booking.setStatus(BookingStatus.CONFIRMED);
+        bookingRepository.save(booking);
+
+        // Create meal services
+        createMealServices(booking);
+
+        log.info("Booking confirmed: {}", reference);
+        return mapToResponseDto(booking);
+    }
+
+    // Deprecated: createBooking (keeping for backwards compatibility if needed, or
+    // removing?)
+    // Converting old createBooking to use lock logic internally or just removing
+    // it.
+    // I will replace the original createBooking block completely.
 
     private String generateBookingReference() {
         return "BK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -261,7 +322,7 @@ public class RoomBookingService {
     /**
      * Get customer bookings
      */
-//    @Transactional(readOnly = true)
+    // @Transactional(readOnly = true)
     public List<BookingResponseDto> getCustomerBookings(Long customerId) {
         return bookingRepository.findByCustomerId(customerId).stream()
                 .map(this::mapToResponseDto)

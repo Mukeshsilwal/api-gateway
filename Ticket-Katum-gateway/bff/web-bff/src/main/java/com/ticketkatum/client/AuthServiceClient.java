@@ -5,6 +5,7 @@ import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.auth.ActiveSessionsResponse;
 import com.ticketkatum.dto.auth.CreateUserRequest;
 import com.ticketkatum.dto.auth.UserDto;
+import com.ticketkatum.dto.auth.request.CreateRegistrationRequest;
 import com.ticketkatum.dto.auth.request.LoginRequest;
 import com.ticketkatum.dto.auth.response.*;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -214,6 +215,79 @@ public class AuthServiceClient {
                 .toFuture();
     }
 
+    // ============ Admin Registration & Management ============
+
+    /**
+     * Register new admin (request)
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<RegistrationResponse> registerAdmin(CreateRegistrationRequest request) {
+        log.debug("Registering new admin: {}", request.getEmail());
+
+        return getWebClient()
+                .post()
+                .uri("/api/registration/admin/request")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> objectMapper(response.getData(), RegistrationResponse.class))
+                .toFuture();
+    }
+
+    /**
+     * Approve admin request
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<Map> approveAdminRequest(Long requestId) {
+        log.debug("Approving admin request: {}", requestId);
+
+        return getWebClient()
+                .post()
+                .uri("/api/registration/admin/approve/" + requestId)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .toFuture();
+    }
+
+    /**
+     * Reject admin request
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<Map> rejectAdminRequest(Long requestId) {
+        log.debug("Rejecting admin request: {}", requestId);
+
+        return getWebClient()
+                .delete()
+                .uri("/api/registration/admin/reject/" + requestId)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .toFuture();
+    }
+
+    /**
+     * Get all admin requests
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<List<com.ticketkatum.dto.auth.AdminRegistrationRequestDto>> getAllAdminRequests() {
+        log.debug("Fetching all admin requests");
+
+        return getWebClient()
+                .get()
+                .uri("/api/registration/admin/requests")
+                .retrieve()
+                .bodyToMono(Map.class)
+                .map(response -> {
+                    // response is Map<String, Object> from controller (success, data, count)
+                    Object data = response.get("data");
+                    return objectMapper(data, new com.fasterxml.jackson.core.type.TypeReference<List<com.ticketkatum.dto.auth.AdminRegistrationRequestDto>>() {});
+                })
+                .toFuture();
+    }
+
     // ============ Fallback Methods ============
 
     private CompletableFuture<LoginResponse> loginFallback(
@@ -259,5 +333,11 @@ public class AuthServiceClient {
         com.fasterxml.jackson.databind.ObjectMapper mapper =
                 new com.fasterxml.jackson.databind.ObjectMapper();
         return mapper.convertValue(data, clazz);
+    }
+
+    private <T> T objectMapper(Object data, com.fasterxml.jackson.core.type.TypeReference<T> typeReference) {
+        com.fasterxml.jackson.databind.ObjectMapper mapper =
+                new com.fasterxml.jackson.databind.ObjectMapper();
+        return mapper.convertValue(data, typeReference);
     }
 }

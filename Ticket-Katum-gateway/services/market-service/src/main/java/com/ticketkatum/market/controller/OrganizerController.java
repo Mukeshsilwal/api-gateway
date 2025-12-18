@@ -16,7 +16,7 @@ public class OrganizerController {
     private final OrganizerAnalyticsService analyticsService;
 
     @GetMapping("/dashboard/{eventId}")
-    public ResponseEntity<EventAnalytics> getDashboard(@PathVariable UUID eventId) {
+    public ResponseEntity<EventAnalytics> getDashboard(@PathVariable("eventId") UUID eventId) {
         return ResponseEntity.ok(analyticsService.getAnalytics(eventId));
     }
     

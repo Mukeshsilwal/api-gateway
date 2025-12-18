@@ -18,41 +18,61 @@ public class MarketServiceClient {
     }
 
     // === RESALE ===
-    public Mono<Object> listTicketForResale(Object request) {
+    public Mono<com.ticketkatum.dto.market.ResaleListing> listTicketForResale(com.ticketkatum.dto.market.CreateListingRequest request) {
         return webClient.post()
-                .uri("/api/v1/market/resale")
+                .uri("/api/v1/market/listings") // Corrected path
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(Object.class);
+                .bodyToMono(com.ticketkatum.dto.market.ResaleListing.class);
     }
 
-    public Flux<Object> getResaleTickets() {
+    public Flux<com.ticketkatum.dto.market.ResaleListing> getResaleTickets(java.util.UUID eventId) {
         return webClient.get()
-                .uri("/api/v1/market/resale/list")
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/v1/market/listings")
+                        .queryParam("eventId", eventId)
+                        .build()) // Corrected path
                 .retrieve()
-                .bodyToFlux(Object.class);
+                .bodyToFlux(com.ticketkatum.dto.market.ResaleListing.class);
+    }
+    
+    public Mono<com.ticketkatum.dto.market.ResaleTransaction> buyListing(java.util.UUID listingId, com.ticketkatum.dto.market.PurchaseRequest request) {
+         return webClient.post()
+                .uri("/api/v1/market/listings/" + listingId + "/buy")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(com.ticketkatum.dto.market.ResaleTransaction.class);
     }
 
     // === BUNDLES ===
-    public Flux<Object> getBundles() {
+    public Flux<com.ticketkatum.dto.market.Bundle> getBundles() {
         return webClient.get()
                 .uri("/api/v1/bundles")
                 .retrieve()
-                .bodyToFlux(Object.class);
+                .bodyToFlux(com.ticketkatum.dto.market.Bundle.class);
     }
 
-    public Mono<Object> bookBundle(String bundleId, Object request) {
+    public Mono<String> bookBundle(String bundleId, com.ticketkatum.dto.market.BundleBookingRequest request) {
         return webClient.post()
                 .uri("/api/v1/bundles/" + bundleId + "/book")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(request)
                 .retrieve()
-                .bodyToMono(Object.class);
+                .bodyToMono(String.class);
+    }
+
+    // === ORGANIZER ===
+    public Mono<com.ticketkatum.dto.market.EventAnalytics> getOrganizerDashboard(java.util.UUID eventId) {
+        return webClient.get()
+                .uri("/api/v1/organizer/dashboard/" + eventId)
+                .retrieve()
+                .bodyToMono(com.ticketkatum.dto.market.EventAnalytics.class);
     }
 
     // === PRICING ===
-    public Mono<Object> calculatePrice(String eventId, Double basePrice) {
+    public Mono<Object> calculatePrice(String eventId, Double basePrice) { // Response DTO unknown, keeping Object
         return webClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/v1/pricing/calculate")

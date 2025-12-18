@@ -21,12 +21,12 @@ public class LoyaltyController {
     private final PointTransactionRepository transactionRepository;
 
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<LoyaltyProfile> getProfile(@PathVariable UUID userId) {
+    public ResponseEntity<LoyaltyProfile> getProfile(@PathVariable("userId") UUID userId) {
         return ResponseEntity.ok(loyaltyService.getProfile(userId));
     }
 
     @GetMapping("/history/{userId}")
-    public ResponseEntity<List<PointTransaction>> getHistory(@PathVariable UUID userId) {
+    public ResponseEntity<List<PointTransaction>> getHistory(@PathVariable("userId") UUID userId) {
         return ResponseEntity.ok(transactionRepository.findByUserIdOrderByCreatedAtDesc(userId));
     }
 

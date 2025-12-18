@@ -26,7 +26,7 @@ public class BundleController {
 
     @PostMapping("/{id}/book")
     public ResponseEntity<String> bookBundle(
-            @PathVariable UUID id,
+            @PathVariable("id") UUID id,
             @RequestBody BundleBookingRequest request) {
         
         bundleService.bookBundle(id, request.getUserId(), request.getContactDetails(), request.getPaymentDetails());
