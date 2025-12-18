@@ -68,6 +68,17 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           OWNER_LC=$(echo "$OWNER_LC" | tr '[:upper:]' '[:lower:]')
+          
+          if [ -z "$AWS_ACCOUNT_ID" ]; then
+            echo "::error::AWS_ACCOUNT_ID secret is not set! Please add it to your repository secrets."
+            exit 1
+          fi
+
+          if [ -z "$OWNER_LC" ]; then
+             echo "::error::Could not determine repository owner."
+             exit 1
+          fi
+
           ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
           declare -A services=(
