@@ -42,40 +42,6 @@ jobs:
             mvn -T1C -DskipTests clean package
           fi
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build & push Docker images
-        env:
-          OWNER_LC: ${{ github.repository_owner }}
-        run: |
-          OWNER_LC=$(echo "$OWNER_LC" | tr '[:upper:]' '[:lower:]')
-          
-          # Array of services with their Dockerfile paths
-          declare -A services=(
-            ["web-bff"]="bff/web-bff/Dockerfile"
-            ["booking-service"]="services/booking-service/Dockerfile"
-            ["payment-service"]="services/payment-service/Dockerfile"
-            ["hotel-service"]="services/hotel-service/Dockerfile"
-            ["auth-service"]="services/auth-service/Dockerfile"
-          )
-          
-          for service in "${!services[@]}"; do
-            dockerfile="${services[$service]}"
-          
-            if [ -f "$dockerfile" ]; then
-              echo "Building and pushing ${service}..."
-              docker build -t ghcr.io/${OWNER_LC}/${service}:${{ github.sha }} -f "$dockerfile" .
-              docker push ghcr.io/${OWNER_LC}/${service}:${{ github.sha }}
-            else
-              echo "Warning: Dockerfile not found at ${dockerfile}, skipping ${service}"
-            fi
-          done
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -83,16 +49,47 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build & push Docker images
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          # Array of services with their Dockerfile paths
+          declare -A services=(
+            ["web-bff"]="bff/web-bff/Dockerfile"
+            ["booking-service"]="services/booking-service/Dockerfile"
+            ["payment-service"]="services/payment-service/Dockerfile"
+            ["hotel-service"]="services/hotel-service/Dockerfile"
+            ["auth-service"]="services/auth-service/Dockerfile"
+            ["market-service"]="services/market-service/Dockerfile"
+            ["bus-service"]="services/bus-service/Dockerfile"
+          )
+          
+          for service in "${!services[@]}"; do
+            dockerfile="${services[$service]}"
+          
+            if [ -f "$dockerfile" ]; then
+              echo "Building and pushing ${service}..."
+              docker build -t $ECR_REGISTRY/$service:$IMAGE_TAG -f "$dockerfile" .
+              docker push $ECR_REGISTRY/$service:$IMAGE_TAG
+            else
+              echo "Warning: Dockerfile not found at ${dockerfile}, skipping ${service}"
+            fi
+          done
+
       - name: Update Kubeconfig
         run: aws eks update-kubeconfig --name ticket-katum-cluster --region us-east-1
 
       - name: Deploy to Kubernetes
         env:
-          OWNER_LC: ${{ github.repository_owner }}
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          OWNER_LC=$(echo "$OWNER_LC" | tr '[:upper:]' '[:lower:]')
-          REGISTRY="ghcr.io/${OWNER_LC}"
+          REGISTRY=$ECR_REGISTRY
           
           # Generate kustomization.yaml recursively if not exists or needs update
           # Note: We are using k8s-deploy directory directly as it contains the manifests
@@ -113,26 +110,27 @@ jobs:
             echo -e "\nimages:" >> kustomization.yaml
           fi
 
-          # We need to use kustomize edit or manual append. Let's append to avoid dependency issues if kustomize isn't perfect
-          # Actually, let's just append the image overrides. 
-          # Warning: This simple appending assumes standard kustomize structure. 
-          # A safer way using pure bash without kustomize CLI edit:
-          
           cat <<EOF >> kustomization.yaml
             - name: ticketkatum/booking-service
               newName: ${REGISTRY}/booking-service
               newTag: ${IMAGE_TAG}
-            - name: web-bff
+            - name: ticketkatum/web-bff
               newName: ${REGISTRY}/web-bff
               newTag: ${IMAGE_TAG}
-            - name: payment-service
+            - name: ticketkatum/payment-service
               newName: ${REGISTRY}/payment-service
               newTag: ${IMAGE_TAG}
-            - name: hotel-service
+            - name: ticketkatum/hotel-service
               newName: ${REGISTRY}/hotel-service
               newTag: ${IMAGE_TAG}
-            - name: auth-service
+            - name: ticketkatum/auth-service
               newName: ${REGISTRY}/auth-service
+              newTag: ${IMAGE_TAG}
+            - name: ticketkatum/market-service
+              newName: ${REGISTRY}/market-service
+              newTag: ${IMAGE_TAG}
+            - name: ticketkatum/bus-service
+              newName: ${REGISTRY}/bus-service
               newTag: ${IMAGE_TAG}
           EOF
           
@@ -142,6 +140,6 @@ jobs:
           kubectl apply -k k8s-deploy
 
           # Wait for rollout
-          for deploy in web-bff booking-service payment-service hotel-service auth-service; do
+          for deploy in web-bff booking-service payment-service hotel-service auth-service market-service bus-service; do
             kubectl rollout status deployment/$deploy --timeout=120s || true
           done
