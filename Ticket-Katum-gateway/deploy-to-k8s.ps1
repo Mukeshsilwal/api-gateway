@@ -6,8 +6,8 @@
 # ============================================================
 
 param(
-    [Parameter(Mandatory=$false)]
-    [ValidateSet('dev','staging','prod')]
+    [Parameter(Mandatory = $false)]
+    [ValidateSet('dev', 'staging', 'prod')]
     [string]$Environment = 'dev'
 )
 
@@ -38,7 +38,8 @@ Write-Host "✓ kubectl found" -ForegroundColor Green
 try {
     kubectl cluster-info | Out-Null
     Write-Host "✓ Connected to Kubernetes cluster" -ForegroundColor Green
-} catch {
+}
+catch {
     Write-Host "Error: Cannot connect to Kubernetes cluster." -ForegroundColor Red
     exit 1
 }
@@ -51,7 +52,8 @@ Write-Host "`n[2/10] Creating namespace..." -ForegroundColor Yellow
 $namespaceExists = kubectl get namespace $Namespace 2>$null
 if ($namespaceExists) {
     Write-Host "✓ Namespace $Namespace already exists" -ForegroundColor Green
-} else {
+}
+else {
     kubectl create namespace $Namespace
     Write-Host "✓ Namespace $Namespace created" -ForegroundColor Green
 }
@@ -78,7 +80,7 @@ Write-Host "✓ Secrets created" -ForegroundColor Green
 # ============================================================
 Write-Host "`n[4/10] Creating ConfigMaps..." -ForegroundColor Yellow
 
-kubectl apply -f "$K8sDir\configmaps.yaml"
+kubectl apply -f "$K8sDir\services\configmaps.yaml"
 Write-Host "✓ ConfigMaps created" -ForegroundColor Green
 
 # ============================================================
@@ -86,7 +88,7 @@ Write-Host "✓ ConfigMaps created" -ForegroundColor Green
 # ============================================================
 Write-Host "`n[5/10] Creating Persistent Volumes..." -ForegroundColor Yellow
 
-kubectl apply -f "$K8sDir\persistent-volumes.yaml"
+kubectl apply -f "$K8sDir\services\persistent-volumes.yaml"
 Write-Host "✓ Persistent Volumes created" -ForegroundColor Green
 
 Write-Host "Waiting for PVCs to be bound..." -ForegroundColor Yellow
@@ -100,7 +102,7 @@ Write-Host "`n[6/10] Deploying infrastructure services..." -ForegroundColor Yell
 
 $infraServices = @('postgres', 'redis', 'rabbitmq', 'kafka', 'eureka')
 foreach ($service in $infraServices) {
-    $deploymentFile = "$K8sDir\$service-deployment.yaml"
+    $deploymentFile = "$K8sDir\services\$service-deployment.yaml"
     if (Test-Path $deploymentFile) {
         kubectl apply -f $deploymentFile
         Write-Host "✓ $service deployed" -ForegroundColor Green
@@ -116,9 +118,9 @@ Write-Host "✓ Infrastructure services ready" -ForegroundColor Green
 # ============================================================
 Write-Host "`n[7/10] Deploying microservices..." -ForegroundColor Yellow
 
-$microservices = @('hotel-service', 'booking-service', 'bus-service', 'payment-service', 'auth-service')
+$microservices = @('hotel-service', 'booking-service', 'bus-service', 'payment-service', 'auth-service', 'market-service')
 foreach ($service in $microservices) {
-    $deploymentFile = "$K8sDir\$service-deployment.yaml"
+    $deploymentFile = "$K8sDir\services\$service-deployment.yaml"
     if (Test-Path $deploymentFile) {
         kubectl apply -f $deploymentFile
         Write-Host "✓ $service deployed" -ForegroundColor Green
@@ -136,7 +138,7 @@ Write-Host "`n[8/10] Deploying BFF services..." -ForegroundColor Yellow
 
 $bffServices = @('web-bff', 'mobile-bff')
 foreach ($bff in $bffServices) {
-    $deploymentFile = "$K8sDir\$bff-deployment.yaml"
+    $deploymentFile = "$K8sDir\services\$bff-deployment.yaml"
     if (Test-Path $deploymentFile) {
         kubectl apply -f $deploymentFile
         Write-Host "✓ $bff deployed" -ForegroundColor Green
@@ -154,7 +156,7 @@ Write-Host "`n[9/10] Deploying monitoring stack..." -ForegroundColor Yellow
 
 $monitoringServices = @('prometheus', 'grafana', 'jaeger')
 foreach ($monitor in $monitoringServices) {
-    $deploymentFile = "$K8sDir\$monitor-deployment.yaml"
+    $deploymentFile = "$K8sDir\services\$monitor-deployment.yaml"
     if (Test-Path $deploymentFile) {
         kubectl apply -f $deploymentFile
         Write-Host "✓ $monitor deployed" -ForegroundColor Green
@@ -166,7 +168,7 @@ foreach ($monitor in $monitoringServices) {
 # ============================================================
 Write-Host "`n[10/10] Configuring Ingress..." -ForegroundColor Yellow
 
-kubectl apply -f "$K8sDir\ingress.yaml"
+kubectl apply -f "$K8sDir\services\ingress.yaml"
 Write-Host "✓ Ingress configured" -ForegroundColor Green
 
 # ============================================================

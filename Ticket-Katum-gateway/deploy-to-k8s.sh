@@ -99,13 +99,13 @@ echo -e "${GREEN}✓ Secrets created${NC}"
 echo -e "\n${YELLOW}[4/11] Creating ConfigMaps...${NC}"
 
 # Apply Prometheus config if it exists
-if [ -f "${K8S_DIR}/prometheus-config.yaml" ]; then
-    kubectl apply -f ${K8S_DIR}/prometheus-config.yaml
+if [ -f "${K8S_DIR}/services/prometheus-config.yaml" ]; then
+    kubectl apply -f ${K8S_DIR}/services/prometheus-config.yaml
     echo -e "${GREEN}✓ Prometheus ConfigMap created${NC}"
 fi
 
-if [ -f "${K8S_DIR}/configmaps.yaml" ]; then
-    kubectl apply -f ${K8S_DIR}/configmaps.yaml
+if [ -f "${K8S_DIR}/services/configmaps.yaml" ]; then
+    kubectl apply -f ${K8S_DIR}/services/configmaps.yaml
     echo -e "${GREEN}✓ ConfigMaps created${NC}"
 else
     echo -e "${YELLOW}⚠ configmaps.yaml not found, skipping...${NC}"
@@ -127,7 +127,7 @@ if [ ! -z "$OLD_PVCS" ]; then
     sleep 5
 fi
 
-kubectl apply -f ${K8S_DIR}/persistent-volumes.yaml
+kubectl apply -f ${K8S_DIR}/services/persistent-volumes.yaml
 echo -e "${GREEN}✓ Storage Class and PVCs created${NC}"
 
 # Note: PVCs will remain in Pending state until pods claim them (WaitForFirstConsumer)
@@ -138,8 +138,8 @@ echo -e "${YELLOW}Note: PVCs will be bound when pods request them (WaitForFirstC
 # ============================================================
 echo -e "\n${YELLOW}[6/11] Deploying infrastructure StatefulSets...${NC}"
 
-if [ -f "${K8S_DIR}/statefulsets.yaml" ]; then
-    kubectl apply -f ${K8S_DIR}/statefulsets.yaml
+if [ -f "${K8S_DIR}/services/statefulsets.yaml" ]; then
+    kubectl apply -f ${K8S_DIR}/services/statefulsets.yaml
     echo -e "${GREEN}✓ Infrastructure StatefulSets deployed${NC}"
 
     # Wait for StatefulSets to be ready
@@ -159,8 +159,8 @@ else
 
     # Fallback to individual deployment files
     for service in postgres redis rabbitmq kafka; do
-        if [ -f "${K8S_DIR}/${service}-deployment.yaml" ]; then
-            kubectl apply -f ${K8S_DIR}/${service}-deployment.yaml
+        if [ -f "${K8S_DIR}/services/${service}-deployment.yaml" ]; then
+            kubectl apply -f ${K8S_DIR}/services/${service}-deployment.yaml
             echo -e "${GREEN}✓ ${service} deployed${NC}"
         fi
     done
@@ -171,8 +171,8 @@ fi
 # ============================================================
 echo -e "\n${YELLOW}[7/11] Deploying Eureka Server...${NC}"
 
-if [ -f "${K8S_DIR}/eureka-deployment.yaml" ]; then
-    kubectl apply -f ${K8S_DIR}/eureka-deployment.yaml
+if [ -f "${K8S_DIR}/services/eureka-deployment.yaml" ]; then
+    kubectl apply -f ${K8S_DIR}/services/eureka-deployment.yaml
     echo "Waiting for Eureka Server..."
     kubectl wait --for=condition=ready pod -l app=eureka-server --timeout=180s -n ${NAMESPACE} || true
     echo -e "${GREEN}✓ Eureka Server deployed${NC}"
@@ -189,8 +189,8 @@ echo -e "\n${YELLOW}[8/11] Deploying microservices...${NC}"
 SERVICES=("hotel-service" "booking-service" "bus-service" "payment-service" "auth-service" "market-service")
 
 for service in "${SERVICES[@]}"; do
-    if [ -f "${K8S_DIR}/${service}-deployment.yaml" ]; then
-        kubectl apply -f ${K8S_DIR}/${service}-deployment.yaml
+    if [ -f "${K8S_DIR}/services/${service}-deployment.yaml" ]; then
+        kubectl apply -f ${K8S_DIR}/services/${service}-deployment.yaml
         echo -e "${GREEN}✓ ${service} deployed${NC}"
     else
         echo -e "${YELLOW}⚠ ${service}-deployment.yaml not found, skipping...${NC}"
@@ -208,8 +208,8 @@ echo -e "${GREEN}✓ Backend services ready${NC}"
 echo -e "\n${YELLOW}[9/11] Deploying BFF services...${NC}"
 
 for bff in web-bff mobile-bff; do
-    if [ -f "${K8S_DIR}/${bff}-deployment.yaml" ]; then
-        kubectl apply -f ${K8S_DIR}/${bff}-deployment.yaml
+    if [ -f "${K8S_DIR}/services/${bff}-deployment.yaml" ]; then
+        kubectl apply -f ${K8S_DIR}/services/${bff}-deployment.yaml
         echo -e "${GREEN}✓ ${bff} deployed${NC}"
     else
         echo -e "${YELLOW}⚠ ${bff}-deployment.yaml not found, skipping...${NC}"
@@ -226,8 +226,8 @@ echo -e "${GREEN}✓ BFF services ready${NC}"
 # ============================================================
 echo -e "\n${YELLOW}[10/11] Configuring Ingress...${NC}"
 
-if [ -f "${K8S_DIR}/ingress.yaml" ]; then
-    kubectl apply -f ${K8S_DIR}/ingress.yaml
+if [ -f "${K8S_DIR}/services/ingress.yaml" ]; then
+    kubectl apply -f ${K8S_DIR}/services/ingress.yaml
     echo -e "${GREEN}✓ Ingress configured${NC}"
 else
     echo -e "${YELLOW}⚠ ingress.yaml not found, skipping...${NC}"

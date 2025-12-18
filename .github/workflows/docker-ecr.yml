@@ -76,6 +76,8 @@ jobs:
             ["payment-service"]="services/payment-service/Dockerfile"
             ["hotel-service"]="services/hotel-service/Dockerfile"
             ["auth-service"]="services/auth-service/Dockerfile"
+            ["bus-service"]="services/bus-service/Dockerfile"
+            ["market-service"]="services/market-service/Dockerfile"
           )
 
           for service in "${!services[@]}"; do
@@ -133,12 +135,18 @@ jobs:
             - name: auth-service
               newName: ${REGISTRY}/auth-service
               newTag: ${IMAGE_TAG}
+            - name: bus-service
+              newName: ${REGISTRY}/bus-service
+              newTag: ${IMAGE_TAG}
+            - name: market-service
+              newName: ${REGISTRY}/market-service
+              newTag: ${IMAGE_TAG}
           EOF
 
           cd ..
 
           kubectl apply -k k8s-deploy
 
-          for deploy in web-bff booking-service payment-service hotel-service auth-service; do
+          for deploy in web-bff booking-service payment-service hotel-service auth-service bus-service market-service; do
             kubectl rollout status deployment/$deploy --timeout=120s || true
           done
