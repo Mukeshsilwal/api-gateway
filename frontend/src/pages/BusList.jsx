@@ -1,0 +1,324 @@
+import { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useLocation } from "react-router-dom";
+import BusDetail from "../components/busDetail";
+import Navbar from "../components/Navbar";
+import BusListContext from "../context/busdetails";
+import Footer from "../components/Footer";
+import busService from "../services/busService";
+import LoadingSpinner from "../components/ui/LoadingSpinner";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Card from "../components/ui/Card";
+import { Filter, X, Search } from "lucide-react";
+
+const BusList = () => {
+  const { setBusList } = useContext(BusListContext);
+  const location = useLocation();
+
+  // State for infinite scroll
+  const [buses, setBuses] = useState([]);
+  const [cursor, setCursor] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Search params from navigation or local storage
+  const searchParams = useMemo(() => {
+    if (location.state?.source && location.state?.destination && location.state?.date) {
+      return {
+        source: location.state.source,
+        destination: location.state.destination,
+        date: location.state.date
+      };
+    }
+
+    try {
+      const stored = localStorage.getItem("searchDetails");
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {
+      console.error("Failed to parse stored search details", e);
+    }
+
+    return null;
+  }, [location.state]);
+
+  const [filters, setFilters] = useState({
+    maxPrice: "",
+    busType: "",
+  });
+
+  // Observer for infinite scroll
+  const observer = useRef();
+  const lastBusElementRef = useCallback(node => {
+    if (loading) return;
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && hasMore) {
+        loadMoreBuses();
+      }
+    });
+    if (node) observer.current.observe(node);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, hasMore]);
+
+  const loadMoreBuses = useCallback(async (isInitial = false) => {
+    if (loading || (!isInitial && !hasMore)) return;
+
+    if (!searchParams) {
+      setLoading(false);
+      setInitialLoadComplete(true);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const currentCursor = isInitial ? null : cursor;
+      const response = await busService.searchBuses({
+        ...searchParams,
+        cursor: currentCursor,
+        pageSize: 10,
+        // Add server-side filters
+        maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined,
+        busType: filters.busType || undefined
+      });
+
+      const responseData = response.data || response;
+      const fetchedBuses = responseData.buses || [];
+
+      setBuses(prev => {
+        const newBuses = isInitial ? fetchedBuses : [...prev, ...fetchedBuses];
+        return newBuses;
+      });
+
+      setCursor(responseData.nextCursor);
+      setHasMore(responseData.hasMore);
+    } catch (err) {
+      setError(err.message || "Failed to load buses");
+    } finally {
+      setLoading(false);
+      setInitialLoadComplete(true);
+    }
+  }, [loading, hasMore, cursor, searchParams, filters]);
+
+  // Sync buses to context whenever they change
+  useEffect(() => {
+    setBusList(buses);
+  }, [buses, setBusList]);
+
+  // Initial load and filter changes
+  useEffect(() => {
+    setBuses([]);
+    setCursor(null);
+    setHasMore(true);
+    setInitialLoadComplete(false);
+    loadMoreBuses(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, filters]); // Re-fetch when filters change
+
+  const handleFilterChange = (event) => {
+    const { name, value } = event.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
+
+  const getStartingFare = (bus) => {
+    if (!bus || !Array.isArray(bus.seats) || bus.seats.length === 0) return 0;
+    return Math.min(...bus.seats.map((s) => Number(s.price) || 0));
+  };
+
+  // No client-side filtering needed - all done server-side
+  const filteredBuses = buses;
+
+  if (!initialLoadComplete && loading && buses.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center">
+          <LoadingSpinner size="lg" text="Finding the best buses for you..." />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error && buses.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <Navbar />
+        <main className="flex-grow flex items-center justify-center p-4">
+          <Card className="max-w-md w-full text-center p-8 border-red-100">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Something went wrong</h3>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </Card>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Navbar />
+
+      <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        {/* Mobile Filter Toggle */}
+        <div className="lg:hidden mb-4">
+          <Button
+            variant="outline"
+            className="w-full justify-between"
+            onClick={() => setShowMobileFilters(true)}
+          >
+            <span className="flex items-center gap-2">
+              <Filter size={18} /> Filters
+            </span>
+            <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+              {filteredBuses.length} results
+            </span>
+          </Button>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Filters Sidebar (Desktop) */}
+          <aside className={`
+            fixed inset-0 z-40 bg-white lg:bg-transparent lg:static lg:z-auto lg:w-72 lg:block
+            transform transition-transform duration-300 ease-in-out
+            ${showMobileFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+          `}>
+            <div className="h-full lg:h-auto overflow-y-auto lg:overflow-visible p-6 lg:p-0">
+              <div className="lg:hidden flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-900">Filters</h3>
+                <button onClick={() => setShowMobileFilters(false)} className="p-2 text-gray-500">
+                  <X size={24} />
+                </button>
+              </div>
+
+              <Card className="sticky top-24">
+                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <Filter size={20} className="text-primary" /> Filters
+                  </h3>
+                  <button
+                    className="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
+                    onClick={() => setFilters({ maxPrice: "", busType: "" })}
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <div className="p-6 space-y-6">
+                  <div>
+                    <Input
+                      label="Max Price"
+                      type="number"
+                      name="maxPrice"
+                      min={0}
+                      placeholder="e.g. 2000"
+                      value={filters.maxPrice}
+                      onChange={handleFilterChange}
+                      icon={() => <span className="text-gray-400 text-sm font-bold">Rs.</span>}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Bus Type</label>
+                    <select
+                      name="busType"
+                      value={filters.busType}
+                      onChange={handleFilterChange}
+                      className="w-full rounded-xl border-gray-200 bg-gray-50 focus:border-primary focus:ring-primary py-2.5 px-4 text-sm transition-all"
+                    >
+                      <option value="">All Types</option>
+                      <option value="Deluxe">Deluxe</option>
+                      <option value="Luxury">Luxury</option>
+                      <option value="Standard">Standard</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-gray-50/50 rounded-b-2xl border-t border-gray-100">
+                  <p className="text-sm text-gray-500 text-center">
+                    Showing {filteredBuses.length} buses
+                  </p>
+                  <Button
+                    className="w-full mt-4 lg:hidden"
+                    onClick={() => setShowMobileFilters(false)}
+                  >
+                    Apply Filters
+                  </Button>
+                </div>
+              </Card>
+            </div>
+          </aside>
+
+          {/* Bus List */}
+          <div className="flex-1">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Available Buses</h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  {searchParams?.source} to {searchParams?.destination} • {searchParams?.date}
+                </p>
+              </div>
+            </div>
+
+            {filteredBuses.length === 0 && !loading ? (
+              <Card className="p-12 text-center border-dashed border-2 border-gray-200 shadow-none bg-transparent">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Search className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No buses found</h3>
+                <p className="text-gray-500">Try adjusting your filters or search for a different date.</p>
+              </Card>
+            ) : (
+              <div className="space-y-4">
+                {filteredBuses.map((bus, index) => {
+                  if (index === filteredBuses.length - 1) {
+                    return (
+                      <div ref={lastBusElementRef} key={bus.id || bus._id || index}>
+                        <BusDetail bus={bus} />
+                      </div>
+                    );
+                  } else {
+                    return <BusDetail bus={bus} key={bus.id || bus._id || index} />;
+                  }
+                })}
+              </div>
+            )}
+
+            {/* Loading more indicator */}
+            {loading && buses.length > 0 && (
+              <div className="py-8 flex justify-center">
+                <LoadingSpinner size="md" />
+              </div>
+            )}
+
+            {!hasMore && buses.length > 0 && (
+              <div className="py-8 text-center">
+                <span className="inline-block px-4 py-1 bg-gray-100 text-gray-500 text-xs rounded-full font-medium">
+                  End of list
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+export default BusList;

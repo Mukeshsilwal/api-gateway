@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Ticket-Katum-gateway
+        working-directory: backend
     permissions:
       contents: read
       packages: write
@@ -82,13 +82,13 @@ jobs:
           ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
           declare -A services=(
-            ["web-bff"]="bff/web-bff/Dockerfile"
+            ["web-bff"]="services/web-bff/Dockerfile"
             ["booking-service"]="services/booking-service/Dockerfile"
             ["payment-service"]="services/payment-service/Dockerfile"
             ["hotel-service"]="services/hotel-service/Dockerfile"
             ["auth-service"]="services/auth-service/Dockerfile"
-            ["bus-service"]="services/bus-service/Dockerfile"
             ["market-service"]="services/market-service/Dockerfile"
+            ["bus-service"]="services/bus-service/Dockerfile"
           )
 
           for service in "${!services[@]}"; do
@@ -124,7 +124,7 @@ jobs:
         run: |
           REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-          cd k8s-deploy
+          cd infra/k8s
 
           if ! grep -q "images:" kustomization.yaml; then
             echo -e "\nimages:" >> kustomization.yaml
@@ -154,9 +154,9 @@ jobs:
               newTag: ${IMAGE_TAG}
           EOF
 
-          cd ..
+          cd ../..
 
-          kubectl apply -k k8s-deploy
+          kubectl apply -k infra/k8s
 
           for deploy in web-bff booking-service payment-service hotel-service auth-service bus-service market-service; do
             kubectl rollout status deployment/$deploy --timeout=120s || true

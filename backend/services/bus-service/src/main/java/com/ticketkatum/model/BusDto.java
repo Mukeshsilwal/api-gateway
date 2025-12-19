@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusDto {
-    private Long id;
+    private Long routeId;
 
     @com.fasterxml.jackson.annotation.JsonProperty("busName")
     @com.fasterxml.jackson.annotation.JsonAlias("name")
@@ -36,5 +37,7 @@ public class BusDto {
     private BigDecimal basePrice;
     private BigDecimal maxPrice;
     private List<SeatDto> seats;
-    private RouteDto route;
+    private long numberOfSeats;
+    private LocalDate date;
+    private RouteDto routeDto;
 }

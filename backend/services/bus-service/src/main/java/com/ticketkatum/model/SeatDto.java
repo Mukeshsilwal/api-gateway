@@ -1,6 +1,7 @@
 package com.ticketkatum.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,4 +20,7 @@ public class SeatDto {
     private String holdExpiresAt;
     private String seatNumber;
     private BigDecimal price;
+    @NotNull
+    private String busName;
+
 }

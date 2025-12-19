@@ -11,9 +11,9 @@ RUN chmod +x mvnw && ./mvnw -N install -DskipTests
 
 # Ensure local modules that are dependencies (e.g. shared-library) are
 # available in the builder local repo before resolving service deps.
-COPY services/shared-library/pom.xml ./services/shared-library/pom.xml
-COPY services/shared-library/src ./services/shared-library/src
-RUN ./mvnw -f services/shared-library/pom.xml -DskipTests install -B
+COPY shared/common/pom.xml ./shared/common/pom.xml
+COPY shared/common/src ./shared/common/src
+RUN ./mvnw -f shared/common/pom.xml -DskipTests install -B
 
 RUN ./mvnw -f services/bus-service/pom.xml dependency:go-offline -B
 

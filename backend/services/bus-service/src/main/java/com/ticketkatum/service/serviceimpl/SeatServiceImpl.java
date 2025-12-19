@@ -57,7 +57,7 @@ public class SeatServiceImpl implements SeatService {
                     Seat seat = seatMapper.toEntity(dto);
                     seat.setStatus(SeatStatus.AVAILABLE);
                     seat.setBus(bus);
-                    seat.setPrice(pricingAlgorithm.calculateDynamicPrice(availableSeats, bus));
+                    seat.setPrice(dto.getPrice() != null ? dto.getPrice() : pricingAlgorithm.calculateDynamicPrice(availableSeats, bus));
                     return seat;
                 }).collect(Collectors.toList());
 

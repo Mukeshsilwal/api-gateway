@@ -10,9 +10,9 @@ COPY services/hotel-service/pom.xml ./services/hotel-service/pom.xml
 RUN chmod +x mvnw && ./mvnw -N install -DskipTests
 
 # Install local shared library so the module is resolvable during service dependency resolution
-COPY services/shared-library/pom.xml ./services/shared-library/pom.xml
-COPY services/shared-library/src ./services/shared-library/src
-RUN ./mvnw -f services/shared-library/pom.xml -DskipTests install -B
+COPY shared/common/pom.xml ./shared/common/pom.xml
+COPY shared/common/src ./shared/common/src
+RUN ./mvnw -f shared/common/pom.xml -DskipTests install -B
 
 RUN ./mvnw -f services/hotel-service/pom.xml dependency:go-offline -B
 COPY services/hotel-service/src ./services/hotel-service/src

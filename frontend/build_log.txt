@@ -1,0 +1,44 @@
+﻿
+> busticket@0.1.0 build
+> node node_modules/react-scripts/bin/react-scripts.js build
+
+node.exe : 
+(node:27428) 
+[DEP0176] 
+DeprecationWarning: 
+fs.F_OK is 
+deprecated, use 
+fs.constants.F_OK 
+instead
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ((node:2   
+ 7428) [D...ts.F_    
+OK instead:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+(Use `node 
+--trace-deprecation 
+...` to show where 
+the warning was 
+created)
+Creating an optimized production build...
+Failed to compile.
+
+Module not found: Error: Can't resolve 'lucide-react' in 'C:\New folder\BusTicketFrontEnd\src\components\ui'
+
+

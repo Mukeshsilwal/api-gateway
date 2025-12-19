@@ -1,0 +1,42 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(to right, #2C3E50, #34495E); /* Gradient background */
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 1rem; /* Space between buttons */
+}
+
+.nav-buttons button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px; 
+  background-color: white;
+  color: #2C3E50; 
+  font-weight: 600; 
+  cursor: pointer;
+  transition: all 0.3s ease; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+}
+
+.nav-buttons button:hover {
+  background-color: #cfdaeb; 
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+.nav-buttons button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

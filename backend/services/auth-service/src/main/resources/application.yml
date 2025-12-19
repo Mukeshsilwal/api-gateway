@@ -8,7 +8,7 @@ jwt:
     time: ${JWT_EXPIRATION:3600000}          # 1 hour
   refresh:
     expiration:
-      time: ${JWT_REFRESH_EXPIRATION:86400000}   # 24 hours
+      time: ${JWT_REFRESH_EXPIRATION:600000}   # 10 minutes
 
 # ============================
 # Spring Configuration

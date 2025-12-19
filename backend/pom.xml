@@ -13,15 +13,15 @@
     <name>Ticket Katum Parent</name>
     <modules>
         <module>gateway</module>
-        <module>infra</module>
-        <module>bff/web-bff</module>
-        <module>services/shared-library</module>
+        <module>services/web-bff</module>
+        <module>shared/common</module>
         <module>services/booking-service</module>
         <module>services/payment-service</module>
         <module>services/hotel-service</module>
         <module>services/bus-service</module>
         <module>services/auth-service</module>
         <module>services/market-service</module>
+        <module>services/eureka-server</module>
     </modules>
 
     <properties>

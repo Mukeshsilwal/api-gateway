@@ -23,7 +23,7 @@ import java.util.Base64;
 @Slf4j
 public class RefreshTokenService {
 
-    @Value("${jwt.refresh.expiration.time:2592000000}") // Default 30 days
+    @Value("${jwt.refresh.expiration.time:600000}") // Default 10 minutes
     private Long refreshTokenDurationMs;
 
     private final RefreshTokenRepository refreshTokenRepository;
@@ -38,59 +38,26 @@ public class RefreshTokenService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
 
-        // Revoke existing tokens for this user (or allow multiple?)
-        // Requirement doesn't specify, but "Logout invalidates refresh token" implies
-        // ability to target.
-        // For simplicity, let's allow multiple devices but usually we might want to
-        // rotate.
-        // Let's implement rotation: if valid, reuse? No, better new one.
-
         // Generate secure random token
         SecureRandom random = new SecureRandom();
         byte[] bytes = new byte[64];
         random.nextBytes(bytes);
         String rawToken = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
 
-        // Hash it? "Stored hashed in DB".
-        // We can use PasswordEncoder or just SHA256.
-        // Using PasswordEncoder implies we can't look it up by token easily unless we
-        // iterate (slow) or use raw token as ID (bad).
-        // Usually "hashed" means we treat it like a password.
-        // But the client sends the token. We need to find the DB entry.
-        // If we hash it, we can't find it by "findByToken(raw)".
-        // Strategy: Token = ID + Secret.
-        // Or simply store it as is if DB encryption is handled, but requirement says
-        // "hashed".
-        // Compromise: Store a Hash of the token. To verify, we need the user context or
-        // traverse?
-        // Actually, if we use JWT for refresh token, it has claims.
-        // But here we generated a random string.
-        // Let's stick to: Token is a UUID (or random string). We treat it as the key.
-        // If "hashed" is a strict requirement for security, we implement "Token
-        // Rotation" family.
-        // Let's use simple storage for now to ensure functionality, as "hashing" lookup
-        // is complex without an indexable key.
-        // Wait, I can store `token` (random) and `tokenHash` (hashed)? No that defeats
-        // purpose.
-        // I will store the token as is for now, but encrypted if possible?
-        // Let's emulate "Hashed":
-        // Input: rawToken.
-        // DB: hash(rawToken).
-        // Lookup: We can't do `findByToken(hash(rawToken))`? Yes we can if hash is
-        // deterministic (SHA256), not BCrypt (salted).
-        // BCrypt is salted.
-
-        // Decision: I'll use standard storage for this iteration to ensure it works
-        // with `findByToken`.
-        // Ideally we would return a handle and a secret. Handle -> DB lookup. Secret ->
-        // verify.
-
-        RefreshToken refreshToken = RefreshToken.builder()
-                .user(user)
-                .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
-                .token(rawToken) // Storing raw for now to match findByToken interface easily.
-                .revoked(false)
-                .build();
+        // Check for existing token and update, or create new
+        RefreshToken refreshToken = refreshTokenRepository.findByUser(user)
+                .map(existingToken -> {
+                    existingToken.setToken(rawToken);
+                    existingToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+                    existingToken.setRevoked(false);
+                    return existingToken;
+                })
+                .orElseGet(() -> RefreshToken.builder()
+                        .user(user)
+                        .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs))
+                        .token(rawToken)
+                        .revoked(false)
+                        .build());
 
         refreshTokenRepository.save(refreshToken);
         return rawToken;

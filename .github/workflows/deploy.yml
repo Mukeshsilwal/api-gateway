@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: Ticket-Katum-gateway
+        working-directory: backend
     permissions:
       contents: read
       packages: write
@@ -60,7 +60,7 @@ jobs:
         run: |
           # Array of services with their Dockerfile paths
           declare -A services=(
-            ["web-bff"]="bff/web-bff/Dockerfile"
+            ["web-bff"]="services/web-bff/Dockerfile"
             ["booking-service"]="services/booking-service/Dockerfile"
             ["payment-service"]="services/payment-service/Dockerfile"
             ["hotel-service"]="services/hotel-service/Dockerfile"
@@ -103,7 +103,7 @@ jobs:
           fi
 
           # Update kustomization.yaml with new images
-          cd k8s-deploy
+          cd infra/k8s
           
           # Ensure kustomization.yaml has images section if not present
           if ! grep -q "images:" kustomization.yaml; then
@@ -134,10 +134,10 @@ jobs:
               newTag: ${IMAGE_TAG}
           EOF
           
-          cd ..
+          cd ../..
 
           # Apply deployment
-          kubectl apply -k k8s-deploy
+          kubectl apply -k infra/k8s
 
           # Wait for rollout
           for deploy in web-bff booking-service payment-service hotel-service auth-service market-service bus-service; do
