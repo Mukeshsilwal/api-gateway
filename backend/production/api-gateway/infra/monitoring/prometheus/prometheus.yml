@@ -1,0 +1,132 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'ticket-katum-prod'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+rule_files:
+  - "alerts.yml"
+
+# Scrape configurations
+scrape_configs:
+  # ==========================================
+  # Spring Boot Microservices
+  # ==========================================
+  - job_name: 'spring-boot-services'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 10s
+    static_configs:
+      - targets:
+          - 'web-bff:8081'
+          - 'mobile-bff:8082'
+          - 'auth-service:8089'
+          - 'booking-service:8091'
+          - 'hotel-service:8087'
+          - 'bus-service:8083'
+          - 'payment-service:8092'
+        labels:
+          service_type: 'microservice'
+          platform: 'spring-boot'
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+      - source_labels: [__address__]
+        regex: '([^:]+):.*'
+        target_label: service_name
+        replacement: '$1'
+
+  # ==========================================
+  # Kong API Gateway
+  # ==========================================
+  - job_name: 'kong'
+    static_configs:
+      - targets:
+          - 'kong:8001'
+        labels:
+          service_type: 'api-gateway'
+    metrics_path: '/metrics'
+
+  # ==========================================
+  # PostgreSQL Exporter
+  # ==========================================
+  - job_name: 'postgres'
+    static_configs:
+      - targets:
+          - 'postgres-exporter:9187'
+        labels:
+          service_type: 'database'
+          db_type: 'postgresql'
+
+  # ==========================================
+  # Redis Exporter
+  # ==========================================
+  - job_name: 'redis'
+    static_configs:
+      - targets:
+          - 'redis-exporter:9121'
+        labels:
+          service_type: 'cache'
+          cache_type: 'redis'
+
+  # ==========================================
+  # RabbitMQ Exporter
+  # ==========================================
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets:
+          - 'rabbitmq:15692'
+        labels:
+          service_type: 'message-queue'
+          mq_type: 'rabbitmq'
+
+  # ==========================================
+  # Kafka Exporter
+  # ==========================================
+  - job_name: 'kafka'
+    static_configs:
+      - targets:
+          - 'kafka-exporter:9308'
+        labels:
+          service_type: 'message-queue'
+          mq_type: 'kafka'
+
+  # ==========================================
+  # Node Exporter (System Metrics)
+  # ==========================================
+  - job_name: 'node'
+    static_configs:
+      - targets:
+          - 'node-exporter:9100'
+        labels:
+          service_type: 'infrastructure'
+          metric_type: 'system'
+
+  # ==========================================
+  # cAdvisor (Container Metrics)
+  # ==========================================
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets:
+          - 'cadvisor:8080'
+        labels:
+          service_type: 'infrastructure'
+          metric_type: 'container'
+
+  # ==========================================
+  # Prometheus Self-Monitoring
+  # ==========================================
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+        labels:
+          service_type: 'monitoring'

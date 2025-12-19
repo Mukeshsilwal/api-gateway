@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: ticket-katum
+data:
+  host: "redis-service"
+  port: "6379"
+  database: "0"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: ticket-katum
+data:
+  host: "postgres-service"
+  port: "5432"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+  namespace: ticket-katum
+data:
+  host: "rabbitmq-service"
+  port: "5672"
+  management-port: "15672"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-config
+  namespace: ticket-katum
+data:
+  bootstrap-servers: "kafka-service:9092"
+  zookeeper-connect: "zookeeper-service:2181"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eureka-config
+  namespace: ticket-katum
+data:
+  server-url: "http://eureka-server:8761/eureka/"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitoring-config
+  namespace: ticket-katum
+data:
+  prometheus-url: "http://prometheus-service:9090"
+  grafana-url: "http://grafana-service:3000"
+  jaeger-url: "http://jaeger-service:16686"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-init-script
+  namespace: ticket-katum
+data:
+  init.sql: |
+    CREATE DATABASE ticketkatum;
+    CREATE DATABASE booking_db;
+    CREATE DATABASE payment_db;
+    CREATE DATABASE hotel_db;
+    CREATE DATABASE movies_db;
+    CREATE DATABASE auth_db;
+    CREATE DATABASE market_db;
+    CREATE DATABASE bus_db;

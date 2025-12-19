@@ -1,0 +1,152 @@
+# ============================================================
+# Eureka Client Configuration (for all microservices)
+# ============================================================
+# Add this to each service's application.yml
+
+eureka:
+  client:
+    # Enable Eureka client
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    
+    # Register with Eureka
+    register-with-eureka: true
+    
+    # Fetch registry from Eureka
+    fetch-registry: true
+    
+    # Eureka server URL
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
+    
+    # Registry fetch interval (30 seconds)
+    registry-fetch-interval-seconds: 30
+    
+    # Heartbeat interval
+    eureka-server-connect-timeout-seconds: 5
+    
+    # Initial instance info replication interval
+    initial-instance-info-replication-interval-seconds: 40
+    
+    # Instance info replication interval
+    instance-info-replication-interval-seconds: 30
+  
+  instance:
+    # Prefer IP address over hostname
+    prefer-ip-address: ${EUREKA_PREFER_IP:true}
+    
+    # Instance ID format
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    
+    # Lease renewal interval (heartbeat) - 30 seconds
+    lease-renewal-interval-in-seconds: 30
+    
+    # Lease expiration duration - 90 seconds
+    lease-expiration-duration-in-seconds: 90
+    
+    # Health check URL
+    health-check-url-path: /actuator/health
+    
+    # Status page URL
+    status-page-url-path: /actuator/info
+    
+    # Metadata
+    metadata-map:
+      zone: ${EUREKA_ZONE:zone1}
+      version: ${project.version:1.0.0}
+      management.port: ${management.server.port:${server.port}}
+      management.context-path: ${management.endpoints.web.base-path:/actuator}
+
+# ============================================================
+# Service-Specific Instance Configuration
+# ============================================================
+
+# Hotel Service
+---
+spring:
+  application:
+    name: hotel-service
+
+server:
+  port: 8087
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+# Booking Service
+---
+spring:
+  application:
+    name: booking-service
+
+server:
+  port: 8091
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+# Bus Service
+---
+spring:
+  application:
+    name: bus-service
+
+server:
+  port: 8083
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+# Payment Service
+---
+spring:
+  application:
+    name: payment-service
+
+server:
+  port: 8092
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+# Auth Service
+---
+spring:
+  application:
+    name: auth-service
+
+server:
+  port: 8089
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+# Web BFF
+---
+spring:
+  application:
+    name: web-bff
+
+server:
+  port: 8081
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}
+
+# Mobile BFF
+---
+spring:
+  application:
+    name: mobile-bff
+
+server:
+  port: 8082
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${server.port}:${random.value}

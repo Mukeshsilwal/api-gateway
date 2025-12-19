@@ -1,0 +1,85 @@
+-- -- ============================================================
+-- -- Booking Service - Performance Indexes
+-- -- ============================================================
+-- -- Migration: V2__add_performance_indexes.sql
+-- -- ============================================================
+--
+-- -- ============================================================
+-- -- Bookings Table Indexes
+-- -- ============================================================
+--
+--
+-- -- Booking reference lookup
+-- CREATE INDEX IF NOT EXISTS idx_booking_reference
+-- ON bookings(booking_reference);
+--
+-- -- Status-based queries
+-- CREATE INDEX IF NOT EXISTS idx_booking_status
+-- ON bookings(status, created_at DESC);
+--
+-- -- Pending confirmations
+-- CREATE INDEX IF NOT EXISTS idx_booking_pending
+-- ON bookings(status, created_at)
+-- WHERE status = 'PENDING';
+--
+-- -- Service type filter
+-- CREATE INDEX IF NOT EXISTS idx_booking_service_type
+-- ON bookings(service_type, user_id);
+--
+-- -- Date range queries
+-- CREATE INDEX IF NOT EXISTS idx_booking_date_range
+-- ON bookings(travel_date, return_date);
+--
+-- -- Payment tracking
+-- CREATE INDEX IF NOT EXISTS idx_booking_payment
+-- ON bookings(payment_id, payment_status);
+--
+-- -- ============================================================
+-- -- Booking Items Table Indexes
+-- -- ============================================================
+--
+-- -- Booking items lookup
+-- CREATE INDEX IF NOT EXISTS idx_booking_item_booking
+-- ON booking_items(booking_id);
+--
+-- -- Service reference
+-- CREATE INDEX IF NOT EXISTS idx_booking_item_service
+-- ON booking_items(service_id, service_type);
+--
+-- -- ============================================================
+-- -- Passengers Table Indexes
+-- -- ============================================================
+--
+-- -- Booking passengers
+-- CREATE INDEX IF NOT EXISTS idx_passenger_booking
+-- ON passengers(booking_id);
+--
+-- -- Passenger search by details
+-- CREATE INDEX IF NOT EXISTS idx_passenger_details
+-- ON passengers(first_name, last_name, email);
+--
+-- -- ============================================================
+-- -- Cancellations Table Indexes
+-- -- ============================================================
+--
+-- -- Booking cancellations
+-- CREATE INDEX IF NOT EXISTS idx_cancellation_booking
+-- ON cancellations(booking_id);
+--
+-- -- Cancellation date
+-- CREATE INDEX IF NOT EXISTS idx_cancellation_date
+-- ON cancellations(cancelled_at DESC);
+--
+-- -- Refund status
+-- CREATE INDEX IF NOT EXISTS idx_cancellation_refund
+-- ON cancellations(refund_status)
+-- WHERE refund_status = 'PENDING';
+--
+-- -- ============================================================
+-- -- Update Statistics
+-- -- ============================================================
+--
+-- ANALYZE bookings;
+-- ANALYZE booking_items;
+-- ANALYZE passengers;
+-- ANALYZE cancellations;
