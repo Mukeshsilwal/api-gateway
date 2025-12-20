@@ -14,6 +14,11 @@ COPY shared/common/pom.xml ./shared/common/pom.xml
 COPY shared/common/src ./shared/common/src
 RUN ./mvnw -f shared/common/pom.xml -DskipTests install -B
 
+# Install shared-events library if it exists (for event-driven arch)
+COPY shared/events/pom.xml ./shared/events/pom.xml
+COPY shared/events/src ./shared/events/src
+RUN ./mvnw -f shared/events/pom.xml -DskipTests install -B || echo "shared-events build failed or skipped"
+
 RUN ./mvnw -f services/hotel-service/pom.xml dependency:go-offline -B
 COPY services/hotel-service/src ./services/hotel-service/src
 
