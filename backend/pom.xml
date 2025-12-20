@@ -25,6 +25,7 @@
         <module>services/eureka-server</module>
         <module>services/ai-service</module>
         <module>services/event-service</module>
+        <module>services/image-service</module>
     </modules>
 
     <properties>
