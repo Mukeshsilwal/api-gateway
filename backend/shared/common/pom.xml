@@ -83,6 +83,12 @@
             <version>0.12.3</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- Explicitly adding httpclient to fix transitive dependency resolution issues -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.14</version>
+        </dependency>
     </dependencies>
 
     <build>

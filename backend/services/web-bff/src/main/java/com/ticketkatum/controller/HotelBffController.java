@@ -269,7 +269,7 @@ public class HotelBffController {
          */
         @GetMapping("/{hotelCode}/rooms")
         public CompletableFuture<ResponseEntity<Response<List<RoomDTO>>>> getRoomsByHotelCode(
-                        @PathVariable String hotelCode) {
+                        @PathVariable("hotelCode") String hotelCode) {
 
                 log.info("Fetching rooms for hotel: {}", hotelCode);
 
