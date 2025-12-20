@@ -11,13 +11,16 @@ spring:
 
 eureka:
   client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
     service-url:
       defaultZone: ${EUREKA_SERVER_URL:http://localhost:8761/eureka/}
 
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  api-secret: ${CLOUDINARY_API_SECRET}
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:dsqubrfjp}
+  api-key: ${CLOUDINARY_API_KEY:624365773875321}
+  api-secret: ${CLOUDINARY_API_SECRET:9P5wS1lelWdo6CubuJxzQiNTClw}
 
 management:
   endpoints:

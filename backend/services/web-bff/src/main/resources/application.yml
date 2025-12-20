@@ -18,7 +18,7 @@ microservices:
   # Core Services
   event-service-url: ${EVENT_SERVICE_URL:http://localhost:8081}
   booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8082}
-  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8083}
+  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8088}
   hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8087}
   auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8089}
   bus-service-url: ${BUS_SERVICE_URL:http://localhost:8083}
