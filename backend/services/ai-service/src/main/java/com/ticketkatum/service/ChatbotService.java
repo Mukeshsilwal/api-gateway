@@ -6,6 +6,7 @@ import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -25,8 +26,9 @@ import java.util.concurrent.TimeUnit;
 public class ChatbotService {
 
     private final OpenAiService openAiService;
-    private final RedisTemplate<String, Object> redisTemplate;
 
+    @Qualifier("customRedisTemplate")
+    private final RedisTemplate<String, Object> redisTemplate;
     @Value("${openai.model}")
     private String model;
 

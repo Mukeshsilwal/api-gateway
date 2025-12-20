@@ -39,16 +39,39 @@ public class EventService {
     public Event createEvent(Map<String, Object> eventData) {
         log.info("Creating new event");
 
-        // Extract basic info
-        @SuppressWarnings("unchecked")
-        Map<String, Object> basicInfo = (Map<String, Object>) eventData.get("basicInfo");
-        
-        Long organizerId = ((Number) eventData.get("organizerId")).longValue();
-        Organizer organizer = organizerRepository.findById(organizerId)
-                .orElseThrow(() -> new RuntimeException("Organizer not found"));
+        // Handle both flat and nested structures
+        Map<String, Object> data = eventData;
+        if (eventData.containsKey("basicInfo")) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> basicInfo = (Map<String, Object>) eventData.get("basicInfo");
+            data = basicInfo;
+        }
+
+        // Get or create default organizer
+        Organizer organizer;
+        if (eventData.containsKey("organizerId")) {
+            Long organizerId = ((Number) eventData.get("organizerId")).longValue();
+            organizer = organizerRepository.findById(organizerId)
+                    .orElseThrow(() -> new RuntimeException("Organizer not found"));
+        } else {
+            // Use first organizer or create a default one
+            organizer = organizerRepository.findAll().stream()
+                    .findFirst()
+                    .orElseGet(() -> {
+                        Organizer defaultOrganizer = Organizer.builder()
+                                .userId(1L) // Default system user
+                                .organizationName("Default Organizer")
+                                .organizationType(Organizer.OrganizationType.INDIVIDUAL)
+                                .verificationStatus(Organizer.VerificationStatus.VERIFIED)
+                                .description("Default system organizer")
+                                .build();
+                        return organizerRepository.save(defaultOrganizer);
+                    });
+            log.info("Using organizer: {} (ID: {})", organizer.getOrganizationName(), organizer.getId());
+        }
 
         // Generate unique slug
-        String name = (String) basicInfo.get("name");
+        String name = (String) data.get("name");
         String slug = slugGenerator.generateUniqueSlug(name);
 
         // Build event
@@ -56,19 +79,19 @@ public class EventService {
                 .organizer(organizer)
                 .slug(slug)
                 .name(name)
-                .category(Event.EventCategory.valueOf((String) basicInfo.get("category")))
-                .type(Event.EventType.valueOf((String) basicInfo.get("type")))
-                .startDateTime(LocalDateTime.parse((String) basicInfo.get("startDateTime")))
-                .endDateTime(LocalDateTime.parse((String) basicInfo.get("endDateTime")))
-                .description((String) basicInfo.get("description"))
-                .shortDescription((String) basicInfo.get("shortDescription"))
-                .coverImage((String) basicInfo.get("coverImage"))
+                .category(Event.EventCategory.valueOf((String) data.get("category")))
+                .type(Event.EventType.valueOf((String) data.get("type")))
+                .startDateTime(LocalDateTime.parse((String) data.get("startDateTime")))
+                .endDateTime(LocalDateTime.parse((String) data.get("endDateTime")))
+                .description((String) data.get("description"))
+                .shortDescription((String) data.get("shortDescription"))
+                .coverImage((String) data.get("coverImage"))
                 .status(Event.EventStatus.DRAFT)
                 .build();
 
         Event savedEvent = eventRepository.save(event);
         log.info("Event created with ID: {}", savedEvent.getId());
-        
+
         return savedEvent;
     }
 
@@ -80,11 +103,11 @@ public class EventService {
         log.info("Fetching event: {}", id);
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
-        
+
         // Increment views
         event.setViews(event.getViews() + 1);
         eventRepository.save(event);
-        
+
         return event;
     }
 
@@ -105,7 +128,7 @@ public class EventService {
     @CacheEvict(value = "events", key = "#id")
     public Event updateEvent(Long id, Map<String, Object> updateData) {
         log.info("Updating event: {}", id);
-        
+
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
@@ -130,7 +153,7 @@ public class EventService {
     @CacheEvict(value = "events", allEntries = true)
     public Event publishEvent(Long id) {
         log.info("Publishing event: {}", id);
-        
+
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
@@ -151,12 +174,12 @@ public class EventService {
     @CacheEvict(value = "events", key = "#id")
     public Event cancelEvent(Long id, String reason) {
         log.info("Cancelling event: {}", id);
-        
+
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 
         event.setStatus(Event.EventStatus.CANCELLED);
-        
+
         return eventRepository.save(event);
     }
 
@@ -165,19 +188,19 @@ public class EventService {
      */
     public Page<Event> getOrganizerEvents(Long organizerId, String status, Pageable pageable) {
         log.info("Fetching events for organizer: {}", organizerId);
-        
+
         if (status != null) {
             Event.EventStatus eventStatus = Event.EventStatus.valueOf(status);
             return eventRepository.findByOrganizerIdAndStatus(organizerId, eventStatus, pageable);
         }
-        
+
         return eventRepository.findByOrganizerId(organizerId, pageable);
     }
 
     /**
      * Search events
      */
-    @Cacheable(value = "event-search", key = "#searchParams.toString()")
+    @Cacheable(value = "event-search", key = "#searchParams != null ? #searchParams.toString() : 'empty'")
     public Page<Event> searchEvents(Map<String, Object> searchParams, Pageable pageable) {
         log.info("Searching events with params: {}", searchParams);
 
@@ -202,9 +225,8 @@ public class EventService {
     public List<Event> getFeaturedEvents(int limit) {
         log.info("Fetching featured events");
         return eventRepository.findFeaturedEvents(
-            LocalDateTime.now(), 
-            Pageable.ofSize(limit)
-        );
+                LocalDateTime.now(),
+                Pageable.ofSize(limit));
     }
 
     /**
@@ -214,7 +236,7 @@ public class EventService {
     @CacheEvict(value = "events", key = "#id")
     public void deleteEvent(Long id) {
         log.info("Deleting event: {}", id);
-        
+
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
 

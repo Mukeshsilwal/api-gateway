@@ -51,6 +51,7 @@ public class Organizer {
     private String website;
 
     @Column(name = "social_media", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private String socialMedia; // JSON: {facebook, instagram, twitter, linkedin}
 
     @Enumerated(EnumType.STRING)
@@ -76,6 +77,7 @@ public class Organizer {
     private BigDecimal totalRevenue = BigDecimal.ZERO;
 
     @Column(name = "bank_details", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private String bankDetails; // JSON: {accountName, bankName, accountNumber, etc}
 
     @Column(name = "tax_id")

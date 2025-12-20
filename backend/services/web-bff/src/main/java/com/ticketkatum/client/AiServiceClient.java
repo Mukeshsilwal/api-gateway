@@ -25,7 +25,7 @@ public class AiServiceClient {
 
     private final WebClient.Builder webClientBuilder;
 
-    @Value("${services.ai-service.url:http://localhost:8085}")
+    @Value("${services.ai-service.url:http://localhost:8095}")
     private String aiServiceUrl;
 
     private static final String SERVICE_NAME = "ai-service";

@@ -48,9 +48,9 @@ microservices:
   
   # Timeout Configuration
   timeout:
-    connection-timeout: ${CONNECTION_TIMEOUT:5000}
-    response-timeout: ${RESPONSE_TIMEOUT:10000}
-    read-timeout: ${READ_TIMEOUT:10000}
+    connection-timeout: ${CONNECTION_TIMEOUT:10000}
+    response-timeout: ${RESPONSE_TIMEOUT:60000}
+    read-timeout: ${READ_TIMEOUT:60000}
 
 # ============================================================
 # SERVER CONFIGURATION

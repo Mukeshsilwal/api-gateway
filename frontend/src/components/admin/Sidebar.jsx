@@ -57,6 +57,7 @@ export function Sidebar({ activeTab, setActiveTab, onLogout, isCollapsed, onTogg
             items: [
                 { id: 'buses', label: 'Bus Manager', icon: Bus },
                 { id: 'routes', label: 'Route Manager', icon: Map },
+                { id: 'events', label: 'Event Manager', icon: Calendar },
                 { id: 'hotels', label: 'Hotel Manager', icon: Hotel },
                 { id: 'cinemas', label: 'Cinema Manager', icon: Film },
                 { id: 'tickets', label: 'Ticket Manager', icon: Ticket },

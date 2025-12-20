@@ -3,7 +3,7 @@
  * Type-safe client for event management operations
  */
 
-import apiClient from './api.service'; // Changed 'api' to 'apiClient'
+import apiClient from '../config/apiConfig';
 import type {
     // Organizer
     OrganizerRegistrationDto,
@@ -28,9 +28,6 @@ import type {
 
     // Communication
     EventAnnouncementDto,
-
-    // Common
-    Response,
 } from '../types/event-dto';
 
 // ============================================================
@@ -42,28 +39,28 @@ export const organizerService = {
      * Register new organizer
      */
     async register(data: OrganizerRegistrationDto): Promise<OrganizerProfileDto> {
-        return api.post<OrganizerProfileDto>('/api/bff/v1/organizers/register', data);
+        return apiClient.post<OrganizerProfileDto>('/api/bff/v1/organizers/register', data);
     },
 
     /**
      * Get organizer profile
      */
     async getProfile(organizerId: number): Promise<OrganizerProfileDto> {
-        return api.get<OrganizerProfileDto>(`/api/bff/v1/organizers/${organizerId}`);
+        return apiClient.get<OrganizerProfileDto>(`/api/bff/v1/organizers/${organizerId}`);
     },
 
     /**
      * Update organizer profile
      */
     async updateProfile(organizerId: number, data: Partial<OrganizerProfileDto>): Promise<OrganizerProfileDto> {
-        return api.put<OrganizerProfileDto>(`/api/bff/v1/organizers/${organizerId}`, data);
+        return apiClient.put<OrganizerProfileDto>(`/api/bff/v1/organizers/${organizerId}`, data);
     },
 
     /**
      * Get organizer dashboard
      */
     async getDashboard(organizerId: number): Promise<OrganizerDashboardDto> {
-        return api.get<OrganizerDashboardDto>(`/api/bff/v1/organizers/${organizerId}/dashboard`);
+        return apiClient.get<OrganizerDashboardDto>(`/api/bff/v1/organizers/${organizerId}/dashboard`);
     },
 
     /**
@@ -72,7 +69,7 @@ export const organizerService = {
     async uploadLogo(organizerId: number, file: File): Promise<string> {
         const formData = new FormData();
         formData.append('logo', file);
-        return api.post<string>(`/api/bff/v1/organizers/${organizerId}/logo`, formData);
+        return apiClient.post<string>(`/api/bff/v1/organizers/${organizerId}/logo`, formData);
     },
 };
 
@@ -85,42 +82,42 @@ export const eventService = {
      * Create new event
      */
     async createEvent(data: EventCreationDto): Promise<EventDto> {
-        return api.post<EventDto>('/api/bff/v1/events', data);
+        return apiClient.post<EventDto>('/api/bff/v1/events', data);
     },
 
     /**
      * Get event by ID
      */
     async getEvent(eventId: number): Promise<EventDto> {
-        return api.get<EventDto>(`/api/bff/v1/events/${eventId}`);
+        return apiClient.get<EventDto>(`/api/bff/v1/events/${eventId}`);
     },
 
     /**
      * Update event
      */
     async updateEvent(eventId: number, data: Partial<EventCreationDto>): Promise<EventDto> {
-        return api.put<EventDto>(`/api/bff/v1/events/${eventId}`, data);
+        return apiClient.put<EventDto>(`/api/bff/v1/events/${eventId}`, data);
     },
 
     /**
      * Delete event
      */
     async deleteEvent(eventId: number): Promise<void> {
-        return api.delete(`/api/bff/v1/events/${eventId}`);
+        return apiClient.delete(`/api/bff/v1/events/${eventId}`);
     },
 
     /**
      * Publish event
      */
     async publishEvent(eventId: number): Promise<EventDto> {
-        return api.post<EventDto>(`/api/bff/v1/events/${eventId}/publish`);
+        return apiClient.post<EventDto>(`/api/bff/v1/events/${eventId}/publish`);
     },
 
     /**
      * Cancel event
      */
     async cancelEvent(eventId: number, reason: string): Promise<EventDto> {
-        return api.post<EventDto>(`/api/bff/v1/events/${eventId}/cancel`, { reason });
+        return apiClient.post<EventDto>(`/api/bff/v1/events/${eventId}/cancel`, { reason });
     },
 
     /**
@@ -130,7 +127,7 @@ export const eventService = {
         const url = status
             ? `/api/bff/v1/organizers/${organizerId}/events?status=${status}`
             : `/api/bff/v1/organizers/${organizerId}/events`;
-        return api.get<EventDto[]>(url);
+        return apiClient.get<EventDto[]>(url);
     },
 
     /**
@@ -146,14 +143,14 @@ export const eventService = {
         minPrice?: number;
         maxPrice?: number;
     }): Promise<EventCardDto[]> {
-        return api.post<EventCardDto[]>('/api/bff/v1/events/search', params);
+        return apiClient.post<EventCardDto[]>('/api/bff/v1/events/search', params);
     },
 
     /**
      * Get featured events
      */
     async getFeaturedEvents(): Promise<EventCardDto[]> {
-        return api.get<EventCardDto[]>('/api/bff/v1/events/featured');
+        return apiClient.get<EventCardDto[]>('/api/bff/v1/events/featured');
     },
 
     /**
@@ -162,7 +159,7 @@ export const eventService = {
     async uploadImages(eventId: number, files: File[]): Promise<string[]> {
         const formData = new FormData();
         files.forEach(file => formData.append('images', file));
-        return api.post<string[]>(`/api/bff/v1/events/${eventId}/images`, formData);
+        return apiClient.post<string[]>(`/api/bff/v1/events/${eventId}/images`, formData);
     },
 };
 
@@ -175,42 +172,42 @@ export const ticketService = {
      * Create ticket type
      */
     async createTicketType(eventId: number, data: TicketTypeDto): Promise<TicketTypeDto> {
-        return api.post<TicketTypeDto>(`/api/bff/v1/events/${eventId}/tickets`, data);
+        return apiClient.post<TicketTypeDto>(`/api/bff/v1/events/${eventId}/tickets`, data);
     },
 
     /**
      * Update ticket type
      */
     async updateTicketType(eventId: number, ticketTypeId: number, data: Partial<TicketTypeDto>): Promise<TicketTypeDto> {
-        return api.put<TicketTypeDto>(`/api/bff/v1/events/${eventId}/tickets/${ticketTypeId}`, data);
+        return apiClient.put<TicketTypeDto>(`/api/bff/v1/events/${eventId}/tickets/${ticketTypeId}`, data);
     },
 
     /**
      * Delete ticket type
      */
     async deleteTicketType(eventId: number, ticketTypeId: number): Promise<void> {
-        return api.delete(`/api/bff/v1/events/${eventId}/tickets/${ticketTypeId}`);
+        return apiClient.delete(`/api/bff/v1/events/${eventId}/tickets/${ticketTypeId}`);
     },
 
     /**
      * Book tickets
      */
     async bookTickets(data: TicketBookingDto): Promise<EventBookingResponseDto> {
-        return api.post<EventBookingResponseDto>('/api/bff/v1/bookings/event', data);
+        return apiClient.post<EventBookingResponseDto>('/api/bff/v1/bookings/event', data);
     },
 
     /**
      * Get booking details
      */
     async getBooking(bookingReference: string): Promise<EventBookingResponseDto> {
-        return api.get<EventBookingResponseDto>(`/api/bff/v1/bookings/event/${bookingReference}`);
+        return apiClient.get<EventBookingResponseDto>(`/api/bff/v1/bookings/event/${bookingReference}`);
     },
 
     /**
      * Cancel booking
      */
     async cancelBooking(bookingReference: string, reason: string): Promise<void> {
-        return api.post(`/api/bff/v1/bookings/event/${bookingReference}/cancel`, { reason });
+        return apiClient.post(`/api/bff/v1/bookings/event/${bookingReference}/cancel`, { reason });
     },
 };
 
@@ -223,14 +220,14 @@ export const analyticsService = {
      * Get event analytics
      */
     async getEventAnalytics(eventId: number): Promise<EventAnalyticsDto> {
-        return api.get<EventAnalyticsDto>(`/api/bff/v1/events/${eventId}/analytics`);
+        return apiClient.get<EventAnalyticsDto>(`/api/bff/v1/events/${eventId}/analytics`);
     },
 
     /**
      * Export attendee list
      */
     async exportAttendees(eventId: number, format: 'CSV' | 'EXCEL'): Promise<Blob> {
-        return api.get(`/api/bff/v1/events/${eventId}/attendees/export?format=${format}`, {
+        return apiClient.get(`/api/bff/v1/events/${eventId}/attendees/export?format=${format}`, {
             responseType: 'blob',
         });
     },
@@ -245,14 +242,14 @@ export const promoCodeService = {
      * Create promo code
      */
     async createPromoCode(eventId: number, data: PromoCodeDto): Promise<PromoCodeDto> {
-        return api.post<PromoCodeDto>(`/api/bff/v1/events/${eventId}/promo-codes`, data);
+        return apiClient.post<PromoCodeDto>(`/api/bff/v1/events/${eventId}/promo-codes`, data);
     },
 
     /**
      * Validate promo code
      */
     async validatePromoCode(eventId: number, code: string): Promise<PromoCodeDto> {
-        return api.get<PromoCodeDto>(`/api/bff/v1/events/${eventId}/promo-codes/${code}/validate`);
+        return apiClient.get<PromoCodeDto>(`/api/bff/v1/events/${eventId}/promo-codes/${code}/validate`);
     },
 };
 
@@ -265,7 +262,7 @@ export const checkInService = {
      * Check in attendee
      */
     async checkIn(data: CheckInDto): Promise<CheckInResponseDto> {
-        return api.post<CheckInResponseDto>('/api/bff/v1/check-in', data);
+        return apiClient.post<CheckInResponseDto>('/api/bff/v1/check-in', data);
     },
 
     /**
@@ -277,7 +274,7 @@ export const checkInService = {
         pending: number;
         checkInRate: number;
     }> {
-        return api.get(`/api/bff/v1/events/${eventId}/check-in/stats`);
+        return apiClient.get(`/api/bff/v1/events/${eventId}/check-in/stats`);
     },
 };
 
@@ -290,14 +287,14 @@ export const communicationService = {
      * Send event announcement
      */
     async sendAnnouncement(data: EventAnnouncementDto): Promise<void> {
-        return api.post('/api/bff/v1/events/announcements', data);
+        return apiClient.post('/api/bff/v1/events/announcements', data);
     },
 
     /**
      * Send event reminder
      */
     async sendReminder(eventId: number): Promise<void> {
-        return api.post(`/api/bff/v1/events/${eventId}/reminders`);
+        return apiClient.post(`/api/bff/v1/events/${eventId}/reminders`);
     },
 };
 

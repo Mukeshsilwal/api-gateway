@@ -52,6 +52,9 @@ const HotelBookingPage = lazy(() => import("./pages/HotelBookingPage")); // NEW
 // Event Routes
 const EventList = lazy(() => import("./pages/EventList"));
 const EventDetails = lazy(() => import("./pages/EventDetails"));
+const EventBooking = lazy(() => import("./pages/EventBooking").then(module => ({ default: module.EventBooking })));
+const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation").then(module => ({ default: module.BookingConfirmation })));
+const AddEventPage = lazy(() => import("./pages/AddEventPage").then(module => ({ default: module.AddEventPage })));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const EsewaDemo = lazy(() => import("./pages/EsewaDemo"));
@@ -243,6 +246,19 @@ function App() {
               {/* Event Routes */}
               <Route path="/events" element={<EventList />} errorElement={<ErrorPage />} />
               <Route path="/events/:eventId" element={<EventDetails />} errorElement={<ErrorPage />} />
+              <Route path="/events/:eventId/book" element={<EventBooking />} errorElement={<ErrorPage />} />
+              <Route path="/events/booking/:bookingReference/confirmation" element={<BookingConfirmation />} errorElement={<ErrorPage />} />
+
+              {/* Add Event Page - Admin Route */}
+              <Route
+                path="/add-event"
+                element={
+                  <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
+                    <AddEventPage />
+                  </ProtectedRoute>
+                }
+                errorElement={<ErrorPage />}
+              />
 
               {/* Market Routes */}
               <Route path="/market" element={<MarketDashboard />} errorElement={<ErrorPage />} />

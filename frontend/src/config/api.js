@@ -43,8 +43,8 @@ const API_CONFIG = {
     HOTEL_SEARCH: '/api/bff/v1/hotels/search',
 
     // === Main BFF ===
-    HOME_DATA: '/api/bff/v1/home',
-    HOME: '/api/bff/v1/home', // Legacy alias for backward compatibility
+    HOME_DATA: '/api/bff/v1/home-data',
+    HOME: '/api/bff/v1/home-data', // Legacy alias for backward compatibility
 
     // === Maintenance BFF ===
     MAINTENANCE_SAVE: '/api/bff/v1/maintenance/save',

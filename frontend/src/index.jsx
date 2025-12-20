@@ -6,6 +6,8 @@ import { BusListProvider } from "./context/busdetails";
 import { SelectedBusProvider } from "./context/selectedbus";
 import { QueryProvider } from "./context/QueryProvider";
 import { Toaster } from 'react-hot-toast';
+import { reportWebVitals } from './utils/webVitals';
+
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -43,3 +45,14 @@ root.render(
     </QueryProvider>
   </React.StrictMode>
 );
+
+// Start monitoring Web Vitals
+reportWebVitals();
+
+// Register Service Worker in production for offline support
+if (import.meta.env.PROD) {
+  import('./utils/serviceWorkerRegistration').then(({ registerServiceWorker }) => {
+    registerServiceWorker();
+  });
+}
+

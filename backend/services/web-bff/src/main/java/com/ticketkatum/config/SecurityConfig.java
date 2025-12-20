@@ -125,7 +125,8 @@ public class SecurityConfig {
                 "X-Correlation-ID",
                 "Session-Id",
                 "Username",
-                "User-Id"));
+                "User-Id",
+                "X-User-Id"));
 
         configuration.setExposedHeaders(Arrays.asList(
                 "X-Request-ID",

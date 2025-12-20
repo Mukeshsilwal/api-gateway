@@ -91,7 +91,16 @@ export const API_ENDPOINTS = {
     // Admin
     ADMIN: {
         DASHBOARD: `${BFF_BASE_URL}/admin/dashboard`,
-        EVENTS: `${BFF_BASE_URL}/admin/events`,
+        EVENTS: {
+            SEARCH: `${BFF_BASE_URL}/events/search`,
+            CREATE: `${BFF_BASE_URL}/events`,
+            DETAILS: (id) => `${BFF_BASE_URL}/events/${id}`,
+            UPDATE: (id) => `${BFF_BASE_URL}/events/${id}`,
+            PUBLISH: (id) => `${BFF_BASE_URL}/events/${id}/publish`,
+            CANCEL: (id) => `${BFF_BASE_URL}/events/${id}/cancel`,
+            ANALYTICS: (id) => `${BFF_BASE_URL}/events/${id}/analytics`,
+            ORGANIZER_EVENTS: (organizerId) => `${BFF_BASE_URL}/organizers/${organizerId}/events`,
+        },
         BOOKINGS: `${BFF_BASE_URL}/admin/bookings`,
         USERS: `${BFF_BASE_URL}/admin/users`,
     },

@@ -99,7 +99,7 @@ const hotelService = {
         try {
             console.log('Creating hotel with data:', hotelData);
             const response = await apiService.post(
-                API_CONFIG.ENDPOINTS.CREATE_HOTEL,
+                API_CONFIG.ENDPOINTS.HOTEL_CREATE,
                 hotelData
             );
             return response.data || response;

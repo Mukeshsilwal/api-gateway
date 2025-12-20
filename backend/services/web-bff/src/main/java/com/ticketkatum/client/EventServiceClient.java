@@ -145,13 +145,13 @@ public class EventServiceClient {
 
     @CircuitBreaker(name = "eventService", fallbackMethod = "searchEventsFallback")
     @Retry(name = "eventService")
-    public Mono<Response<List<?>>> searchEvents(Map<String, Object> searchParams) {
+    public Mono<Response<?>> searchEvents(Map<String, Object> searchParams) {
         log.info("Searching events with params: {}", searchParams);
         return webClient.post()
                 .uri("/api/events/search")
                 .bodyValue(searchParams)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<List<?>>>() {
+                .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
                 });
     }
 
@@ -327,9 +327,9 @@ public class EventServiceClient {
         return Mono.just(Response.error("Unable to cancel event"));
     }
 
-    private Mono<Response<List<?>>> searchEventsFallback(Map<String, Object> params, Exception ex) {
-        log.error("Event service unavailable for search", ex);
-        return Mono.just(Response.error("Unable to search events"));
+    private Mono<Response<?>> searchEventsFallback(Map<String, Object> params, Exception ex) {
+        log.warn("Fallback: Search events failed - {}", ex.getMessage());
+        return Mono.just(Response.error("Event search temporarily unavailable"));
     }
 
     private Mono<Response<List<?>>> getFeaturedEventsFallback(Exception ex) {

@@ -15,6 +15,7 @@ import TripScheduler from "../components/admin/TripScheduler";
 import TicketingDashboard from "../components/admin/ticketing/TicketingDashboard";
 import RoomMaintenancePage from "../components/admin/maintenance/RoomMaintenancePage";
 import UserManagement from "../components/admin/UserManagement";
+import { EventManager } from "../components/admin/EventManager";
 
 export function AdminPanel() {
   const navigate = useNavigate();
@@ -64,6 +65,8 @@ export function AdminPanel() {
         return <HotelManager />;
       case 'cinemas':
         return <CinemaManager />;
+      case 'events':
+        return <EventManager />;
       case 'users':
         return <UserManagement />;
       case 'settings':

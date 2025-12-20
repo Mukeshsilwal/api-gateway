@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8095
 
 spring:
   application:
@@ -14,8 +14,8 @@ spring:
 # OpenAI Configuration
 openai:
   api:
-    key: ${OPENAI_API_KEY:your-api-key-here}
-  model: gpt-4-turbo-preview
+    key: ${OPENAI_API_KEY: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}
+  model: gpt-4o-mini
   max-tokens: 500
   temperature: 0.7
 

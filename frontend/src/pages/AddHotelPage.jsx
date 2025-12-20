@@ -86,18 +86,31 @@ export function AddHotelPage() {
 
             // Step 1: Upload hotel images if provided
             if (images && images.length > 0) {
-                toast.info('Uploading hotel images...');
+                toast.info(`Uploading ${images.length} hotel image(s)...`);
 
-                // Upload all images
-                for (const image of images) {
-                    const imageUrl = await imageService.uploadImage(image);
-                    uploadedImageUrls.push(imageUrl);
+                try {
+                    // Upload all images
+                    for (let i = 0; i < images.length; i++) {
+                        const image = images[i];
+                        console.log(`Uploading image ${i + 1}/${images.length}:`, image.name);
+
+                        const imageUrl = await imageService.uploadImage(image);
+                        console.log(`Image ${i + 1} uploaded successfully:`, imageUrl);
+                        uploadedImageUrls.push(imageUrl);
+                    }
+
+                    console.log('All images uploaded successfully:', uploadedImageUrls);
+                    toast.success(`${uploadedImageUrls.length} image(s) uploaded successfully!`);
+                } catch (imageError) {
+                    console.error('Image upload failed:', imageError);
+                    toast.error(`Image upload failed: ${imageError.message}`);
+                    return; // Stop if image upload fails
                 }
-
-                toast.info('Images uploaded successfully. Creating hotel...');
             }
 
             // Step 2: Create hotel with complete data
+            toast.info('Creating hotel...');
+
             const hotelDataToSend = {
                 ...hotelInfo,
                 images: uploadedImageUrls,
@@ -110,34 +123,44 @@ export function AddHotelPage() {
             };
 
             console.log('Sending hotel data:', JSON.stringify(hotelDataToSend, null, 2));
-            const response = await hotelService.createHotel(hotelDataToSend);
-            console.log('Hotel created successfully:', response);
 
-            toast.success('Hotel created successfully!');
-            navigate('/admin/panel', { state: { tab: 'hotels' } });
-        } catch (error) {
-            console.error('Error creating hotel:', error);
+            try {
+                const response = await hotelService.createHotel(hotelDataToSend);
+                console.log('Hotel created successfully:', response);
 
-            // Extract detailed error message
-            let errorMessage = 'Failed to create hotel';
+                toast.success('Hotel created successfully!');
+                navigate('/admin/panel', { state: { tab: 'hotels' } });
+            } catch (hotelError) {
+                console.error('Hotel creation failed:', hotelError);
 
-            if (error.response?.data) {
-                const errorData = error.response.data;
-                console.error('Backend validation error:', errorData);
+                // Extract detailed error message
+                let errorMessage = 'Failed to create hotel';
 
-                // Handle validation errors
-                if (errorData.errors && Array.isArray(errorData.errors)) {
-                    errorMessage = errorData.errors.map(e => e.message || e).join(', ');
-                } else if (errorData.message) {
-                    errorMessage = errorData.message;
-                } else if (typeof errorData === 'string') {
-                    errorMessage = errorData;
+                if (hotelError.response?.data) {
+                    const errorData = hotelError.response.data;
+                    console.error('Backend validation error:', errorData);
+
+                    // Handle validation errors
+                    if (errorData.errors && Array.isArray(errorData.errors)) {
+                        errorMessage = errorData.errors.map(e => e.message || e).join(', ');
+                    } else if (errorData.message) {
+                        errorMessage = errorData.message;
+                    } else if (typeof errorData === 'string') {
+                        errorMessage = errorData;
+                    }
+                } else if (hotelError.message) {
+                    errorMessage = hotelError.message;
                 }
-            } else if (error.message) {
-                errorMessage = error.message;
-            }
 
-            toast.error(errorMessage);
+                toast.error(errorMessage);
+                // Don't re-throw, just log and show error
+            }
+        } catch (error) {
+            console.error('Error in handleSubmit:', error);
+            // If error wasn't already handled by inner catch, show it
+            if (!error.response) {
+                toast.error(error.message || 'An unexpected error occurred');
+            }
         }
     };
 

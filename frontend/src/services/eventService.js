@@ -146,7 +146,7 @@ class EventService {
      */
     async createEvent(eventData) {
         try {
-            const response = await apiClient.post(API_ENDPOINTS.EVENTS.CREATE, eventData);
+            const response = await apiClient.post(API_ENDPOINTS.ADMIN.EVENTS.CREATE, eventData);
             return response.data;
         } catch (error) {
             console.error('Create event error:', error);
@@ -162,7 +162,7 @@ class EventService {
      */
     async updateEvent(eventId, eventData) {
         try {
-            const response = await apiClient.put(API_ENDPOINTS.EVENTS.UPDATE(eventId), eventData);
+            const response = await apiClient.put(API_ENDPOINTS.ADMIN.EVENTS.UPDATE(eventId), eventData);
             return response.data;
         } catch (error) {
             console.error('Update event error:', error);
@@ -196,6 +196,87 @@ class EventService {
             return response.data;
         } catch (error) {
             console.error('Get event bookings error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get all events with filters (Admin)
+     * @param {Object} filters - { status, category, organizerId, dateFrom, dateTo, search }
+     * @returns {Promise} Response with filtered events
+     */
+    async getAllEventsAdmin(filters = {}) {
+        try {
+            const response = await apiClient.post(API_ENDPOINTS.ADMIN.EVENTS.SEARCH, filters);
+            return response.data;
+        } catch (error) {
+            console.error('Get all events admin error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Approve event - publish it (Admin)
+     * @param {string|number} eventId - Event ID
+     * @returns {Promise} Response with updated event
+     */
+    async approveEvent(eventId) {
+        try {
+            const response = await apiClient.post(API_ENDPOINTS.ADMIN.EVENTS.PUBLISH(eventId));
+            return response.data;
+        } catch (error) {
+            console.error('Approve event error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Reject event - cancel with reason (Admin)
+     * @param {string|number} eventId - Event ID
+     * @param {string} reason - Rejection reason
+     * @returns {Promise} Response with updated event
+     */
+    async rejectEvent(eventId, reason) {
+        try {
+            const response = await apiClient.post(API_ENDPOINTS.ADMIN.EVENTS.CANCEL(eventId), {
+                reason,
+                cancelledBy: 'ADMIN'
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Reject event error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get event analytics (Admin)
+     * @param {string|number} eventId - Event ID
+     * @returns {Promise} Response with event analytics
+     */
+    async getEventAnalytics(eventId) {
+        try {
+            const response = await apiClient.get(API_ENDPOINTS.ADMIN.EVENTS.ANALYTICS(eventId));
+            return response.data;
+        } catch (error) {
+            console.error('Get event analytics error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Get organizer's events (Admin)
+     * @param {string|number} organizerId - Organizer ID
+     * @param {string} status - Optional status filter
+     * @returns {Promise} Response with organizer's events
+     */
+    async getOrganizerEvents(organizerId, status = null) {
+        try {
+            const url = API_ENDPOINTS.ADMIN.EVENTS.ORGANIZER_EVENTS(organizerId);
+            const response = await apiClient.get(url, { params: { status } });
+            return response.data;
+        } catch (error) {
+            console.error('Get organizer events error:', error);
             throw error;
         }
     }

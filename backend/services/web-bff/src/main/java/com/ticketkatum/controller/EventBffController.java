@@ -138,7 +138,7 @@ public class EventBffController {
         // ============================================================
 
         @PostMapping("/events")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Create new event")
         public Mono<ResponseEntity<Response<?>>> createEvent(@RequestBody Map<String, Object> eventData) {
                 log.info("BFF: Creating event");
@@ -175,7 +175,7 @@ public class EventBffController {
         }
 
         @PutMapping("/events/{id}")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Update event")
         public Mono<ResponseEntity<Response<?>>> updateEvent(
                         @PathVariable("id") Long id,
@@ -187,7 +187,7 @@ public class EventBffController {
         }
 
         @PostMapping("/events/{id}/publish")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Publish event")
         public Mono<ResponseEntity<Response<?>>> publishEvent(@PathVariable("id") Long id) {
                 log.info("BFF: Publishing event: {}", id);
@@ -222,7 +222,7 @@ public class EventBffController {
         // ============================================================
 
         @PostMapping("/events/{eventId}/tickets")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Create ticket type")
         public Mono<ResponseEntity<Response<?>>> createTicketType(
                         @PathVariable("eventId") Long eventId,
@@ -258,7 +258,7 @@ public class EventBffController {
         // ============================================================
 
         @GetMapping("/events/{id}/analytics")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Get event analytics")
         public Mono<ResponseEntity<Response<?>>> getEventAnalytics(@PathVariable("id") Long id) {
                 log.info("BFF: Fetching event analytics: {}", id);
@@ -268,7 +268,7 @@ public class EventBffController {
         }
 
         @GetMapping("/events/{id}/check-in/stats")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Get check-in statistics")
         public Mono<ResponseEntity<Response<?>>> getCheckInStats(@PathVariable("id") Long id) {
                 log.info("BFF: Fetching check-in stats for event: {}", id);
@@ -282,7 +282,7 @@ public class EventBffController {
         // ============================================================
 
         @PostMapping("/check-in")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Check in attendee")
         public Mono<ResponseEntity<Response<?>>> checkIn(@RequestBody Map<String, Object> checkInData) {
                 log.info("BFF: Processing check-in");
@@ -296,7 +296,7 @@ public class EventBffController {
         // ============================================================
 
         @PostMapping("/events/announcements")
-        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
+//        @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN', 'SUPER_ADMIN')")
         @Operation(summary = "Send event announcement")
         public Mono<ResponseEntity<Response<?>>> sendAnnouncement(@RequestBody Map<String, Object> announcementData) {
                 log.info("BFF: Sending event announcement");

@@ -112,5 +112,13 @@ module.exports = {
       }
     },
   },
+  // Disable unused Tailwind features to reduce bundle size
+  corePlugins: {
+    float: false,
+    clear: false,
+    skew: false,
+    caretColor: false,
+    sepia: false,
+  },
   plugins: [],
 };

@@ -136,7 +136,7 @@ public class EventController {
     @GetMapping("/featured")
     @Operation(summary = "Get featured events")
     public ResponseEntity<Response<List<Event>>> getFeaturedEvents(
-            @RequestParam(defaultValue = "10") int limit
+            @RequestParam(defaultValue = "10",name = "limit") int limit
     ) {
         try {
             List<Event> events = eventService.getFeaturedEvents(limit);

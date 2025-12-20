@@ -89,6 +89,9 @@ jobs:
             ["auth-service"]="services/auth-service/Dockerfile"
             ["market-service"]="services/market-service/Dockerfile"
             ["bus-service"]="services/bus-service/Dockerfile"
+            ["event-service"]="services/event-service/Dockerfile"
+            ["ai-service"]="services/ai-service/Dockerfile"
+            ["image-service"]="services/image-service/Dockerfile"
           )
 
           for service in "${!services[@]}"; do
@@ -134,12 +137,15 @@ jobs:
             hotel-service=${REGISTRY}/hotel-service:${IMAGE_TAG} \
             auth-service=${REGISTRY}/auth-service:${IMAGE_TAG} \
             bus-service=${REGISTRY}/bus-service:${IMAGE_TAG} \
-            market-service=${REGISTRY}/market-service:${IMAGE_TAG}
+            market-service=${REGISTRY}/market-service:${IMAGE_TAG} \
+            event-service=${REGISTRY}/event-service:${IMAGE_TAG} \
+            ai-service=${REGISTRY}/ai-service:${IMAGE_TAG} \
+            image-service=${REGISTRY}/image-service:${IMAGE_TAG}
 
           cd ../..
 
           kubectl apply -k infra/k8s
 
-          for deploy in web-bff booking-service payment-service hotel-service auth-service bus-service market-service; do
+          for deploy in web-bff booking-service payment-service hotel-service auth-service bus-service market-service event-service ai-service image-service; do
             kubectl rollout status deployment/$deploy --timeout=120s || true
           done

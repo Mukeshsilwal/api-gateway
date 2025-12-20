@@ -47,7 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/bff/v1/buses/**",
             "/api/bff/v1/registration/**",
             "/api/bff/market/**",
-            "/api/bff/v1/events"
+            "/api/bff/v1/events",
+            "/api/bff/v1/ai/**"
 
     };
 

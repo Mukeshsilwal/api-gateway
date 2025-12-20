@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "events", indexes = {
-    @Index(name = "idx_events_status", columnList = "status"),
-    @Index(name = "idx_events_category", columnList = "category"),
-    @Index(name = "idx_events_start_date", columnList = "start_date_time"),
-    @Index(name = "idx_events_slug", columnList = "slug", unique = true)
+        @Index(name = "idx_events_status", columnList = "status"),
+        @Index(name = "idx_events_category", columnList = "category"),
+        @Index(name = "idx_events_start_date", columnList = "start_date_time"),
+        @Index(name = "idx_events_slug", columnList = "slug", unique = true)
 })
 @Data
 @NoArgsConstructor
@@ -81,9 +81,11 @@ public class Event {
     private String coverImage;
 
     @Column(name = "images", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private String images; // JSON array of image URLs
 
     @Column(name = "tags", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private String tags; // JSON array of tags
 
     @Column(name = "language", length = 10)
@@ -120,6 +122,7 @@ public class Event {
     private Integer shares = 0;
 
     @Column(name = "seo_meta", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private String seoMeta; // JSON: {title, description, keywords, ogImage}
 
     @Version
@@ -141,7 +144,7 @@ public class Event {
     private LocalDateTime deletedAt;
 
     public enum EventCategory {
-        MUSIC, SPORTS, CONFERENCE, WORKSHOP, FESTIVAL, 
+        MUSIC, SPORTS, CONFERENCE, WORKSHOP, FESTIVAL,
         EXHIBITION, THEATER, COMEDY, NETWORKING, OTHER
     }
 
