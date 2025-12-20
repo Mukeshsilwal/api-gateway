@@ -23,7 +23,7 @@ public class CrowdController {
     }
 
     @GetMapping("/heatmap/{eventId}")
-    public ResponseEntity<List<CrowdZone>> getHeatmap(@PathVariable("eventId") UUID eventId) {
+    public ResponseEntity<List<CrowdZone>> getHeatmap(@PathVariable("eventId") Long eventId) {
         return ResponseEntity.ok(crowdService.getHeatmap(eventId));
     }
 

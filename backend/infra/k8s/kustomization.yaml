@@ -17,4 +17,24 @@ resources:
   - services/manual-pvs.yaml
   - services/prometheus-config.yaml
   - services/statefulsets.yaml
+  - services/event-service-deployment.yaml
+  - services/event-service-service.yaml
 
+images:
+  - name: event-service
+    newTag: latest
+
+  - name: booking-service
+    newTag: latest
+  - name: web-bff
+    newTag: latest
+  - name: payment-service
+    newTag: latest
+  - name: hotel-service
+    newTag: latest
+  - name: auth-service
+    newTag: latest
+  - name: bus-service
+    newTag: latest
+  - name: market-service
+    newTag: latest

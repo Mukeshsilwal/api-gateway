@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
         - name: eureka-server
-          image: ticketkatum/eureka-server:latest
+          image: eureka-server:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8761

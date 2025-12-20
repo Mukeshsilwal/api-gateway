@@ -1,0 +1,81 @@
+# Spring Boot Application Performance Tuning
+
+# Server Configuration
+server:
+  tomcat:
+    threads:
+      max: 500
+      min-spare: 100
+    max-connections: 10000
+    accept-count: 1000
+    connection-timeout: 20000
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Kafka Producer Optimization
+spring:
+  kafka:
+    producer:
+      acks: 1  # Changed from 'all' for better throughput
+      retries: 3
+      batch-size: 32768
+      buffer-memory: 67108864  # 64MB
+      compression-type: snappy
+      linger-ms: 10
+      max-in-flight-requests-per-connection: 5
+      properties:
+        max.request.size: 1048576
+        
+    # Kafka Consumer Optimization
+    consumer:
+      max-poll-records: 500
+      fetch-min-size: 1024
+      fetch-max-wait: 500
+      properties:
+        max.partition.fetch.bytes: 1048576
+        session.timeout.ms: 30000
+        heartbeat.interval.ms: 10000
+
+# Connection Pool Tuning
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      
+  # Redis Connection Pool
+  redis:
+    lettuce:
+      pool:
+        max-active: 50
+        max-idle: 20
+        min-idle: 10
+        max-wait: 3000
+
+# JPA Optimization
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+
+# Async Configuration
+  task:
+    execution:
+      pool:
+        core-size: 20
+        max-size: 100
+        queue-capacity: 1000
+
+# Logging (reduce for performance)
+logging:
+  level:
+    root: WARN
+    com.ticketkatum: INFO
+    org.springframework.kafka: WARN

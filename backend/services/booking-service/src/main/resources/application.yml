@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    include: kafka
   application:
     name: booking-service
 

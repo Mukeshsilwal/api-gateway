@@ -1,0 +1,81 @@
+# Auth Service - Production Configuration
+spring:
+  application:
+    name: auth-service
+  profiles:
+    active: prod
+
+  # Database Configuration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://prod-db:5432/auth_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  # Redis Configuration
+  redis:
+    host: ${REDIS_HOST:redis-cluster}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    timeout: 3000
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8084}
+  tomcat:
+    threads:
+      max: 500
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+  instance:
+    hostname: ${HOSTNAME:auth-service}
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# Logging
+logging:
+  level:
+    root: WARN
+    com.ticketkatum: INFO
+    org.springframework.security: WARN
+  file:
+    name: /var/log/auth-service/application.log
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:3600000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
+  issuer: ticketkatum-auth
+  algorithm: RS256
+
+# Security Configuration
+security:
+  allowed-origins: ${ALLOWED_ORIGINS:https://ticketkatum.com,https://www.ticketkatum.com}
+  session:
+    max-concurrent-sessions: 5
+    timeout-minutes: 30
+  password:
+    min-length: 8
+    require-uppercase: true
+    require-lowercase: true
+    require-digit: true
+    require-special-char: true

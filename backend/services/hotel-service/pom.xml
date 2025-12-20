@@ -35,6 +35,13 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- Shared Events for Kafka event publishing -->
+        <dependency>
+            <groupId>com.ticketkatum</groupId>
+            <artifactId>shared-events</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- Spring Boot ActiveMQ Starter (Jakarta) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

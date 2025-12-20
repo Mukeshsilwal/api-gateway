@@ -75,8 +75,16 @@ class ApiService {
       token = options._retryToken;
     }
 
+    // Get or generate correlation ID for request tracking
+    let correlationId = options.correlationId;
+    if (!correlationId) {
+      // Check if there's a correlation ID from a previous response
+      correlationId = sessionStorage.getItem('lastCorrelationId') || this.generateCorrelationId();
+    }
+
     const headers = {
       'Content-Type': 'application/json',
+      'X-Correlation-ID': correlationId, // Add correlation ID header
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     };
@@ -172,6 +180,24 @@ class ApiService {
     }
   }
 
+  /** Generate a unique correlation ID for request tracking */
+  generateCorrelationId() {
+    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  }
+
+  /** Extract and store correlation ID from response */
+  extractCorrelationId(response) {
+    const correlationId = response.headers.get('X-Correlation-ID');
+    if (correlationId) {
+      sessionStorage.setItem('lastCorrelationId', correlationId);
+      // Log correlation ID in development for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Correlation ID: ${correlationId}]`);
+      }
+    }
+    return correlationId;
+  }
+
   async refreshToken() {
     const refreshToken = localStorage.getItem('refreshToken');
     const sessionId = localStorage.getItem('sessionId');
@@ -259,6 +285,9 @@ class ApiService {
   /** Parse JSON response and return full response object */
   async parseAndUnwrap(response) {
     try {
+      // Extract correlation ID from response headers
+      this.extractCorrelationId(response);
+
       // Check content type to determine how to parse
       const contentType = response.headers.get('content-type');
 

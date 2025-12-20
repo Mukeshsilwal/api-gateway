@@ -26,12 +26,13 @@ public class MarketController {
     }
 
     @PostMapping("/listings/{id}/buy")
-    public ResponseEntity<ResaleTransaction> buyListing(@PathVariable("id") UUID id, @Valid @RequestBody PurchaseRequest request) {
+    public ResponseEntity<ResaleTransaction> buyListing(@PathVariable("id") long id,
+            @Valid @RequestBody PurchaseRequest request) {
         return ResponseEntity.ok(resaleService.purchaseListing(id, request));
     }
 
     @GetMapping("/listings")
-    public ResponseEntity<List<ResaleListing>> getListings(@RequestParam UUID eventId) {
+    public ResponseEntity<List<ResaleListing>> getListings(@RequestParam Long eventId) {
         return ResponseEntity.ok(resaleService.getActiveListingsForEvent(eventId));
     }
 }

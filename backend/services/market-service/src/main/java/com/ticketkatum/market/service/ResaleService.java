@@ -35,7 +35,8 @@ public class ResaleService {
         log.info("Creating resale listing for ticket: {}", request.getOriginalTicketId());
 
         // 1. Verify Ownership
-        boolean isOwner = bookingServiceClient.validateTicketOwnership(request.getOriginalTicketId(), request.getSellerUserId());
+        boolean isOwner = bookingServiceClient.validateTicketOwnership(request.getOriginalTicketId(),
+                request.getSellerUserId());
         if (!isOwner) {
             throw new IllegalArgumentException("User does not own this ticket or it is not valid for resale.");
         }
@@ -66,7 +67,7 @@ public class ResaleService {
     }
 
     @Transactional
-    public ResaleTransaction purchaseListing(UUID listingId, PurchaseRequest request) {
+    public ResaleTransaction purchaseListing(long listingId, PurchaseRequest request) {
         log.info("Processing purchase for listing: {}", listingId);
 
         ResaleListing listing = listingRepository.findById(listingId)
@@ -104,7 +105,7 @@ public class ResaleService {
         return transactionRepository.save(transaction);
     }
 
-    public List<ResaleListing> getActiveListingsForEvent(UUID eventId) {
+    public List<ResaleListing> getActiveListingsForEvent(Long eventId) {
         return listingRepository.findByEventIdAndStatus(eventId, ListingStatus.ACTIVE);
     }
 }

@@ -6,5 +6,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CrowdZoneRepository extends JpaRepository<CrowdZone, UUID> {
-    List<CrowdZone> findByEventId(UUID eventId);
+    List<CrowdZone> findByEventId(Long eventId);
 }

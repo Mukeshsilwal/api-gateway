@@ -15,6 +15,7 @@
         <module>gateway</module>
         <module>services/web-bff</module>
         <module>shared/common</module>
+        <module>shared/events</module>
         <module>services/booking-service</module>
         <module>services/payment-service</module>
         <module>services/hotel-service</module>
@@ -22,6 +23,8 @@
         <module>services/auth-service</module>
         <module>services/market-service</module>
         <module>services/eureka-server</module>
+        <module>services/ai-service</module>
+        <module>services/event-service</module>
     </modules>
 
     <properties>

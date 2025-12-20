@@ -62,7 +62,7 @@ export default function AdminLogin() {
             setEmail("");
             setPassword("");
 
-            toast.success(`Welcome ${authService.getRoleDisplayName(normalizedRole)}!`);
+            toast.success(`Welcome back, Admin!`);
 
             // Determine redirect path
             // If 'from' is generic (home), force default admin redirect (e.g. /admin/panel)

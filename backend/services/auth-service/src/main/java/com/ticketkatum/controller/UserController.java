@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable Long id) {
+    public ResponseEntity<UserDto> getUser(@PathVariable("id") Long id) {
         return ResponseEntity.ok(userService.getUser(id));
     }
 
@@ -52,21 +52,21 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserDto> updateUser(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
     @PutMapping("/{email}/credentials-status")
     public ResponseEntity<Void> updateUserCredentialsStatus(
-            @PathVariable String email,
+            @PathVariable("email") String email,
             @RequestParam boolean nonExpired) {
         userService.updateCredentialsStatus(email, nonExpired);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok().build();
     }

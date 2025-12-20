@@ -21,7 +21,7 @@ public class LoyaltyService {
     private final PointTransactionRepository transactionRepository;
 
     @Transactional
-    public void earnPoints(UUID userId, int spendAmount, String source) {
+    public void earnPoints(long userId, int spendAmount, String source) {
         LoyaltyProfile profile = getOrCreateProfile(userId);
         
         // Calculate Multiplier based on Tier
@@ -47,7 +47,7 @@ public class LoyaltyService {
     }
 
     @Transactional
-    public void redeemPoints(UUID userId, int pointsToRedeem, String source) {
+    public void redeemPoints(long userId, int pointsToRedeem, String source) {
         LoyaltyProfile profile = getOrCreateProfile(userId);
 
         if (profile.getPointsBalance() < pointsToRedeem) {
@@ -68,11 +68,11 @@ public class LoyaltyService {
         log.info("User {} redeemed {} points. New Balance: {}", userId, pointsToRedeem, profile.getPointsBalance());
     }
 
-    public LoyaltyProfile getProfile(UUID userId) {
+    public LoyaltyProfile getProfile(long userId) {
         return getOrCreateProfile(userId);
     }
 
-    private LoyaltyProfile getOrCreateProfile(UUID userId) {
+    private LoyaltyProfile getOrCreateProfile(long userId) {
         return profileRepository.findById(userId)
                 .orElseGet(() -> {
                     LoyaltyProfile newProfile = LoyaltyProfile.builder()

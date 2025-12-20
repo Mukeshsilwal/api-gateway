@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 
 import java.util.concurrent.Executor;
 
@@ -22,11 +23,11 @@ public class AsyncConfig implements AsyncConfigurer {
         executor.setThreadNamePrefix("BFF-Async-");
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
-        executor.initialize();
+        executor.initialize(); // Must initialize before wrapping
 
-        log.info("Async executor initialized with core pool size: {}",
-                executor.getCorePoolSize());
+        log.info("Async executor initialized and wrapped with SecurityContext propagation.");
 
-        return executor;
+        // Wrap the executor so SecurityContext is passed to async threads
+        return new DelegatingSecurityContextAsyncTaskExecutor(executor);
     }
 }

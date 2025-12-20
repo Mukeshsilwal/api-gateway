@@ -8,16 +8,17 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * RoomBooking entity with optimistic locking to prevent double-booking
+ */
 @Entity
-@Table(name = "room_bookings",
-        indexes = {
-                @Index(name = "idx_booking_reference", columnList = "bookingReference"),
-                @Index(name = "idx_room_dates", columnList = "room_id,checkIn,checkOut"),
-                @Index(name = "idx_customer", columnList = "customerId"),
-                @Index(name = "idx_status", columnList = "status"),
-                @Index(name = "idx_check_in", columnList = "checkIn")
-        }
-)
+@Table(name = "room_bookings", indexes = {
+        @Index(name = "idx_booking_reference", columnList = "bookingReference"),
+        @Index(name = "idx_room_dates", columnList = "room_id,checkIn,checkOut"),
+        @Index(name = "idx_customer", columnList = "customerId"),
+        @Index(name = "idx_status", columnList = "status"),
+        @Index(name = "idx_check_in", columnList = "checkIn")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -88,6 +89,11 @@ public class RoomBooking {
     private String customerName;
     private String customerEmail;
     private String customerPhone;
+
+    // Optimistic locking - critical for preventing double-booking
+    @Version
+    @Column(nullable = false)
+    private Integer version;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

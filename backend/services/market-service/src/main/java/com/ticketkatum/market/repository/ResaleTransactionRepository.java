@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface ResaleTransactionRepository extends JpaRepository<ResaleTransaction, UUID> {
-    List<ResaleTransaction> findByBuyerUserId(UUID buyerUserId);
-    List<ResaleTransaction> findBySellerUserId(UUID sellerUserId);
+public interface ResaleTransactionRepository extends JpaRepository<ResaleTransaction, Long> {
+    List<ResaleTransaction> findByBuyerUserId(long buyerUserId);
+    List<ResaleTransaction> findBySellerUserId(long sellerUserId);
 }

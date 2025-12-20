@@ -70,6 +70,13 @@
             <version>1.0.0</version>
         </dependency>
 
+        <!-- Shared Events for Kafka event publishing -->
+        <dependency>
+            <groupId>com.ticketkatum</groupId>
+            <artifactId>shared-events</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
         <!-- JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

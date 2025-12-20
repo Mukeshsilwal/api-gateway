@@ -27,6 +27,26 @@ spring:
       host: localhost
       port: 6379
 
+# Logging configuration with correlation ID
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId:-NO-CORRELATION-ID}] %-5level %logger{36} - %msg%n"
+  level:
+    com.ticketkatum: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: WARN
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+  show-actuator: true
+
 sendgrid:
   api:
     key: ${SENDGRID_API_KEY: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}

@@ -1,0 +1,99 @@
+# Payment Service - Production Configuration
+spring:
+  application:
+    name: payment-service
+  profiles:
+    active: prod
+
+  # Database Configuration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://prod-db:5432/payment_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-1:9092,kafka-2:9092,kafka-3:9092}
+    producer:
+      acks: all
+      retries: 5
+    consumer:
+      group-id: ${spring.application.name}
+
+  # Redis Configuration
+  data:
+    redis:
+      password: ${REDIS_PASSWORD}
+      port: ${REDIS_PORT:6379}
+      host: ${REDIS_HOST:redis-cluster}
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8083}
+  tomcat:
+    threads:
+      max: 500
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+  instance:
+    hostname: ${HOSTNAME:payment-service}
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# Logging
+logging:
+  level:
+    root: WARN
+    com.ticketkatum: INFO
+  file:
+    name: /var/log/payment-service/application.log
+
+# Payment Gateway Configuration
+payment:
+  esewa:
+    merchant-id: ${ESEWA_MERCHANT_ID}
+    secret-key: ${ESEWA_SECRET_KEY}
+    api-url: https://esewa.com.np/api/epay/main/v2/form
+    verify-url: https://esewa.com.np/api/epay/transaction/status
+    success-url: ${APP_URL}/payment/esewa/success
+    failure-url: ${APP_URL}/payment/esewa/failure
+    
+  khalti:
+    public-key: ${KHALTI_PUBLIC_KEY}
+    secret-key: ${KHALTI_SECRET_KEY}
+    api-url: https://khalti.com/api/v2/epayment/initiate/
+    verify-url: https://khalti.com/api/v2/epayment/lookup/
+    return-url: ${APP_URL}/payment/khalti/callback
+    
+  imepay:
+    merchant-code: ${IMEPAY_MERCHANT_CODE}
+    merchant-name: ${IMEPAY_MERCHANT_NAME:TicketKatum}
+    username: ${IMEPAY_USERNAME}
+    password: ${IMEPAY_PASSWORD}
+    module: ${IMEPAY_MODULE:IPS}
+    api-url: https://payment.imepay.com.np:7979/api/Web/GetToken
+    verify-url: https://payment.imepay.com.np:7979/api/Web/Confirm
+    
+  retry:
+    max-attempts: 5
+    backoff-delay-ms: 2000
+    max-backoff-delay-ms: 30000

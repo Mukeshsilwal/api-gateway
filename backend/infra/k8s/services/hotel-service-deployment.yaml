@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
         - name: hotel-service
-          image: ticketkatum/hotel-service:latest
+          image: hotel-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8087

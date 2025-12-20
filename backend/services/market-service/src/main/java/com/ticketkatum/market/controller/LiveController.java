@@ -22,7 +22,7 @@ public class LiveController {
 
     // POLLS
     @GetMapping("/polls/{eventId}")
-    public ResponseEntity<List<LivePoll>> getPolls(@PathVariable("eventId") UUID eventId) {
+    public ResponseEntity<List<LivePoll>> getPolls(@PathVariable("eventId") Long eventId) {
         return ResponseEntity.ok(interactionService.getActivePolls(eventId));
     }
 
@@ -39,7 +39,7 @@ public class LiveController {
 
     // F&B
     @GetMapping("/products/{eventId}")
-    public ResponseEntity<List<Product>> getMenu(@PathVariable("eventId") UUID eventId) {
+    public ResponseEntity<List<Product>> getMenu(@PathVariable("eventId") Long eventId) {
         return ResponseEntity.ok(productService.getMenu(eventId));
     }
 
@@ -56,14 +56,14 @@ public class LiveController {
 
     @Data
     public static class VoteRequest {
-        private UUID pollId;
+        private long pollId;
         private String selectedOption;
     }
 
     @Data
     public static class OrderRequest {
-        private UUID userId;
-        private UUID productId;
+        private long userId;
+        private long productId;
         private String seatLocation;
     }
 }

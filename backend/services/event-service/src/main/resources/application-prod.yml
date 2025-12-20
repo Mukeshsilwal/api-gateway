@@ -1,0 +1,144 @@
+# Event Service - Production Configuration
+spring:
+  application:
+    name: event-service
+  profiles:
+    active: prod
+
+  # Database Configuration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://prod-db:5432/event_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-1:9092,kafka-2:9092,kafka-3:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 5
+      batch-size: 32768
+      buffer-memory: 67108864
+      compression-type: snappy
+      properties:
+        spring.json.add.type.headers: false
+        max.in.flight.requests.per.connection: 5
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      max-poll-records: 500
+      properties:
+        spring.json.trusted.packages: com.ticketkatum.events.*
+
+  # Redis Configuration
+  redis:
+    host: ${REDIS_HOST:redis-cluster}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 50
+        max-idle: 20
+        min-idle: 10
+        max-wait: 3000
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8081}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  tomcat:
+    threads:
+      max: 500
+      min-spare: 100
+    max-connections: 10000
+    accept-count: 1000
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    hostname: ${HOSTNAME:event-service}
+
+# Management & Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: production
+
+# Logging Configuration
+logging:
+  level:
+    root: WARN
+    com.ticketkatum: INFO
+    org.springframework.kafka: WARN
+    org.hibernate.SQL: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{correlationId}] [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: /var/log/event-service/application.log
+    max-size: 100MB
+    max-history: 30
+
+# Application Specific Configuration
+app:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:https://ticketkatum.com,https://www.ticketkatum.com}
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+  
+  event:
+    max-tickets-per-booking: 10
+    booking-timeout-minutes: 15
+    
+  storage:
+    upload-dir: ${UPLOAD_DIR:/app/uploads/events}
+    max-file-size: 10MB

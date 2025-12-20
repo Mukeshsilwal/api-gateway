@@ -1,0 +1,311 @@
+{
+    "dashboard": {
+        "title": "Business Metrics - Event Ticketing",
+        "tags": [
+            "business",
+            "analytics",
+            "kpi"
+        ],
+        "timezone": "browser",
+        "schemaVersion": 16,
+        "version": 1,
+        "refresh": "30s",
+        "panels": [
+            {
+                "id": 1,
+                "title": "Booking Conversion Rate",
+                "type": "gauge",
+                "gridPos": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 6,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "(sum(rate(booking_confirmed_total[1h])) / sum(rate(booking_initiated_total[1h]))) * 100",
+                        "refId": "A"
+                    }
+                ],
+                "options": {
+                    "showThresholdLabels": false,
+                    "showThresholdMarkers": true
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "percent",
+                        "min": 0,
+                        "max": 100,
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "value": 0,
+                                    "color": "red"
+                                },
+                                {
+                                    "value": 50,
+                                    "color": "yellow"
+                                },
+                                {
+                                    "value": 75,
+                                    "color": "green"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "id": 2,
+                "title": "Real-time Revenue",
+                "type": "stat",
+                "gridPos": {
+                    "x": 6,
+                    "y": 0,
+                    "w": 6,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "sum(payment_captured_amount_total)",
+                        "refId": "A"
+                    }
+                ],
+                "options": {
+                    "colorMode": "background",
+                    "graphMode": "area",
+                    "textMode": "value_and_name"
+                },
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "currencyUSD",
+                        "decimals": 2
+                    }
+                }
+            },
+            {
+                "id": 3,
+                "title": "Payment Success Rate",
+                "type": "gauge",
+                "gridPos": {
+                    "x": 12,
+                    "y": 0,
+                    "w": 6,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "(sum(rate(payment_captured_total[1h])) / (sum(rate(payment_captured_total[1h])) + sum(rate(payment_failed_total[1h])))) * 100",
+                        "refId": "A"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "percent",
+                        "min": 0,
+                        "max": 100,
+                        "thresholds": {
+                            "mode": "absolute",
+                            "steps": [
+                                {
+                                    "value": 0,
+                                    "color": "red"
+                                },
+                                {
+                                    "value": 90,
+                                    "color": "yellow"
+                                },
+                                {
+                                    "value": 95,
+                                    "color": "green"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                "id": 4,
+                "title": "Active Bookings (Last Hour)",
+                "type": "stat",
+                "gridPos": {
+                    "x": 18,
+                    "y": 0,
+                    "w": 6,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "sum(increase(booking_initiated_total[1h]))",
+                        "refId": "A"
+                    }
+                ],
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "area"
+                }
+            },
+            {
+                "id": 5,
+                "title": "Bookings by Event Type",
+                "type": "piechart",
+                "gridPos": {
+                    "x": 0,
+                    "y": 8,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "sum by (event_name) (booking_confirmed_total)",
+                        "legendFormat": "{{event_name}}",
+                        "refId": "A"
+                    }
+                ],
+                "options": {
+                    "legend": {
+                        "displayMode": "table",
+                        "placement": "right"
+                    },
+                    "pieType": "donut"
+                }
+            },
+            {
+                "id": 6,
+                "title": "Revenue Trend (24h)",
+                "type": "graph",
+                "gridPos": {
+                    "x": 12,
+                    "y": 8,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "sum(rate(payment_captured_amount_total[5m]))",
+                        "legendFormat": "Revenue/min",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "currencyUSD",
+                        "label": "Revenue"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 7,
+                "title": "Payment Failure Reasons",
+                "type": "table",
+                "gridPos": {
+                    "x": 0,
+                    "y": 16,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "topk(10, sum by (failure_reason) (payment_failed_total))",
+                        "format": "table",
+                        "refId": "A"
+                    }
+                ],
+                "transformations": [
+                    {
+                        "id": "organize",
+                        "options": {
+                            "excludeByName": {},
+                            "indexByName": {},
+                            "renameByName": {
+                                "failure_reason": "Failure Reason",
+                                "Value": "Count"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "id": 8,
+                "title": "Customer Activity Heatmap",
+                "type": "heatmap",
+                "gridPos": {
+                    "x": 12,
+                    "y": 16,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "sum by (hour) (rate(booking_initiated_total[1h]))",
+                        "refId": "A"
+                    }
+                ],
+                "dataFormat": "tsbuckets",
+                "heatmap": {},
+                "cards": {
+                    "cardPadding": 2
+                }
+            },
+            {
+                "id": 9,
+                "title": "Hotel vs Bus vs Event Bookings",
+                "type": "bargauge",
+                "gridPos": {
+                    "x": 0,
+                    "y": 24,
+                    "w": 12,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "sum(booking_confirmed_total{booking_type=\"event\"})",
+                        "legendFormat": "Events",
+                        "refId": "A"
+                    },
+                    {
+                        "expr": "sum(hotel_booking_confirmed_total)",
+                        "legendFormat": "Hotels",
+                        "refId": "B"
+                    },
+                    {
+                        "expr": "sum(bus_booking_confirmed_total)",
+                        "legendFormat": "Bus",
+                        "refId": "C"
+                    }
+                ],
+                "options": {
+                    "orientation": "horizontal",
+                    "displayMode": "gradient"
+                }
+            },
+            {
+                "id": 10,
+                "title": "Average Booking Value",
+                "type": "stat",
+                "gridPos": {
+                    "x": 12,
+                    "y": 24,
+                    "w": 6,
+                    "h": 6
+                },
+                "targets": [
+                    {
+                        "expr": "sum(payment_captured_amount_total) / sum(booking_confirmed_total)",
+                        "refId": "A"
+                    }
+                ],
+                "fieldConfig": {
+                    "defaults": {
+                        "unit": "currencyUSD",
+                        "decimals": 2
+                    }
+                }
+            }
+        ]
+    }
+}

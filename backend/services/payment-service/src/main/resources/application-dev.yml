@@ -1,0 +1,103 @@
+# Payment Service - Development Configuration
+spring:
+  application:
+    name: payment-service
+  profiles:
+    active: dev
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/payment_db
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: 1
+      retries: 3
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+
+  # Redis Configuration
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000
+
+# Server Configuration
+server:
+  port: 8083
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.ticketkatum: DEBUG
+  file:
+    name: logs/payment-service-dev.log
+
+# Payment Gateway Configuration
+payment:
+  esewa:
+    merchant-id: ${ESEWA_MERCHANT_ID:test_merchant}
+    secret-key: ${ESEWA_SECRET_KEY:test_secret}
+    api-url: https://uat.esewa.com.np/api/epay/main/v2/form
+    verify-url: https://uat.esewa.com.np/api/epay/transaction/status
+    success-url: http://localhost:3000/payment/esewa/success
+    failure-url: http://localhost:3000/payment/esewa/failure
+    
+  khalti:
+    public-key: ${KHALTI_PUBLIC_KEY:test_public_key}
+    secret-key: ${KHALTI_SECRET_KEY:test_secret_key}
+    api-url: https://a.khalti.com/api/v2/epayment/initiate/
+    verify-url: https://a.khalti.com/api/v2/epayment/lookup/
+    return-url: http://localhost:3000/payment/khalti/callback
+    
+  imepay:
+    merchant-code: ${IMEPAY_MERCHANT_CODE:test_merchant}
+    merchant-name: ${IMEPAY_MERCHANT_NAME:TicketKatum}
+    username: ${IMEPAY_USERNAME:test_user}
+    password: ${IMEPAY_PASSWORD:test_pass}
+    module: ${IMEPAY_MODULE:IPS}
+    api-url: https://stg.imepay.com.np:7979/api/Web/GetToken
+    verify-url: https://stg.imepay.com.np:7979/api/Web/Confirm
+    
+  retry:
+    max-attempts: 3
+    backoff-delay-ms: 1000
+    max-backoff-delay-ms: 10000

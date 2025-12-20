@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.jms.ConnectionFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,10 +27,9 @@ public class ActiveMQConfig {
 
     @Bean
     public MappingJackson2MessageConverter jacksonJmsMessageConverter(
-            ObjectMapper jmsObjectMapper) {
+            @Qualifier("jmsObjectMapper") ObjectMapper jmsObjectMapper) {
 
-        MappingJackson2MessageConverter converter =
-                new MappingJackson2MessageConverter();
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
 
         converter.setTargetType(MessageType.TEXT);
         converter.setTypeIdPropertyName("_type");
@@ -60,5 +60,3 @@ public class ActiveMQConfig {
         return template;
     }
 }
-
-

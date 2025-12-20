@@ -16,17 +16,17 @@ public class LiveInteractionService {
 
     private final LivePollRepository pollRepository;
 
-    public List<LivePoll> getActivePolls(UUID eventId) {
-        return pollRepository.findByEventIdAndStatus(eventId, PollStatus.ACTIVE);
+    public List<LivePoll> getActivePolls(Long eventId) {
+        return pollRepository.findByEventIdAndStatus(eventId.toString(), PollStatus.ACTIVE);
     }
 
     @Transactional
-    public void castVote(UUID pollId, String selectedOption) {
+    public void castVote(long pollId, String selectedOption) {
         LivePoll poll = pollRepository.findById(pollId)
                 .orElseThrow(() -> new IllegalArgumentException("Poll not found"));
 
         if (!poll.getOptions().contains(selectedOption)) {
-             throw new IllegalArgumentException("Invalid option");
+            throw new IllegalArgumentException("Invalid option");
         }
 
         poll.getVotes().merge(selectedOption, 1, Integer::sum);

@@ -1,0 +1,54 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: ai-service
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+
+# OpenAI Configuration
+openai:
+  api:
+    key: ${OPENAI_API_KEY:your-api-key-here}
+  model: gpt-4-turbo-preview
+  max-tokens: 500
+  temperature: 0.7
+
+# Chatbot Configuration
+chatbot:
+  max-conversation-history: 10
+  conversation-ttl: 3600 # 1 hour in seconds
+  rate-limit:
+    requests-per-minute: 20
+    requests-per-hour: 100
+
+# Logging
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId:-NO-CORRELATION-ID}] %-5level %logger{36} - %msg%n"
+  level:
+    com.ticketkatum: DEBUG
+    org.springframework.web: INFO
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Eureka (if using service discovery)
+eureka:
+  client:
+    enabled: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

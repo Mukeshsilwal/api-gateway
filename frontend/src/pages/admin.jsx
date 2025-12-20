@@ -14,6 +14,7 @@ import { Settings } from "../components/admin/Settings";
 import TripScheduler from "../components/admin/TripScheduler";
 import TicketingDashboard from "../components/admin/ticketing/TicketingDashboard";
 import RoomMaintenancePage from "../components/admin/maintenance/RoomMaintenancePage";
+import UserManagement from "../components/admin/UserManagement";
 
 export function AdminPanel() {
   const navigate = useNavigate();
@@ -63,6 +64,8 @@ export function AdminPanel() {
         return <HotelManager />;
       case 'cinemas':
         return <CinemaManager />;
+      case 'users':
+        return <UserManagement />;
       case 'settings':
         return <Settings isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
       case 'scheduler':

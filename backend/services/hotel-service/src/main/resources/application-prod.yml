@@ -1,0 +1,74 @@
+# Hotel Service - Production Configuration
+spring:
+  application:
+    name: hotel-service
+  profiles:
+    active: prod
+
+  # Database Configuration
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://prod-db:5432/hotel_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 20
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:kafka-1:9092,kafka-2:9092,kafka-3:9092}
+    producer:
+      acks: all
+      retries: 5
+    consumer:
+      group-id: ${spring.application.name}
+
+  # Redis Configuration
+  redis:
+    host: ${REDIS_HOST:redis-cluster}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+
+# Server Configuration
+server:
+  port: ${SERVER_PORT:8087}
+  tomcat:
+    threads:
+      max: 500
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
+  instance:
+    hostname: ${HOSTNAME:hotel-service}
+
+# Management
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+# Logging
+logging:
+  level:
+    root: WARN
+    com.ticketkatum: INFO
+  file:
+    name: /var/log/hotel-service/application.log
+
+# Application Specific
+app:
+  hotel:
+    room-hold-duration-minutes: 15
+    max-rooms-per-booking: 5
+    cancellation-window-hours: 24

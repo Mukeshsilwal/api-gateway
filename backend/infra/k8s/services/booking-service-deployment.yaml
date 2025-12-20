@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: booking-service
-          image: ticketkatum/booking-service:latest
+          image: booking-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8090

@@ -1,0 +1,155 @@
+groups:
+  - name: kafka_alerts
+    interval: 30s
+    rules:
+      - alert: HighConsumerLag
+        expr: kafka_consumergroup_lag > 1000
+        for: 5m
+        labels:
+          severity: warning
+          component: kafka
+        annotations:
+          summary: "High consumer lag detected"
+          description: "Consumer group {{ $labels.consumergroup }} has lag of {{ $value }} messages on topic {{ $labels.topic }}"
+
+      - alert: CriticalConsumerLag
+        expr: kafka_consumergroup_lag > 10000
+        for: 2m
+        labels:
+          severity: critical
+          component: kafka
+        annotations:
+          summary: "Critical consumer lag detected"
+          description: "Consumer group {{ $labels.consumergroup }} has critical lag of {{ $value }} messages on topic {{ $labels.topic }}"
+
+      - alert: NoMessagesConsumed
+        expr: rate(event_consumed_total[5m]) == 0
+        for: 10m
+        labels:
+          severity: warning
+          component: consumer
+        annotations:
+          summary: "Consumer not processing messages"
+          description: "Consumer {{ $labels.consumer }} has not processed any messages in the last 10 minutes"
+
+  - name: event_publishing_alerts
+    interval: 30s
+    rules:
+      - alert: HighPublishingErrorRate
+        expr: (rate(event_publishing_errors_total[5m]) / rate(event_published_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: publisher
+        annotations:
+          summary: "High event publishing error rate"
+          description: "Event type {{ $labels.event_type }} has {{ $value | humanizePercentage }} error rate"
+
+      - alert: PublishingFailure
+        expr: rate(event_published_total[5m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+          component: publisher
+        annotations:
+          summary: "Event publishing stopped"
+          description: "No events have been published in the last 10 minutes"
+
+  - name: business_alerts
+    interval: 1m
+    rules:
+      - alert: LowBookingConversionRate
+        expr: (sum(rate(booking_confirmed_total[1h])) / sum(rate(booking_initiated_total[1h]))) < 0.3
+        for: 30m
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "Low booking conversion rate"
+          description: "Booking conversion rate is {{ $value | humanizePercentage }}, below 30% threshold"
+
+      - alert: HighPaymentFailureRate
+        expr: (sum(rate(payment_failed_total[1h])) / (sum(rate(payment_captured_total[1h])) + sum(rate(payment_failed_total[1h])))) > 0.1
+        for: 15m
+        labels:
+          severity: critical
+          component: payment
+        annotations:
+          summary: "High payment failure rate"
+          description: "Payment failure rate is {{ $value | humanizePercentage }}, above 10% threshold"
+
+      - alert: NoRevenueGenerated
+        expr: rate(payment_captured_amount_total[1h]) == 0
+        for: 1h
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "No revenue generated"
+          description: "No successful payments in the last hour"
+
+  - name: service_health_alerts
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 2m
+        labels:
+          severity: critical
+          component: service
+        annotations:
+          summary: "Service is down"
+          description: "Service {{ $labels.job }} on instance {{ $labels.instance }} is down"
+
+      - alert: HighErrorRate
+        expr: (rate(http_server_requests_seconds_count{status=~"5.."}[5m]) / rate(http_server_requests_seconds_count[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+          component: service
+        annotations:
+          summary: "High HTTP error rate"
+          description: "Service {{ $labels.job }} has {{ $value | humanizePercentage }} error rate"
+
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_server_requests_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: warning
+          component: service
+        annotations:
+          summary: "High response time"
+          description: "Service {{ $labels.job }} has p95 response time of {{ $value }}s"
+
+  - name: infrastructure_alerts
+    interval: 30s
+    rules:
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is {{ $value }}%"
+
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 10% on {{ $labels.instance }}"

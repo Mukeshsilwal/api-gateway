@@ -82,8 +82,8 @@ public class AdminBffController {
     @GetMapping("/summary")
     @Operation(summary = "Get dashboard summary", description = "Get aggregated dashboard summary. Requires ADMIN role.")
     public CompletableFuture<ResponseEntity<Response<com.ticketkatum.dto.admin.DashboardSummaryDto>>> getDashboardSummary(
-            @RequestParam(defaultValue = "30d") String window,
-            @RequestParam(defaultValue = "Asia/Kathmandu") String tz) {
+            @RequestParam(defaultValue = "30d",name = "window") String window,
+            @RequestParam(defaultValue = "Asia/Kathmandu",name = "tz") String tz) {
 
         String correlationId = UUID.randomUUID().toString();
         log.info("[{}] BFF: Fetching dashboard summary", correlationId);

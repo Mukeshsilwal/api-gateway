@@ -163,25 +163,42 @@ export function BusManager() {
         }
 
         const seatNumTrim = String(seatNumber).trim();
+
+        // Parse and validate bus ID
+        const busIdNumber = parseInt(seatBusId, 10);
+        if (isNaN(busIdNumber) || !seatBusId || seatBusId === "") {
+            toast.error("Please select a valid bus from the dropdown.");
+            console.error('Invalid bus ID:', seatBusId);
+            return;
+        }
+
         const targetBus = allBuses.find((b) => String(b.id) === String(seatBusId));
-        if (targetBus) {
-            const existingSeats = Array.isArray(targetBus.seats) ? targetBus.seats : [];
-            const duplicate = existingSeats.some((s) => String(s.seatNumber).toLowerCase() === seatNumTrim.toLowerCase());
-            if (duplicate) {
-                toast.error("A seat with this number already exists for the selected bus.");
-                return;
-            }
+        if (!targetBus) {
+            toast.error("Selected bus not found. Please refresh and try again.");
+            return;
+        }
+
+        const existingSeats = Array.isArray(targetBus.seats) ? targetBus.seats : [];
+        const duplicate = existingSeats.some((s) => String(s.seatNumber).toLowerCase() === seatNumTrim.toLowerCase());
+        if (duplicate) {
+            toast.error("A seat with this number already exists for the selected bus.");
+            return;
         }
 
         try {
             setIsCreatingSeat(true);
-            const seatRes = await ApiService.post(API_CONFIG.ENDPOINTS.ADD_SEAT, {
-                busId: seatBusId,
+            const payload = {
+                busId: busIdNumber,
+                busName: targetBus?.busName || '',
                 seatNumber: seatNumTrim,
                 price: parseFloat(seatPrice),
                 status: isReserved ? 'BOOKED' : 'AVAILABLE',
-                reserved: isReserved
-            });
+                reserved: isReserved,
+                holdExpiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString() // 15 min from now
+            };
+
+            console.log('Creating seat with payload:', payload);
+            const seatRes = await ApiService.post(API_CONFIG.ENDPOINTS.ADD_SEAT, payload);
 
             if (seatRes && (seatRes.statusCode === 200 || seatRes.statusCode === 201)) {
                 toast.success("New Seat added!");
@@ -643,8 +660,10 @@ export function BusManager() {
                                             <select
                                                 value={seatBusId}
                                                 onChange={(e) => {
-                                                    setSeatBusId(e.target.value);
-                                                    const bus = allBuses.find(b => String(b.id) === e.target.value);
+                                                    const selectedValue = e.target.value;
+                                                    console.log('Selected bus ID:', selectedValue);
+                                                    setSeatBusId(selectedValue);
+                                                    const bus = allBuses.find(b => String(b.id) === String(selectedValue));
                                                     setSelectedBusForPreview(bus || null);
                                                 }}
                                                 className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
@@ -658,7 +677,7 @@ export function BusManager() {
                                                     const dateStr = dateVal ? new Date(dateVal).toLocaleDateString() : '';
 
                                                     return (
-                                                        <option key={bus.id} value={bus.id}>
+                                                        <option key={bus.id} value={String(bus.id)}>
                                                             {displayName} {dateStr ? `(${dateStr})` : ''} - {Array.isArray(bus.seats) ? bus.seats.length : 0} seats
                                                         </option>
                                                     );

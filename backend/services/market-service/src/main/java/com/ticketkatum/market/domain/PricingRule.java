@@ -3,8 +3,6 @@ package com.ticketkatum.market.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
-
 @Entity
 @Table(name = "pricing_rules")
 @Getter
@@ -15,11 +13,11 @@ import java.util.UUID;
 public class PricingRule {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     // Optional: context of the rule (specific event ID or null for global)
-    private UUID eventId;
+    private Long eventId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -35,7 +33,8 @@ public class PricingRule {
     @Column(nullable = false)
     private Double multiplier;
 
-    // Higher priority rules run first (or last, depending on logic, let's say First)
+    // Higher priority rules run first (or last, depending on logic, let's say
+    // First)
     private int priority;
 
     private boolean active;

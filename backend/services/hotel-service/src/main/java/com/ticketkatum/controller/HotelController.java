@@ -138,8 +138,8 @@ public class HotelController {
     @GetMapping("/{hotelCode}/rooms")
     public ResponseEntity<Response<List<RoomDTO>>> getRoomsByHotel(
             @PathVariable("hotelCode") String hotelCode,
-            @RequestParam(required = false) String roomType,
-            @RequestParam(required = false) Boolean active) {
+            @RequestParam(required = false,name = "roomType") String roomType,
+            @RequestParam(required = false,name = "active") Boolean active) {
 
         log.info("Fetching rooms for hotel: {} - type: {}, active: {}", hotelCode, roomType, active);
 

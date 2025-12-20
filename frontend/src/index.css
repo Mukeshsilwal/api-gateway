@@ -17,23 +17,23 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary Brand Color (Indigo/Violet) */
-    --primary: 244.5 57.9% 50.6%;
-    /* Indigo 600 */
-    --primary-foreground: 210 40% 98%;
+    /* Primary Brand Color (Warm Orange/Coral) */
+    --primary: 16 90% 58%;
+    /* Coral/Orange - matches the reference */
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary (Emerald/Teal for distinct actions) */
-    --secondary: 160 84% 39%;
-    /* Emerald 600 */
+    /* Secondary (Deep Navy for backgrounds) */
+    --secondary: 220 26% 24%;
+    /* Navy Blue */
     --secondary-foreground: 0 0% 100%;
 
     /* Muted / Neutral */
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    /* Accent (for hovers, highlights) */
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent (Lighter Orange for highlights) */
+    --accent: 16 100% 66%;
+    --accent-foreground: 0 0% 100%;
 
     /* Destructive (Red) */
     --destructive: 0 84.2% 60.2%;
@@ -42,7 +42,7 @@
     /* Borders & Inputs */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 244.5 57.9% 50.6%;
+    --ring: 16 90% 58%;
 
     --radius: 0.75rem;
   }
@@ -137,17 +137,17 @@
 
   /* Primary Button - Main CTA */
   .btn-primary {
-    @apply px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
+    @apply px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
   }
 
   /* Secondary Button - Alternative actions */
   .btn-secondary {
-    @apply px-6 py-2.5 bg-white text-gray-700 font-semibold border-2 border-gray-300 rounded-lg shadow-sm hover:shadow-md hover:border-gray-400 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply px-6 py-2.5 bg-white text-slate-700 font-semibold border-2 border-slate-300 rounded-lg shadow-sm hover:shadow-md hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed;
   }
 
   /* Card Component - Consistent container */
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all duration-200 ease-in-out;
+    @apply bg-white rounded-2xl shadow-sm border border-slate-100 p-6 transition-all duration-200 ease-in-out;
   }
 
   .card-hover {
@@ -171,16 +171,16 @@
 
   /* Focus Glow Effect */
   .focus-glow {
-    @apply focus:ring-4 focus:ring-primary/20 focus:border-primary transition-all duration-200;
+    @apply focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 transition-all duration-200;
   }
 
   /* Gradient Background Utilities */
   .bg-gradient-primary {
-    @apply bg-gradient-to-br from-indigo-600 to-violet-600;
+    @apply bg-gradient-to-br from-orange-500 to-orange-600;
   }
 
   .bg-gradient-secondary {
-    @apply bg-gradient-to-br from-emerald-500 to-teal-600;
+    @apply bg-gradient-to-br from-slate-700 to-slate-800;
   }
 
   .bg-gradient-surface {
@@ -189,10 +189,10 @@
 
   /* Premium Shadow Utilities */
   .shadow-premium {
-    box-shadow: 0 10px 40px -10px rgba(79, 70, 229, 0.2);
+    box-shadow: 0 10px 40px -10px rgba(249, 115, 22, 0.25);
   }
 
   .shadow-premium-lg {
-    box-shadow: 0 20px 60px -15px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 20px 60px -15px rgba(249, 115, 22, 0.35);
   }
 }

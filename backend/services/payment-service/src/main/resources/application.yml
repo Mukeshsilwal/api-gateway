@@ -2,6 +2,8 @@ server:
   port: 8086
 
 spring:
+  profiles:
+    include: kafka
   application:
     name: payment-service
 

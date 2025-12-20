@@ -8,5 +8,6 @@ import java.util.UUID;
 
 public interface PricingRuleRepository extends JpaRepository<PricingRule, UUID> {
     List<PricingRule> findByActiveTrueOrderByPriorityAsc();
-    List<PricingRule> findByEventIdAndActiveTrue(UUID eventId);
+
+    List<PricingRule> findByEventIdAndActiveTrue(Long eventId);
 }

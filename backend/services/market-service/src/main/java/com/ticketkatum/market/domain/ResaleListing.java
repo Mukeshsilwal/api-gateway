@@ -9,7 +9,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "resale_listings")
@@ -20,17 +19,17 @@ import java.util.UUID;
 public class ResaleListing {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
     private Long originalTicketId;
 
     @Column(nullable = false)
-    private UUID sellerUserId;
+    private Long sellerUserId;
 
     @Column(nullable = false)
-    private UUID eventId;
+    private Long eventId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

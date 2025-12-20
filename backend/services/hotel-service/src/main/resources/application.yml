@@ -2,6 +2,8 @@ server:
   port: 8087
 
 spring:
+  profiles:
+    include: kafka
   application:
     name: hotel-service
 
@@ -19,7 +21,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
     show-sql: false
     properties:
       hibernate:

@@ -12,7 +12,13 @@ class AuthService {
     ROLES_KEY = 'userRoles'; // New key for roles array
     USER_DATA_KEY = 'userData';
     SESSION_ID_KEY = 'sessionId';
-    SESSION_ID_KEY = 'sessionId';
+    TOKEN_EXPIRY_KEY = 'tokenExpiry';
+    expirationCheckInterval = null;
+
+    constructor() {
+        // Start expiration check when service is instantiated
+        this.startExpirationCheck();
+    }
 
     /**
      * Normalize backend role format to frontend format
@@ -57,7 +63,7 @@ class AuthService {
      * Store authentication data after successful login (Aggregated Response)
      * @param {Object} aggregatedResponse - The AggregatedLoginResponse from Web-BFF
      */
-    login(aggregatedResponse) {
+    async login(aggregatedResponse) {
         // Handle BFF response structure where data is nested in 'data' property
         const responseData = aggregatedResponse.data || aggregatedResponse;
 
@@ -69,13 +75,17 @@ class AuthService {
         const { authData, userProfile, userPreferences } = responseData;
         // Support both structures (authData wrapper or direct)
         const tokenData = authData || responseData;
-        const { accessToken, refreshToken, sessionId, roles } = tokenData;
+        const { accessToken, refreshToken, sessionId, roles, expiresIn } = tokenData; // Added expiresIn
 
         // Store tokens
         localStorage.setItem(this.TOKEN_KEY, accessToken);
         if (refreshToken) {
             localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
         }
+
+        // Store token expiration time if provided, default to 1 hour if not
+        const expiryTime = Date.now() + (expiresIn || 3600) * 1000;
+        localStorage.setItem(this.TOKEN_EXPIRY_KEY, expiryTime.toString());
 
         // Store Roles
         if (Array.isArray(roles)) {
@@ -102,34 +112,46 @@ class AuthService {
             localStorage.setItem(this.SESSION_ID_KEY, sessionId);
         }
 
+        // Start expiration check
+        this.startExpirationCheck();
+
         return true;
     }
 
-    /**
-     * Clear all authentication data
-     */
     /**
      * Clear all authentication data and invalidate session on server
      */
     async logout() {
         try {
             const sessionId = this.getSessionId();
-            // Best effort logout
-            await apiService.post(API_CONFIG.ENDPOINTS.LOGOUT, {}, {
-                headers: sessionId ? { 'Session-Id': sessionId } : {}
-            });
+
+            // Call logout API if session exists
+            if (sessionId) {
+                await apiService.post(API_CONFIG.ENDPOINTS.LOGOUT, {}, {
+                    headers: { 'Session-Id': sessionId }
+                });
+            }
         } catch (error) {
             console.error("Logout API call failed", error);
         } finally {
-            // Always clear local storage even if API fails
-            localStorage.removeItem(this.TOKEN_KEY);
-            localStorage.removeItem(this.REFRESH_TOKEN_KEY);
-            localStorage.removeItem(this.ROLE_KEY);
-            localStorage.removeItem(this.ROLES_KEY);
-            localStorage.removeItem(this.USER_DATA_KEY);
-            localStorage.removeItem(this.SESSION_ID_KEY);
-            localStorage.removeItem('userPreferences');
+            // Always clear all auth data even if API fails
+            this.clearAuth();
         }
+    }
+
+    /**
+     * Clear all authentication data from localStorage
+     */
+    clearAuth() {
+        localStorage.removeItem(this.TOKEN_KEY);
+        localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+        localStorage.removeItem(this.ROLE_KEY);
+        localStorage.removeItem(this.ROLES_KEY);
+        localStorage.removeItem(this.USER_DATA_KEY);
+        localStorage.removeItem(this.SESSION_ID_KEY);
+        localStorage.removeItem(this.TOKEN_EXPIRY_KEY);
+        localStorage.removeItem('userPreferences');
+        this.stopExpirationCheck();
     }
 
     /**
@@ -565,9 +587,99 @@ class AuthService {
         }
     }
 
+    /**
+     * Check if token is expired
+     */
+    isTokenExpired() {
+        const expiryTime = localStorage.getItem(this.TOKEN_EXPIRY_KEY);
+        if (!expiryTime) {
+            return false;
+        }
+        return Date.now() >= parseInt(expiryTime);
+    }
+
+    /**
+     * Get time until token expiration in milliseconds
+     */
+    getTimeUntilExpiration() {
+        const expiryTime = localStorage.getItem(this.TOKEN_EXPIRY_KEY);
+        if (!expiryTime) {
+            return null;
+        }
+        const timeLeft = parseInt(expiryTime) - Date.now();
+        return timeLeft > 0 ? timeLeft : 0;
+    }
+
+    /**
+     * Start checking for token expiration
+     */
+    startExpirationCheck() {
+        // Clear any existing interval
+        this.stopExpirationCheck();
+
+        // Check immediately
+        if (this.isTokenExpired()) {
+            this.handleTokenExpiration();
+            return;
+        }
+
+        // Check every minute
+        this.expirationCheckInterval = setInterval(() => {
+            if (this.isTokenExpired()) {
+                this.handleTokenExpiration();
+            }
+        }, 60000); // Check every 60 seconds
+    }
+
+    /**
+     * Stop checking for token expiration
+     */
+    stopExpirationCheck() {
+        if (this.expirationCheckInterval) {
+            clearInterval(this.expirationCheckInterval);
+            this.expirationCheckInterval = null;
+        }
+    }
+
+    /**
+     * Handle token expiration
+     */
+    handleTokenExpiration() {
+        console.warn('Token has expired. Clearing authentication...');
+
+        // Clear all auth data
+        this.clearAuth();
+
+        // Dispatch custom event for components to listen to
+        window.dispatchEvent(new CustomEvent('tokenExpired', {
+            detail: { message: 'Your session has expired. Please login again.' }
+        }));
+
+        // Redirect to login page if not already there
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/admin/login') {
+            window.location.href = '/login';
+        }
+    }
+
+    /**
+     * Initialize expiration check on page load
+     */
+    initializeExpirationCheck() {
+        if (this.isAuthenticated()) {
+            if (this.isTokenExpired()) {
+                this.handleTokenExpiration();
+            } else {
+                this.startExpirationCheck();
+            }
+        }
+    }
 }
 
-// Export singleton instance
+// Create singleton instance
 const authService = new AuthService();
+
+// Initialize expiration check when service is loaded
+authService.initializeExpirationCheck();
+
 export { authService, ROLES };
 export default authService;

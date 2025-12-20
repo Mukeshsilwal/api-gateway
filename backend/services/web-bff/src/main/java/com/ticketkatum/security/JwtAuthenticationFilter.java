@@ -2,7 +2,6 @@ package com.ticketkatum.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.crypto.SecretKey;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,12 +42,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/movies/**",
             "/api/hotels/search/**",
             "/api/hotels/*",
+            "/api/bff/v1/home",
             "/api/bff/v1/hotels/**",
+            "/api/bff/v1/buses/**",
             "/api/bff/v1/registration/**",
             "/api/bff/market/**",
-            "/api/bff/v1/**",
-            "/api/bff/v1/auth/**"
-
+            "/api/bff/v1/events"
 
     };
 
@@ -62,9 +59,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+        // Skip filter for async dispatches - authentication was already done in
+        // original request
+        if (request.getDispatcherType() == jakarta.servlet.DispatcherType.ASYNC) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Check if this is a public endpoint - skip JWT validation
-        if (isPublicEndpoint(path)) {
-            log.debug("Skipping JWT validation for public endpoint: {}", path);
+        boolean isPublic = isPublicEndpoint(path);
+        log.info("Request to path: {} - isPublic: {}", path, isPublic);
+
+        if (isPublic) {
+            log.info("Skipping JWT validation for public endpoint: {}", path);
             filterChain.doFilter(request, response);
             return;
         }
@@ -79,7 +86,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String token = authHeader.substring(7);
-            SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
+
+            // Use HMAC secret key for HS256 verification
+            javax.crypto.SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(
+                    jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
 
             Claims claims = Jwts.parserBuilder()
                     .setSigningKey(key)
@@ -91,21 +101,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @SuppressWarnings("unchecked")
             List<String> roles = claims.get("roles", List.class);
 
-            if (username != null) {
+            if (username != null && roles != null) {
                 List<SimpleGrantedAuthority> authorities = roles.stream()
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                authorities
-                        );
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        username,
+                        null,
+                        authorities);
 
                 authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                        new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -115,6 +122,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.setAttribute("roles", roles);
 
                 log.debug("Successfully authenticated user: {}", username);
+            } else {
+                log.warn("JWT token missing required claims - username: {}, roles: {}", username, roles);
             }
         } catch (Exception e) {
             log.error("JWT authentication failed for path {}: {}", path, e.getMessage());

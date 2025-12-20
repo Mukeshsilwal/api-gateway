@@ -8,7 +8,6 @@ import org.hibernate.type.SqlTypes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Entity
 @Table(name = "live_polls")
@@ -20,11 +19,11 @@ import java.util.UUID;
 public class LivePoll {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(nullable = false)
-    private UUID eventId;
+    private String eventId;
 
     @Column(nullable = false)
     private String question;

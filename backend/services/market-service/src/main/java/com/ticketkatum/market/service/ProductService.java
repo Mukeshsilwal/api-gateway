@@ -15,11 +15,11 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final LoyaltyService loyaltyService;
 
-    public List<Product> getMenu(UUID eventId) {
+    public List<Product> getMenu(Long eventId) {
         return productRepository.findByEventId(eventId);
     }
 
-    public void orderProduct(UUID userId, UUID productId, String seatLocation) {
+    public void orderProduct(long userId, long productId, String seatLocation) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
@@ -27,10 +27,10 @@ public class ProductService {
         // 1. Process Payment (Mocked)
         // 2. Grant Loyalty Points (10 pts per $ spent)
         loyaltyService.earnPoints(userId, product.getPrice().intValue(), "F&B_ORDER");
-        
+
         // 3. Send to Kitchen/Bar (Mocked)
     }
-    
+
     // Admin
     public Product addProduct(Product product) {
         return productRepository.save(product);

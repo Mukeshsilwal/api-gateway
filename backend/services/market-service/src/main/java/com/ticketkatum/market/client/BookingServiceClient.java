@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface BookingServiceClient {
 
     @GetMapping("/api/bookings/ticket/{ticketId}/validate-ownership")
-    boolean validateTicketOwnership(@PathVariable("ticketId") Long ticketId, @RequestParam("userId") UUID userId);
+    boolean validateTicketOwnership(@PathVariable("ticketId") Long ticketId, @RequestParam("userId") long userId);
 
     @GetMapping("/api/bookings/ticket/{ticketId}/face-value")
     BigDecimal getTicketFaceValue(@PathVariable("ticketId") Long ticketId);
@@ -22,7 +22,7 @@ public interface BookingServiceClient {
     void lockTicketForResale(@PathVariable("ticketId") Long ticketId);
 
     @PostMapping("/api/bookings/ticket/{ticketId}/transfer")
-    void transferTicket(@PathVariable("ticketId") Long ticketId, @RequestParam("newOwnerId") UUID newOwnerId);
+    void transferTicket(@PathVariable("ticketId") Long ticketId, @RequestParam("newOwnerId") long newOwnerId);
 
     @PostMapping("/api/booking/{category}/{service}")
     com.ticketkatum.utils.Response bookTicket(

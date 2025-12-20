@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "resale_transactions")
@@ -19,17 +18,17 @@ import java.util.UUID;
 public class ResaleTransaction {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(nullable = false)
-    private UUID listingId;
+    private long listingId;
 
     @Column(nullable = false)
-    private UUID buyerUserId;
+    private long buyerUserId;
 
     @Column(nullable = false)
-    private UUID sellerUserId;
+    private long sellerUserId;
 
     @Column(nullable = false)
     private BigDecimal finalPrice;

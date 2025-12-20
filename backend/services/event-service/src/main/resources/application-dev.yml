@@ -1,0 +1,134 @@
+# Event Service - Development Configuration
+spring:
+  application:
+    name: event-service
+  profiles:
+    active: dev
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5432/event_db
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: 1
+      retries: 3
+      batch-size: 16384
+      buffer-memory: 33554432
+      compression-type: snappy
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: ${spring.application.name}
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: com.ticketkatum.events.*
+
+  # Redis Configuration
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 10
+        min-idle: 5
+        max-wait: 3000
+
+# Server Configuration
+server:
+  port: 8081
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+# Management & Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ticketkatum: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.admin.AdminClient: ERROR
+    org.apache.kafka.clients.NetworkClient: ERROR
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/event-service-dev.log
+
+# Application Specific Configuration
+app:
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:5173
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+  
+  event:
+    max-tickets-per-booking: 10
+    booking-timeout-minutes: 15
+    
+  storage:
+    upload-dir: ./uploads/events
+    max-file-size: 10MB

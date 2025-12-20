@@ -1,0 +1,39 @@
+spring:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        compression.type: snappy
+        linger.ms: 10
+        batch.size: 16384
+    consumer:
+      group-id: ${spring.application.name:ticketkatum-consumer}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.ticketkatum.events.*"
+        max.poll.records: 100
+        session.timeout.ms: 30000
+    listener:
+      ack-mode: manual
+      concurrency: 3
+    admin:
+      auto-create: true
+      properties:
+        replication.factor: 1 # Set to 3 in production
+        min.insync.replicas: 1 # Set to 2 in production
+
+# Logging configuration for Kafka
+logging:
+  level:
+    org.apache.kafka: WARN
+    org.springframework.kafka: INFO
+    com.ticketkatum.events: DEBUG

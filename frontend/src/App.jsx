@@ -9,6 +9,7 @@ import LoadingFallback from "./components/LoadingFallback";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import AnalyticsObserver from "./components/AnalyticsObserver";
 import { initAnalytics } from "./services/analytics";
+import AIChatbot from "./components/chatbot/AIChatbot";
 
 // Lazy load components for code splitting
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
@@ -47,6 +48,10 @@ const BusBooking = lazy(() => import("./pages/BusBooking"));
 const BusBookingPage = lazy(() => import("./pages/BusBookingPage")); // NEW
 const MarketPurchasePage = lazy(() => import("./pages/MarketPurchasePage")); // NEW
 const HotelBookingPage = lazy(() => import("./pages/HotelBookingPage")); // NEW
+
+// Event Routes
+const EventList = lazy(() => import("./pages/EventList"));
+const EventDetails = lazy(() => import("./pages/EventDetails"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const EsewaDemo = lazy(() => import("./pages/EsewaDemo"));
@@ -235,6 +240,10 @@ function App() {
                 errorElement={<ErrorPage />}
               />
 
+              {/* Event Routes */}
+              <Route path="/events" element={<EventList />} errorElement={<ErrorPage />} />
+              <Route path="/events/:eventId" element={<EventDetails />} errorElement={<ErrorPage />} />
+
               {/* Market Routes */}
               <Route path="/market" element={<MarketDashboard />} errorElement={<ErrorPage />} />
               <Route path="/market/dashboard/:eventId" element={<MarketDashboard />} errorElement={<ErrorPage />} />
@@ -275,6 +284,9 @@ function App() {
           pauseOnHover
           theme="light"
         />
+
+        {/* AI Chatbot - Floating widget available on all pages */}
+        <AIChatbot />
       </ErrorBoundary>
     </div>
   );

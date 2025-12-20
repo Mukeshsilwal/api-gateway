@@ -18,7 +18,7 @@ public class CrowdFlowService {
 
     private final CrowdZoneRepository zoneRepository;
 
-    public List<CrowdZone> getHeatmap(UUID eventId) {
+    public List<CrowdZone> getHeatmap(Long eventId) {
         return zoneRepository.findByEventId(eventId);
     }
 
@@ -40,9 +40,10 @@ public class CrowdFlowService {
         }
 
         zone.updateStatus(); // Recalculate Green/Yellow/Red
-        
+
         if (zone.getStatus() == ZoneStatus.RED) {
-            log.warn("ALERT: Zone {} is OVERCROWDED ({} / {})", zone.getZoneName(), zone.getCurrentOccupancy(), zone.getCapacity());
+            log.warn("ALERT: Zone {} is OVERCROWDED ({} / {})", zone.getZoneName(), zone.getCurrentOccupancy(),
+                    zone.getCapacity());
             // In real app: Trigger Push Notification or SMS to staff
         }
 

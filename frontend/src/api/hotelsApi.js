@@ -210,6 +210,9 @@ const hotelsApi = {
     /**
      * GET /api/hotels/cities - Get list of cities with hotels
      * Cached for 5 minutes with request deduplication
+     * 
+     * NOTE: Backend endpoint /api/bff/v1/find/cities does not exist yet.
+     * Using hardcoded fallback until implemented.
      */
     getCities: async () => {
         const now = Date.now();
@@ -219,7 +222,24 @@ const hotelsApi = {
             return cache.cities;
         }
 
-        // Deduplicate concurrent requests
+        // TODO: Implement backend endpoint /api/bff/v1/find/cities
+        // For now, return hardcoded cities
+        const cities = [
+            'Kathmandu',
+            'Pokhara',
+            'Lalitpur',
+            'Bhaktapur',
+            'Chitwan',
+            'Lumbini'
+        ];
+
+        // Update cache
+        cache.cities = cities;
+        cache.timestamp = now;
+
+        return cities;
+
+        /* Original implementation - commented out until backend endpoint exists
         return dedupedRequest('cities', async () => {
             const response = await api.get(API_CONFIG.ENDPOINTS.HOTELS_CITIES);
 
@@ -240,6 +260,7 @@ const hotelsApi = {
 
             return cities;
         });
+        */
     },
 
     /**

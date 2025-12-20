@@ -186,40 +186,32 @@ const HeroSection = () => {
     };
 
     return (
-        <div className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-primary-900 via-primary-800 to-purple-900 overflow-hidden">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-                <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
+        <div className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 overflow-hidden">
+            {/* Background Pattern - Subtle dots/texture */}
+            <div className="absolute inset-0 opacity-5">
+                <div className="absolute inset-0" style={{
+                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+                    backgroundSize: '30px 30px'
+                }}></div>
             </div>
 
-            <div className="container mx-auto px-4 relative z-10 flex flex-col lg:flex-row items-center gap-12 py-20">
-                {/* Left Content */}
-                <div className="flex-1 text-center lg:text-left text-white space-y-6">
-                    <h1 className="text-4xl lg:text-6xl font-display font-bold leading-tight animate-slide-up">
-                        Explore Nepal <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-purple-300">
-                            With Comfort
+            <div className="container mx-auto px-4 relative z-10 flex flex-col items-center gap-12 py-20">
+                {/* Centered Content */}
+                <div className="text-center space-y-6 max-w-4xl">
+                    <h1 className="text-4xl lg:text-6xl font-display font-bold leading-tight animate-slide-up text-white">
+                        Book Your Next <br />
+                        <span className="text-orange-500">
+                            Adventure Today
                         </span>
                     </h1>
-                    <p className="text-lg text-blue-100 max-w-xl mx-auto lg:mx-0 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                        Book bus tickets, flights, and hotels—seamlessly. Experience the beauty of Nepal with our premium travel partners.
+                    <p className="text-lg text-slate-300 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                        Bus tickets, hotel rooms, event passes, and flights — all at your fingertips with unbeatable prices and seamless booking.
                     </p>
-                    <div className="flex flex-wrap gap-4 justify-center lg:justify-start animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                        <Button
-                            variant="secondary"
-                            size="lg"
-                            className="rounded-full"
-                            onClick={() => document.getElementById('search-widget').scrollIntoView({ behavior: 'smooth' })}
-                        >
-                            Start Booking
-                        </Button>
-                    </div>
                 </div>
 
                 {/* Right Search Widget */}
-                <div id="search-widget" className="w-full max-w-md animate-scale-in" style={{ animationDelay: '0.3s' }}>
-                    <Card className="border-0 shadow-premium-lg bg-white/95 backdrop-blur-sm">
+                <div id="search-widget" className="w-full max-w-4xl animate-scale-in" style={{ animationDelay: '0.3s' }}>
+                    <Card className="border-0 shadow-2xl bg-white">
                         {/* Tabs */}
                         <div className="flex border-b border-gray-100">
                             {tabs.map((tab) => (
@@ -229,8 +221,8 @@ const HeroSection = () => {
                                     className={`
                                         flex-1 flex items-center justify-center gap-2 py-4 text-sm font-medium transition-all
                                         ${activeTab === tab.id
-                                            ? 'text-primary border-b-2 border-primary bg-primary-50/50'
-                                            : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}
+                                            ? 'text-white bg-orange-500'
+                                            : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
                                     `}
                                 >
                                     <tab.icon size={18} />

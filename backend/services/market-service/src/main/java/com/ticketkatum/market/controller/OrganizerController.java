@@ -16,12 +16,12 @@ public class OrganizerController {
     private final OrganizerAnalyticsService analyticsService;
 
     @GetMapping("/dashboard/{eventId}")
-    public ResponseEntity<EventAnalytics> getDashboard(@PathVariable("eventId") UUID eventId) {
+    public ResponseEntity<EventAnalytics> getDashboard(@PathVariable("eventId") Long eventId) {
         return ResponseEntity.ok(analyticsService.getAnalytics(eventId));
     }
-    
+
     @PostMapping("/pricing/override")
-    public ResponseEntity<String> overridePricing(@RequestParam UUID eventId, @RequestParam double multiplier) {
+    public ResponseEntity<String> overridePricing(@RequestParam Long eventId, @RequestParam double multiplier) {
         // Call DynamicPricingService to set a manual override rule
         return ResponseEntity.ok("Pricing override activated: " + multiplier + "x");
     }

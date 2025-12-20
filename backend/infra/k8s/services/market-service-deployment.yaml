@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: market-service
-        image: ticketkatum/market-service:latest
+        image: market-service:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8092

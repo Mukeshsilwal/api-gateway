@@ -1,7 +1,7 @@
 # ============================================================
 # TICKET KATUM WEB-BFF - COMPLETE CONFIGURATION
 # Backend for Frontend Layer
-# Supports: Hotel Management + Bus Ticketing + Authentication
+# Supports: Hotel Management + Bus Ticketing + Authentication + AI Assistant
 # ============================================================
 
 spring:
@@ -10,63 +10,68 @@ spring:
   zipkin:
     enabled: false
 
-    # Server Configuration
-    server:
-      port: ${SERVER_PORT:8080}
-      servlet:
-        context-path: /
-      compression:
-        enabled: true
-        mime-types: application/json,application/xml,text/html,text/xml,text/plain
-      error:
-        include-message: always
-        include-binding-errors: always
-    servlet:
-      multipart:
-        enabled: true
-        max-file-size: 10MB
-        max-request-size: 20MB
-        file-size-threshold: 2KB
-
 # ============================================================
-# MICROSERVICES URLs
+# MICROSERVICES REGISTRATION
+# All microservices URLs for service-to-service communication
 # ============================================================
 microservices:
-  # ========== Hotel Management Services ==========
+  # Core Services
+  event-service-url: ${EVENT_SERVICE_URL:http://localhost:8081}
+  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8082}
+  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8083}
   hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8087}
+  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8089}
+  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8083}
+  market-service-url: ${MARKET_SERVICE_URL:http://localhost:8092}
+  
+  # Hotel Management Services
   recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8087}
-  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8086}
   maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8087}
   staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8087}
+  
+  # Support Services
   image-service-url: ${IMAGE_SERVICE_URL:http://localhost:8086}
-
-  # ========== Authentication & User Services ==========
-  auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8089}
   user-service-url: ${USER_SERVICE_URL:http://localhost:8089}
-  registration-service-url: ${REGISTRATION_SERVICE_URL:http://localhost:8089}
-
-  # ========== Booking Services ==========
-  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8091}
-
-  # ========== Bus Ticketing Services ==========
-  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8083}
-  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8083}
+  registration-service-url: ${REGISTRATION_SERVICE_URL:http://localhost:8084}
+  
+  # Bus Ticketing Services
+  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8082}
   route-service-url: ${ROUTE_SERVICE_URL:http://localhost:8083}
   seat-service-url: ${SEAT_SERVICE_URL:http://localhost:8083}
   ticket-service-url: ${TICKET_SERVICE_URL:http://localhost:8083}
-  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8083}
-
-  # ========== Common Services ==========
+  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8082}
+  
+  # Communication Services
   notification-service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8091}
   email-service-url: ${EMAIL_SERVICE_URL:http://localhost:8092}
   sms-service-url: ${SMS_SERVICE_URL:http://localhost:8093}
-  market-service-url: ${MARKET_SERVICE_URL:http://localhost:8092}
-
-  # ========== Timeout Configuration ==========
+  
+  # Timeout Configuration
   timeout:
-    connection-timeout: ${CONNECTION_TIMEOUT:5000}  # 5 seconds
-    response-timeout: ${RESPONSE_TIMEOUT:10000}     # 10 seconds
-    read-timeout: ${READ_TIMEOUT:10000}              # 10 seconds
+    connection-timeout: ${CONNECTION_TIMEOUT:5000}
+    response-timeout: ${RESPONSE_TIMEOUT:10000}
+    read-timeout: ${READ_TIMEOUT:10000}
+
+# ============================================================
+# SERVER CONFIGURATION
+# ============================================================
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  error:
+    include-message: always
+    include-binding-errors: always
+
+servlet:
+  multipart:
+    enabled: true
+    max-file-size: 10MB
+    max-request-size: 20MB
+    file-size-threshold: 2KB
 
 # ============================================================
 # RESILIENCE4J CONFIGURATION

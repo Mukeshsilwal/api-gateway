@@ -19,4 +19,20 @@ public class Response<T> {
         this.statusCode = statusCode;
         this.message = message;
     }
+
+    // Static factory methods
+    public static <T> Response<T> success(T data) {
+        return Response.<T>builder()
+                .statusCode(200)
+                .message("Success")
+                .data(data)
+                .build();
+    }
+
+    public static <T> Response<T> error(String message) {
+        return Response.<T>builder()
+                .statusCode(500)
+                .message(message)
+                .build();
+    }
 }

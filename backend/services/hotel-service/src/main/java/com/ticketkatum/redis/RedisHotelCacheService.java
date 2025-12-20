@@ -54,17 +54,27 @@ public class RedisHotelCacheService {
      * Batch add multiple hotels to geospatial index
      */
     public void addHotelsToGeoIndex(List<Hotel> hotels) {
+        if (hotels == null || hotels.isEmpty()) {
+            log.info("No hotels to add to geo index, skipping...");
+            return;
+        }
+
         try {
-            GeoOperations<String, Object> geoOps = redisTemplate.opsForGeo();
+            Map<String, Point> geoPoints = new HashMap<>();
+            for (Hotel hotel : hotels) {
+                if (hotel.getLatitude() != null && hotel.getLongitude() != null) {
+                    Point point = new Point(hotel.getLongitude(), hotel.getLatitude());
+                    geoPoints.put(String.valueOf(hotel.getId()), point);
+                }
+            }
 
-            Map<Object, Point> memberCoordinateMap = hotels.stream()
-                    .collect(Collectors.toMap(
-                            h -> h.getId().toString(),
-                            h -> new Point(h.getLongitude(), h.getLatitude())
-                    ));
+            if (geoPoints.isEmpty()) {
+                log.info("No hotels with valid coordinates to add to geo index");
+                return;
+            }
 
-            Long added = geoOps.add(HOTELS_GEO_KEY, memberCoordinateMap);
-            log.info("Added {} hotels to geospatial index", added);
+            redisTemplate.opsForGeo().add(HOTELS_GEO_KEY, (RedisGeoCommands.GeoLocation<Object>) geoPoints);
+            log.info("Added {} hotels to geo index", geoPoints.size());
         } catch (Exception e) {
             log.error("Failed to batch add hotels to geo index", e);
         }
@@ -113,8 +123,7 @@ public class RedisHotelCacheService {
                     RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
                             .includeDistance()
                             .sortAscending()
-                            .limit(100)
-            );
+                            .limit(100));
 
             if (results == null) {
                 return Collections.emptyList();
@@ -147,8 +156,7 @@ public class RedisHotelCacheService {
                     RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs()
                             .includeDistance()
                             .sortAscending()
-                            .limit(limit)
-            );
+                            .limit(limit));
 
             if (results == null) {
                 return Collections.emptyMap();
@@ -157,8 +165,7 @@ public class RedisHotelCacheService {
             return results.getContent().stream()
                     .collect(Collectors.toMap(
                             result -> result.getContent().getName().toString(),
-                            result -> result.getDistance().getValue()
-                    ));
+                            result -> result.getDistance().getValue()));
 
         } catch (Exception e) {
             log.error("Failed to get nearby hotels with distance", e);
@@ -178,8 +185,7 @@ public class RedisHotelCacheService {
                     key,
                     recommendations,
                     SEARCH_RESULT_TTL_MINUTES,
-                    TimeUnit.MINUTES
-            );
+                    TimeUnit.MINUTES);
             log.debug("Cached search results for location ({}, {})", latitude, longitude);
         } catch (Exception e) {
             log.error("Failed to cache search results", e);
@@ -194,8 +200,7 @@ public class RedisHotelCacheService {
             double latitude, double longitude, double radiusKm, String sortBy) {
         try {
             String key = generateSearchCacheKey(latitude, longitude, radiusKm, sortBy);
-            List<HotelRecommendation> results =
-                    (List<HotelRecommendation>) redisTemplate.opsForValue().get(key);
+            List<HotelRecommendation> results = (List<HotelRecommendation>) redisTemplate.opsForValue().get(key);
 
             if (results != null) {
                 log.debug("Cache hit for search results at ({}, {})", latitude, longitude);
@@ -217,8 +222,7 @@ public class RedisHotelCacheService {
                     key,
                     recommendation,
                     RECOMMENDATION_TTL_MINUTES,
-                    TimeUnit.MINUTES
-            );
+                    TimeUnit.MINUTES);
             log.debug("Cached recommendation for hotel ID: {}", hotelId);
         } catch (Exception e) {
             log.error("Failed to cache recommendation for hotel ID: {}", hotelId, e);
@@ -231,8 +235,7 @@ public class RedisHotelCacheService {
     public Optional<HotelRecommendation> getCachedRecommendation(Long hotelId) {
         try {
             String key = HOTEL_RECOMMENDATION_PREFIX + hotelId;
-            HotelRecommendation rec =
-                    (HotelRecommendation) redisTemplate.opsForValue().get(key);
+            HotelRecommendation rec = (HotelRecommendation) redisTemplate.opsForValue().get(key);
             return Optional.ofNullable(rec);
         } catch (Exception e) {
             log.error("Failed to get cached recommendation for hotel ID: {}", hotelId, e);
@@ -340,8 +343,7 @@ public class RedisHotelCacheService {
                     HOTELS_GEO_KEY,
                     hotelId.toString(),
                     userLocation,
-                    Metrics.KILOMETERS
-            );
+                    Metrics.KILOMETERS);
 
             return Optional.ofNullable(distance != null ? distance.getValue() : null);
         } catch (Exception e) {

@@ -113,7 +113,7 @@ public class AuthController {
             }
 
             Map<Object, Object> session = sessionService.getSession(sessionId);
-            String username = session != null ? (String) session.get("username") : "unknown";
+            String username = session != null ? (String) session.get("user") : "unknown";
 
             sessionService.invalidateSession(sessionId);
 
@@ -170,7 +170,7 @@ public class AuthController {
             }
 
             Long sessionsInvalidated = sessionService.invalidateAllUserSessions(username);
-            
+
             try {
                 // Invalidate all refresh tokens
                 User user = (User) userDetailsService.loadUserByUsername(username);
@@ -351,7 +351,6 @@ public class AuthController {
         }
     }
 
-
     @PostMapping("/register/admin")
     public ResponseEntity<Response<UserDto>> registerAdmin(
             @Valid @RequestBody CreateRegistrationRequest createRegistrationRequest) {
@@ -388,13 +387,13 @@ public class AuthController {
 
         try {
             log.info("Attempting to register customer: {}", createUserRequest.getEmail());
-            
+
             // Force role to USER if not specified or override?
             // Let's rely on service logic or set it here.
             // CreateUserRequest has "role" field.
             // If public registration, we should force "USER".
-            createUserRequest.setRole("USER"); 
-            
+            createUserRequest.setRole("USER");
+
             UserDto userDto = userService.createUser(createUserRequest);
 
             Response<UserDto> response = ResponseHandler.success(
@@ -429,14 +428,16 @@ public class AuthController {
             }
 
             String refreshToken = authHeader.substring(7).trim();
-            // String username = jwtService.extractUsername(refreshToken); // Token is opaque now
+            // String username = jwtService.extractUsername(refreshToken); // Token is
+            // opaque now
 
             // Verify token in DB
             RefreshToken dbToken = refreshTokenService.findByToken(refreshToken)
                     .orElseThrow(() -> new BadCredentialsException("Refresh token not found"));
-            
+
             UserDetails userDetails = (UserDetails) dbToken.getUser();
-            // Or load fresh: userDetailsService.loadUserByUsername(dbToken.getUser().getEmail());
+            // Or load fresh:
+            // userDetailsService.loadUserByUsername(dbToken.getUser().getEmail());
 
             if (dbToken.isRevoked()) {
                 throw new BadCredentialsException("Refresh token revoked");

@@ -1,0 +1,262 @@
+{
+    "dashboard": {
+        "title": "Kafka Event Metrics",
+        "tags": [
+            "kafka",
+            "events",
+            "messaging"
+        ],
+        "timezone": "browser",
+        "schemaVersion": 16,
+        "version": 1,
+        "refresh": "10s",
+        "panels": [
+            {
+                "id": 1,
+                "title": "Event Publishing Rate",
+                "type": "graph",
+                "gridPos": {
+                    "x": 0,
+                    "y": 0,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "rate(kafka_producer_record_send_total[5m])",
+                        "legendFormat": "{{topic}} - {{instance}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ops",
+                        "label": "Events/sec"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "title": "Consumer Lag by Topic",
+                "type": "graph",
+                "gridPos": {
+                    "x": 12,
+                    "y": 0,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "kafka_consumergroup_lag",
+                        "legendFormat": "{{topic}} - {{consumergroup}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "short",
+                        "label": "Messages"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ],
+                "alert": {
+                    "name": "High Consumer Lag",
+                    "conditions": [
+                        {
+                            "evaluator": {
+                                "params": [
+                                    1000
+                                ],
+                                "type": "gt"
+                            },
+                            "query": {
+                                "params": [
+                                    "A",
+                                    "5m",
+                                    "now"
+                                ]
+                            },
+                            "type": "query"
+                        }
+                    ],
+                    "frequency": "1m",
+                    "handler": 1,
+                    "message": "Consumer lag is above 1000 messages"
+                }
+            },
+            {
+                "id": 3,
+                "title": "Events by Type",
+                "type": "graph",
+                "gridPos": {
+                    "x": 0,
+                    "y": 8,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "sum by (event_type) (rate(event_published_total[5m]))",
+                        "legendFormat": "{{event_type}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ops",
+                        "label": "Events/sec"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 4,
+                "title": "Publishing Errors",
+                "type": "graph",
+                "gridPos": {
+                    "x": 12,
+                    "y": 8,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "rate(event_publishing_errors_total[5m])",
+                        "legendFormat": "{{event_type}} - {{error_type}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ops",
+                        "label": "Errors/sec"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 5,
+                "title": "Event Processing Latency (p95)",
+                "type": "graph",
+                "gridPos": {
+                    "x": 0,
+                    "y": 16,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "histogram_quantile(0.95, rate(event_processing_duration_seconds_bucket[5m]))",
+                        "legendFormat": "{{consumer}} - {{event_type}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "s",
+                        "label": "Latency"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 6,
+                "title": "Consumer Processing Rate",
+                "type": "graph",
+                "gridPos": {
+                    "x": 12,
+                    "y": 16,
+                    "w": 12,
+                    "h": 8
+                },
+                "targets": [
+                    {
+                        "expr": "rate(event_consumed_total[5m])",
+                        "legendFormat": "{{consumer}} - {{event_type}}",
+                        "refId": "A"
+                    }
+                ],
+                "yaxes": [
+                    {
+                        "format": "ops",
+                        "label": "Events/sec"
+                    },
+                    {
+                        "format": "short"
+                    }
+                ]
+            },
+            {
+                "id": 7,
+                "title": "Dead Letter Queue Messages",
+                "type": "stat",
+                "gridPos": {
+                    "x": 0,
+                    "y": 24,
+                    "w": 6,
+                    "h": 4
+                },
+                "targets": [
+                    {
+                        "expr": "sum(dlq_messages_total)",
+                        "refId": "A"
+                    }
+                ],
+                "options": {
+                    "colorMode": "background",
+                    "graphMode": "area",
+                    "orientation": "auto"
+                },
+                "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                        {
+                            "value": 0,
+                            "color": "green"
+                        },
+                        {
+                            "value": 10,
+                            "color": "yellow"
+                        },
+                        {
+                            "value": 100,
+                            "color": "red"
+                        }
+                    ]
+                }
+            },
+            {
+                "id": 8,
+                "title": "Retry Attempts",
+                "type": "stat",
+                "gridPos": {
+                    "x": 6,
+                    "y": 24,
+                    "w": 6,
+                    "h": 4
+                },
+                "targets": [
+                    {
+                        "expr": "sum(rate(event_retry_attempts_total[5m]))",
+                        "refId": "A"
+                    }
+                ],
+                "options": {
+                    "colorMode": "value",
+                    "graphMode": "area"
+                }
+            }
+        ]
+    }
+}

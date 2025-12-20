@@ -20,11 +20,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
 
       - name: Build artifacts (Maven)
         run: |
@@ -126,33 +126,15 @@ jobs:
 
           cd infra/k8s
 
-          if ! grep -q "images:" kustomization.yaml; then
-            echo -e "\nimages:" >> kustomization.yaml
-          fi
-
-          cat <<EOF >> kustomization.yaml
-            - name: booking-service
-              newName: ${REGISTRY}/booking-service
-              newTag: ${IMAGE_TAG}
-            - name: web-bff
-              newName: ${REGISTRY}/web-bff
-              newTag: ${IMAGE_TAG}
-            - name: payment-service
-              newName: ${REGISTRY}/payment-service
-              newTag: ${IMAGE_TAG}
-            - name: hotel-service
-              newName: ${REGISTRY}/hotel-service
-              newTag: ${IMAGE_TAG}
-            - name: auth-service
-              newName: ${REGISTRY}/auth-service
-              newTag: ${IMAGE_TAG}
-            - name: bus-service
-              newName: ${REGISTRY}/bus-service
-              newTag: ${IMAGE_TAG}
-            - name: market-service
-              newName: ${REGISTRY}/market-service
-              newTag: ${IMAGE_TAG}
-          EOF
+          # Use kustomize edit to update images (replaces existing tags)
+          kustomize edit set image \
+            booking-service=${REGISTRY}/booking-service:${IMAGE_TAG} \
+            web-bff=${REGISTRY}/web-bff:${IMAGE_TAG} \
+            payment-service=${REGISTRY}/payment-service:${IMAGE_TAG} \
+            hotel-service=${REGISTRY}/hotel-service:${IMAGE_TAG} \
+            auth-service=${REGISTRY}/auth-service:${IMAGE_TAG} \
+            bus-service=${REGISTRY}/bus-service:${IMAGE_TAG} \
+            market-service=${REGISTRY}/market-service:${IMAGE_TAG}
 
           cd ../..
 

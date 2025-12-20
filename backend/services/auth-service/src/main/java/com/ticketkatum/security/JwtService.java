@@ -4,17 +4,16 @@ import com.ticketkatum.entity.Role;
 import com.ticketkatum.entity.Permission;
 import com.ticketkatum.entity.User;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -41,22 +40,11 @@ public class JwtService {
     @Value("${jwt.refresh.expiration.time:86400000}")
     private long refreshExpirationTime;
 
-    private final PrivateKey privateKey;
-    private final PublicKey publicKey;
+    @Value("${jwt.secret:dMbz7o4YE45aAyT6BUYMsO_ireJ00J96Xxbv6AQ65xb0Ajauql1fScOEP4hEb7oyBtjHfTjvkeXBfpSjE8uyoA}")
+    private String jwtSecret;
 
-    public JwtService() {
-        // Generate RSA Key Pair on startup (In production, load from Keystore/Vault)
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            KeyPair keyPair = keyPairGenerator.generateKeyPair();
-            this.privateKey = keyPair.getPrivate();
-            this.publicKey = keyPair.getPublic();
-            log.info("RSA Key Pair generated successfully");
-        } catch (NoSuchAlgorithmException e) {
-            log.error("Failed to generate RSA keys", e);
-            throw new RuntimeException(e);
-        }
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -141,11 +129,22 @@ public class JwtService {
         if (userDetails instanceof User) {
             return generateAccessToken((User) userDetails);
         }
-        // Fallback or empty claims
+        // Fallback - extract roles from authorities
         Map<String, Object> claims = new HashMap<>();
-        claims.put(AUTHORITIES_CLAIM, userDetails.getAuthorities().stream()
+        List<String> authorities = userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+                .collect(Collectors.toList());
+
+        claims.put(AUTHORITIES_CLAIM, authorities);
+
+        // Extract roles (authorities that start with ROLE_)
+        List<String> roles = authorities.stream()
+                .filter(auth -> auth.startsWith("ROLE_"))
+                .collect(Collectors.toList());
+
+        if (!roles.isEmpty()) {
+            claims.put(ROLES_CLAIM, roles);
+        }
 
         return buildToken(claims, userDetails.getUsername(), jwtExpirationTime);
     }
@@ -177,16 +176,17 @@ public class JwtService {
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
                 .setIssuer("TicketKatum")
-                .signWith(privateKey, SignatureAlgorithm.RS256)
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     /**
      * Extract all claims from JWT token
      */
+    @SuppressWarnings("deprecation")
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(publicKey)
+                .setSigningKey(getSigningKey().getEncoded())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();

@@ -13,10 +13,10 @@ public class CreateListingRequest {
     private Long originalTicketId;
 
     @NotNull
-    private UUID sellerUserId;
+    private long sellerUserId;
 
     @NotNull
-    private UUID eventId;
+    private long eventId;
 
     @NotNull
     @Positive

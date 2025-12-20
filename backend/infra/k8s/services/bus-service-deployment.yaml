@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: bus-service
-          image: ticketkatum/bus-service:latest
+          image: bus-service:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8088

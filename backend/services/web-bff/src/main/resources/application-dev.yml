@@ -1,0 +1,218 @@
+# Web BFF - Development Configuration
+spring:
+  application:
+    name: web-bff
+  profiles:
+    active: dev
+
+  # No database for BFF - it's a gateway/aggregator
+  # All data comes from downstream services
+
+  # Redis Configuration (for caching and session management)
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    timeout: 3000
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 10
+        min-idle: 5
+        max-wait: 3000
+
+# Microservices URLs Configuration
+microservices:
+  event-service-url: http://localhost:8081
+  booking-service-url: http://localhost:8082
+  payment-service-url: http://localhost:8083
+  hotel-service-url: http://localhost:8087
+  auth-service-url: http://localhost:8089
+  bus-service-url: http://localhost:8082
+  market-service-url: http://localhost:8092
+  
+  # Additional service URLs
+  recommendation-service-url: http://localhost:8087
+  maintenance-service-url: http://localhost:8087
+  staff-service-url: http://localhost:8087
+  image-service-url: http://localhost:8086
+  user-service-url: http://localhost:8089
+  registration-service-url: http://localhost:8084
+  bus-stop-service-url: http://localhost:8082
+  route-service-url: http://localhost:8082
+  seat-service-url: http://localhost:8082
+  ticket-service-url: http://localhost:8082
+  bus-booking-service-url: http://localhost:8082
+  notification-service-url: http://localhost:8091
+  email-service-url: http://localhost:8092
+  sms-service-url: http://localhost:8093
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+
+# Management & Monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ticketkatum: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.cloud: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{correlationId}] - %msg%n"
+  file:
+    name: logs/web-bff-dev.log
+
+# Downstream Service URLs (via Eureka)
+services:
+  event-service:
+    url: http://event-service
+    connect-timeout: 5000
+    read-timeout: 10000
+  
+  booking-service:
+    url: http://booking-service
+    connect-timeout: 5000
+    read-timeout: 10000
+  
+  payment-service:
+    url: http://payment-service
+    connect-timeout: 5000
+    read-timeout: 15000
+  
+  hotel-service:
+    url: http://hotel-service
+    connect-timeout: 5000
+    read-timeout: 10000
+  
+  auth-service:
+    url: http://auth-service
+    connect-timeout: 5000
+    read-timeout: 5000
+
+# WebClient Configuration
+webclient:
+  max-connections: 500
+  pending-acquire-timeout: 45000
+  max-idle-time: 20000
+  max-life-time: 60000
+  evict-in-background: 120000
+
+# Circuit Breaker Configuration
+resilience4j:
+  circuitbreaker:
+    instances:
+      eventService:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 100
+        slow-call-duration-threshold: 5s
+      
+      bookingService:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+      
+      paymentService:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 15s
+        failure-rate-threshold: 50
+      
+      hotelService:
+        register-health-indicator: true
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+
+  # Retry Configuration
+  retry:
+    instances:
+      eventService:
+        max-attempts: 3
+        wait-duration: 500ms
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+      
+      bookingService:
+        max-attempts: 3
+        wait-duration: 500ms
+      
+      paymentService:
+        max-attempts: 2
+        wait-duration: 1000ms
+
+  # Rate Limiter Configuration
+  ratelimiter:
+    instances:
+      default:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+        timeout-duration: 0
+
+# CORS Configuration
+cors:
+  allowed-origins: http://localhost:3000,http://localhost:5173
+  allowed-methods: GET,POST,PUT,DELETE,OPTIONS,PATCH
+  allowed-headers: "*"
+  allow-credentials: true
+  max-age: 3600
+
+# Cache Configuration
+cache:
+  event-details:
+    ttl: 300  # 5 minutes
+  hotel-list:
+    ttl: 600  # 10 minutes
+  bus-routes:
+    ttl: 1800  # 30 minutes
+
+# API Rate Limiting
+rate-limit:
+  enabled: true
+  requests-per-minute: 100
+  requests-per-hour: 1000
+
+# Session Configuration
+session:
+  timeout-minutes: 30
+  max-concurrent-sessions: 5

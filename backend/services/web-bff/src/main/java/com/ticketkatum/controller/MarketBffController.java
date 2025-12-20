@@ -18,14 +18,14 @@ public class MarketBffController {
     private final MarketAggregator marketAggregator;
 
     @GetMapping("/dashboard/live/{eventId}")
-    public Mono<ResponseEntity<MarketAggregator.LiveDashboardDTO>> getLiveDashboard(@PathVariable String eventId) {
+    public Mono<ResponseEntity<MarketAggregator.LiveDashboardDTO>> getLiveDashboard(@PathVariable("eventId") String eventId) {
         return marketAggregator.getLiveDashboard(eventId)
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/dashboard/organizer/{eventId}")
     public Mono<ResponseEntity<MarketAggregator.OrganizerDashboardDTO>> getOrganizerDashboard(
-            @PathVariable String eventId) {
+            @PathVariable("eventId") String eventId) {
         return marketAggregator.getOrganizerDashboard(eventId)
                 .map(ResponseEntity::ok);
     }
@@ -49,7 +49,7 @@ public class MarketBffController {
     @PostMapping("/resale/{id}/buy")
     @Operation(summary = "Buy resale ticket", description = "Purchase a resale listing")
     public Mono<ResponseEntity<com.ticketkatum.dto.market.ResaleTransaction>> buyListing(
-            @PathVariable java.util.UUID id,
+            @PathVariable("id") java.util.UUID id,
             @RequestBody com.ticketkatum.dto.market.PurchaseRequest request) {
         return marketClient.buyListing(id, request)
                 .map(ResponseEntity::ok);
@@ -72,7 +72,7 @@ public class MarketBffController {
 
     @PostMapping("/bundles/{bundleId}/book")
     @Operation(summary = "Book bundle", description = "Book a specific bundle")
-    public Mono<ResponseEntity<String>> bookBundle(@PathVariable String bundleId,
+    public Mono<ResponseEntity<String>> bookBundle(@PathVariable("bundleId") String bundleId,
             @RequestBody com.ticketkatum.dto.market.BundleBookingRequest request) {
         return marketClient.bookBundle(bundleId, request)
                 .map(ResponseEntity::ok);
@@ -81,7 +81,7 @@ public class MarketBffController {
     @GetMapping("/organizer/dashboard/{eventId}")
     @Operation(summary = "Organizer dashboard", description = "Get event analytics for organizer")
     public Mono<ResponseEntity<com.ticketkatum.dto.market.EventAnalytics>> getOrganizerDashboard(
-            @PathVariable java.util.UUID eventId) {
+            @PathVariable("eventId") java.util.UUID eventId) {
         return marketClient.getOrganizerDashboard(eventId)
                 .map(ResponseEntity::ok);
     }
@@ -93,25 +93,25 @@ public class MarketBffController {
     }
 
     @GetMapping("/loyalty/{userId}")
-    public Mono<ResponseEntity<Object>> getLoyaltyProfile(@PathVariable String userId) {
+    public Mono<ResponseEntity<Object>> getLoyaltyProfile(@PathVariable("userId") String userId) {
         return marketClient.getLoyaltyProfile(userId)
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/loyalty/{userId}/history")
-    public Mono<ResponseEntity<List<Object>>> getLoyaltyHistory(@PathVariable String userId) {
+    public Mono<ResponseEntity<List<Object>>> getLoyaltyHistory(@PathVariable("userId") String userId) {
         return marketClient.getLoyaltyHistory(userId).collectList()
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/crowd/heatmap/{eventId}")
-    public Mono<ResponseEntity<List<Object>>> getHeatmap(@PathVariable String eventId) {
+    public Mono<ResponseEntity<List<Object>>> getHeatmap(@PathVariable("eventId") String eventId) {
         return marketClient.getHeatmap(eventId).collectList()
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/live/polls/{eventId}")
-    public Mono<ResponseEntity<List<Object>>> getPolls(@PathVariable String eventId) {
+    public Mono<ResponseEntity<List<Object>>> getPolls(@PathVariable("eventId") String eventId) {
         return marketClient.getPolls(eventId).collectList()
                 .map(ResponseEntity::ok);
     }
@@ -123,7 +123,7 @@ public class MarketBffController {
     }
 
     @GetMapping("/live/menu/{eventId}")
-    public Mono<ResponseEntity<List<Object>>> getMenu(@PathVariable String eventId) {
+    public Mono<ResponseEntity<List<Object>>> getMenu(@PathVariable("eventId") String eventId) {
         return marketClient.getMenu(eventId).collectList()
                 .map(ResponseEntity::ok);
     }
