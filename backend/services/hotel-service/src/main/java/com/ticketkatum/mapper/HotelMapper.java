@@ -80,6 +80,13 @@ public class HotelMapper {
             builder.amenities(new HashSet<>());
         }
 
+        // SAFE: Only access images if initialized
+        if (Hibernate.isInitialized(room.getImages())) {
+            builder.images(new HashSet<>(room.getImages()));
+        } else {
+            builder.images(new HashSet<>());
+        }
+
         // SAFE: Only access hotel if initialized
         if (room.getHotel() != null && Hibernate.isInitialized(room.getHotel())) {
             builder.hotelId(room.getHotel().getId());
@@ -115,6 +122,13 @@ public class HotelMapper {
             builder.amenities(new HashSet<>(room.getAmenities()));
         } else {
             builder.amenities(new HashSet<>());
+        }
+
+        // SAFE: Only access images if initialized
+        if (Hibernate.isInitialized(room.getImages())) {
+            builder.images(new HashSet<>(room.getImages()));
+        } else {
+            builder.images(new HashSet<>());
         }
 
         return builder.build();
@@ -190,6 +204,7 @@ public class HotelMapper {
                 .basePrice(room.getBasePrice())
                 .maxPrice(room.getMaxPrice())
                 .amenities(new HashSet<>(room.getAmenities()))
+                .images(new HashSet<>(room.getImages()))
                 .active(room.isActive())
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt())
@@ -204,16 +219,17 @@ public class HotelMapper {
                 Hibernate.isInitialized(hotel.getImages()) &&
                 Hibernate.isInitialized(hotel.getRooms()) &&
                 hotel.getRooms().stream()
-                        .allMatch(room -> Hibernate.isInitialized(room.getAmenities()));
+                        .allMatch(room -> Hibernate.isInitialized(room.getAmenities())
+                                && Hibernate.isInitialized(room.getImages()));
     }
 
     /**
      * Utility method to check if room amenities are initialized
      */
     public boolean isRoomFullyInitialized(Room room) {
-        return room != null && Hibernate.isInitialized(room.getAmenities());
+        return room != null && Hibernate.isInitialized(room.getAmenities())
+                && Hibernate.isInitialized(room.getImages());
     }
-
 
     public Hotel convertRowToHotel(Map<String, Object> row) {
         Hotel hotel = new Hotel();

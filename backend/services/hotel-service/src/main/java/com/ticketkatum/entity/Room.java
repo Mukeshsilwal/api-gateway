@@ -48,6 +48,12 @@ public class Room {
     @Builder.Default
     private Set<String> amenities = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "room_images", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "image_url")
+    @Builder.Default
+    private Set<String> images = new HashSet<>();
+
     @Builder.Default
     private boolean active = true;
 

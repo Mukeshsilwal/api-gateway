@@ -24,6 +24,7 @@ public class RoomDTO {
     private BigDecimal basePrice;
     private BigDecimal maxPrice;
     private Set<String> amenities;
+    private Set<String> images;
     private boolean active;
     private long hotelId;
     private String hotelCode;

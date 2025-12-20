@@ -19,8 +19,13 @@ resources:
   - services/statefulsets.yaml
   - services/event-service-deployment.yaml
   - services/event-service-service.yaml
+  - services/image-service-deployment.yaml
+  - services/image-service-service.yaml
 
 images:
+  - name: image-service
+    newName: 572638914672.dkr.ecr.us-east-1.amazonaws.com/image-service
+    newTag: latest
   - name: event-service
     newName: 572638914672.dkr.ecr.us-east-1.amazonaws.com/event-service
     newTag: latest

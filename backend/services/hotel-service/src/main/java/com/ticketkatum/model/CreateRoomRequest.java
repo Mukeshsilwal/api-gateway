@@ -59,5 +59,9 @@ public class CreateRoomRequest {
     @Builder.Default
     private Set<@NotBlank(message = "Amenity name cannot be blank") String> amenities = new HashSet<>();
 
+    @Size(max = 10, message = "Maximum 10 images allowed")
+    @Builder.Default
+    private Set<@Pattern(regexp = "^https?://.*", message = "Invalid image URL") String> images = new HashSet<>();
+
     // REMOVED: imageUrl field (not used in Room entity)
 }

@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
+import imageService from '../../services/image.service';
 import PropTypes from 'prop-types';
 
 const ROOM_TYPES = [
@@ -51,7 +53,8 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
         pricingConfigurations: [], // Array of { rentType, mealPlan, mealService, price }
         allowedRentTypes: ['DAILY'],
         allowedMealPlans: ['NONE'],
-        allowedMealServices: ['BUFFET']
+        allowedMealServices: ['BUFFET'],
+        images: []
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
@@ -70,7 +73,8 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
                 pricingConfigurations: editingRoom.pricingConfigurations || [],
                 allowedRentTypes: editingRoom.allowedRentTypes || ['DAILY'],
                 allowedMealPlans: editingRoom.allowedMealPlans || ['NONE'],
-                allowedMealServices: editingRoom.allowedMealServices || ['BUFFET']
+                allowedMealServices: editingRoom.allowedMealServices || ['BUFFET'],
+                images: editingRoom.images || []
             });
         } else {
             setFormData({
@@ -85,7 +89,8 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
                 pricingConfigurations: [],
                 allowedRentTypes: ['DAILY'],
                 allowedMealPlans: ['NONE'],
-                allowedMealServices: ['BUFFET']
+                allowedMealServices: ['BUFFET'],
+                images: []
             });
         }
         setErrors({});
@@ -154,6 +159,23 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
         if (!validate()) return;
 
         try {
+            setIsSubmitting(true);
+            let uploadedImageUrls = [];
+
+            // Case 1: Existing images (strings) flow through
+            const existingImages = formData.images.filter(img => typeof img === 'string');
+            uploadedImageUrls = [...existingImages];
+
+            // Case 2: New images (Files) need upload
+            const newImageFiles = formData.images.filter(img => typeof img !== 'string');
+
+            if (newImageFiles.length > 0) {
+                toast.info(`Uploading ${newImageFiles.length} new image${newImageFiles.length > 1 ? 's' : ''}...`);
+                const newUrls = await imageService.uploadMultipleImages(newImageFiles);
+                uploadedImageUrls = [...uploadedImageUrls, ...newUrls];
+                toast.success('Images uploaded successfully');
+            }
+
             // Construct payload explicitly to ensure 'type' is not sent, only 'roomType'
             const payload = {
                 roomNumber: formData.roomNumber,
@@ -162,6 +184,7 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
                 maxPrice: formData.maxPrice ? parseFloat(formData.maxPrice) : null,
                 capacity: parseInt(formData.capacity),
                 amenities: formData.amenities,
+                images: uploadedImageUrls,
                 active: formData.active,
                 description: formData.description,
                 pricingConfigurations: formData.pricingConfigurations,
@@ -174,6 +197,7 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
             onClose();
         } catch (error) {
             console.error('Error saving room:', error);
+            toast.error(error.message || 'Failed to save room');
         } finally {
             setIsSubmitting(false);
         }
@@ -461,6 +485,71 @@ export function AddRoomModal({ isOpen, onClose, onSave, editingRoom = null, exis
                                 <div className="text-xs text-gray-500 text-right mt-1">
                                     {formData.description.length}/500
                                 </div>
+                            </div>
+
+                            {/* Room Images */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Room Images</label>
+                                <div className="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-teal-500 transition-colors bg-gray-50">
+                                    <div className="space-y-1 text-center">
+                                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                        <div className="flex text-sm text-gray-600 justify-center">
+                                            <label htmlFor="room-images-upload" className="relative cursor-pointer bg-white rounded-md font-semibold text-teal-600 hover:text-teal-500 focus-within:outline-none">
+                                                <span>Upload files</span>
+                                                <input
+                                                    id="room-images-upload"
+                                                    name="room-images-upload"
+                                                    type="file"
+                                                    className="sr-only"
+                                                    multiple
+                                                    accept="image/*"
+                                                    onChange={(e) => {
+                                                        const files = Array.from(e.target.files);
+                                                        if (files.length + formData.images.length > 10) {
+                                                            toast.error('Maximum 10 images allowed');
+                                                            return;
+                                                        }
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            images: [...prev.images, ...files]
+                                                        }));
+                                                    }}
+                                                />
+                                            </label>
+                                            <p className="pl-1">or drag and drop</p>
+                                        </div>
+                                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                                    </div>
+                                </div>
+                                {formData.images && formData.images.length > 0 && (
+                                    <div className="mt-4 grid grid-cols-4 gap-4">
+                                        {formData.images.map((img, index) => (
+                                            <div key={index} className="relative h-24 w-24 rounded-lg overflow-hidden border-2 border-gray-200 group">
+                                                <img
+                                                    src={typeof img === 'string' ? img : URL.createObjectURL(img)}
+                                                    alt={`Preview ${index}`}
+                                                    className="h-full w-full object-cover"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            images: prev.images.filter((_, i) => i !== index)
+                                                        }));
+                                                    }}
+                                                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity transform hover:scale-110"
+                                                >
+                                                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             {/* --- New Configurations --- */}

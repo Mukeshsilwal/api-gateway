@@ -81,7 +81,11 @@ public class RoomServiceImpl implements RoomService {
                     .capacity(req.getCapacity())
                     .basePrice(req.getBasePrice())
                     .maxPrice(req.getMaxPrice())
+                    .capacity(req.getCapacity())
+                    .basePrice(req.getBasePrice())
+                    .maxPrice(req.getMaxPrice())
                     .amenities(req.getAmenities())
+                    .images(req.getImages())
                     .active(req.getActive() != null ? req.getActive() : true)
                     .hotel(hotel)
                     .createdAt(LocalDateTime.now())
@@ -90,8 +94,9 @@ public class RoomServiceImpl implements RoomService {
 
             Room savedRoom = roomRepository.save(room);
 
-            // Initialize amenities before mapping (still inside transaction)
+            // Initialize amenities and images before mapping (still inside transaction)
             Hibernate.initialize(savedRoom.getAmenities());
+            Hibernate.initialize(savedRoom.getImages());
 
             log.info("Room added successfully: {} to hotel: {}", savedRoom.getId(), hotelCode);
             return hotelMapper.toRoomDTO(savedRoom);
@@ -139,13 +144,16 @@ public class RoomServiceImpl implements RoomService {
             room.setCapacity(req.getCapacity());
             room.setBasePrice(req.getBasePrice());
             room.setMaxPrice(req.getMaxPrice());
+            room.setMaxPrice(req.getMaxPrice());
             room.setAmenities(req.getAmenities());
+            room.setImages(req.getImages());
             room.setUpdatedAt(LocalDateTime.now());
 
             Room updatedRoom = roomRepository.save(room);
 
-            // Initialize amenities before mapping (still inside transaction)
+            // Initialize amenities and images before mapping (still inside transaction)
             Hibernate.initialize(updatedRoom.getAmenities());
+            Hibernate.initialize(updatedRoom.getImages());
 
             log.info("Room updated successfully: {}", updatedRoom.getId());
             return hotelMapper.toRoomDTO(updatedRoom);
@@ -175,8 +183,9 @@ public class RoomServiceImpl implements RoomService {
                         return new RoomNotFoundException(roomId);
                     });
 
-            // Initialize amenities while still in transaction
+            // Initialize amenities and images while still in transaction
             Hibernate.initialize(room.getAmenities());
+            Hibernate.initialize(room.getImages());
 
             // Initialize hotel if needed for the DTO
             if (room.getHotel() != null) {
@@ -207,9 +216,10 @@ public class RoomServiceImpl implements RoomService {
 
             List<Room> rooms = roomRepository.findByHotelHotelCode(hotelCode);
 
-            // Initialize amenities for ALL rooms while still in transaction
+            // Initialize amenities and images for ALL rooms while still in transaction
             rooms.forEach(room -> {
                 Hibernate.initialize(room.getAmenities());
+                Hibernate.initialize(room.getImages());
                 // Also initialize hotel reference if needed
                 if (room.getHotel() != null) {
                     Hibernate.initialize(room.getHotel());
@@ -284,7 +294,11 @@ public class RoomServiceImpl implements RoomService {
             List<Room> rooms = roomRepository.findByHotelIdAndActiveTrue(hotelId);
 
             // Initialize amenities for all rooms
-            rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+            // Initialize amenities and images for all rooms
+            rooms.forEach(room -> {
+                Hibernate.initialize(room.getAmenities());
+                Hibernate.initialize(room.getImages());
+            });
 
             log.info("Found {} active rooms for hotel ID: {}", rooms.size(), hotelId);
             return hotelMapper.toRoomDTOList(rooms);
@@ -309,7 +323,11 @@ public class RoomServiceImpl implements RoomService {
             List<Room> rooms = roomRepository.findByHotelId(hotelId);
 
             // Initialize amenities for all rooms
-            rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+            // Initialize amenities and images for all rooms
+            rooms.forEach(room -> {
+                Hibernate.initialize(room.getAmenities());
+                Hibernate.initialize(room.getImages());
+            });
 
             log.info("Found {} total rooms for hotel ID: {}", rooms.size(), hotelId);
             return hotelMapper.toRoomDTOList(rooms);
@@ -345,7 +363,11 @@ public class RoomServiceImpl implements RoomService {
                     roomType);
 
             // Initialize amenities for all rooms
-            rooms.forEach(room -> Hibernate.initialize(room.getAmenities()));
+            // Initialize amenities and images for all rooms
+            rooms.forEach(room -> {
+                Hibernate.initialize(room.getAmenities());
+                Hibernate.initialize(room.getImages());
+            });
 
             log.info("Found {} {} type rooms", rooms.size(), roomType);
             return hotelMapper.toRoomDTOList(rooms);

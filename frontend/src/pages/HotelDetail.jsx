@@ -383,6 +383,7 @@ const RoomCard = ({ room, onBook, isDateSelected, isAvailable }) => {
     // Determine initial state if options exist
     const [selectedRentType, setSelectedRentType] = useState(room.availableRentTypes?.[0]?.id || "");
     const [selectedMealPlan, setSelectedMealPlan] = useState(room.availableMealPlans?.[0]?.id || "");
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const handleBookClick = () => {
         onBook({
@@ -391,8 +392,47 @@ const RoomCard = ({ room, onBook, isDateSelected, isAvailable }) => {
         });
     };
 
+    const images = room.images && room.images.length > 0 ? room.images : [];
+
     return (
         <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all flex flex-col sm:flex-row gap-6">
+            {/* Room Image - Left Side */}
+            {images.length > 0 && (
+                <div className="w-full sm:w-1/3 md:w-1/4 h-48 sm:h-auto flex-shrink-0 relative rounded-xl overflow-hidden group">
+                    <img
+                        src={images[currentImageIndex]}
+                        alt={room.roomType || room.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.src = "https://placehold.co/400x300?text=Room"; }}
+                    />
+                    {images.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+                                }}
+                                className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+                                }}
+                                className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded-full">
+                                {currentImageIndex + 1}/{images.length}
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+
             <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
                     <h3 className="text-xl font-bold text-gray-900">{room.roomType || room.name}</h3>

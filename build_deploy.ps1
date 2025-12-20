@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Continue"
-$services = @('web-bff', 'payment-service', 'hotel-service', 'bus-service', 'market-service', 'auth-service', 'booking-service', 'eureka-server', 'event-service')
+$services = @('web-bff', 'payment-service', 'hotel-service', 'bus-service', 'market-service', 'auth-service', 'booking-service', 'eureka-server', 'event-service', 'image-service')
 $registry = "572638914672.dkr.ecr.us-east-1.amazonaws.com"
 $region = "us-east-1"
 
