@@ -14,7 +14,7 @@ import { Settings } from "../components/admin/Settings";
 import TripScheduler from "../components/admin/TripScheduler";
 import TicketingDashboard from "../components/admin/ticketing/TicketingDashboard";
 import RoomMaintenancePage from "../components/admin/maintenance/RoomMaintenancePage";
-import UserManagement from "../components/admin/UserManagement";
+import UserManagement from "../components/admin/UserManager";
 import { EventManager } from "../components/admin/EventManager";
 import { StaffManager } from "../components/admin/StaffManager";
 import RoleManager from "../components/admin/RoleManager";

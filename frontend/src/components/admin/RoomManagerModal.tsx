@@ -40,7 +40,8 @@ export const RoomManagerModal: React.FC<RoomManagerModalProps> = ({ isOpen, onCl
             const uniqueRoomsMap = new Map();
             rawRooms.forEach((room: any) => {
                 const id = room.id || room.roomId;
-                if (id) uniqueRoomsMap.set(id, { ...room, id }); // ensure id property exists
+                // Ensure both id and roomId properties exist for consistency
+                if (id) uniqueRoomsMap.set(id, { ...room, id, roomId: id });
             });
 
             setRooms(Array.from(uniqueRoomsMap.values()));

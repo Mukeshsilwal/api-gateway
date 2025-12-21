@@ -79,7 +79,7 @@ export const HotelManager: React.FC = () => {
             // We might need to extend HotelDto or assume it's there if the backend returns it.
             // Checking dto.ts, HotelDto doesn't have 'rooms' property openly defined, but response might have it.
             // Safe access using (hotel as any).rooms or extending local interface.
-            key: 'id', // Dummy key since we use render with full object
+            key: 'roomsCount', // Unique key for rooms column
             label: 'Rooms',
             sortable: true,
             render: (_: any, hotel: HotelDto) => {
@@ -88,7 +88,7 @@ export const HotelManager: React.FC = () => {
             }
         },
         {
-            key: 'id', // Dummy key
+            key: 'priceRange', // Unique key for price range column
             label: 'Price Range',
             sortable: false,
             render: (_: any, hotel: HotelDto) => {
@@ -101,7 +101,7 @@ export const HotelManager: React.FC = () => {
             }
         },
         {
-            key: 'id', // Dummy key
+            key: 'actions', // Unique key for actions column
             label: 'Actions',
             sortable: false,
             render: (_: any, hotel: HotelDto) => (

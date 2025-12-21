@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DataTable } from '../../DataTable';
+import { DataTable } from '../DataTable';
 import { Bed, Film, Bus, MoreHorizontal, AlertCircle, CheckCircle, Clock, Filter, X } from 'lucide-react';
 import { Ticket } from './types';
 

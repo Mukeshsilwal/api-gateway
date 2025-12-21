@@ -21,7 +21,7 @@ const UserRegister = lazy(() => import("./pages/UserRegister"));
 const HomePage = lazy(() => import("./pages/Homepage"));
 const BusList = lazy(() => import("./pages/BusList"));
 const TicketDetails = lazy(() => import("./pages/ticketDetails"));
-const ErrorPage = lazy(() => import("./pages/error-page"));
+const ErrorPage = lazy(() => import("./pages/ErrorPage"));
 const TicketConfirmed = lazy(() => import("./pages/ticketconfirm"));
 const AdminPanel = lazy(() => import("./pages/admin").then(module => ({ default: module.AdminPanel })));
 const PlaneList = lazy(() => import("./pages/PlaneList"));
