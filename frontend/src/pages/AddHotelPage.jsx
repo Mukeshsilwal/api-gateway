@@ -63,21 +63,57 @@ export function AddHotelPage() {
 
     const handleSubmit = async () => {
         try {
-            // Frontend validation
-            if (!hotelData.name || !hotelData.hotelCode) {
-                toast.error('Please fill in hotel name and code');
-                return;
-            }
-            if (!hotelData.address || !hotelData.city) {
-                toast.error('Please fill in address and city');
-                return;
-            }
-            if (!hotelData.phone) {
-                toast.error('Please provide a phone number');
-                return;
-            }
+            // Comprehensive Frontend Validation
+            const errors = [];
+
+            // Name
+            if (!hotelData.name?.trim()) errors.push("Hotel name is required");
+            else if (hotelData.name.length < 3 || hotelData.name.length > 100) errors.push("Hotel name must be between 3 and 100 characters");
+
+            // Hotel Code
+            if (!hotelData.hotelCode?.trim()) errors.push("Hotel code is required");
+            else if (!/^[A-Z0-9-_]{3,20}$/.test(hotelData.hotelCode)) errors.push("Hotel code must be 3-20 uppercase alphanumeric chars (hyphens/underscores allowed)");
+
+            // City
+            if (!hotelData.city?.trim()) errors.push("City is required");
+            else if (hotelData.city.length < 2 || hotelData.city.length > 50) errors.push("City must be between 2 and 50 characters");
+
+            // Address
+            if (!hotelData.address?.trim()) errors.push("Address is required");
+            else if (hotelData.address.length > 200) errors.push("Address must not exceed 200 characters");
+
+            // Phone
+            if (!hotelData.phone?.trim()) errors.push("Phone number is required");
+            else if (!/^\+?[1-9]\d{1,14}$/.test(hotelData.phone)) errors.push("Invalid phone number format (E.164)");
+
+            // Email
+            if (hotelData.email && hotelData.email.length > 100) errors.push("Email must not exceed 100 characters");
+            // Basic email regex
+            if (hotelData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(hotelData.email)) errors.push("Invalid email format");
+
+            // Stars
+            if (!hotelData.stars || hotelData.stars < 1 || hotelData.stars > 5) errors.push("Stars must be between 1 and 5");
+
+            // Description
+            if (hotelData.description && hotelData.description.length > 1000) errors.push("Description must not exceed 1000 characters");
+
+            // Amenities
+            if (hotelData.amenities.length > 20) errors.push("Maximum 20 amenities allowed");
+
+            // Coordinates
             if (hotelData.latitude === 0 || hotelData.longitude === 0) {
-                toast.error('Please provide valid GPS coordinates (use Get Current Location button or enter manually)');
+                errors.push("Please provide valid GPS coordinates");
+            } else {
+                if (hotelData.latitude < -90 || hotelData.latitude > 90) errors.push("Latitude must be between -90 and 90");
+                if (hotelData.longitude < -180 || hotelData.longitude > 180) errors.push("Longitude must be between -180 and 180");
+            }
+
+            // Images
+            if (hotelData.images && hotelData.images.length > 10) errors.push("Maximum 10 images allowed");
+
+            if (errors.length > 0) {
+                // Show all errors or just the first few
+                errors.forEach(err => toast.error(err));
                 return;
             }
 

@@ -8,7 +8,7 @@ import jakarta.validation.ConstraintValidatorContext;
  */
 public class HotelCodeValidator implements ConstraintValidator<ValidHotelCode, String> {
 
-    private static final String HOTEL_CODE_PATTERN = "^[A-Z0-9]{6,10}$";
+    private static final String HOTEL_CODE_PATTERN = "^[A-Z0-9-_]{3,20}$";
 
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {

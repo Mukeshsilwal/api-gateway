@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface ValidHotelCode {
 
-    String message() default "Hotel code must be 6-10 uppercase alphanumeric characters";
+    String message() default "Hotel code must be 3-20 uppercase alphanumeric characters (hyphens/underscores allowed)";
 
     Class<?>[] groups() default {};
 
