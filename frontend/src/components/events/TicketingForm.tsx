@@ -38,7 +38,7 @@ const TicketingForm: React.FC<TicketingFormProps> = ({ data, onChange }) => {
     };
 
     const removeTicketType = (index: number) => {
-        const tickets = formData.ticketTypes?.filter((_, i) => i !== index) || [];
+        const tickets = formData.ticketTypes?.filter((_: TicketTypeDto, i: number) => i !== index) || [];
         updateField('ticketTypes', tickets);
     };
 

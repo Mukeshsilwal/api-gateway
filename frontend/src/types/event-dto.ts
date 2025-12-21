@@ -3,6 +3,8 @@
  * TypeScript interfaces for event onboarding and management
  */
 
+import { PaymentStatus } from "./dto";
+
 // ============================================================
 // ORGANIZER MANAGEMENT
 // ============================================================

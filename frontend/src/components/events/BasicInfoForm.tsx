@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { EventBasicInfoDto, EventCategory, EventType } from '../../types/event-dto';
-import { Calendar, MapPin, Tag, Type, Globe } from 'lucide-react';
+import { Tag, Type, Globe } from 'lucide-react';
+import ImageUpload from '../common/ImageUpload';
 
 interface BasicInfoFormProps {
     data: Partial<EventBasicInfoDto>;
@@ -12,7 +13,7 @@ interface BasicInfoFormProps {
  * Step 1 of event creation wizard
  */
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onChange }) => {
-    const [formData, setFormData] = useState<Partial<EventBasicInfoDto>>(data);
+    const [formData, setFormData] = useState<any>(data);
 
     const updateField = (field: keyof EventBasicInfoDto, value: any) => {
         const updated = { ...formData, [field]: value };
@@ -84,72 +85,8 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onChange }) => {
                 </div>
             </div>
 
-            {/* Date & Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Calendar size={16} className="inline mr-1" />
-                        Start Date & Time *
-                    </label>
-                    <input
-                        type="datetime-local"
-                        value={formData.startDateTime || ''}
-                        onChange={(e) => updateField('startDateTime', e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                    />
-                </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <Calendar size={16} className="inline mr-1" />
-                        End Date & Time *
-                    </label>
-                    <input
-                        type="datetime-local"
-                        value={formData.endDateTime || ''}
-                        onChange={(e) => updateField('endDateTime', e.target.value)}
-                        min={formData.startDateTime}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                    />
-                </div>
-            </div>
 
-            {/* Venue (for offline/hybrid) */}
-            {(formData.type === 'OFFLINE' || formData.type === 'HYBRID') && (
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        <MapPin size={16} className="inline mr-1" />
-                        Venue Name *
-                    </label>
-                    <input
-                        type="text"
-                        value={formData.venue?.name || ''}
-                        onChange={(e) => updateField('venue', { ...formData.venue, name: e.target.value })}
-                        placeholder="Enter venue name"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                    />
-                </div>
-            )}
-
-            {/* Online Link (for online/hybrid) */}
-            {(formData.type === 'ONLINE' || formData.type === 'HYBRID') && (
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Online Event Link *
-                    </label>
-                    <input
-                        type="url"
-                        value={formData.onlineLink || ''}
-                        onChange={(e) => updateField('onlineLink', e.target.value)}
-                        placeholder="https://zoom.us/j/..."
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        required
-                    />
-                </div>
-            )}
 
             {/* Short Description */}
             <div>
@@ -199,30 +136,13 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onChange }) => {
             </div>
 
             {/* Cover Image */}
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Cover Image URL *
-                </label>
-                <input
-                    type="url"
-                    value={formData.coverImage || ''}
-                    onChange={(e) => updateField('coverImage', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    required
+            <div className="md:col-span-2">
+                <ImageUpload
+                    label="Cover Image *"
+                    value={formData.coverImage}
+                    onChange={(file) => updateField('coverImage', file)}
+                    description="Upload a high-quality cover image (recommended 1200x600px)"
                 />
-                {formData.coverImage && (
-                    <div className="mt-3">
-                        <img
-                            src={formData.coverImage}
-                            alt="Cover preview"
-                            className="w-full h-48 object-cover rounded-lg"
-                            onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/800x400?text=Invalid+Image+URL';
-                            }}
-                        />
-                    </div>
-                )}
             </div>
         </div>
     );
