@@ -50,8 +50,7 @@ public class BookingService {
 
         // Extract ticket selections
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> ticketSelections = 
-            (List<Map<String, Object>>) bookingData.get("tickets");
+        List<Map<String, Object>> ticketSelections = (List<Map<String, Object>>) bookingData.get("tickets");
 
         // Validate and calculate total
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -100,14 +99,14 @@ public class BookingService {
                 .contactEmail((String) bookingData.get("contactEmail"))
                 .contactPhone((String) bookingData.get("contactPhone"))
                 .bookedAt(LocalDateTime.now())
+                .tickets(objectMapper.writeValueAsString(ticketSelections)) // Serialize tickets to JSON
                 .build();
 
         EventBooking savedBooking = bookingRepository.save(booking);
 
         // Create attendees and generate QR codes
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> attendeesData = 
-            (List<Map<String, Object>>) bookingData.get("attendees");
+        List<Map<String, Object>> attendeesData = (List<Map<String, Object>>) bookingData.get("attendees");
 
         List<String> qrCodes = new ArrayList<>();
         int attendeeIndex = 0;
@@ -121,10 +120,9 @@ public class BookingService {
 
                 String ticketId = qrCodeGenerator.generateTicketId();
                 String qrData = qrCodeGenerator.generateTicketQRData(
-                    ticketId,
-                    eventId.toString(),
-                    attendeeData.get("firstName") + " " + attendeeData.get("lastName")
-                );
+                        ticketId,
+                        eventId.toString(),
+                        attendeeData.get("firstName") + " " + attendeeData.get("lastName"));
                 String qrCodeBase64 = qrCodeGenerator.generateQRCodeBase64(qrData);
 
                 Attendee attendee = Attendee.builder()
@@ -218,5 +216,18 @@ public class BookingService {
         }
 
         return bookingRepository.save(booking);
+    }
+
+    /**
+     * Confirm booking (called by payment verification listener).
+     * Wrapper for confirmPayment with transaction IDs.
+     */
+    @Transactional
+    public EventBooking confirmBooking(String bookingReference, String transactionId, String externalTransactionId) {
+        log.info("💳 Confirming booking from payment verification: {}, txnId: {}",
+                bookingReference, transactionId);
+
+        // Use transactionId as paymentId
+        return confirmPayment(bookingReference, transactionId);
     }
 }

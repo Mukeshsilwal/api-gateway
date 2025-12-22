@@ -1,5 +1,7 @@
 package com.ticketkatum.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -30,7 +33,10 @@ import java.time.LocalDateTime;
 @Builder
 @SQLDelete(sql = "UPDATE events SET deleted_at = NOW() WHERE id = ?")
 @Where(clause = "deleted_at IS NULL")
-public class Event {
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+public class Event implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +44,23 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "organizer_id", nullable = false)
+    @JsonIgnore
     private Organizer organizer;
+
+    // Transient fields for JSON serialization
+    @Transient
+    private Long organizerId;
+
+    @Transient
+    private String organizerName;
+
+    @PostLoad
+    private void populateOrganizerInfo() {
+        if (this.organizer != null) {
+            this.organizerId = this.organizer.getId();
+            this.organizerName = this.organizer.getOrganizationName();
+        }
+    }
 
     @Column(name = "slug", nullable = false, unique = true, length = 255)
     private String slug;
@@ -66,6 +88,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id")
+    @JsonIgnore
     private Venue venue;
 
     @Column(name = "online_link")

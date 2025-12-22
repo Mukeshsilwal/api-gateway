@@ -361,14 +361,30 @@ class AuthService {
 
     /**
      * Get appropriate redirect path based on user role
+     * Checks for pending bookings and redirects user accordingly
      * @returns {string}
      */
     getDefaultRedirect() {
         const role = this.getRole();
 
+        // For regular users, check if there's a pending booking
+        if (role === ROLES.USER) {
+            const pendingBooking = sessionStorage.getItem('pendingBooking');
+            if (pendingBooking) {
+                try {
+                    const booking = JSON.parse(pendingBooking);
+                    // Return to the event details page so they can re-select tickets
+                    return `/events/${booking.eventId}`;
+                } catch (e) {
+                    console.error('Error parsing pending booking:', e);
+                    sessionStorage.removeItem('pendingBooking');
+                }
+            }
+            return '/home';
+        }
+
+        // Admins and super admins go to admin panel
         switch (role) {
-            case ROLES.USER:
-                return '/home';
             case ROLES.ADMIN:
                 return '/admin/panel';
             case ROLES.SUPER_ADMIN:

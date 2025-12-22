@@ -62,7 +62,8 @@ public class EsewaPaymentProvider implements PaymentProvider {
             String su = buildCallbackUrl(esewaProperties.getSuccessUrl(), pid);
             String fu = buildCallbackUrl(esewaProperties.getFailureUrl(), pid);
 
-            // V2 API signature format: HMAC_SHA256(total_amount,transaction_uuid,product_code)
+            // V2 API signature format:
+            // HMAC_SHA256(total_amount,transaction_uuid,product_code)
             String signature = generateEsewaV2Signature(tAmt, pid, scd, esewaProperties.getSecretKey());
 
             log.info("eSewa Payment Initiation - Transaction ID: {}, Amount: {}, Signature generated", pid, tAmt);
@@ -86,19 +87,19 @@ public class EsewaPaymentProvider implements PaymentProvider {
                             </form>
                           </body>
                         </html>
-                    """.formatted(
-                    esewaProperties.getBaseUrl(),
-                    trimAmount(amt),
-                    trimAmount(taxAmt),
-                    trimAmount(tAmt),
-                    htmlEscape(pid),
-                    htmlEscape(scd),
-                    trimAmount(psc),
-                    trimAmount(pdc),
-                    htmlEscape(su),
-                    htmlEscape(fu),
-                    htmlEscape(signature)
-            );
+                    """
+                    .formatted(
+                            esewaProperties.getBaseUrl(),
+                            trimAmount(amt),
+                            trimAmount(taxAmt),
+                            trimAmount(tAmt),
+                            htmlEscape(pid),
+                            htmlEscape(scd),
+                            trimAmount(psc),
+                            trimAmount(pdc),
+                            htmlEscape(su),
+                            htmlEscape(fu),
+                            htmlEscape(signature));
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("htmlForm", htmlForm);
@@ -124,9 +125,11 @@ public class EsewaPaymentProvider implements PaymentProvider {
 
     /**
      * Generates eSewa V2 API signature
-     * Format: Base64(HMAC_SHA256(secret, "total_amount=X,transaction_uuid=Y,product_code=Z"))
+     * Format: Base64(HMAC_SHA256(secret,
+     * "total_amount=X,transaction_uuid=Y,product_code=Z"))
      */
-    private String generateEsewaV2Signature(double totalAmount, String transactionUuid, String productCode, String secretKey) throws Exception {
+    private String generateEsewaV2Signature(double totalAmount, String transactionUuid, String productCode,
+            String secretKey) throws Exception {
         String amtStr = trimAmount(totalAmount);
 
         String message = String.format("total_amount=%s,transaction_uuid=%s,product_code=%s",
@@ -157,7 +160,8 @@ public class EsewaPaymentProvider implements PaymentProvider {
      * Basic HTML escape for values inserted into attributes
      */
     private String htmlEscape(String s) {
-        if (s == null) return "";
+        if (s == null)
+            return "";
         return s.replace("&", "&amp;")
                 .replace("\"", "&quot;")
                 .replace("<", "&lt;")
@@ -178,19 +182,15 @@ public class EsewaPaymentProvider implements PaymentProvider {
 
             log.info("Verifying eSewa payment: {}", url);
 
-            ResponseEntity<String> responseEntity =
-                    restTemplate.getForEntity(url, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
 
-            VerificationResult result =
-                    parseVerificationResponse(responseEntity.getBody());
+            VerificationResult result = parseVerificationResponse(responseEntity.getBody());
 
             if (!result.isSuccess()) {
                 return ResponseHandler.failureWildcard(
                         "Payment Verification Failed",
-                        result.getFailureReason()
-                );
+                        result.getFailureReason());
             }
-
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("transactionId", txn.getInternalTxnId());
@@ -199,42 +199,52 @@ public class EsewaPaymentProvider implements PaymentProvider {
             responseData.put("status", "SUCCESS");
             responseData.put("verifiedAt", new Date());
 
-                this.markSuccess(txn.getInternalTxnId(), result.getRefId());
+            this.markSuccess(txn.getInternalTxnId(), result.getRefId());
 
+            // Determine booking type from bookingId prefix
+            String bookingType = determineBookingType(txn.getBookingId());
+
+            // Publish event to ActiveMQ (non-blocking - don't fail verification if queue
+            // unavailable)
+            try {
                 paymentEventPublisher.publishPaymentVerified(
-                        new PaymentVerifiedEvent(
-                                txn.getBookingId(),
-                                txn.getInternalTxnId(),
-                                txn.getMerchantId(),
-                                txn.getAmount(),
-                                "ESEWA",
-                                LocalDateTime.now()
-                        )
-                );
+                        PaymentVerifiedEvent.builder()
+                                .bookingId(txn.getBookingId())
+                                .transactionId(txn.getInternalTxnId())
+                                .merchantId(txn.getMerchantId())
+                                .amount(txn.getAmount())
+                                .provider("ESEWA")
+                                .verifiedAt(LocalDateTime.now())
+                                .bookingType(bookingType)
+                                .externalTransactionId(result.getRefId())
+                                .metadata(txn.getMetadata())
+                                .build());
+                log.info("✅ Payment verified event published to queue for booking: {}", txn.getBookingId());
+            } catch (Exception queueError) {
+                log.error("⚠️ Failed to publish payment event to ActiveMQ (verification still successful): {}",
+                        queueError.getMessage());
+                // Don't throw - payment is verified, queue publishing is optional
+            }
 
             return ResponseHandler.successWildcard(
                     "Payment verified successfully",
-                    responseData
-            );
+                    responseData);
 
         } catch (Exception e) {
             log.error("eSewa verification error", e);
             return ResponseHandler.failureWildcard(
                     "Payment Verification Error",
-                    e.getMessage()
-            );
+                    e.getMessage());
         }
     }
 
     @Transactional
     public PaymentTransaction markSuccess(
             String internalTxnId,
-            String providerTxnId
-    ) {
+            String providerTxnId) {
 
         PaymentTransaction txn = txnRepo.findByInternalTxnId(internalTxnId)
-                .orElseThrow(() ->
-                        new IllegalStateException("Transaction not found: " + internalTxnId));
+                .orElseThrow(() -> new IllegalStateException("Transaction not found: " + internalTxnId));
 
         if (txn.getStatus() == TransactionStatus.SUCCESS) {
             log.info("Payment already marked SUCCESS: {}", internalTxnId);
@@ -271,8 +281,10 @@ public class EsewaPaymentProvider implements PaymentProvider {
                 response.contains("\"status\":\"success\"");
 
         result.setSuccess(success);
-        if (success) result.setRefId(extractRefId(response));
-        else result.setFailureReason(extractFailureReason(response));
+        if (success)
+            result.setRefId(extractRefId(response));
+        else
+            result.setFailureReason(extractFailureReason(response));
 
         return result;
     }
@@ -280,10 +292,12 @@ public class EsewaPaymentProvider implements PaymentProvider {
     private String extractRefId(String response) {
         try {
             int idx = response.indexOf("ref_id");
-            if (idx == -1) return "N/A";
+            if (idx == -1)
+                return "N/A";
             int start = idx + 8;
             int end = response.indexOf("\"", start);
-            if (end == -1) end = response.length();
+            if (end == -1)
+                end = response.length();
             return response.substring(start, end).trim();
         } catch (Exception e) {
             return "N/A";
@@ -292,10 +306,14 @@ public class EsewaPaymentProvider implements PaymentProvider {
 
     private String extractFailureReason(String response) {
         response = response.toLowerCase();
-        if (response.contains("insufficient")) return "Insufficient balance";
-        if (response.contains("invalid")) return "Invalid transaction or credentials";
-        if (response.contains("expired")) return "Transaction expired";
-        if (response.contains("cancelled")) return "Cancelled by user";
+        if (response.contains("insufficient"))
+            return "Insufficient balance";
+        if (response.contains("invalid"))
+            return "Invalid transaction or credentials";
+        if (response.contains("expired"))
+            return "Transaction expired";
+        if (response.contains("cancelled"))
+            return "Cancelled by user";
         return "Payment verification failed";
     }
 
@@ -335,6 +353,29 @@ public class EsewaPaymentProvider implements PaymentProvider {
 
         public void setRawResponse(String rawResponse) {
             this.rawResponse = rawResponse;
+        }
+    }
+
+    /**
+     * Determine booking type from bookingId prefix.
+     * BKG- = EVENT, HTL- = HOTEL, BUS- = BUS, etc.
+     */
+    private String determineBookingType(String bookingId) {
+        if (bookingId == null || bookingId.isEmpty()) {
+            return "UNKNOWN";
+        }
+
+        if (bookingId.startsWith("BKG-")) {
+            return "EVENT";
+        } else if (bookingId.startsWith("HTL-")) {
+            return "HOTEL";
+        } else if (bookingId.startsWith("BUS-")) {
+            return "BUS";
+        } else if (bookingId.startsWith("FLT-")) {
+            return "FLIGHT";
+        } else {
+            // Default or extract from metadata if needed
+            return "UNKNOWN";
         }
     }
 }

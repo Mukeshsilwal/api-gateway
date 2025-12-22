@@ -197,6 +197,17 @@ public class EventServiceClient {
                 });
     }
 
+    @CircuitBreaker(name = "eventService", fallbackMethod = "getEventTicketsFallback")
+    @Retry(name = "eventService")
+    public Mono<Response<List<?>>> getEventTickets(Long eventId) {
+        log.info("Fetching ticket types for event: {}", eventId);
+        return webClient.get()
+                .uri("/api/events/{eventId}/tickets", eventId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<List<?>>>() {
+                });
+    }
+
     @CircuitBreaker(name = "eventService", fallbackMethod = "bookTicketsFallback")
     @Retry(name = "eventService")
     public Mono<Response<?>> bookTickets(Map<String, Object> bookingData) {
@@ -215,6 +226,17 @@ public class EventServiceClient {
         log.info("Fetching booking: {}", bookingReference);
         return webClient.get()
                 .uri("/api/bookings/event/{reference}", bookingReference)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
+                });
+    }
+
+    @CircuitBreaker(name = "eventService", fallbackMethod = "cloneEventFallback")
+    @Retry(name = "eventService")
+    public Mono<Response<?>> cloneEvent(Long eventId) {
+        log.info("Cloning event: {}", eventId);
+        return webClient.post()
+                .uri("/api/events/{id}/clone", eventId)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
                 });
@@ -279,6 +301,77 @@ public class EventServiceClient {
     }
 
     // ============================================================
+    // PROMO CODE OPERATIONS
+    // ============================================================
+
+    @CircuitBreaker(name = "eventService", fallbackMethod = "validatePromoCodeFallback")
+    @Retry(name = "eventService")
+    public Mono<Response<?>> validatePromoCode(Map<String, Object> request) {
+        log.info("Validating promo code");
+        return webClient.post()
+                .uri("/api/promo-codes/validate")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
+                });
+    }
+
+    @CircuitBreaker(name = "eventService", fallbackMethod = "getPromoCodesFallback")
+    @Retry(name = "eventService")
+    public Mono<Response<?>> getPromoCodes(Long eventId) {
+        log.info("Fetching promo codes for event: {}", eventId);
+        return webClient.get()
+                .uri("/api/promo-codes/event/{eventId}", eventId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
+                });
+    }
+
+    // ============================================================
+    // WAITLIST OPERATIONS
+    // ============================================================
+
+    @CircuitBreaker(name = "eventService", fallbackMethod = "joinWaitlistFallback")
+    @Retry(name = "eventService")
+    public Mono<Response<?>> joinWaitlist(Map<String, Object> request) {
+        log.info("Joining waitlist");
+        return webClient.post()
+                .uri("/api/waitlist")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
+                });
+    }
+
+    @CircuitBreaker(name = "eventService", fallbackMethod = "getWaitlistFallback")
+    @Retry(name = "eventService")
+    public Mono<Response<?>> getWaitlist(Long eventId) {
+        log.info("Fetching waitlist for event: {}", eventId);
+        return webClient.get()
+                .uri("/api/waitlist/event/{eventId}", eventId)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Response<?>>() {
+                });
+    }
+
+    // ============================================================
+    // EXPORT OPERATIONS
+    // ============================================================
+
+    @CircuitBreaker(name = "eventService", fallbackMethod = "exportAttendeesFallback")
+    @Retry(name = "eventService")
+    public Mono<byte[]> exportAttendees(Long eventId, String format) {
+        log.info("Exporting attendees for event: {} format: {}", eventId, format);
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/events/{id}/attendees/export")
+                        .queryParam("format", format)
+                        .build(eventId))
+                .retrieve()
+                .bodyToMono(byte[].class);
+    }
+
+    // ============================================================
     // FALLBACK METHODS
     // ============================================================
 
@@ -300,6 +393,11 @@ public class EventServiceClient {
     private Mono<Response<?>> getOrganizerDashboardFallback(Long id, Exception ex) {
         log.error("Event service unavailable for dashboard: {}", id, ex);
         return Mono.just(Response.error("Unable to fetch dashboard data"));
+    }
+
+    private Mono<Response<?>> cloneEventFallback(Long id, Exception ex) {
+        log.error("Event service unavailable for clone: {}", id, ex);
+        return Mono.just(Response.error("Unable to clone event"));
     }
 
     private Mono<Response<?>> createEventFallback(Map<String, Object> data, Exception ex) {
@@ -347,6 +445,11 @@ public class EventServiceClient {
         return Mono.just(Response.error("Unable to create ticket type"));
     }
 
+    private Mono<Response<List<?>>> getEventTicketsFallback(Long eventId, Exception ex) {
+        log.error("Event service unavailable for ticket fetch: {}", eventId, ex);
+        return Mono.just(Response.success(List.of()));
+    }
+
     private Mono<Response<?>> bookTicketsFallback(Map<String, Object> data, Exception ex) {
         log.error("Event service unavailable for booking", ex);
         return Mono.just(Response.error("Unable to book tickets. Please try again later."));
@@ -375,5 +478,30 @@ public class EventServiceClient {
     private Mono<Response<?>> sendAnnouncementFallback(Map<String, Object> data, Exception ex) {
         log.error("Event service unavailable for announcement", ex);
         return Mono.just(Response.error("Unable to send announcement"));
+    }
+
+    private Mono<Response<?>> validatePromoCodeFallback(Map<String, Object> request, Exception ex) {
+        log.error("Event service unavailable for promo code validation", ex);
+        return Mono.just(Response.error("Unable to validate promo code"));
+    }
+
+    private Mono<Response<?>> getPromoCodesFallback(Long eventId, Exception ex) {
+        log.error("Event service unavailable for promo codes: {}", eventId, ex);
+        return Mono.just(Response.error("Unable to fetch promo codes"));
+    }
+
+    private Mono<Response<?>> joinWaitlistFallback(Map<String, Object> request, Exception ex) {
+        log.error("Event service unavailable for waitlist", ex);
+        return Mono.just(Response.error("Unable to join waitlist"));
+    }
+
+    private Mono<Response<?>> getWaitlistFallback(Long eventId, Exception ex) {
+        log.error("Event service unavailable for waitlist: {}", eventId, ex);
+        return Mono.just(Response.error("Unable to fetch waitlist"));
+    }
+
+    private Mono<byte[]> exportAttendeesFallback(Long eventId, String format, Exception ex) {
+        log.error("Event service unavailable for export: {}", eventId, ex);
+        return Mono.just(new byte[0]);
     }
 }

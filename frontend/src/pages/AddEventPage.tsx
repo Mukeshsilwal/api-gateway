@@ -18,7 +18,7 @@ import ReviewEvent from '../components/events/ReviewEvent';
 
 export function AddEventPage() {
     const navigate = useNavigate();
-    const [currentStep, setCurrentStep] = useState(1);
+    const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Initial state matching the EventCreationDto structure roughly
@@ -83,17 +83,29 @@ export function AddEventPage() {
 
     const validateStep = (step: number): boolean => {
         switch (step) {
-            case 1: // Basic Info
-                if (!basicInfo.name) {
+            case 0: // Basic Info
+                if (!basicInfo.name || basicInfo.name.trim() === '') {
                     toast.error('Event name is required');
                     return false;
                 }
-                if (!basicInfo.description) {
-                    toast.error('Description is required');
+                if (!basicInfo.category) {
+                    toast.error('Event category is required');
+                    return false;
+                }
+                if (!basicInfo.type) {
+                    toast.error('Event type is required');
+                    return false;
+                }
+                if (!basicInfo.description || basicInfo.description.trim() === '') {
+                    toast.error('Event description is required');
+                    return false;
+                }
+                if (!basicInfo.coverImage || typeof basicInfo.coverImage !== 'string') {
+                    toast.error('Please upload a cover image');
                     return false;
                 }
                 return true;
-            case 2: // Venue & Schedule
+            case 1: // Venue & Schedule
                 if (!basicInfo.startDateTime || !basicInfo.endDateTime) {
                     toast.error('Start and End dates are required');
                     return false;
@@ -102,14 +114,32 @@ export function AddEventPage() {
                     toast.error('End date must be after start date');
                     return false;
                 }
+                // Validate venue for OFFLINE/HYBRID events
+                if (basicInfo.type === 'OFFLINE' || basicInfo.type === 'HYBRID') {
+                    if (!basicInfo.venue || !basicInfo.venue.name || basicInfo.venue.name.trim() === '') {
+                        toast.error('Venue name is required for offline/hybrid events');
+                        return false;
+                    }
+                }
+                // Validate online link for ONLINE/HYBRID events
+                if (basicInfo.type === 'ONLINE' || basicInfo.type === 'HYBRID') {
+                    if (!basicInfo.onlineLink || basicInfo.onlineLink.trim() === '') {
+                        toast.error('Online link is required for online/hybrid events');
+                        return false;
+                    }
+                }
                 return true;
-            case 3: // Ticketing
+            case 2: // Ticketing
                 if (!ticketing.salesStartDate || !ticketing.salesEndDate) {
                     toast.error('Sales start and end dates are required');
                     return false;
                 }
                 if (new Date(ticketing.salesStartDate) >= new Date(ticketing.salesEndDate)) {
                     toast.error('Sales end date must be after start date');
+                    return false;
+                }
+                if (!ticketing.ticketTypes || ticketing.ticketTypes.length === 0) {
+                    toast.error('At least one ticket type is required');
                     return false;
                 }
                 return true;
@@ -129,19 +159,22 @@ export function AddEventPage() {
     const handleComplete = async () => {
         if (isSubmitting) return;
 
+        // Final validation
+        if (!validateStep(0) || !validateStep(1) || !validateStep(2)) {
+            return;
+        }
+
         try {
             setIsSubmitting(true);
             const eventData = transformToDto('PUBLISHED');
+            const response = await eventService.createEvent(eventData);
 
-            // Final validation (mostly redundant if steps valid, but good for safety)
-            if (!validateStep(1) || !validateStep(2) || !validateStep(3)) {
-                setIsSubmitting(false);
-                return;
-            }
+            toast.success('Event created successfully! Redirecting to events list...');
 
-            await eventService.createEvent(eventData);
-            toast.success('Event created successfully!');
-            navigate('/events');
+            // Redirect to events list after a brief delay
+            setTimeout(() => {
+                navigate('/events');
+            }, 1500);
         } catch (error: any) {
             console.error('Error creating event:', error);
             toast.error(error.response?.data?.message || 'Failed to create event');
@@ -177,7 +210,7 @@ export function AddEventPage() {
                         onStepChange={handleStepChange}
                         onComplete={handleComplete}
                     >
-                        {currentStep === 1 && (
+                        {currentStep === 0 && (
                             <div className="p-6">
                                 <BasicInfoForm
                                     data={basicInfo}
@@ -186,7 +219,7 @@ export function AddEventPage() {
                             </div>
                         )}
 
-                        {currentStep === 2 && (
+                        {currentStep === 1 && (
                             <div className="p-6">
                                 <VenueScheduleForm
                                     data={basicInfo}
@@ -195,7 +228,7 @@ export function AddEventPage() {
                             </div>
                         )}
 
-                        {currentStep === 3 && (
+                        {currentStep === 2 && (
                             <div className="p-6">
                                 <TicketingForm
                                     data={ticketing}
@@ -204,7 +237,7 @@ export function AddEventPage() {
                             </div>
                         )}
 
-                        {currentStep === 4 && (
+                        {currentStep === 3 && (
                             <div className="p-6">
                                 <ReviewEvent
                                     data={{ ...basicInfo, ...ticketing } as any}

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,9 +19,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "event_bookings", indexes = {
-    @Index(name = "idx_booking_reference", columnList = "booking_reference", unique = true),
-    @Index(name = "idx_booking_user", columnList = "user_id"),
-    @Index(name = "idx_booking_event", columnList = "event_id")
+        @Index(name = "idx_booking_reference", columnList = "booking_reference", unique = true),
+        @Index(name = "idx_booking_user", columnList = "user_id"),
+        @Index(name = "idx_booking_event", columnList = "event_id")
 })
 @Data
 @NoArgsConstructor
@@ -42,6 +44,7 @@ public class EventBooking {
     private String bookingReference;
 
     @Column(name = "tickets", columnDefinition = "jsonb", nullable = false)
+    @JdbcTypeCode(SqlTypes.JSON)
     private String tickets; // JSON array of ticket details
 
     @Column(name = "total_amount", precision = 10, scale = 2, nullable = false)
@@ -65,6 +68,7 @@ public class EventBooking {
     private String paymentId;
 
     @Column(name = "qr_codes", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String qrCodes; // JSON array of QR code URLs
 
     @Enumerated(EnumType.STRING)

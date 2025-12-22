@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { EventBasicInfoDto, EventCategory, EventType } from '../../types/event-dto';
 import { Tag, Type, Globe } from 'lucide-react';
 import ImageUpload from '../common/ImageUpload';
@@ -14,6 +14,20 @@ interface BasicInfoFormProps {
  */
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ data, onChange }) => {
     const [formData, setFormData] = useState<any>(data);
+
+    // Set defaults for language and timezone if not provided
+    useEffect(() => {
+        const needsDefaults = !formData.language || !formData.timezone;
+        if (needsDefaults) {
+            const updated = {
+                ...formData,
+                language: formData.language || 'English',
+                timezone: formData.timezone || 'Asia/Kathmandu'
+            };
+            setFormData(updated);
+            onChange(updated);
+        }
+    }, []);
 
     const updateField = (field: keyof EventBasicInfoDto, value: any) => {
         const updated = { ...formData, [field]: value };

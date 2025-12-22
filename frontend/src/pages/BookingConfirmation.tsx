@@ -49,7 +49,19 @@ export function BookingConfirmation() {
         try {
             setLoading(true);
             const response = await eventService.getBookingDetails(bookingReference!);
-            setBooking(response.data || response);
+            const bookingData = response.data || response;
+
+            // Parse tickets JSON string if it's a string
+            if (bookingData && typeof bookingData.tickets === 'string') {
+                try {
+                    bookingData.tickets = JSON.parse(bookingData.tickets);
+                } catch (e) {
+                    console.error('Error parsing tickets JSON:', e);
+                    bookingData.tickets = [];
+                }
+            }
+
+            setBooking(bookingData);
         } catch (error) {
             console.error('Error fetching booking:', error);
             toast.error('Failed to load booking details');

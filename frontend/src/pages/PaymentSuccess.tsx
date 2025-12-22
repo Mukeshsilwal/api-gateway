@@ -115,6 +115,17 @@ export default function PaymentSuccess() {
                     payment_method: 'esewa'
                 });
 
+                // 6. Navigate to QR/Ticket page after 3 seconds
+                const bookingReference = result?.data?.bookingReference || result?.data?.bookingId;
+                if (bookingReference) {
+                    console.log('📱 Navigating to tickets page with booking:', bookingReference);
+                    setTimeout(() => {
+                        navigate(`/events/booking/${bookingReference}/tickets`);
+                    }, 3000);
+                } else {
+                    console.warn('⚠️ No booking reference found in verification result');
+                }
+
             } catch (err: any) {
                 console.error('❌ Verification Failed:', err);
                 setError(err.message || 'Payment verification failed.');
@@ -251,8 +262,24 @@ export default function PaymentSuccess() {
                     <div className="space-y-3">
                         <Button
                             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-14 rounded-xl text-lg font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 transition-all transform hover:-translate-y-0.5"
+                            onClick={() => {
+                                const bookingRef = verificationResult?.data?.bookingReference || verificationResult?.data?.bookingId;
+                                if (bookingRef) {
+                                    navigate(`/events/booking/${bookingRef}/tickets`);
+                                } else {
+                                    console.error('No booking reference available');
+                                    toast.error('Unable to load tickets');
+                                }
+                            }}
+                        >
+                            View My Tickets 🎫
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="w-full h-12 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
                             onClick={() => navigate('/')}
                         >
+                            <Home size={18} className="mr-2" />
                             Return to Home
                         </Button>
                         <Button

@@ -66,7 +66,19 @@ export function EventDetails() {
             setLoading(true);
             if (eventId) {
                 const response = await eventService.getEventById(eventId);
-                setEvent(response.data || response);
+                const eventData = response.data || response;
+
+                // Fetch ticket types separately if not included
+                try {
+                    const ticketsResponse = await eventService.getEventTickets(eventId);
+                    const ticketsData = ticketsResponse.data || ticketsResponse;
+                    eventData.ticketTypes = Array.isArray(ticketsData) ? ticketsData : ticketsData.content || [];
+                } catch (ticketError) {
+                    console.error('Error fetching tickets:', ticketError);
+                    eventData.ticketTypes = [];
+                }
+
+                setEvent(eventData);
             }
         } catch (error) {
             console.error('Error fetching event:', error);

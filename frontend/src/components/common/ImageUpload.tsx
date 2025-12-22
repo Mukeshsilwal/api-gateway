@@ -1,10 +1,11 @@
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { CloudUpload, X, Image as ImageIcon } from 'lucide-react';
+import { CloudUpload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
+import imageService from '../../services/image.service';
 
 interface ImageUploadProps {
-    value?: string | File;
-    onChange: (file: File | null) => void;
+    value?: string;
+    onChange: (url: string | null) => void;
     label?: string;
     description?: string;
     className?: string;
@@ -17,22 +18,50 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     description = "Drag & drop an image here, or click to select",
     className = ""
 }) => {
-    const [preview, setPreview] = useState<string | null>(
-        typeof value === 'string' ? value : (value ? URL.createObjectURL(value) : null)
-    );
+    const [preview, setPreview] = useState<string | null>(value || null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadError, setUploadError] = useState<string | null>(null);
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
+    const onDrop = useCallback(async (acceptedFiles: File[]) => {
         const file = acceptedFiles[0];
         if (file) {
-            const objectUrl = URL.createObjectURL(file);
-            setPreview(objectUrl);
-            onChange(file);
+            try {
+                setIsUploading(true);
+                setUploadError(null);
+                setUploadProgress(0);
+
+                // Show local preview immediately
+                const objectUrl = URL.createObjectURL(file);
+                setPreview(objectUrl);
+
+                // Upload to server and get URL
+                const imageUrl = await imageService.uploadImage(file, (progress: number) => {
+                    setUploadProgress(progress);
+                });
+
+                // Clean up object URL
+                URL.revokeObjectURL(objectUrl);
+
+                // Set the server URL as preview
+                setPreview(imageUrl);
+                onChange(imageUrl);
+            } catch (error: any) {
+                console.error('Image upload failed:', error);
+                setUploadError(error.message || 'Failed to upload image');
+                setPreview(null);
+                onChange(null);
+            } finally {
+                setIsUploading(false);
+                setUploadProgress(0);
+            }
         }
     }, [onChange]);
 
     const removeImage = (e: React.MouseEvent) => {
         e.stopPropagation();
         setPreview(null);
+        setUploadError(null);
         onChange(null);
     };
 
@@ -42,7 +71,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             'image/*': ['.jpeg', '.jpg', '.png', '.webp']
         },
         maxFiles: 1,
-        multiple: false
+        multiple: false,
+        disabled: isUploading
     });
 
     return (
@@ -55,11 +85,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     relative border-2 border-dashed rounded-xl p-8 transition-all duration-200 cursor-pointer text-center
                     ${isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400 bg-gray-50'}
                     ${preview ? 'border-none p-0 overflow-hidden bg-transparent' : ''}
+                    ${isUploading ? 'pointer-events-none opacity-75' : ''}
                 `}
             >
                 <input {...getInputProps()} />
 
-                {preview ? (
+                {preview && !isUploading ? (
                     <div className="relative w-full h-64 bg-gray-100 rounded-xl overflow-hidden group">
                         <img
                             src={preview}
@@ -79,6 +110,18 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         >
                             <X size={18} />
                         </button>
+                    </div>
+                ) : isUploading ? (
+                    <div className="flex flex-col items-center justify-center py-12">
+                        <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
+                        <p className="text-gray-900 font-medium mb-2">Uploading image...</p>
+                        <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                                className="h-full bg-blue-600 transition-all duration-300"
+                                style={{ width: `${uploadProgress}%` }}
+                            />
+                        </div>
+                        <p className="text-sm text-gray-500 mt-2">{uploadProgress}% complete</p>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-6">
@@ -101,6 +144,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </div>
                 )}
             </div>
+
+            {uploadError && (
+                <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{uploadError}</p>
+                </div>
+            )}
         </div>
     );
 };

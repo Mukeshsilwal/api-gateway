@@ -60,21 +60,23 @@ public class RedisHotelCacheService {
         }
 
         try {
-            Map<String, Point> geoPoints = new HashMap<>();
+            GeoOperations<String, Object> geoOps = redisTemplate.opsForGeo();
+            int addedCount = 0;
+
             for (Hotel hotel : hotels) {
                 if (hotel.getLatitude() != null && hotel.getLongitude() != null) {
                     Point point = new Point(hotel.getLongitude(), hotel.getLatitude());
-                    geoPoints.put(String.valueOf(hotel.getId()), point);
+                    geoOps.add(HOTELS_GEO_KEY, point, String.valueOf(hotel.getId()));
+                    addedCount++;
                 }
             }
 
-            if (geoPoints.isEmpty()) {
+            if (addedCount == 0) {
                 log.info("No hotels with valid coordinates to add to geo index");
                 return;
             }
 
-            redisTemplate.opsForGeo().add(HOTELS_GEO_KEY, (RedisGeoCommands.GeoLocation<Object>) geoPoints);
-            log.info("Added {} hotels to geo index", geoPoints.size());
+            log.info("Added {} hotels to geo index", addedCount);
         } catch (Exception e) {
             log.error("Failed to batch add hotels to geo index", e);
         }

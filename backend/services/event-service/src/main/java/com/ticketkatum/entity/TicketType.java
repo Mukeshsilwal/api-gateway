@@ -6,8 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -21,7 +24,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class TicketType {
+public class TicketType implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,6 +58,7 @@ public class TicketType {
     @Column(name = "available_to")
     private LocalDateTime availableTo;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "benefits", columnDefinition = "jsonb")
     private String benefits; // JSON array of benefits
 
@@ -87,7 +93,7 @@ public class TicketType {
     public boolean isAvailable() {
         LocalDateTime now = LocalDateTime.now();
         boolean timeValid = (availableFrom == null || now.isAfter(availableFrom)) &&
-                           (availableTo == null || now.isBefore(availableTo));
+                (availableTo == null || now.isBefore(availableTo));
         return isActive && !isSoldOut() && timeValid;
     }
 }

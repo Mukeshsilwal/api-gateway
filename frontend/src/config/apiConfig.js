@@ -26,6 +26,7 @@ export const API_ENDPOINTS = {
         FEATURED: `${BFF_BASE_URL}/events/featured`,
         UPCOMING: `${BFF_BASE_URL}/events/upcoming`,
         TICKETS: (eventId) => `${BFF_BASE_URL}/events/${eventId}/tickets`,
+        BOOKING_DETAILS: (reference) => `${BFF_BASE_URL}/bookings/event/${reference}`,
     },
 
     // Bookings
@@ -118,14 +119,14 @@ const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
     (config) => {
-        // Add auth token
-        const token = localStorage.getItem('accessToken');
+        // Add auth token - using 'token' key to match authService.TOKEN_KEY
+        const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
 
         // Add session ID if available
-        const sessionId = sessionStorage.getItem('sessionId');
+        const sessionId = localStorage.getItem('sessionId'); // Changed from sessionStorage to localStorage
         if (sessionId) {
             config.headers['Session-Id'] = sessionId;
         }

@@ -185,16 +185,33 @@ const TicketingForm: React.FC<TicketingFormProps> = ({ data, onChange }) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Ticket Name *
+                                        Ticket Type *
                                     </label>
-                                    <input
-                                        type="text"
+                                    <select
                                         value={ticket.name}
                                         onChange={(e) => updateTicketType(index, 'name', e.target.value)}
-                                        placeholder="e.g., General Admission, VIP"
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                         required
-                                    />
+                                    >
+                                        <option value="">Select ticket type</option>
+                                        <option value="General Admission">General Admission</option>
+                                        <option value="VIP">VIP</option>
+                                        <option value="Early Bird">Early Bird</option>
+                                        <option value="Student">Student</option>
+                                        <option value="Group">Group</option>
+                                        <option value="Premium">Premium</option>
+                                        <option value="Standard">Standard</option>
+                                        <option value="Economy">Economy</option>
+                                    </select>
+                                    {ticket.name && !['General Admission', 'VIP', 'Early Bird', 'Student', 'Group', 'Premium', 'Standard', 'Economy'].includes(ticket.name) && (
+                                        <input
+                                            type="text"
+                                            value={ticket.name}
+                                            onChange={(e) => updateTicketType(index, 'name', e.target.value)}
+                                            placeholder="Custom ticket type name"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-lg mt-2"
+                                        />
+                                    )}
                                 </div>
 
                                 <div>

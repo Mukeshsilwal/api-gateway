@@ -51,6 +51,15 @@ class EventService {
     }
 
     /**
+     * Get event by ID (alias for getEventDetails)
+     * @param {string|number} eventId - Event ID
+     * @returns {Promise} Response with event details
+     */
+    async getEventById(eventId) {
+        return this.getEventDetails(eventId);
+    }
+
+    /**
      * Get event categories
      * @returns {Promise} Response with categories
      */
@@ -114,7 +123,7 @@ class EventService {
      */
     async createBooking(bookingData) {
         try {
-            const response = await apiClient.post(API_ENDPOINTS.EVENTS.CREATE_BOOKING, bookingData);
+            const response = await apiClient.post(`/api/bff/v1/bookings/event`, bookingData);
             return response.data;
         } catch (error) {
             console.error('Create booking error:', error);
@@ -231,6 +240,21 @@ class EventService {
     }
 
     /**
+     * Publish event (Admin)
+     * @param {string|number} eventId - Event ID
+     * @returns {Promise} Response with updated event
+     */
+    async publishEvent(eventId) {
+        try {
+            const response = await apiClient.post(API_ENDPOINTS.ADMIN.EVENTS.PUBLISH(eventId));
+            return response.data;
+        } catch (error) {
+            console.error('Publish event error:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Reject event - cancel with reason (Admin)
      * @param {string|number} eventId - Event ID
      * @param {string} reason - Rejection reason
@@ -277,6 +301,38 @@ class EventService {
             return response.data;
         } catch (error) {
             console.error('Get organizer events error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Clone event (Admin)
+     * @param {string|number} eventId - Event ID to clone
+     * @returns {Promise} Response with cloned event
+     */
+    async cloneEvent(eventId) {
+        try {
+            const response = await apiClient.post(`/api/bff/v1/events/${eventId}/clone`);
+            return response.data;
+        } catch (error) {
+            console.error('Clone event error:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Export event attendees (Admin)
+     * @param {string|number} eventId - Event ID
+     * @returns {Promise} Response with CSV data
+     */
+    async exportAttendees(eventId) {
+        try {
+            const response = await apiClient.get(`/api/bff/v1/events/${eventId}/attendees/export`, {
+                responseType: 'blob'
+            });
+            return response;
+        } catch (error) {
+            console.error('Export attendees error:', error);
             throw error;
         }
     }

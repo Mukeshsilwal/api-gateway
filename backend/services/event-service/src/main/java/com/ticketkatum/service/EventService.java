@@ -2,8 +2,10 @@ package com.ticketkatum.service;
 
 import com.ticketkatum.entity.Event;
 import com.ticketkatum.entity.Organizer;
+import com.ticketkatum.entity.TicketType;
 import com.ticketkatum.repository.EventRepository;
 import com.ticketkatum.repository.OrganizerRepository;
+import com.ticketkatum.repository.TicketTypeRepository;
 import com.ticketkatum.util.SlugGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +32,7 @@ public class EventService {
 
     private final EventRepository eventRepository;
     private final OrganizerRepository organizerRepository;
+    private final TicketTypeRepository ticketTypeRepository;
     private final SlugGenerator slugGenerator;
 
     /**
@@ -92,6 +96,49 @@ public class EventService {
         Event savedEvent = eventRepository.save(event);
         log.info("Event created with ID: {}", savedEvent.getId());
 
+        // Process ticketing data if present
+        if (eventData.containsKey("ticketing")) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> ticketing = (Map<String, Object>) eventData.get("ticketing");
+
+            if (ticketing.containsKey("ticketTypes")) {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> ticketTypes = (List<Map<String, Object>>) ticketing.get("ticketTypes");
+
+                int totalTickets = 0;
+                log.info("Creating {} ticket types for event {}", ticketTypes.size(), savedEvent.getId());
+
+                for (Map<String, Object> ticketData : ticketTypes) {
+                    TicketType ticket = TicketType.builder()
+                            .event(savedEvent)
+                            .name((String) ticketData.get("name"))
+                            .description(ticketData.get("description") != null ? (String) ticketData.get("description")
+                                    : null)
+                            .price(new BigDecimal(ticketData.get("price").toString()))
+                            .quantity(((Number) ticketData.get("quantity")).intValue())
+                            .quantitySold(0)
+                            .availableFrom(ticketing.get("salesStartDate") != null
+                                    ? LocalDateTime.parse((String) ticketing.get("salesStartDate"))
+                                    : null)
+                            .availableTo(ticketing.get("salesEndDate") != null
+                                    ? LocalDateTime.parse((String) ticketing.get("salesEndDate"))
+                                    : null)
+                            .isActive(true)
+                            .sortOrder(0)
+                            .build();
+
+                    ticketTypeRepository.save(ticket);
+                    totalTickets += ticket.getQuantity();
+                    log.info("Created ticket type '{}' with {} tickets", ticket.getName(), ticket.getQuantity());
+                }
+
+                // Update event with total tickets
+                savedEvent.setTotalTickets(totalTickets);
+                savedEvent = eventRepository.save(savedEvent);
+                log.info("Updated event total tickets: {}", totalTickets);
+            }
+        }
+
         return savedEvent;
     }
 
@@ -119,6 +166,14 @@ public class EventService {
         log.info("Fetching event by slug: {}", slug);
         return eventRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
+    }
+
+    /**
+     * Get ticket types for an event
+     */
+    public List<TicketType> getTicketTypes(Long eventId) {
+        log.info("Fetching ticket types for event: {}", eventId);
+        return ticketTypeRepository.findByEventIdOrderBySortOrderAsc(eventId);
     }
 
     /**
@@ -200,7 +255,6 @@ public class EventService {
     /**
      * Search events
      */
-    @Cacheable(value = "event-search", key = "#searchParams != null ? #searchParams.toString() : 'empty'")
     public Page<Event> searchEvents(Map<String, Object> searchParams, Pageable pageable) {
         log.info("Searching events with params: {}", searchParams);
 
@@ -210,11 +264,34 @@ public class EventService {
         }
 
         if (searchParams.containsKey("category")) {
-            String category = (String) searchParams.get("category");
-            Event.EventCategory eventCategory = Event.EventCategory.valueOf(category);
-            return eventRepository.findByCategory(eventCategory, LocalDateTime.now(), pageable);
+            try {
+                String category = (String) searchParams.get("category");
+                Event.EventCategory eventCategory = Event.EventCategory.valueOf(category.toUpperCase());
+                return eventRepository.findByCategory(eventCategory, LocalDateTime.now(), pageable);
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid category value: {}", searchParams.get("category"));
+                // Fall through to default behavior
+            }
         }
 
+        // If status filter is provided, use it
+        if (searchParams.containsKey("status")) {
+            try {
+                String status = (String) searchParams.get("status");
+                // Handle "ALL" status to return all events
+                if ("ALL".equalsIgnoreCase(status)) {
+                    return eventRepository.findAll(pageable);
+                }
+                Event.EventStatus eventStatus = Event.EventStatus.valueOf(status.toUpperCase());
+                return eventRepository.findByStatus(eventStatus, pageable);
+            } catch (IllegalArgumentException e) {
+                log.warn("Invalid status value: {}", searchParams.get("status"));
+                // Fall through to default behavior
+            }
+        }
+
+        // Default: return only PUBLISHED events for customer-facing views
+        log.info("No status filter provided, defaulting to PUBLISHED events");
         return eventRepository.findByStatus(Event.EventStatus.PUBLISHED, pageable);
     }
 

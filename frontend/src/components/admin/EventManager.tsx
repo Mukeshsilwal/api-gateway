@@ -12,7 +12,11 @@ import {
     Search,
     Filter,
     Plus,
-    AlertCircle
+    AlertCircle,
+    RefreshCw,
+    BarChart2,
+    Copy,
+    Download
 } from 'lucide-react';
 import eventService from '../../services/eventService';
 import { EventDto, EventStatus, EventCategory } from '../../types/event-dto';
@@ -27,10 +31,14 @@ interface EventFilter {
 
 interface EventCardProps {
     event: EventDto;
-    onApprove: (eventId: number) => void;
+    onApprove: (eventId: number) => Promise<void>;
     onReject: (event: EventDto) => void;
+    onPublish: (eventId: number) => Promise<void>;
     onViewDetails: (event: EventDto) => void;
-    getStatusBadge: (status: EventStatus) => React.ReactNode;
+    onViewAnalytics: (event: EventDto) => void;
+    onClone: (event: EventDto) => void;
+    onExport: (eventId: number) => void;
+    getStatusBadge: (status: EventStatus) => JSX.Element;
     formatDate: (dateString?: string) => string;
     formatCurrency: (amount?: number) => string;
     actionLoading: boolean;
@@ -68,6 +76,7 @@ export const EventManager: React.FC<EventManagerProps> = () => {
     const [selectedEvent, setSelectedEvent] = useState<EventDto | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
+    const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
     const [actionLoading, setActionLoading] = useState(false);
 
@@ -82,15 +91,27 @@ export const EventManager: React.FC<EventManagerProps> = () => {
             setError(null);
 
             const filters: EventFilter = {};
-            if (statusFilter !== 'ALL') filters.status = statusFilter;
+            // Always pass status filter, including 'ALL' to show draft events in admin
+            filters.status = statusFilter;
             if (categoryFilter !== 'ALL') filters.category = categoryFilter;
             if (searchQuery) filters.search = searchQuery;
 
             const response = await eventService.getAllEventsAdmin(filters);
 
-            // Handle Response wrapper
-            const eventsData = (response as any).data || [];
-            setEvents(Array.isArray(eventsData) ? eventsData : []);
+            // Handle Response wrapper with Spring Page object
+            console.log('📊 Event Manager - Raw Response:', response);
+
+            // Extract from Page object: response.data is the Response wrapper, 
+            // response.data.data is the Page object, 
+            // response.data.data.content is the events array
+            const pageData = (response as any).data;
+            const eventsArray = pageData?.content || [];
+
+            console.log('📊 Event Manager - Page Data:', pageData);
+            console.log('📊 Event Manager - Extracted Events:', eventsArray);
+            console.log('📊 Event Manager - Total Elements:', pageData?.totalElements);
+
+            setEvents(Array.isArray(eventsArray) ? eventsArray : []);
         } catch (err: any) {
             console.error('Failed to fetch events:', err);
             setError(err.message || 'Failed to load events');
@@ -116,7 +137,7 @@ export const EventManager: React.FC<EventManagerProps> = () => {
         }
     };
 
-    const handleReject = async () => {
+    const handleRejectEvent = async () => {
         if (!rejectReason.trim()) {
             alert('Please provide a reason for rejection');
             return;
@@ -140,6 +161,24 @@ export const EventManager: React.FC<EventManagerProps> = () => {
         }
     };
 
+    const handlePublishEvent = async (eventId: number) => {
+        if (!window.confirm('Are you sure you want to publish this event? It will be visible to all users.')) {
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            await eventService.publishEvent(eventId);
+            await fetchEvents();
+            alert('Event published successfully!');
+        } catch (err: any) {
+            console.error('Failed to publish event:', err);
+            alert('Failed to publish event: ' + (err.message || 'Unknown error'));
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
     const openRejectModal = (event: EventDto) => {
         setSelectedEvent(event);
         setShowRejectModal(true);
@@ -148,6 +187,49 @@ export const EventManager: React.FC<EventManagerProps> = () => {
     const viewEventDetails = (event: EventDto) => {
         setSelectedEvent(event);
         setShowDetailsModal(true);
+    };
+
+    const viewEventAnalytics = (event: EventDto) => {
+        setSelectedEvent(event);
+        setShowAnalyticsModal(true);
+    };
+
+    const handleCloneEvent = async (event: EventDto) => {
+        if (!window.confirm(`Clone "${event.basicInfo?.name}"? This will create a draft copy.`)) {
+            return;
+        }
+
+        try {
+            setActionLoading(true);
+            const response = await eventService.cloneEvent(event.id);
+            const clonedEvent = response.data.data || response.data;
+            alert(`Event cloned successfully! New event ID: ${clonedEvent.id}`);
+            await fetchEvents(); // Refresh list
+        } catch (error: any) {
+            console.error('Error cloning event:', error);
+            alert(error.response?.data?.message || 'Failed to clone event');
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleExportAttendees = async (eventId: number) => {
+        try {
+            const response = await eventService.exportAttendees(eventId);
+
+            // Create download link
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `attendees_${eventId}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (error: any) {
+            console.error('Error exporting attendees:', error);
+            alert('Failed to export attendees');
+        }
     };
 
     const getStatusBadge = (status: EventStatus) => {
@@ -199,13 +281,23 @@ export const EventManager: React.FC<EventManagerProps> = () => {
                         Manage and approve events from organizers
                     </p>
                 </div>
-                <button
-                    onClick={() => navigate('/add-event')}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                    <Plus size={20} />
-                    Create Event
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={fetchEvents}
+                        disabled={loading}
+                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    >
+                        <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
+                        Refresh
+                    </button>
+                    <button
+                        onClick={() => navigate('/add-event')}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                        <Plus size={20} />
+                        Create Event
+                    </button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -298,7 +390,11 @@ export const EventManager: React.FC<EventManagerProps> = () => {
                             event={event}
                             onApprove={handleApprove}
                             onReject={openRejectModal}
+                            onPublish={handlePublishEvent}
                             onViewDetails={viewEventDetails}
+                            onViewAnalytics={viewEventAnalytics}
+                            onClone={handleCloneEvent}
+                            onExport={handleExportAttendees}
                             getStatusBadge={getStatusBadge}
                             formatDate={formatDate}
                             formatCurrency={formatCurrency}
@@ -337,12 +433,26 @@ export const EventManager: React.FC<EventManagerProps> = () => {
                     getStatusBadge={getStatusBadge}
                 />
             )}
+
+            {/* Analytics Modal */}
+            {showAnalyticsModal && selectedEvent && (
+                <AnalyticsModal
+                    event={selectedEvent}
+                    onClose={() => {
+                        setShowAnalyticsModal(false);
+                        setSelectedEvent(null);
+                    }}
+                />
+            )}
         </div>
     );
 };
 
 // Event Card Component
-const EventCard: React.FC<EventCardProps> = ({ event, onApprove, onReject, onViewDetails, getStatusBadge, formatDate, formatCurrency, actionLoading }) => {
+const EventCard: React.FC<EventCardProps> = ({
+    event, onApprove, onReject, onPublish, onViewDetails, onViewAnalytics, onClone, onExport,
+    getStatusBadge, formatDate, formatCurrency, actionLoading
+}) => {
     const basicInfo = event.basicInfo || {};
     const venue = basicInfo.venue;
 
@@ -380,7 +490,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onApprove, onReject, onVie
                 <div className="space-y-2 text-sm">
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <Calendar size={16} />
-                        <span>{formatDate(basicInfo.startDateTime)}</span>
+                        <span>{formatDate(basicInfo.startDateTime || (event as any).startDateTime)}</span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
                         <MapPin size={16} />
@@ -423,6 +533,16 @@ const EventCard: React.FC<EventCardProps> = ({ event, onApprove, onReject, onVie
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-3">
+                    {event.status === 'DRAFT' && (
+                        <button
+                            onClick={() => onPublish(event.id)}
+                            disabled={actionLoading}
+                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                        >
+                            <CheckCircle size={16} />
+                            Publish
+                        </button>
+                    )}
                     {event.status === 'PENDING_REVIEW' && (
                         <>
                             <button
@@ -449,6 +569,34 @@ const EventCard: React.FC<EventCardProps> = ({ event, onApprove, onReject, onVie
                     >
                         <Eye size={16} />
                         Details
+                    </button>
+                    <button
+                        onClick={() => onViewAnalytics(event)}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-sm rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
+                    >
+                        <BarChart2 size={16} />
+                        Analytics
+                    </button>
+                </div>
+
+                {/* Secondary Actions */}
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => onClone(event)}
+                        disabled={actionLoading}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        title="Clone Event"
+                    >
+                        <Copy size={16} />
+                        Clone
+                    </button>
+                    <button
+                        onClick={() => onExport(event.id)}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        title="Export Attendees"
+                    >
+                        <Download size={16} />
+                        Export
                     </button>
                 </div>
             </div>
@@ -548,11 +696,15 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">Start Date</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{formatDate(basicInfo.startDateTime)}</p>
+                                <p className="font-medium text-gray-900 dark:text-white">
+                                    {formatDate(basicInfo.startDateTime || (event as any).startDateTime)}
+                                </p>
                             </div>
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">End Date</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{formatDate(basicInfo.endDateTime)}</p>
+                                <p className="font-medium text-gray-900 dark:text-white">
+                                    {formatDate(basicInfo.endDateTime || (event as any).endDateTime)}
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -622,6 +774,57 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
                             </div>
                         </div>
                     </div>
+                </div>
+
+                {/* Footer */}
+                <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                    >
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Analytics Modal Component
+const AnalyticsModal: React.FC<{ event: EventDto; onClose: () => void }> = ({ event, onClose }) => {
+    // Lazy load the analytics dashboard
+    const AnalyticsDashboard = React.lazy(() => import('../analytics/AnalyticsDashboard'));
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-7xl w-full my-8">
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                    <div>
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                            Analytics Dashboard
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            {event.basicInfo?.name || 'Event Analytics'}
+                        </p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                        <XCircle size={24} />
+                    </button>
+                </div>
+
+                {/* Content */}
+                <div className="p-6 max-h-[80vh] overflow-y-auto">
+                    <React.Suspense fallback={
+                        <div className="flex items-center justify-center py-12">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                        </div>
+                    }>
+                        <AnalyticsDashboard eventId={event.id} />
+                    </React.Suspense>
                 </div>
 
                 {/* Footer */}

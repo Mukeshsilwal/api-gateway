@@ -55,6 +55,8 @@ const EventDetails = lazy(() => import("./pages/EventDetails"));
 const EventBooking = lazy(() => import("./pages/EventBooking").then(module => ({ default: module.EventBooking })));
 const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation").then(module => ({ default: module.BookingConfirmation })));
 const AddEventPage = lazy(() => import("./pages/AddEventPage").then(module => ({ default: module.AddEventPage })));
+const EventCalendarPage = lazy(() => import("./pages/EventCalendarPage"));
+const EventCheckInPage = lazy(() => import("./pages/EventCheckInPage"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const EsewaDemo = lazy(() => import("./pages/EsewaDemo"));
@@ -248,6 +250,16 @@ const App: React.FC = () => {
               <Route path="/events/:eventId" element={<EventDetails />} errorElement={<ErrorPage />} />
               <Route path="/events/:eventId/book" element={<EventBooking />} errorElement={<ErrorPage />} />
               <Route path="/events/booking/:bookingReference/confirmation" element={<BookingConfirmation />} errorElement={<ErrorPage />} />
+              <Route path="/events/calendar" element={<EventCalendarPage />} errorElement={<ErrorPage />} />
+              <Route
+                path="/events/:eventId/check-in"
+                element={
+                  <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
+                    <EventCheckInPage />
+                  </ProtectedRoute>
+                }
+                errorElement={<ErrorPage />}
+              />
 
               {/* Add Event Page - Admin Route */}
               <Route

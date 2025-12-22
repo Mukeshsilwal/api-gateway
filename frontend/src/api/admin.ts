@@ -68,10 +68,10 @@ export const adminApi = {
      * Fallback polling endpoint for live bus locations.
      */
     getLiveSnapshot: async (tz: string = 'Asia/Kathmandu'): Promise<LiveSnapshot> => {
-        const response = await client.get<LiveSnapshot>('/live/buses/snapshot', {
+        const response = await client.get<BffResponse<LiveSnapshot>>('/api/bff/v1/admin/live/buses/snapshot', {
             params: { tz }
         });
-        return response.data;
+        return response.data.data;
     },
 
     /**

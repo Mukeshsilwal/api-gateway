@@ -24,120 +24,123 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC)
-                        .permitAll()
-                        // Public endpoints - ORDER MATTERS!
-                        .requestMatchers("/error").permitAll()
-                        .requestMatchers("/api/bff/v1/auth/**").permitAll()
-                        // Allow gateway public paths to forward to BFF (rewritten by
-                        // ApiPathRewriteFilter)
-                        .requestMatchers("/api/web/v1/auth/**").permitAll()
-                        .requestMatchers(
-                                "/actuator/**",
-                                "/health/**",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/api/bff/v1/home",
-                                "/api/bff/v1/buses/**",
-                                "/api/bff/v1/hotels/**",
-                                "/api/bff/v1/registration/**",
-                                "/api/bff/market/**",
-                                "/api/bff/v1/ai/**",
-                                "/api/bff/v1/events/**") // AI chatbot endpoints - public
-                        // access
-                        .permitAll()
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+                http
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                .authorizeHttpRequests(auth -> auth
+                                                .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC)
+                                                .permitAll()
+                                                // Public endpoints - ORDER MATTERS!
+                                                .requestMatchers("/error").permitAll()
+                                                .requestMatchers("/api/bff/v1/auth/**").permitAll()
+                                                // Allow gateway public paths to forward to BFF (rewritten by
+                                                // ApiPathRewriteFilter)
+                                                .requestMatchers("/api/web/v1/auth/**").permitAll()
+                                                .requestMatchers(
+                                                                "/actuator/**",
+                                                                "/health/**",
+                                                                "/swagger-ui/**",
+                                                                "/v3/api-docs/**",
+                                                                "/swagger-ui.html",
+                                                                "/api/bff/v1/home",
+                                                                "/api/bff/v1/buses/**",
+                                                                "/api/bff/v1/hotels/**",
+                                                                "/api/bff/v1/registration/**",
+                                                                "/api/bff/market/**",
+                                                                "/api/bff/v1/ai/**",
+                                                                "/api/bff/v1/events/**",
+                                                                "/api/bff/v1/payments/verify/**") // Payment
+                                                                                                  // verification
+                                                                                                  // callbacks (eSewa,
+                                                                                                  // Khalti)
+                                                // access
+                                                .permitAll()
 
-                        // Public API endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/hotels/search/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/hotels/{id}").permitAll()
+                                                // Public API endpoints
+                                                .requestMatchers(HttpMethod.GET, "/api/movies/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/hotels/search/**").permitAll()
+                                                .requestMatchers(HttpMethod.GET, "/api/hotels/{id}").permitAll()
 
-                        // Authentication required
-                        .requestMatchers("/api/bookings/**").authenticated()
-                        .requestMatchers("/api/payments/**").authenticated()
-                        .requestMatchers("/api/user/**").authenticated()
+                                                // Authentication required
+                                                .requestMatchers("/api/bookings/**").authenticated()
+                                                .requestMatchers("/api/payments/**").authenticated()
+                                                .requestMatchers("/api/user/**").authenticated()
 
-                        // Admin endpoints - require authentication
-                        .requestMatchers("/api/bff/v1/admin/**").authenticated()
-                        .requestMatchers("/api/bff/v1/users/**").authenticated() // User
-                        // management -
-                        // admin only
-                        .requestMatchers("/live/buses/**").authenticated()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                                                // Admin endpoints - require authentication
+                                                .requestMatchers("/api/bff/v1/admin/**").authenticated()
+                                                .requestMatchers("/api/bff/v1/users/**").authenticated() // User
+                                                // management -
+                                                // admin only
+                                                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // All other requests require authentication
-                        .anyRequest().authenticated())
-                // Add custom JWT filter
-                .addFilterBefore(jwtAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                                                // All other requests require authentication
+                                                .anyRequest().authenticated())
+                                // Add custom JWT filter
+                                .addFilterBefore(jwtAuthenticationFilter,
+                                                UsernamePasswordAuthenticationFilter.class);
 
-        // Configure security context to be inherited by async threads
-        org.springframework.security.core.context.SecurityContextHolder
-                .setStrategyName(
-                        org.springframework.security.core.context.SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
+                // Configure security context to be inherited by async threads
+                org.springframework.security.core.context.SecurityContextHolder
+                                .setStrategyName(
+                                                org.springframework.security.core.context.SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
 
-        // Handle authentication exceptions
-        // .exceptionHandling(exception -> exception
-        // .authenticationEntryPoint((request, response, authException) -> {
-        // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // response.setContentType("application/json");
-        // response.getWriter().write(String.format(
-        // "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}",
-        // java.time.LocalDateTime.now(),
-        // authException.getMessage(),
-        // request.getRequestURI()
-        // ));
-        // })
-        // );
+                // Handle authentication exceptions
+                // .exceptionHandling(exception -> exception
+                // .authenticationEntryPoint((request, response, authException) -> {
+                // response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                // response.setContentType("application/json");
+                // response.getWriter().write(String.format(
+                // "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"%s\",\"path\":\"%s\"}",
+                // java.time.LocalDateTime.now(),
+                // authException.getMessage(),
+                // request.getRequestURI()
+                // ));
+                // })
+                // );
 
-        return http.build();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "https://ticketkatum.com",
-                "https://www.ticketkatum.com"));
+                configuration.setAllowedOrigins(Arrays.asList(
+                                "http://localhost:3000",
+                                "http://localhost:3001",
+                                "https://ticketkatum.com",
+                                "https://www.ticketkatum.com"));
 
-        configuration.setAllowedMethods(Arrays.asList(
-                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                configuration.setAllowedMethods(Arrays.asList(
+                                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
-        configuration.setAllowedHeaders(Arrays.asList(
-                "Authorization",
-                "Content-Type",
-                "Accept",
-                "X-Request-ID",
-                "X-Correlation-ID",
-                "Session-Id",
-                "Username",
-                "User-Id",
-                "X-User-Id"));
+                configuration.setAllowedHeaders(Arrays.asList(
+                                "Authorization",
+                                "Content-Type",
+                                "Accept",
+                                "X-Request-ID",
+                                "X-Correlation-ID",
+                                "Session-Id",
+                                "Username",
+                                "User-Id",
+                                "X-User-Id"));
 
-        configuration.setExposedHeaders(Arrays.asList(
-                "X-Request-ID",
-                "X-Correlation-ID"));
+                configuration.setExposedHeaders(Arrays.asList(
+                                "X-Request-ID",
+                                "X-Correlation-ID"));
 
-        configuration.setAllowCredentials(true);
-        configuration.setMaxAge(3600L);
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
 
-        return source;
-    }
+                return source;
+        }
 }

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Filter, Calendar } from 'lucide-react';
 import eventService from '../services/eventService';
 import EventCard from '../components/EventCard';
@@ -35,12 +36,29 @@ const EventList: React.FC = () => {
     const fetchEvents = async () => {
         try {
             setLoading(true);
-            const response = await eventService.getEvents();
-            const eventData = response.data || [];
-            setEvents(eventData);
-            setFilteredEvents(eventData);
+            // Only show PUBLISHED events in customer-facing view
+            const response = await eventService.searchEvents({ status: 'PUBLISHED' });
+            // Handle Response wrapper: response.data could be the array or could be wrapped
+            let eventData = response.data;
+
+            // If data is wrapped in another object (e.g., { content: [...] }), extract it
+            if (eventData && typeof eventData === 'object' && !Array.isArray(eventData)) {
+                // Check for pagination response
+                if (eventData.content && Array.isArray(eventData.content)) {
+                    eventData = eventData.content;
+                } else if (eventData.data && Array.isArray(eventData.data)) {
+                    eventData = eventData.data;
+                }
+            }
+
+            // Ensure we have an array
+            const events = Array.isArray(eventData) ? eventData : [];
+            setEvents(events);
+            setFilteredEvents(events);
         } catch (error) {
             console.error('Error fetching events:', error);
+            setEvents([]);
+            setFilteredEvents([]);
         } finally {
             setLoading(false);
         }

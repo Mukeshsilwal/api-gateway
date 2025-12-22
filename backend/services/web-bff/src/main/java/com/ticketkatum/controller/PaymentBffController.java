@@ -67,7 +67,7 @@ public class PaymentBffController {
     @Operation(summary = "Verify payment and update booking",
             description = "Verify payment status and update related booking")
     public CompletableFuture<ResponseEntity<Response<PaymentVerificationWithBooking>>> verifyPayment(
-            @PathVariable String provider,
+            @PathVariable("provider") String provider,
             @Valid @RequestBody VerifyPaymentRequest request) {
 
         log.info("BFF: Verifying payment: {}", request.getTransactionId());

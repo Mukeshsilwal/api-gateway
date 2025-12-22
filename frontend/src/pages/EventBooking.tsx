@@ -30,9 +30,42 @@ export function EventBooking() {
     });
     const [attendees, setAttendees] = useState<Attendee[]>([]);
 
+    // Check authentication on mount
+    React.useEffect(() => {
+        const token = localStorage.getItem('token');
+
+        if (!token) {
+            // User not authenticated, redirect to login
+            toast.info('Please login to continue booking');
+
+            // Save current booking details to session storage to restore after login
+            if (event && selectedTickets) {
+                sessionStorage.setItem('pendingBooking', JSON.stringify({
+                    eventId,
+                    event,
+                    selectedTickets,
+                    returnUrl: window.location.pathname
+                }));
+            }
+
+            // Redirect to login with return URL
+            navigate('/login', {
+                state: { from: window.location.pathname }
+            });
+            return;
+        }
+    }, [navigate, eventId, event, selectedTickets]);
+
     // Initialize attendees array based on selected tickets
     React.useEffect(() => {
         if (!event || !selectedTickets) {
+            // Check if there's a pending booking from session storage
+            const pendingBooking = sessionStorage.getItem('pendingBooking');
+            if (pendingBooking) {
+                const booking = JSON.parse(pendingBooking);
+                // This would need to be handled differently - perhaps redirect back to event details
+                sessionStorage.removeItem('pendingBooking');
+            }
             navigate('/events');
             return;
         }
@@ -119,6 +152,24 @@ export function EventBooking() {
             setLoading(true);
             setStep(3);
 
+            // Get userId from stored user data
+            const userDataStr = localStorage.getItem('userData');
+            let userId = null;
+            if (userDataStr) {
+                try {
+                    const userData = JSON.parse(userDataStr);
+                    userId = userData.id || userData.userId;
+                } catch (e) {
+                    console.error('Error parsing user data:', e);
+                }
+            }
+
+            if (!userId) {
+                toast.error('User session expired. Please login again.');
+                navigate('/login');
+                return;
+            }
+
             // Prepare tickets array for API
             const tickets = Object.entries(selectedTickets).map(([ticketTypeId, quantity]) => ({
                 ticketTypeId: parseInt(ticketTypeId),
@@ -127,33 +178,110 @@ export function EventBooking() {
 
             const bookingData = {
                 eventId: parseInt(eventId as string),
+                userId: userId,
                 tickets: tickets,
                 attendees: attendees,
                 contactEmail: contactInfo.email,
                 contactPhone: contactInfo.phone
             };
 
-            console.log('Creating booking:', bookingData);
+            console.log('📤 Creating event booking with data:', bookingData);
             const response = await eventService.createBooking(bookingData);
 
-            console.log('Booking created:', response);
-            const { bookingReference, paymentUrl } = response.data || response;
+            console.log('📥 Full API response:', response);
+            console.log('📦 Response structure:', {
+                hasData: !!response.data,
+                dataKeys: response.data ? Object.keys(response.data) : [],
+                fullResponse: response
+            });
 
+            // Handle BFF Response wrapper structure
+            // The BFF returns: { status: number, message: string, data: { bookingReference, paymentUrl, ... } }
+            let actualData = response.data;
+
+            // If response.data has a 'data' property, unwrap it (BFF Response wrapper)
+            if (actualData && typeof actualData === 'object' && 'data' in actualData) {
+                console.log('🔓 Unwrapping Response object');
+                actualData = actualData.data;
+            }
+
+            console.log('✅ Actual booking data:', actualData);
+
+            const bookingReference = actualData?.bookingReference;
+            const paymentUrl = actualData?.paymentUrl;
+            const htmlForm = actualData?.htmlForm;
+
+            console.log('📋 Extracted values:', {
+                bookingReference,
+                paymentUrl: paymentUrl ? 'present' : 'missing',
+                htmlForm: htmlForm ? 'present' : 'missing',
+                hasPaymentMethod: !!(htmlForm || paymentUrl)
+            });
+
+            if (!bookingReference) {
+                console.error('❌ No booking reference found in response');
+                throw new Error('Booking created but no reference returned');
+            }
+
+            // Priority 1: HTML Form (eSewa V2 API)
+            if (htmlForm) {
+                console.log('📝 Rendering eSewa HTML form for auto-submission');
+                toast.success('Booking created! Redirecting to eSewa...');
+
+                // Small delay to ensure toast is visible
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Create a temporary div to hold the form
+                const formContainer = document.createElement('div');
+                formContainer.innerHTML = htmlForm;
+                document.body.appendChild(formContainer);
+
+                // Manually submit the form (onload event doesn't fire for dynamically inserted HTML)
+                const form = formContainer.querySelector('form');
+                if (form) {
+                    console.log('✅ HTML form found, submitting to eSewa...');
+                    form.submit(); // Manually trigger form submission
+                } else {
+                    console.error('❌ Form element not found in HTML');
+                    throw new Error('Payment form not found');
+                }
+
+                // Don't set loading to false - page will redirect
+                return; // Exit early as form will handle redirect
+            }
+
+            // Priority 2: Payment URL (fallback for non-eSewa or legacy)
             if (paymentUrl) {
                 // Redirect to payment gateway
-                toast.success('Redirecting to payment...');
+                console.log('💳 Redirecting to eSewa payment gateway:', paymentUrl);
+                toast.success('Booking created! Redirecting to payment...');
+
+                // Small delay to ensure toast is visible
+                await new Promise(resolve => setTimeout(resolve, 500));
                 window.location.href = paymentUrl;
             } else {
-                // Navigate to confirmation (for free events)
+                // Navigate to confirmation (for free events or if payment failed)
+                console.warn('⚠️ No payment method found in response, navigating to confirmation');
+                toast.warning('Payment method not available. Please contact support.');
                 navigate(`/events/booking/${bookingReference}/confirmation`);
             }
         } catch (error: any) {
-            console.error('Error creating booking:', error);
+            console.error('❌ Error creating booking:', error);
+            console.error('Error details:', {
+                message: error.message,
+                response: error.response,
+                responseData: error.response?.data
+            });
+
             setStep(2); // Go back to review
 
             let errorMessage = 'Failed to create booking';
+
+            // Try to extract error from BFF Response wrapper
             if (error.response?.data?.message) {
                 errorMessage = error.response.data.message;
+            } else if (error.response?.data?.data?.message) {
+                errorMessage = error.response.data.data.message;
             } else if (error.message) {
                 errorMessage = error.message;
             }

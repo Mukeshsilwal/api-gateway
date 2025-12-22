@@ -36,7 +36,21 @@ export function FeaturedEventsSection() {
             }
 
             const response = await eventService.searchEvents(searchParams);
-            setEvents(response.data || response || []);
+
+            // Handle paginated response structure: response.data.content
+            let eventData = response.data || response || [];
+
+            // Extract from pagination wrapper if present
+            if (eventData && typeof eventData === 'object' && !Array.isArray(eventData)) {
+                if (eventData.content && Array.isArray(eventData.content)) {
+                    eventData = eventData.content;
+                } else if (eventData.data && Array.isArray(eventData.data)) {
+                    eventData = eventData.data;
+                }
+            }
+
+            // Ensure we have an array
+            setEvents(Array.isArray(eventData) ? eventData : []);
         } catch (error) {
             console.error('Error fetching events:', error);
             toast.error('Failed to load events');

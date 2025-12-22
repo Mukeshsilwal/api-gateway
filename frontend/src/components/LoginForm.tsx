@@ -81,7 +81,32 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
             if (onSuccess) onSuccess();
 
             if (redirectOnSuccess) {
-                const targetPath = from || authService.getDefaultRedirect();
+                // Determine redirect based on which login page was used
+                let targetPath;
+
+                if (from) {
+                    // If there's a "from" path, go there
+                    targetPath = from;
+                } else if (location.pathname === '/login') {
+                    // User login page - check for pending booking or go to home
+                    const pendingBooking = sessionStorage.getItem('pendingBooking');
+                    if (pendingBooking) {
+                        try {
+                            const booking = JSON.parse(pendingBooking);
+                            targetPath = `/events/${booking.eventId}`;
+                        } catch (e) {
+                            console.error('Error parsing pending booking:', e);
+                            sessionStorage.removeItem('pendingBooking');
+                            targetPath = '/home';
+                        }
+                    } else {
+                        targetPath = '/home';
+                    }
+                } else {
+                    // Admin login or other - use role-based redirect
+                    targetPath = authService.getDefaultRedirect();
+                }
+
                 navigate(targetPath, { replace: true });
             }
         } catch (error: any) {

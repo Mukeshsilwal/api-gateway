@@ -29,6 +29,9 @@ import java.util.Map;
 public class EventController {
 
     private final EventService eventService;
+    private final com.ticketkatum.service.AnalyticsService analyticsService;
+    private final com.ticketkatum.service.ExportService exportService;
+    private final com.ticketkatum.service.EventCloneService eventCloneService;
 
     @PostMapping
     @Operation(summary = "Create new event")
@@ -73,8 +76,7 @@ public class EventController {
     @Operation(summary = "Update event")
     public ResponseEntity<Response<Event>> updateEvent(
             @PathVariable("id") Long id,
-            @RequestBody Map<String, Object> updateData
-    ) {
+            @RequestBody Map<String, Object> updateData) {
         try {
             Event event = eventService.updateEvent(id, updateData);
             return ResponseEntity.ok(Response.success("Event updated successfully", event));
@@ -82,6 +84,33 @@ public class EventController {
             log.error("Error updating event", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Response.error(400, e.getMessage()));
+        }
+    }
+
+    @PostMapping("/{id}/clone")
+    @Operation(summary = "Clone event")
+    public ResponseEntity<Response<Event>> cloneEvent(@PathVariable("id") Long id) {
+        try {
+            Event clonedEvent = eventCloneService.cloneEvent(id);
+            return ResponseEntity.ok(Response.success("Event cloned successfully", clonedEvent));
+        } catch (Exception e) {
+            log.error("Error cloning event", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Response.error(400, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{eventId}/tickets")
+    @Operation(summary = "Get ticket types for event")
+    public ResponseEntity<Response<List<com.ticketkatum.entity.TicketType>>> getEventTickets(
+            @PathVariable("eventId") Long eventId) {
+        try {
+            List<com.ticketkatum.entity.TicketType> tickets = eventService.getTicketTypes(eventId);
+            return ResponseEntity.ok(Response.success(tickets));
+        } catch (Exception e) {
+            log.error("Error fetching tickets for event: {}", eventId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Response.error(500, e.getMessage()));
         }
     }
 
@@ -102,8 +131,7 @@ public class EventController {
     @Operation(summary = "Cancel event")
     public ResponseEntity<Response<Event>> cancelEvent(
             @PathVariable("id") Long id,
-            @RequestBody Map<String, String> cancelData
-    ) {
+            @RequestBody Map<String, String> cancelData) {
         try {
             String reason = cancelData.get("reason");
             Event event = eventService.cancelEvent(id, reason);
@@ -120,8 +148,7 @@ public class EventController {
     public ResponseEntity<Response<Page<Event>>> searchEvents(
             @RequestBody Map<String, Object> searchParams,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size
-    ) {
+            @RequestParam(defaultValue = "20") int size) {
         try {
             Pageable pageable = PageRequest.of(page, size);
             Page<Event> events = eventService.searchEvents(searchParams, pageable);
@@ -136,13 +163,47 @@ public class EventController {
     @GetMapping("/featured")
     @Operation(summary = "Get featured events")
     public ResponseEntity<Response<List<Event>>> getFeaturedEvents(
-            @RequestParam(defaultValue = "10",name = "limit") int limit
-    ) {
+            @RequestParam(defaultValue = "10", name = "limit") int limit) {
         try {
             List<Event> events = eventService.getFeaturedEvents(limit);
             return ResponseEntity.ok(Response.success(events));
         } catch (Exception e) {
             log.error("Error fetching featured events", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Response.error(500, e.getMessage()));
+        }
+    }
+
+    @GetMapping("/{id}/attendees/export")
+    @Operation(summary = "Export attendees")
+    public ResponseEntity<byte[]> exportAttendees(
+            @PathVariable("id") Long id,
+            @RequestParam(defaultValue = "csv") String format) {
+        try {
+            if ("csv".equalsIgnoreCase(format)) {
+                byte[] csvData = exportService.exportAttendeesCSV(id);
+                return ResponseEntity.ok()
+                        .header("Content-Type", "text/csv")
+                        .header("Content-Disposition", "attachment; filename=\"attendees_" + id + ".csv\"")
+                        .body(csvData);
+            } else {
+                return ResponseEntity.badRequest().body(null);
+            }
+        } catch (Exception e) {
+            log.error("Error exporting attendees", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/{id}/analytics")
+    @Operation(summary = "Get event analytics")
+    public ResponseEntity<Response<com.ticketkatum.dto.EventAnalyticsDto>> getEventAnalytics(
+            @PathVariable("id") Long id) {
+        try {
+            com.ticketkatum.dto.EventAnalyticsDto analytics = analyticsService.getEventAnalytics(id);
+            return ResponseEntity.ok(Response.success(analytics));
+        } catch (Exception e) {
+            log.error("Error fetching event analytics", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Response.error(500, e.getMessage()));
         }

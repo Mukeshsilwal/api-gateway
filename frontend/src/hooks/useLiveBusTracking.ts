@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { adminApi, LiveSnapshot } from '../api/admin';
 
-const SSE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/live/buses/stream` : 'http://localhost:8080/api/live/buses/stream';
+const SSE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/bff/v1/admin/live/buses/stream` : 'http://localhost:8080/api/bff/v1/admin/live/buses/stream';
 const POLLING_INTERVAL = 60000;
 
 export const useLiveBusTracking = (tz: string = 'Asia/Kathmandu') => {

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +18,8 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "attendees", indexes = {
-    @Index(name = "idx_attendee_qr", columnList = "qr_code", unique = true),
-    @Index(name = "idx_attendee_ticket", columnList = "ticket_id", unique = true)
+        @Index(name = "idx_attendee_qr", columnList = "qr_code", unique = true),
+        @Index(name = "idx_attendee_ticket", columnList = "ticket_id", unique = true)
 })
 @Data
 @NoArgsConstructor
@@ -49,7 +51,7 @@ public class Attendee {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(name = "qr_code", nullable = false, unique = true)
+    @Column(name = "qr_code", nullable = false, unique = true, columnDefinition = "TEXT")
     private String qrCode;
 
     @Column(name = "ticket_id", nullable = false, unique = true, length = 50)
@@ -70,6 +72,7 @@ public class Attendee {
     private String checkInLocation;
 
     @Column(name = "additional_info", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String additionalInfo; // JSON for custom fields
 
     @CreationTimestamp
