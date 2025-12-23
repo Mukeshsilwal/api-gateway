@@ -57,6 +57,7 @@ const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation").the
 const AddEventPage = lazy(() => import("./pages/AddEventPage").then(module => ({ default: module.AddEventPage })));
 const EventCalendarPage = lazy(() => import("./pages/EventCalendarPage"));
 const EventCheckInPage = lazy(() => import("./pages/EventCheckInPage"));
+const EventTickets = lazy(() => import("./pages/EventTickets"));
 
 const NotFound = lazy(() => import("./pages/NotFound"));
 const EsewaDemo = lazy(() => import("./pages/EsewaDemo"));
@@ -250,6 +251,7 @@ const App: React.FC = () => {
               <Route path="/events/:eventId" element={<EventDetails />} errorElement={<ErrorPage />} />
               <Route path="/events/:eventId/book" element={<EventBooking />} errorElement={<ErrorPage />} />
               <Route path="/events/booking/:bookingReference/confirmation" element={<BookingConfirmation />} errorElement={<ErrorPage />} />
+              <Route path="/events/booking/:bookingReference/tickets" element={<EventTickets />} errorElement={<ErrorPage />} />
               <Route path="/events/calendar" element={<EventCalendarPage />} errorElement={<ErrorPage />} />
               <Route
                 path="/events/:eventId/check-in"

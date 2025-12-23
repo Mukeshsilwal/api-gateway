@@ -27,6 +27,36 @@ export default function PaymentSuccess() {
     // Use ref to prevent double verification in StrictMode
     const verificationAttempted = useRef(false);
 
+    // Helper to robustly find booking reference
+    const extractBookingRef = (res: any) => {
+        if (!res) return null;
+        console.log('🔍 Extracting ref from:', res);
+
+        // 1. Check inside verificationResponse (Wrapper from verifyPaymentNew)
+        if (res.verificationResponse) {
+            const vr = res.verificationResponse;
+            if (vr.bookingReference) return vr.bookingReference;
+            if (vr.bookingId) return vr.bookingId;
+            if (vr.data?.bookingReference) return vr.data.bookingReference;
+            if (vr.data?.bookingId) return vr.data.bookingId;
+            if (vr.data?.transaction?.bookingId) return vr.data.transaction.bookingId;
+        }
+
+        // 2. Check direct properties
+        if (res.bookingReference) return res.bookingReference;
+        if (res.bookingId) return res.bookingId;
+
+        // 3. Check inside data property
+        if (res.data) {
+            if (res.data.bookingReference) return res.data.bookingReference;
+            if (res.data.bookingId) return res.data.bookingId;
+            if (res.data.transaction?.bookingId) return res.data.transaction.bookingId;
+            if (res.data.transactionId) return res.data.transactionId;
+        }
+
+        return null;
+    };
+
     useEffect(() => {
         const handleSuccess = async () => {
             if (verificationAttempted.current) return;
@@ -116,7 +146,13 @@ export default function PaymentSuccess() {
                 });
 
                 // 6. Navigate to QR/Ticket page after 3 seconds
-                const bookingReference = result?.data?.bookingReference || result?.data?.bookingId;
+                // Extract booking reference from various possible locations
+                // 6. Navigate to QR/Ticket page after 3 seconds
+                const bookingReference = extractBookingRef(result);
+
+                console.log('📦 Full verification result:', result);
+                console.log('📦 Extracted booking reference:', bookingReference);
+
                 if (bookingReference) {
                     console.log('📱 Navigating to tickets page with booking:', bookingReference);
                     setTimeout(() => {
@@ -263,12 +299,13 @@ export default function PaymentSuccess() {
                         <Button
                             className="w-full bg-emerald-600 hover:bg-emerald-700 text-white h-14 rounded-xl text-lg font-bold shadow-lg shadow-emerald-200 hover:shadow-emerald-300 transition-all transform hover:-translate-y-0.5"
                             onClick={() => {
-                                const bookingRef = verificationResult?.data?.bookingReference || verificationResult?.data?.bookingId;
+                                const bookingRef = extractBookingRef(verificationResult);
+
                                 if (bookingRef) {
                                     navigate(`/events/booking/${bookingRef}/tickets`);
                                 } else {
-                                    console.error('No booking reference available');
-                                    toast.error('Unable to load tickets');
+                                    console.error('No booking reference available', verificationResult);
+                                    toast.error('Unable to load tickets. Please check your email.');
                                 }
                             }}
                         >
