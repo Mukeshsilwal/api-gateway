@@ -1,6 +1,14 @@
 import React from 'react';
 
-export const SeatIcon = ({ status, seatNumber, type = 'standard', className }) => {
+interface SeatIconProps {
+    status?: string;
+    seatNumber?: string;
+    type?: 'standard' | 'sleeper' | 'driver';
+    className?: string;
+    onClick?: () => void;
+}
+
+export const SeatIcon: React.FC<SeatIconProps> = ({ status, seatNumber, type = 'standard', className, onClick }) => {
     // Colors based on status
     const getColors = () => {
         const normalizedStatus = status ? status.toLowerCase() : 'available';
@@ -14,10 +22,10 @@ export const SeatIcon = ({ status, seatNumber, type = 'standard', className }) =
                 };
             case 'selected':
                 return {
-                    fill: '#4f46e5', // indigo-600
-                    stroke: '#4338ca', // indigo-700
+                    fill: '#f97316', // primary (orange-500)
+                    stroke: '#c2410c', // orange-700
                     text: '#ffffff', // white
-                    accent: '#6366f1' // indigo-500
+                    accent: '#fb923c' // orange-400
                 };
             case 'ladies':
                 return {
@@ -125,7 +133,10 @@ export const SeatIcon = ({ status, seatNumber, type = 'standard', className }) =
     );
 
     return (
-        <div className={`relative w-full h-full ${className || ''}`}>
+        <div
+            className={`relative w-full h-full ${className || ''}`}
+            onClick={onClick}
+        >
             {type === 'driver' ? renderDriverSeat() :
                 type === 'sleeper' ? renderSleeperSeat() :
                     renderStandardSeat()}

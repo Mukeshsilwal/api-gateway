@@ -81,7 +81,7 @@ export const BusSeatPreview: React.FC<BusSeatPreviewProps> = ({
     const availableCount = seats.length - bookedCount;
 
     return (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden">
             {/* Bus Front */}
             <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -129,7 +129,7 @@ export const BusSeatPreview: React.FC<BusSeatPreviewProps> = ({
 
                                 {/* Aisle */}
                                 <div className="w-8 flex items-center justify-center">
-                                    <div className="w-1 h-8 bg-gray-200 rounded-full"></div>
+                                    <div className="w-1 h-8 bg-muted rounded-full"></div>
                                 </div>
 
                                 {/* Right side (2 seats) */}
@@ -156,51 +156,51 @@ export const BusSeatPreview: React.FC<BusSeatPreviewProps> = ({
                     </div>
                 ) : (
                     <div className="text-center py-12">
-                        <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                             </svg>
                         </div>
-                        <p className="text-gray-500 font-medium">No seats configured</p>
-                        <p className="text-gray-400 text-sm mt-1">Add seats to see the layout preview</p>
+                        <p className="text-muted-foreground font-medium">No seats configured</p>
+                        <p className="text-muted-foreground text-sm mt-1">Add seats to see the layout preview</p>
                     </div>
                 )}
             </div>
 
             {/* Legend */}
             {showLegend && seatGrid.length > 0 && (
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-100">
+                <div className="bg-muted/30 px-6 py-4 border-t border-border">
                     <div className="flex flex-wrap items-center justify-center gap-6 text-sm">
                         <div className="flex items-center gap-2">
                             <div className="w-5 h-5 bg-emerald-100 border border-emerald-200 rounded"></div>
-                            <span className="text-gray-600">Available</span>
+                            <span className="text-muted-foreground">Available</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="w-5 h-5 bg-indigo-600 rounded"></div>
-                            <span className="text-gray-600">Selected</span>
+                            <span className="text-muted-foreground">Selected</span>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 bg-gray-300 rounded"></div>
-                            <span className="text-gray-600">Booked</span>
+                            <div className="w-5 h-5 bg-muted rounded"></div>
+                            <span className="text-muted-foreground">Booked</span>
                         </div>
                     </div>
                 </div>
             )}
 
             {/* Capacity Info */}
-            <div className="px-6 py-3 bg-slate-50 border-t border-gray-100 flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="px-6 py-3 bg-muted/50 border-t border-border flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
-                    <span>Total Capacity: <strong className="text-slate-800">{seats.length} seats</strong></span>
+                    <span>Total Capacity: <strong className="text-foreground">{seats.length} seats</strong></span>
                 </div>
                 <div className="text-sm">
                     <span className="text-emerald-600 font-medium">
                         {availableCount} available
                     </span>
-                    <span className="text-gray-400 mx-2">•</span>
-                    <span className="text-gray-500">
+                    <span className="text-muted-foreground mx-2">•</span>
+                    <span className="text-muted-foreground">
                         {bookedCount} booked
                     </span>
                 </div>

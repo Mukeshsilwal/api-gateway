@@ -112,18 +112,18 @@ const NearbyHotels = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
             <NavigationBar />
 
             <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                        <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
                             <MapPin className="text-primary" />
                             Nearby Hotels
                         </h1>
-                        <p className="text-slate-600 mt-2">
+                        <p className="text-muted-foreground mt-2">
                             {totalResults > 0
                                 ? `${totalResults} hotels found within ${filters.radiusKm} km`
                                 : 'Discover hotels near you'}
@@ -132,17 +132,17 @@ const NearbyHotels = () => {
 
                     {/* Location Permission */}
                     {!location && !locationLoading && (
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center mb-8">
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-8 text-center mb-8">
                             <MapPin size={48} className="mx-auto text-primary mb-4" />
-                            <h3 className="text-xl font-bold text-slate-900 mb-2">
+                            <h3 className="text-xl font-bold text-foreground mb-2">
                                 Enable Location Access
                             </h3>
-                            <p className="text-slate-600 mb-6">
+                            <p className="text-muted-foreground mb-6">
                                 {locationError || 'Allow location access to find hotels near you'}
                             </p>
                             <button
                                 onClick={requestLocation}
-                                className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors"
+                                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
                             >
                                 Enable Location
                             </button>
@@ -153,7 +153,7 @@ const NearbyHotels = () => {
                     {locationLoading && (
                         <div className="flex justify-center items-center h-64">
                             <LoadingSpinner size="large" />
-                            <span className="ml-3 text-slate-600">Getting your location...</span>
+                            <span className="ml-3 text-muted-foreground">Getting your location...</span>
                         </div>
                     )}
 
@@ -176,7 +176,7 @@ const NearbyHotels = () => {
                                 {/* Mobile Filter Toggle */}
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className="lg:hidden w-full mb-4 flex items-center justify-center gap-2 px-4 py-3 bg-white rounded-lg border border-slate-200 font-semibold text-slate-700 hover:bg-slate-50"
+                                    className="lg:hidden w-full mb-4 flex items-center justify-center gap-2 px-4 py-3 bg-card rounded-lg border border-border font-semibold text-foreground hover:bg-muted"
                                 >
                                     <SlidersHorizontal size={20} />
                                     {showFilters ? 'Hide Filters' : 'Show Filters'}
@@ -192,8 +192,8 @@ const NearbyHotels = () => {
                                 {/* Hotels Grid */}
                                 {!loading && hotels.length === 0 && (
                                     <div className="text-center py-16">
-                                        <AlertCircle size={48} className="mx-auto text-slate-400 mb-4" />
-                                        <p className="text-slate-600 text-lg">No hotels found matching your criteria</p>
+                                        <AlertCircle size={48} className="mx-auto text-muted-foreground mb-4" />
+                                        <p className="text-muted-foreground text-lg">No hotels found matching your criteria</p>
                                         <button
                                             onClick={handleResetFilters}
                                             className="mt-4 text-primary font-semibold hover:underline"

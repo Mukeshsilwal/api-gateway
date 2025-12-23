@@ -80,7 +80,7 @@ export default function SuperAdminLogin() {
     }
 
     return (
-        <div className="min-h-screen flex bg-slate-50">
+        <div className="min-h-screen flex bg-background">
             {/* Left Side - Image */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-purple-900 to-indigo-900">
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] bg-cover bg-center opacity-20"></div>

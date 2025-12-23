@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, Ticket } from 'lucide-react';
+import { Menu, X, LogOut, Ticket, Sun, Moon } from 'lucide-react';
 import authService from '../services/authService';
 import Button from './ui/Button';
 import { User } from '../types/auth'; // Import User type
@@ -8,6 +8,13 @@ import { User } from '../types/auth'; // Import User type
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (localStorage.getItem('theme')) {
+      return localStorage.getItem('theme') as 'light' | 'dark';
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
   // Explicitly type the user state
   const [user, setUser] = useState<User | null>(authService.getCurrentUser() as User | null);
   const navigate = useNavigate();
@@ -27,6 +34,19 @@ const Navbar: React.FC = () => {
 
     return () => window.removeEventListener('scroll', handleScroll);
   }, [location]);
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
 
   const handleLogout = () => {
     authService.logout();
@@ -52,7 +72,7 @@ const Navbar: React.FC = () => {
         text-sm font-medium transition-colors hover:text-primary
         ${location.pathname === path
       ? 'text-primary font-bold'
-      : (scrolled || !isHome ? 'text-gray-700' : 'text-white/90 hover:text-white')}
+      : 'text-gray-700 hover:text-orange-600'}
     `;
 
   return (
@@ -63,7 +83,7 @@ const Navbar: React.FC = () => {
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">
             T
           </div>
-          <span className={`text-xl font-display font-bold ${scrolled || !isHome ? 'text-gray-900' : 'text-white'}`}>
+          <span className={`text-xl font-display font-bold text-gray-900`}>
             TicketKatum
           </span>
         </Link>
@@ -79,25 +99,32 @@ const Navbar: React.FC = () => {
               {link.name}
             </Link>
           ))}
+          {/* Theme Toggle - Removed or Kept? Kept for now but defaults to dark icon */}
+          <button
+            onClick={toggleTheme}
+            className={`p-2 rounded-full transition-colors hover:bg-gray-100 text-gray-700`}
+          >
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
         </div>
 
         {/* Auth Buttons */}
         <div className="hidden md:flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
-              <span className={`text-sm font-medium ${scrolled || !isHome ? 'text-gray-700' : 'text-white'}`}>
+              <span className={`text-sm font-medium text-gray-700`}>
                 Hi, {user.firstName || 'User'}
               </span>
               <Link
                 to="/my-bookings"
-                className={`text-sm font-medium hover:underline ${scrolled || !isHome ? 'text-indigo-600' : 'text-white'}`}
+                className={`text-sm font-medium hover:underline text-indigo-600`}
               >
                 My Bookings
               </Link>
               <Button
-                variant={scrolled || !isHome ? 'ghost' : 'white'}
+                variant={'ghost'}
                 size="sm"
-                className={!scrolled && isHome ? 'bg-white/10 text-white hover:bg-white/20 border-0' : ''}
+                className={''}
                 onClick={handleLogout}
               >
                 <LogOut size={16} className="mr-2" />
@@ -108,9 +135,9 @@ const Navbar: React.FC = () => {
             <>
               <Link to="/login">
                 <Button
-                  variant={scrolled || !isHome ? 'ghost' : 'white'}
+                  variant={'ghost'}
                   size="sm"
-                  className={!scrolled && isHome ? 'bg-white/10 text-white hover:bg-white/20 border-0' : ''}
+                  className={'text-gray-700 hover:bg-gray-100'}
                 >
                   Sign In
                 </Button>
@@ -126,7 +153,7 @@ const Navbar: React.FC = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className={`md:hidden p-2 ${scrolled || !isHome ? 'text-gray-900' : 'text-white'}`}
+          className={`md:hidden p-2 text-gray-900`}
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
@@ -147,6 +174,14 @@ const Navbar: React.FC = () => {
                 {link.name}
               </Link>
             ))}
+            <div className="h-px bg-gray-100 my-2"></div>
+            <button
+              onClick={() => { toggleTheme(); setIsOpen(false); }}
+              className="flex items-center gap-2 text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg"
+            >
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+            </button>
             <div className="h-px bg-gray-100 my-2"></div>
             {user ? (
               <>

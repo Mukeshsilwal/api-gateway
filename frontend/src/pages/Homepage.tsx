@@ -65,29 +65,29 @@ export function Homepage() {
     };
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-background text-foreground">
             <Navbar />
 
             {/* Hero Section with Booking Widget */}
-            <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+            <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-background">
                 {/* Background Decoration */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900">
-                    <div className="absolute top-20 right-20 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute inset-0 bg-background">
+                    <div className="absolute top-20 right-20 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl opacity-50 dark:opacity-100"></div>
+                    <div className="absolute bottom-20 left-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl opacity-50 dark:opacity-100"></div>
                 </div>
 
                 <div className="container mx-auto px-4 py-20 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         {/* Left Content */}
-                        <div className="text-white space-y-8 animate-slide-up">
+                        <div className="text-gray-900 dark:text-white space-y-8 animate-slide-up">
                             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight font-display">
                                 Book smarter. <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600">
                                     Travel easier.
                                 </span>
                             </h1>
 
-                            <p className="text-xl text-gray-300 leading-relaxed max-w-2xl border-l-4 border-orange-500 pl-6">
+                            <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl border-l-4 border-orange-500 pl-6">
                                 Bus, hotel, flight & event bookings — all in one trusted platform.
                             </p>
 
@@ -100,14 +100,14 @@ export function Homepage() {
                                 </button>
                                 <button
                                     onClick={() => navigate('/hotels')}
-                                    className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300"
+                                    className="px-8 py-4 bg-white dark:bg-white/10 backdrop-blur-sm text-gray-700 dark:text-white font-semibold rounded-xl border border-gray-200 dark:border-white/20 hover:bg-gray-50 dark:hover:bg-white/20 transform hover:-translate-y-1 transition-all duration-300 shadow-sm dark:shadow-none"
                                 >
                                     Browse Hotels
                                 </button>
                             </div>
 
                             {/* Trust Indicators */}
-                            <div className="flex items-center gap-8 pt-8 border-t border-white/10">
+                            <div className="flex items-center gap-8 pt-8 border-t border-gray-200 dark:border-white/10">
                                 <div className="flex items-center gap-2">
                                     <div className="text-orange-500">
                                         <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
@@ -115,8 +115,8 @@ export function Homepage() {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p className="text-white font-bold">4.8+</p>
-                                        <p className="text-gray-400 text-sm">Rating</p>
+                                        <p className="text-gray-900 dark:text-white font-bold">4.8+</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">Rating</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -126,8 +126,8 @@ export function Homepage() {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p className="text-white font-bold">Secure</p>
-                                        <p className="text-gray-400 text-sm">Payments</p>
+                                        <p className="text-gray-900 dark:text-white font-bold">Secure</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">Payments</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
@@ -137,8 +137,8 @@ export function Homepage() {
                                         </svg>
                                     </div>
                                     <div>
-                                        <p className="text-white font-bold">1M+</p>
-                                        <p className="text-gray-400 text-sm">Users</p>
+                                        <p className="text-gray-900 dark:text-white font-bold">1M+</p>
+                                        <p className="text-gray-500 dark:text-gray-400 text-sm">Users</p>
                                     </div>
                                 </div>
                             </div>
@@ -147,14 +147,14 @@ export function Homepage() {
                         {/* Right Booking Widget */}
                         <div className="relative">
                             {/* Main Widget Card */}
-                            <div className="glass-dark rounded-3xl p-8 animate-fade-in relative z-20">
+                            <div className="glass shadow-xl dark:glass-dark rounded-3xl p-8 animate-fade-in relative z-20">
                                 {/* Tabs */}
-                                <div className="flex gap-2 mb-8 bg-black/40 p-2 rounded-2xl backdrop-blur-sm">
+                                <div className="flex gap-2 mb-8 bg-gray-100 dark:bg-black/40 p-2 rounded-2xl dark:backdrop-blur-sm">
                                     <button
                                         onClick={() => setActiveTab('bus')}
                                         className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'bus'
-                                            ? 'bg-orange-500 text-white shadow-glow'
-                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:text-white dark:hover:bg-white/5'
                                             }`}
                                     >
                                         <Bus size={20} />
@@ -163,8 +163,8 @@ export function Homepage() {
                                     <button
                                         onClick={() => setActiveTab('hotel')}
                                         className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'hotel'
-                                            ? 'bg-orange-500 text-white shadow-glow'
-                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:text-white dark:hover:bg-white/5'
                                             }`}
                                     >
                                         <Hotel size={20} />
@@ -173,8 +173,8 @@ export function Homepage() {
                                     <button
                                         onClick={() => setActiveTab('flight')}
                                         className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'flight'
-                                            ? 'bg-orange-500 text-white shadow-glow'
-                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                                            : 'text-gray-600 dark:text-gray-400 hover:bg-white dark:hover:text-white dark:hover:bg-white/5'
                                             }`}
                                     >
                                         <Plane size={20} />
@@ -188,16 +188,16 @@ export function Homepage() {
                                         <>
                                             {/* City/Location */}
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                     City / Location
                                                 </label>
                                                 <div className="relative group">
                                                     <select
                                                         value={bookingData.city}
                                                         onChange={(e) => handleInputChange('city', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
+                                                        className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20"
                                                         style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23fb923c\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
                                                             backgroundRepeat: 'no-repeat',
                                                             backgroundPosition: 'right 1rem center',
                                                             backgroundSize: '1.5rem',
@@ -205,18 +205,18 @@ export function Homepage() {
                                                         }}
                                                     >
                                                         <option value="" className="text-gray-500">Select city</option>
-                                                        <option value="kathmandu" className="text-gray-900">Kathmandu</option>
-                                                        <option value="pokhara" className="text-gray-900">Pokhara</option>
-                                                        <option value="chitwan" className="text-gray-900">Chitwan</option>
-                                                        <option value="biratnagar" className="text-gray-900">Biratnagar</option>
-                                                        <option value="lumbini" className="text-gray-900">Lumbini</option>
+                                                        <option value="kathmandu" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Kathmandu</option>
+                                                        <option value="pokhara" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Pokhara</option>
+                                                        <option value="chitwan" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Chitwan</option>
+                                                        <option value="biratnagar" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Biratnagar</option>
+                                                        <option value="lumbini" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Lumbini</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             {/* Check-in Date */}
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                     Check-in Date
                                                 </label>
                                                 <input
@@ -224,7 +224,7 @@ export function Homepage() {
                                                     value={bookingData.checkIn}
                                                     onChange={(e) => handleInputChange('checkIn', e.target.value)}
                                                     min={new Date().toISOString().split('T')[0]}
-                                                    className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20 [color-scheme:dark]"
+                                                    className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20 [color-scheme:light] dark:[color-scheme:dark]"
                                                 />
                                             </div>
 
@@ -245,76 +245,76 @@ export function Homepage() {
                                             {/* Guests & Rooms */}
                                             <div className="grid grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                         Guests
                                                     </label>
-                                                    <select
-                                                        value={bookingData.guests}
-                                                        onChange={(e) => handleInputChange('guests', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
-                                                        style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
-                                                            backgroundRepeat: 'no-repeat',
-                                                            backgroundPosition: 'right 1rem center',
-                                                            backgroundSize: '1.5rem',
-                                                            appearance: 'none'
-                                                        }}
-                                                    >
-                                                        {[1, 2, 3, 4, 5, 6].map(num => (
-                                                            <option key={num} value={num} className="text-gray-900">{num} Guest{num > 1 ? 's' : ''}</option>
-                                                        ))}
-                                                    </select>
+                                                    <div className="relative group">
+                                                        <select
+                                                            value={bookingData.guests}
+                                                            onChange={(e) => handleInputChange('guests', e.target.value)}
+                                                            className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20 appearance-none"
+                                                            style={{
+                                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fb923c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                                                backgroundRepeat: 'no-repeat',
+                                                                backgroundPosition: 'right 1rem center',
+                                                                backgroundSize: '1.5rem'
+                                                            }}
+                                                        >
+                                                            {[1, 2, 3, 4, 5, 6].map(num => (
+                                                                <option key={num} value={num} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{num} Guest{num > 1 ? 's' : ''}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                         Rooms
                                                     </label>
-                                                    <select
-                                                        value={bookingData.rooms}
-                                                        onChange={(e) => handleInputChange('rooms', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
-                                                        style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
-                                                            backgroundRepeat: 'no-repeat',
-                                                            backgroundPosition: 'right 1rem center',
-                                                            backgroundSize: '1.5rem',
-                                                            appearance: 'none'
-                                                        }}
-                                                    >
-                                                        {[1, 2, 3, 4].map(num => (
-                                                            <option key={num} value={num} className="text-gray-900">{num} Room{num > 1 ? 's' : ''}</option>
-                                                        ))}
-                                                    </select>
+                                                    <div className="relative group">
+                                                        <select
+                                                            value={bookingData.rooms}
+                                                            onChange={(e) => handleInputChange('rooms', e.target.value)}
+                                                            className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20 appearance-none"
+                                                            style={{
+                                                                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fb923c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                                                                backgroundRepeat: 'no-repeat',
+                                                                backgroundPosition: 'right 1rem center',
+                                                                backgroundSize: '1.5rem'
+                                                            }}
+                                                        >
+                                                            {[1, 2, 3, 4].map(num => (
+                                                                <option key={num} value={num} className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">{num} Room{num > 1 ? 's' : ''}</option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </>
                                     ) : (
-                                        // Bus/Flight Form Fields
                                         <>
                                             {/* From Field */}
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                     From
                                                 </label>
                                                 <div className="relative group">
                                                     <select
                                                         value={bookingData.from}
                                                         onChange={(e) => handleInputChange('from', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
+                                                        className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20 appearance-none"
                                                         style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fb923c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                                                             backgroundRepeat: 'no-repeat',
                                                             backgroundPosition: 'right 1rem center',
-                                                            backgroundSize: '1.5rem',
-                                                            appearance: 'none'
+                                                            backgroundSize: '1.5rem'
                                                         }}
                                                     >
-                                                        <option value="" className="text-gray-500">Select source city</option>
-                                                        <option value="kathmandu" className="text-gray-900">Kathmandu</option>
-                                                        <option value="pokhara" className="text-gray-900">Pokhara</option>
-                                                        <option value="chitwan" className="text-gray-900">Chitwan</option>
-                                                        <option value="biratnagar" className="text-gray-900">Biratnagar</option>
-                                                        <option value="janakpur" className="text-gray-900">Janakpur</option>
+                                                        <option value="" className="text-gray-500">Select City</option>
+                                                        <option value="kathmandu" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Kathmandu</option>
+                                                        <option value="pokhara" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Pokhara</option>
+                                                        <option value="chitwan" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Chitwan</option>
+                                                        <option value="biratnagar" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Biratnagar</option>
+                                                        <option value="lumbini" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Lumbini</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -323,8 +323,11 @@ export function Homepage() {
                                             <div className="flex justify-center -my-3 relative z-10">
                                                 <button
                                                     type="button"
-                                                    onClick={handleSwap}
-                                                    className="p-3 bg-orange-500 text-white rounded-full hover:bg-orange-600 transform hover:rotate-180 transition-all duration-300 shadow-lg border-4 border-gray-900"
+                                                    onClick={() => {
+                                                        const temp = bookingData.from;
+                                                        setBookingData(prev => ({ ...prev, from: prev.to, to: temp }));
+                                                    }}
+                                                    className="p-2 bg-white dark:bg-gray-800 rounded-full shadow-lg border-2 border-gray-200 dark:border-gray-700 text-orange-500 hover:rotate-180 transition-all duration-300 hover:shadow-orange-500/20"
                                                 >
                                                     <ArrowRightLeft size={20} />
                                                 </button>
@@ -332,35 +335,34 @@ export function Homepage() {
 
                                             {/* To Field */}
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                     To
                                                 </label>
                                                 <div className="relative group">
                                                     <select
                                                         value={bookingData.to}
                                                         onChange={(e) => handleInputChange('to', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
+                                                        className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20 appearance-none"
                                                         style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fb923c'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                                                             backgroundRepeat: 'no-repeat',
                                                             backgroundPosition: 'right 1rem center',
-                                                            backgroundSize: '1.5rem',
-                                                            appearance: 'none'
+                                                            backgroundSize: '1.5rem'
                                                         }}
                                                     >
-                                                        <option value="" className="text-gray-500">Select destination city</option>
-                                                        <option value="kathmandu" className="text-gray-900">Kathmandu</option>
-                                                        <option value="pokhara" className="text-gray-900">Pokhara</option>
-                                                        <option value="chitwan" className="text-gray-900">Chitwan</option>
-                                                        <option value="biratnagar" className="text-gray-900">Biratnagar</option>
-                                                        <option value="janakpur" className="text-gray-900">Janakpur</option>
+                                                        <option value="" className="text-gray-500">Select City</option>
+                                                        <option value="pokhara" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Pokhara</option>
+                                                        <option value="kathmandu" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Kathmandu</option>
+                                                        <option value="chitwan" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Chitwan</option>
+                                                        <option value="biratnagar" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Biratnagar</option>
+                                                        <option value="lumbini" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-white">Lumbini</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             {/* Travel Date */}
                                             <div>
-                                                <label className="block text-sm font-semibold text-gray-300 mb-2">
+                                                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                                     Travel Date
                                                 </label>
                                                 <input
@@ -368,7 +370,7 @@ export function Homepage() {
                                                     value={bookingData.date}
                                                     onChange={(e) => handleInputChange('date', e.target.value)}
                                                     min={new Date().toISOString().split('T')[0]}
-                                                    className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20 [color-scheme:dark]"
+                                                    className="w-full px-4 py-4 bg-gray-50 dark:bg-white/5 text-gray-900 dark:text-white border-2 border-gray-200 dark:border-white/10 rounded-xl focus:border-orange-500 focus:bg-white dark:focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-orange-500/30 dark:hover:border-white/20 [color-scheme:light] dark:[color-scheme:dark]"
                                                 />
                                             </div>
                                         </>
@@ -378,15 +380,19 @@ export function Homepage() {
                                     <div className="space-y-4">
                                         <button
                                             type="submit"
-                                            className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-lg rounded-xl hover:shadow-2xl hover:shadow-orange-500/50 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 sticky bottom-4 z-50 md:static"
+                                            className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-lg rounded-xl hover:shadow-xl hover:shadow-orange-500/30 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 sticky bottom-4 z-50 md:static"
                                         >
-                                            <Search size={20} />
+                                            <Search size={22} strokeWidth={2.5} />
                                             <span>Search {activeTab === 'bus' ? 'Buses' : activeTab === 'hotel' ? 'Hotels' : 'Flights'}</span>
                                         </button>
 
-                                        <div className="flex items-center justify-between text-xs text-gray-400 font-medium px-2">
-                                            <span>🔥 Popular routes today</span>
-                                            <span>Starting from NPR 800</span>
+                                        <div className="flex items-center justify-between text-xs font-medium px-2">
+                                            <span className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                                                <span className="animate-pulse">🔥</span> Popular routes today
+                                            </span>
+                                            <span className="text-gray-600 dark:text-gray-400">
+                                                Starting from <span className="text-gray-900 dark:text-white font-bold">NPR 800</span>
+                                            </span>
                                         </div>
                                     </div>
                                 </form>
@@ -403,18 +409,18 @@ export function Homepage() {
             <OffersSection />
 
             {/* Featured Events Section */}
-            <section className="bg-gradient-to-b from-black to-gray-900 py-20">
+            <section className="bg-white dark:bg-black py-20 transition-colors duration-300">
                 <FeaturedEventsSection />
             </section>
 
             {/* Why Choose Us Section */}
-            <section className="bg-gray-900 py-20">
+            <section className="bg-muted/30 py-20">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                            Why <span className="text-orange-500">Choose Us</span>
+                        <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+                            Why <span className="text-primary">Choose Us</span>
                         </h2>
-                        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+                        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
                             Experience the best booking platform with unmatched features and service
                         </p>
                     </div>
@@ -442,7 +448,7 @@ export function Homepage() {
                         />
                     </div>
                 </div>
-            </section>
+            </section >
 
             <Footer />
         </div >
@@ -481,12 +487,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) =
     };
 
     return (
-        <div className="p-8 bg-gray-800/50 backdrop-blur-sm rounded-2xl border border-gray-700/50 hover:border-orange-500/50 hover:bg-gray-800 transition-all duration-300 group">
-            <div className="w-16 h-16 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-500 mb-6 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 group-hover:scale-110">
+        <div className="p-8 bg-card rounded-2xl border border-border hover:border-primary/50 hover:shadow-lg transition-all duration-300 group">
+            <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300 group-hover:scale-110">
                 {icons[icon]}
             </div>
-            <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
-            <p className="text-gray-400 leading-relaxed">{description}</p>
+            <h3 className="text-xl font-bold text-foreground mb-3">{title}</h3>
+            <p className="text-muted-foreground leading-relaxed">{description}</p>
         </div>
     );
 };

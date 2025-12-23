@@ -63,7 +63,7 @@ export default function ConfirmDialog({
 
             {/* Dialog */}
             <div
-                className={`relative bg-white dark:bg-slate-800 rounded-xl shadow-xl max-w-md w-full transform transition-all duration-200 ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
+                className={`relative bg-card rounded-xl shadow-xl max-w-md w-full transform transition-all duration-200 ${isOpen ? 'scale-100 opacity-100' : 'scale-95 opacity-0'
                     }`}
             >
                 <div className="p-6">
@@ -104,7 +104,7 @@ export default function ConfirmDialog({
                             type="button"
                             onClick={onClose}
                             disabled={confirmLoading}
-                            className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg text-slate-700 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 px-4 py-2 border border-border rounded-lg text-foreground font-medium hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {cancelText}
                         </button>

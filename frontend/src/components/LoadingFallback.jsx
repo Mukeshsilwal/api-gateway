@@ -7,10 +7,10 @@ import PropTypes from 'prop-types';
 export default function LoadingFallback({ fullScreen = false, message = 'Loading...' }) {
     if (fullScreen) {
         return (
-            <div className="fixed inset-0 bg-slate-50 dark:bg-slate-900 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
                 <div className="text-center">
                     <LoadingSpinner size="large" />
-                    <p className="mt-4 text-slate-600 dark:text-slate-300 text-lg">{message}</p>
+                    <p className="mt-4 text-foreground text-lg">{message}</p>
                 </div>
             </div>
         );
@@ -20,7 +20,7 @@ export default function LoadingFallback({ fullScreen = false, message = 'Loading
         <div className="flex items-center justify-center py-12">
             <div className="text-center">
                 <LoadingSpinner />
-                <p className="mt-4 text-slate-600 dark:text-slate-300">{message}</p>
+                <p className="mt-4 text-muted-foreground">{message}</p>
             </div>
         </div>
     );

@@ -204,7 +204,7 @@ const PaymentCallback = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
             <NavigationBar />
 
             <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8">

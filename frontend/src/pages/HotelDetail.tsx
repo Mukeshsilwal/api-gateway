@@ -194,15 +194,15 @@ const HotelDetail: React.FC = () => {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen bg-slate-50 flex flex-col">
+            <div className="min-h-screen bg-background flex flex-col">
                 <NavigationBar />
                 <main className="flex-grow pt-24 pb-12">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="animate-pulse space-y-8">
-                            <div className="h-96 bg-gray-200 rounded-2xl"></div>
+                            <div className="h-96 bg-muted rounded-2xl"></div>
                             <div className="space-y-4">
-                                <div className="h-8 bg-gray-200 rounded w-2/3"></div>
-                                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                <div className="h-8 bg-muted rounded w-2/3"></div>
+                                <div className="h-4 bg-muted rounded w-1/2"></div>
                             </div>
                         </div>
                     </div>
@@ -218,7 +218,7 @@ const HotelDetail: React.FC = () => {
         : ["https://placehold.co/800x600?text=Hotel+Image"];
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+        <div className="min-h-screen bg-background flex flex-col font-sans">
             <NavigationBar />
 
             <main className="flex-grow pt-24 pb-12">
@@ -253,7 +253,7 @@ const HotelDetail: React.FC = () => {
                                         <button
                                             key={index}
                                             onClick={() => setSelectedImage(index)}
-                                            className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index ? 'border-indigo-600 ring-2 ring-indigo-100' : 'border-transparent opacity-70 hover:opacity-100'
+                                            className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index ? 'border-primary ring-2 ring-primary/20' : 'border-transparent opacity-70 hover:opacity-100'
                                                 }`}
                                         >
                                             <img src={img} alt="" className="w-full h-full object-cover" />
@@ -267,7 +267,7 @@ const HotelDetail: React.FC = () => {
                         <div className="flex flex-col justify-center space-y-6">
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide">
+                                    <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wide">
                                         {hotel.type || 'Luxury Hotel'}
                                     </span>
                                     {hotel.stars && (
@@ -278,46 +278,46 @@ const HotelDetail: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-                                <h1 className="text-4xl font-bold text-gray-900 mb-2 leading-tight">{hotel.name}</h1>
-                                <div className="flex items-center text-gray-500 text-sm">
-                                    <MapPin size={16} className="mr-1.5 text-indigo-500" />
+                                <h1 className="text-4xl font-bold text-foreground mb-2 leading-tight">{hotel.name}</h1>
+                                <div className="flex items-center text-muted-foreground text-sm">
+                                    <MapPin size={16} className="mr-1.5 text-primary" />
                                     {hotel.address || `${hotel.city}, ${hotel.country}`}
                                 </div>
                             </div>
 
                             {/* Combined Rating Block */}
-                            <div className="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100 w-fit">
-                                <div className="bg-indigo-600 text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl">
+                            <div className="flex items-center gap-4 bg-card p-4 rounded-xl shadow-sm border border-border w-fit">
+                                <div className="bg-primary text-primary-foreground w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl">
                                     {hotel.rating || 4.9}
                                 </div>
                                 <div>
-                                    <div className="font-bold text-gray-900">Excellent</div>
-                                    <div className="text-xs text-gray-500">{hotel.reviews || 128} verified reviews</div>
+                                    <div className="font-bold text-foreground">Excellent</div>
+                                    <div className="text-xs text-muted-foreground">{hotel.reviews || 128} verified reviews</div>
                                 </div>
                             </div>
 
-                            <p className="text-gray-600 leading-relaxed">
+                            <p className="text-muted-foreground leading-relaxed">
                                 {hotel.description || "Experience luxury and comfort in the heart of the city. Enjoy world-class amenities and exceptional service."}
                             </p>
 
                             {/* Amenities Grid */}
-                            <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                            <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-2"><Wifi size={16} className="text-green-500" /> Free High-Speed Wi-Fi</div>
                                 <div className="flex items-center gap-2"><Coffee size={16} className="text-orange-500" /> Breakfast Included</div>
                                 <div className="flex items-center gap-2"><Car size={16} className="text-blue-500" /> Free Parking</div>
-                                <div className="flex items-center gap-2"><ShieldCheck size={16} className="text-indigo-500" /> 24/7 Security</div>
+                                <div className="flex items-center gap-2"><ShieldCheck size={16} className="text-primary" /> 24/7 Security</div>
                             </div>
 
                             {/* Contact */}
-                            <div className="flex gap-6 pt-4 border-t border-gray-100">
+                            <div className="flex gap-6 pt-4 border-t border-border">
                                 {hotel.phone && (
-                                    <a href={`tel:${hotel.phone.replace(/\s+/g, '')}`} className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                                    <a href={`tel:${hotel.phone.replace(/\s+/g, '')}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
                                         <Phone size={18} />
                                         <span className="text-sm font-medium">{hotel.phone}</span>
                                     </a>
                                 )}
                                 {hotel.email && (
-                                    <a href={`mailto:${hotel.email}`} className="flex items-center gap-2 text-gray-600 hover:text-indigo-600 transition-colors">
+                                    <a href={`mailto:${hotel.email}`} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
                                         <Mail size={18} />
                                         <span className="text-sm font-medium">Email Hotel</span>
                                     </a>
@@ -329,7 +329,7 @@ const HotelDetail: React.FC = () => {
                     {/* Booking Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         <div className="lg:col-span-2">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Rooms</h2>
+                            <h2 className="text-2xl font-bold text-foreground mb-6">Available Rooms</h2>
                             {rooms.length > 0 ? (
                                 <div className="space-y-4">
                                     {rooms.map((room) => (
@@ -361,53 +361,53 @@ const HotelDetail: React.FC = () => {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-12 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200">
-                                    <Info className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                                    <h3 className="text-lg font-medium text-gray-900">No rooms available</h3>
-                                    <p className="text-gray-500">Try changing your dates or check back later.</p>
+                                <div className="text-center py-12 bg-muted rounded-2xl border-2 border-dashed border-border">
+                                    <Info className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                                    <h3 className="text-lg font-medium text-foreground">No rooms available</h3>
+                                    <p className="text-muted-foreground">Try changing your dates or check back later.</p>
                                 </div>
                             )}
                         </div>
 
                         {/* Sidebar */}
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24 border border-gray-100">
-                                <h3 className="text-lg font-bold text-gray-900 mb-4">Your Stay</h3>
+                            <div className="bg-card rounded-2xl shadow-lg p-6 sticky top-24 border border-border">
+                                <h3 className="text-lg font-bold text-foreground mb-4">Your Stay</h3>
                                 <div className="space-y-4">
-                                    <div className="bg-gray-50 p-4 rounded-xl space-y-3">
+                                    <div className="bg-muted/50 p-4 rounded-xl space-y-3">
                                         <div>
-                                            <label className="text-xs font-semibold text-gray-500 uppercase">Check-in</label>
+                                            <label className="text-xs font-semibold text-muted-foreground uppercase">Check-in</label>
                                             <input
                                                 type="date"
-                                                className="w-full bg-transparent border-b border-gray-300 focus:border-indigo-600 outline-none py-1 text-sm font-medium"
+                                                className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm font-medium text-foreground"
                                                 value={bookingParams.checkIn || ''}
                                                 onChange={(e) => navigate('.', { state: { ...bookingParams, checkIn: e.target.value }, replace: true })}
                                                 min={new Date().toISOString().split('T')[0]}
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-gray-500 uppercase">Check-out</label>
+                                            <label className="text-xs font-semibold text-muted-foreground uppercase">Check-out</label>
                                             <input
                                                 type="date"
-                                                className="w-full bg-transparent border-b border-gray-300 focus:border-indigo-600 outline-none py-1 text-sm font-medium"
+                                                className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm font-medium text-foreground"
                                                 value={bookingParams.checkOut || ''}
                                                 onChange={(e) => navigate('.', { state: { ...bookingParams, checkOut: e.target.value }, replace: true })}
                                                 min={bookingParams.checkIn || new Date().toISOString().split('T')[0]}
                                             />
                                         </div>
                                         <div>
-                                            <label className="text-xs font-semibold text-gray-500 uppercase">Guests</label>
+                                            <label className="text-xs font-semibold text-muted-foreground uppercase">Guests</label>
                                             <select
-                                                className="w-full bg-transparent border-b border-gray-300 focus:border-indigo-600 outline-none py-1 text-sm font-medium"
+                                                className="w-full bg-transparent border-b border-border focus:border-primary outline-none py-1 text-sm font-medium text-foreground"
                                                 value={bookingParams.guests || 1}
                                                 onChange={(e) => navigate('.', { state: { ...bookingParams, guests: parseInt(e.target.value) }, replace: true })}
                                             >
-                                                {[1, 2, 3, 4].map(n => <option key={n} value={n}>{n} Guest{n > 1 ? 's' : ''}</option>)}
+                                                {[1, 2, 3, 4].map(n => <option key={n} value={n} className="bg-card text-foreground">{n} Guest{n > 1 ? 's' : ''}</option>)}
                                             </select>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2 text-xs text-gray-500 bg-blue-50 p-3 rounded-lg text-blue-700">
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground bg-primary/10 p-3 rounded-lg text-primary">
                                         <Info size={14} />
                                         <span>Select dates to see accurate pricing</span>
                                     </div>
@@ -471,7 +471,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAva
     const images = room.images && room.images.length > 0 ? room.images : [];
 
     return (
-        <div className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all flex flex-col sm:flex-row gap-6">
+        <div className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all flex flex-col sm:flex-row gap-6">
             {/* Room Image - Left Side */}
             {images.length > 0 && (
                 <div className="w-full sm:w-1/3 md:w-1/4 h-48 sm:h-auto flex-shrink-0 relative rounded-xl overflow-hidden group">
@@ -511,18 +511,18 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAva
 
             <div className="flex-1">
                 <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-gray-900">{room.roomType || room.name}</h3>
-                    {room.size && <span className="text-xs bg-gray-100 px-2 py-1 rounded text-gray-600">{room.size} sq ft</span>}
+                    <h3 className="text-xl font-bold text-foreground">{room.roomType || room.name}</h3>
+                    {room.size && <span className="text-xs bg-muted px-2 py-1 rounded text-muted-foreground">{room.size} sq ft</span>}
                 </div>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{room.description || "Spacious room with modern amenities."}</p>
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{room.description || "Spacious room with modern amenities."}</p>
 
                 {/* Options Selection */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-4">
                     {room.availableRentTypes && room.availableRentTypes.length > 0 && (
                         <div>
-                            <label className="text-xs font-semibold text-gray-500 uppercase block mb-1">Rent Type</label>
+                            <label className="text-xs font-semibold text-muted-foreground uppercase block mb-1">Rent Type</label>
                             <select
-                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                                 value={selectedRentType}
                                 onChange={(e) => setSelectedRentType(e.target.value)}
                             >
@@ -537,9 +537,9 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAva
 
                     {room.availableMealPlans && room.availableMealPlans.length > 0 && (
                         <div>
-                            <label className="text-xs font-semibold text-gray-500 uppercase block mb-1">Meal Plan</label>
+                            <label className="text-xs font-semibold text-muted-foreground uppercase block mb-1">Meal Plan</label>
                             <select
-                                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                                 value={selectedMealPlan}
                                 onChange={(e) => setSelectedMealPlan(e.target.value)}
                             >
@@ -554,24 +554,24 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAva
                     )}
                 </div>
 
-                <div className="flex flex-wrap gap-2 text-xs text-gray-500 mt-2">
-                    <span className="bg-green-50 text-green-700 px-2 py-1 rounded-md">Free Cancellation</span>
-                    <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded-md">Breakfast Included</span>
+                <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mt-2">
+                    <span className="bg-green-500/10 text-green-700 px-2 py-1 rounded-md">Free Cancellation</span>
+                    <span className="bg-primary/10 text-primary px-2 py-1 rounded-md">Breakfast Included</span>
                 </div>
             </div>
             <div className="sm:text-right flex flex-col justify-between min-w-[140px]">
                 <div>
-                    <div className="text-3xl font-bold text-indigo-600">
+                    <div className="text-3xl font-bold text-primary">
                         NPR {(room.price || room.basePrice || 0).toLocaleString()}
                     </div>
-                    <div className="text-xs text-gray-500">per night / excluding tax</div>
+                    <div className="text-xs text-muted-foreground">per night / excluding tax</div>
                 </div>
                 <button
                     onClick={handleBookClick}
                     disabled={isDateSelected && !isAvailable}
                     className={`mt-4 w-full font-bold py-3 rounded-xl shadow-md transition-all active:scale-95 ${isDateSelected && !isAvailable
-                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : "bg-[#60bb46] hover:bg-[#4ca036] text-white"
+                        ? "bg-muted text-muted-foreground cursor-not-allowed"
+                        : "bg-primary hover:bg-primary-dark text-primary-foreground"
                         }`}
                 >
                     {isDateSelected ? (

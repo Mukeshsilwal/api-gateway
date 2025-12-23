@@ -144,23 +144,23 @@ const PlaneSeatSelection = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50 flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col">
             <NavigationBar />
 
             <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-                <h1 className="text-3xl font-bold text-slate-900 mb-8">Select Your Seats</h1>
+                <h1 className="text-3xl font-bold text-foreground mb-8">Select Your Seats</h1>
 
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Left Column: Seat Map */}
                     <div className="flex-1">
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-8">
                             <div className="flex justify-center mb-8">
-                                <div className="w-full max-w-md bg-slate-100 rounded-t-full p-8 pb-4 border-x-4 border-t-4 border-slate-300 relative">
+                                <div className="w-full max-w-md bg-muted rounded-t-full p-8 pb-4 border-x-4 border-t-4 border-muted-foreground/20 relative">
                                     {/* Cockpit area visual */}
-                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-slate-200 rounded-full opacity-50"></div>
+                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-16 bg-muted-foreground/20 rounded-full opacity-50"></div>
 
                                     <div className="space-y-4 relative z-10">
-                                        <div className="flex justify-between px-8 text-xs font-bold text-slate-400 mb-2">
+                                        <div className="flex justify-between px-8 text-xs font-bold text-muted-foreground mb-2">
                                             <div className="flex gap-4"><span>A</span><span>B</span><span>C</span></div>
                                             <div className="flex gap-4"><span>D</span><span>E</span><span>F</span></div>
                                         </div>
@@ -178,7 +178,7 @@ const PlaneSeatSelection = () => {
                                                         />
                                                     ))}
                                                 </div>
-                                                <div className="text-xs text-slate-300 font-mono">{rowIndex + 1}</div>
+                                                <div className="text-xs text-muted-foreground font-mono">{rowIndex + 1}</div>
                                                 <div className="flex gap-2">
                                                     {row.slice(3, 6).map(seat => (
                                                         <SeatIcon
@@ -196,18 +196,18 @@ const PlaneSeatSelection = () => {
                                 </div>
                             </div>
 
-                            <div className="flex justify-center gap-6 mt-8 text-sm border-t border-slate-100 pt-6">
+                            <div className="flex justify-center gap-6 mt-8 text-sm border-t border-border pt-6">
                                 <div className="flex items-center gap-2">
                                     <SeatIcon status="available" className="w-5 h-5" />
-                                    <span className="text-slate-600">Available</span>
+                                    <span className="text-muted-foreground">Available</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <SeatIcon status="booked" className="w-5 h-5" />
-                                    <span className="text-slate-600">Booked</span>
+                                    <span className="text-muted-foreground">Booked</span>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <SeatIcon status="selected" className="w-5 h-5" />
-                                    <span className="text-slate-600">Selected</span>
+                                    <span className="text-muted-foreground">Selected</span>
                                 </div>
                             </div>
                         </div>
@@ -216,59 +216,59 @@ const PlaneSeatSelection = () => {
                     {/* Right Column: Details & Form */}
                     <div className="lg:w-96 flex-shrink-0 space-y-6">
                         {/* Flight Summary */}
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                            <h3 className="text-lg font-bold text-slate-900 mb-4">Flight Summary</h3>
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+                            <h3 className="text-lg font-bold text-foreground mb-4">Flight Summary</h3>
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">Airline</span>
-                                    <span className="font-medium text-slate-900">{selectedFlight.airline}</span>
+                                    <span className="text-muted-foreground">Airline</span>
+                                    <span className="font-medium text-foreground">{selectedFlight.airline}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">Flight No</span>
-                                    <span className="font-medium text-slate-900">{selectedFlight.flightNumber}</span>
+                                    <span className="text-muted-foreground">Flight No</span>
+                                    <span className="font-medium text-foreground">{selectedFlight.flightNumber}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">Route</span>
-                                    <span className="font-medium text-slate-900">{selectedFlight.source} - {selectedFlight.destination}</span>
+                                    <span className="text-muted-foreground">Route</span>
+                                    <span className="font-medium text-foreground">{selectedFlight.source} - {selectedFlight.destination}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">Date</span>
-                                    <span className="font-medium text-slate-900">{new Date(selectedFlight.departureDateTime).toLocaleDateString()}</span>
+                                    <span className="text-muted-foreground">Date</span>
+                                    <span className="font-medium text-foreground">{new Date(selectedFlight.departureDateTime).toLocaleDateString()}</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Passenger Form */}
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                            <h3 className="text-lg font-bold text-slate-900 mb-4">Passenger Details</h3>
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+                            <h3 className="text-lg font-bold text-foreground mb-4">Passenger Details</h3>
                             <div className="space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Full Name</label>
                                     <input
                                         type="text"
                                         value={passengerDetails.name}
                                         onChange={(e) => setPassengerDetails({ ...passengerDetails, name: e.target.value })}
-                                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500"
+                                        className="w-full p-2 border border-input rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
                                         placeholder="John Doe"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Email</label>
                                     <input
                                         type="email"
                                         value={passengerDetails.email}
                                         onChange={(e) => setPassengerDetails({ ...passengerDetails, email: e.target.value })}
-                                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500"
+                                        className="w-full p-2 border border-input rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
                                         placeholder="john@example.com"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                                    <label className="block text-sm font-medium text-foreground mb-1">Phone</label>
                                     <input
                                         type="tel"
                                         value={passengerDetails.contact}
                                         onChange={(e) => setPassengerDetails({ ...passengerDetails, contact: e.target.value })}
-                                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500"
+                                        className="w-full p-2 border border-input rounded-lg focus:ring-2 focus:ring-primary bg-background text-foreground"
                                         placeholder="+977 9800000000"
                                     />
                                 </div>
@@ -276,10 +276,10 @@ const PlaneSeatSelection = () => {
                         </div>
 
                         {/* Payment Method */}
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-                            <h3 className="text-lg font-bold text-slate-900 mb-4">Payment Method</h3>
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+                            <h3 className="text-lg font-bold text-foreground mb-4">Payment Method</h3>
                             <div className="space-y-3">
-                                <label className="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                                <label className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors">
                                     <input
                                         type="radio"
                                         name="payment"
@@ -288,9 +288,9 @@ const PlaneSeatSelection = () => {
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4 text-green-600 focus:ring-green-500"
                                     />
-                                    <span className="ml-3 font-medium text-slate-700">eSewa</span>
+                                    <span className="ml-3 font-medium text-foreground">eSewa</span>
                                 </label>
-                                <label className="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                                <label className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors">
                                     <input
                                         type="radio"
                                         name="payment"
@@ -299,9 +299,9 @@ const PlaneSeatSelection = () => {
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4 text-purple-600 focus:ring-purple-500"
                                     />
-                                    <span className="ml-3 font-medium text-slate-700">Khalti</span>
+                                    <span className="ml-3 font-medium text-foreground">Khalti</span>
                                 </label>
-                                <label className="flex items-center p-3 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-50 transition-colors">
+                                <label className="flex items-center p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors">
                                     <input
                                         type="radio"
                                         name="payment"
@@ -310,25 +310,25 @@ const PlaneSeatSelection = () => {
                                         onChange={(e) => setPaymentMethod(e.target.value)}
                                         className="w-4 h-4 text-red-600 focus:ring-red-500"
                                     />
-                                    <span className="ml-3 font-medium text-slate-700">IME Pay</span>
+                                    <span className="ml-3 font-medium text-foreground">IME Pay</span>
                                 </label>
                             </div>
                         </div>
 
                         {/* Price & Checkout */}
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-24">
+                        <div className="bg-card rounded-xl shadow-sm border border-border p-6 sticky top-24">
                             <div className="flex justify-between items-center mb-4">
-                                <span className="text-slate-600">Selected Seats ({selectedSeats.length})</span>
-                                <span className="font-bold text-slate-900">{selectedSeats.map(s => s.seatNumber).join(", ")}</span>
+                                <span className="text-muted-foreground">Selected Seats ({selectedSeats.length})</span>
+                                <span className="font-bold text-foreground">{selectedSeats.map(s => s.seatNumber).join(", ")}</span>
                             </div>
-                            <div className="flex justify-between items-center text-lg font-bold text-slate-900 mb-6 pt-4 border-t border-slate-100">
+                            <div className="flex justify-between items-center text-lg font-bold text-foreground mb-6 pt-4 border-t border-border">
                                 <span>Total Amount</span>
-                                <span className="text-sky-600">NPR {totalCost}</span>
+                                <span className="text-primary">NPR {totalCost}</span>
                             </div>
                             <button
                                 onClick={handleBooking}
                                 disabled={selectedSeats.length === 0 || isProcessing}
-                                className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
+                                className="w-full bg-primary hover:bg-primary-dark text-primary-foreground font-bold py-3 rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center"
                             >
                                 {isProcessing ? (
                                     <>

@@ -194,25 +194,25 @@ const HeroSection: React.FC = () => {
     };
 
     return (
-        <div className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-700 to-slate-900 overflow-hidden">
+        <div className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-stone-100 overflow-hidden">
             {/* Background Pattern - Subtle dots/texture */}
-            <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0 opacity-[0.4]">
                 <div className="absolute inset-0" style={{
-                    backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                    backgroundSize: '30px 30px'
+                    backgroundImage: 'radial-gradient(circle, #f97316 1px, transparent 1px)',
+                    backgroundSize: '40px 40px'
                 }}></div>
             </div>
 
             <div className="container mx-auto px-4 relative z-10 flex flex-col items-center gap-12 py-20">
                 {/* Centered Content */}
                 <div className="text-center space-y-6 max-w-4xl">
-                    <h1 className="text-4xl lg:text-6xl font-display font-bold leading-tight animate-slide-up text-white">
+                    <h1 className="text-4xl lg:text-6xl font-display font-bold leading-tight animate-slide-up text-gray-900">
                         Book Your Next <br />
-                        <span className="text-orange-500">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600">
                             Adventure Today
                         </span>
                     </h1>
-                    <p className="text-lg text-slate-300 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                    <p className="text-lg text-gray-600 max-w-3xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
                         Bus tickets, hotel rooms, event passes, and flights — all at your fingertips with unbeatable prices and seamless booking.
                     </p>
                 </div>

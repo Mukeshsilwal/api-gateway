@@ -15,9 +15,9 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
     ];
 
     return (
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div className="bg-card rounded-xl shadow-sm border border-border p-6">
             <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <h3 className="text-lg font-bold text-foreground flex items-center gap-2">
                     <SlidersHorizontal size={20} />
                     Filters
                 </h3>
@@ -33,7 +33,7 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
             <div className="space-y-6">
                 {/* Distance Radius */}
                 <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
                         <MapPin size={16} />
                         Distance: {filters.radiusKm} km
                     </label>
@@ -43,9 +43,9 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
                         max="50"
                         value={filters.radiusKm}
                         onChange={(e) => onFilterChange('radiusKm', Number(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
                         <span>1 km</span>
                         <span>50 km</span>
                     </div>
@@ -53,7 +53,7 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
 
                 {/* Star Rating */}
                 <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
                         <Star size={16} />
                         Minimum Star Rating
                     </label>
@@ -63,8 +63,8 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
                                 key={stars}
                                 onClick={() => onFilterChange('minStarRating', filters.minStarRating === stars ? null : stars)}
                                 className={`py-2 px-1 rounded-lg text-xs font-bold transition-all ${filters.minStarRating === stars
-                                        ? 'bg-primary text-white'
-                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                    ? 'bg-primary text-primary-foreground'
+                                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
                                     }`}
                             >
                                 {stars}★
@@ -75,7 +75,7 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
 
                 {/* Max Price */}
                 <div>
-                    <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-3">
+                    <label className="flex items-center gap-2 text-sm font-semibold text-foreground mb-3">
                         <DollarSign size={16} />
                         Max Price: {filters.maxPrice ? `NPR ${filters.maxPrice}` : 'Any'}
                     </label>
@@ -86,9 +86,9 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
                         step="500"
                         value={filters.maxPrice || 10000}
                         onChange={(e) => onFilterChange('maxPrice', Number(e.target.value) === 10000 ? null : Number(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-primary"
+                        className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
                     />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
                         <span>Any</span>
                         <span>NPR 10,000</span>
                     </div>
@@ -96,7 +96,7 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
 
                 {/* Amenities */}
                 <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-3 block">
+                    <label className="text-sm font-semibold text-foreground mb-3 block">
                         Amenities
                     </label>
                     <div className="grid grid-cols-2 gap-2">
@@ -104,8 +104,8 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
                             <label
                                 key={amenity}
                                 className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${filters.amenities?.includes(amenity)
-                                        ? 'bg-primary/10 border-2 border-primary'
-                                        : 'bg-slate-50 border-2 border-transparent hover:border-slate-200'
+                                    ? 'bg-primary/10 border-2 border-primary'
+                                    : 'bg-muted/50 border-2 border-transparent hover:border-border'
                                     }`}
                             >
                                 <input
@@ -119,7 +119,7 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
                                     }}
                                     className="w-4 h-4 accent-primary"
                                 />
-                                <span className="text-xs font-medium text-slate-700">{amenity}</span>
+                                <span className="text-xs font-medium text-foreground">{amenity}</span>
                             </label>
                         ))}
                     </div>
@@ -127,13 +127,13 @@ const HotelFilters = ({ filters, onFilterChange, onReset }) => {
 
                 {/* Sort By */}
                 <div>
-                    <label className="text-sm font-semibold text-slate-700 mb-3 block">
+                    <label className="text-sm font-semibold text-foreground mb-3 block">
                         Sort By
                     </label>
                     <select
                         value={filters.sortBy}
                         onChange={(e) => onFilterChange('sortBy', e.target.value)}
-                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="w-full p-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
                     >
                         {sortOptions.map((option) => (
                             <option key={option.value} value={option.value}>

@@ -4,45 +4,45 @@
 
 @layer base {
   :root {
-    /* Base Colors - Light Mode */
-    --background: 210 40% 98%;
-    /* Slate 50 */
-    --foreground: 222.2 84% 4.9%;
-    /* Slate 950 */
+    /* Warm Stone Palette for Friendly/Trustworthy Vibe */
 
-    /* Card / Surface */
+    /* Background: Warm Stone 50 */
+    --background: 60 5% 96%;
+    /* Foreground: Stone 900 (Soft Black) */
+    --foreground: 24 10% 10%;
+
+    /* Card / Surface: White */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 24 10% 10%;
 
+    /* Popover: White */
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 24 10% 10%;
 
-    /* Primary Brand Color (Warm Orange/Coral) */
-    --primary: 16 90% 58%;
-    /* Coral/Orange - matches the reference */
+    /* Primary Brand: Refined Orange (Orange 500) */
+    --primary: 24 95% 53%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary (Deep Navy for backgrounds) */
-    --secondary: 220 26% 24%;
-    /* Navy Blue */
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary: Stone 100 for subtle backgrounds */
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 24 10% 10%;
 
-    /* Muted / Neutral */
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted: Stone 100 */
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5% 45%;
 
-    /* Accent (Lighter Orange for highlights) */
-    --accent: 16 100% 66%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent: Orange 100 for highlights */
+    --accent: 32 98% 88%;
+    --accent-foreground: 24 10% 10%;
 
-    /* Destructive (Red) */
+    /* Destructive: Red */
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 60 9.1% 97.8%;
 
-    /* Borders & Inputs */
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 16 90% 58%;
+    /* Borders & Inputs: Stone 200 */
+    --border: 24 5% 90%;
+    --input: 24 5% 90%;
+    --ring: 24 95% 53%;
 
     --radius: 0.75rem;
   }
