@@ -1,9 +1,11 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, Hotel, Plane, ArrowRightLeft, Search } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FeaturedEventsSection from '../components/events/FeaturedEventsSection';
+import { SocialProofSection } from '../components/home/SocialProofSection';
+import { OffersSection } from '../components/home/OffersSection';
 
 /**
  * Modern Homepage with Dark Theme and Integrated Booking Widget
@@ -77,18 +79,16 @@ export function Homepage() {
                 <div className="container mx-auto px-4 py-20 relative z-10">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         {/* Left Content */}
-                        <div className="text-white space-y-8">
-                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">
-                                Book Your Next{' '}
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600 animate-pulse-slow">
-                                    Adventure
-                                </span>{' '}
-                                Today
+                        <div className="text-white space-y-8 animate-slide-up">
+                            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight font-display">
+                                Book smarter. <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600">
+                                    Travel easier.
+                                </span>
                             </h1>
 
                             <p className="text-xl text-gray-300 leading-relaxed max-w-2xl border-l-4 border-orange-500 pl-6">
-                                Bus tickets, hotel rooms, event passes, and flights — all at your
-                                fingertips with unbeatable prices and seamless booking.
+                                Bus, hotel, flight & event bookings — all in one trusted platform.
                             </p>
 
                             <div className="flex gap-4 pt-4">
@@ -105,19 +105,56 @@ export function Homepage() {
                                     Browse Hotels
                                 </button>
                             </div>
+
+                            {/* Trust Indicators */}
+                            <div className="flex items-center gap-8 pt-8 border-t border-white/10">
+                                <div className="flex items-center gap-2">
+                                    <div className="text-orange-500">
+                                        <svg className="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-white font-bold">4.8+</p>
+                                        <p className="text-gray-400 text-sm">Rating</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="text-orange-500">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-white font-bold">Secure</p>
+                                        <p className="text-gray-400 text-sm">Payments</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="text-orange-500">
+                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p className="text-white font-bold">1M+</p>
+                                        <p className="text-gray-400 text-sm">Users</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Right Booking Widget */}
                         <div className="relative">
                             {/* Main Widget Card */}
-                            <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-gray-700/50">
+                            <div className="glass-dark rounded-3xl p-8 animate-fade-in relative z-20">
                                 {/* Tabs */}
-                                <div className="flex gap-2 mb-8 bg-gray-900/50 p-2 rounded-2xl">
+                                <div className="flex gap-2 mb-8 bg-black/40 p-2 rounded-2xl backdrop-blur-sm">
                                     <button
                                         onClick={() => setActiveTab('bus')}
                                         className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'bus'
-                                            ? 'bg-orange-500 text-white shadow-lg'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                            ? 'bg-orange-500 text-white shadow-glow'
+                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
                                         <Bus size={20} />
@@ -126,8 +163,8 @@ export function Homepage() {
                                     <button
                                         onClick={() => setActiveTab('hotel')}
                                         className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'hotel'
-                                            ? 'bg-orange-500 text-white shadow-lg'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                            ? 'bg-orange-500 text-white shadow-glow'
+                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
                                         <Hotel size={20} />
@@ -136,8 +173,8 @@ export function Homepage() {
                                     <button
                                         onClick={() => setActiveTab('flight')}
                                         className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all ${activeTab === 'flight'
-                                            ? 'bg-orange-500 text-white shadow-lg'
-                                            : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                                            ? 'bg-orange-500 text-white shadow-glow'
+                                            : 'text-gray-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
                                         <Plane size={20} />
@@ -154,25 +191,27 @@ export function Homepage() {
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">
                                                     City / Location
                                                 </label>
-                                                <select
-                                                    value={bookingData.city}
-                                                    onChange={(e) => handleInputChange('city', e.target.value)}
-                                                    className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
-                                                    style={{
-                                                        backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23F97316\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
-                                                        backgroundRepeat: 'no-repeat',
-                                                        backgroundPosition: 'right 1rem center',
-                                                        backgroundSize: '1.5rem',
-                                                        appearance: 'none'
-                                                    }}
-                                                >
-                                                    <option value="" className="text-gray-500">Select city</option>
-                                                    <option value="kathmandu" className="text-gray-900">Kathmandu</option>
-                                                    <option value="pokhara" className="text-gray-900">Pokhara</option>
-                                                    <option value="chitwan" className="text-gray-900">Chitwan</option>
-                                                    <option value="biratnagar" className="text-gray-900">Biratnagar</option>
-                                                    <option value="lumbini" className="text-gray-900">Lumbini</option>
-                                                </select>
+                                                <div className="relative group">
+                                                    <select
+                                                        value={bookingData.city}
+                                                        onChange={(e) => handleInputChange('city', e.target.value)}
+                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
+                                                        style={{
+                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundRepeat: 'no-repeat',
+                                                            backgroundPosition: 'right 1rem center',
+                                                            backgroundSize: '1.5rem',
+                                                            appearance: 'none'
+                                                        }}
+                                                    >
+                                                        <option value="" className="text-gray-500">Select city</option>
+                                                        <option value="kathmandu" className="text-gray-900">Kathmandu</option>
+                                                        <option value="pokhara" className="text-gray-900">Pokhara</option>
+                                                        <option value="chitwan" className="text-gray-900">Chitwan</option>
+                                                        <option value="biratnagar" className="text-gray-900">Biratnagar</option>
+                                                        <option value="lumbini" className="text-gray-900">Lumbini</option>
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             {/* Check-in Date */}
@@ -185,7 +224,7 @@ export function Homepage() {
                                                     value={bookingData.checkIn}
                                                     onChange={(e) => handleInputChange('checkIn', e.target.value)}
                                                     min={new Date().toISOString().split('T')[0]}
-                                                    className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
+                                                    className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20 [color-scheme:dark]"
                                                 />
                                             </div>
 
@@ -199,12 +238,12 @@ export function Homepage() {
                                                     value={bookingData.checkOut}
                                                     onChange={(e) => handleInputChange('checkOut', e.target.value)}
                                                     min={bookingData.checkIn || new Date().toISOString().split('T')[0]}
-                                                    className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
+                                                    className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20 [color-scheme:dark]"
                                                 />
                                             </div>
 
                                             {/* Guests & Rooms */}
-                                            <div className="space-y-4">
+                                            <div className="grid grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-sm font-semibold text-gray-300 mb-2">
                                                         Guests
@@ -212,9 +251,9 @@ export function Homepage() {
                                                     <select
                                                         value={bookingData.guests}
                                                         onChange={(e) => handleInputChange('guests', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
+                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
                                                         style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23F97316\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
                                                             backgroundRepeat: 'no-repeat',
                                                             backgroundPosition: 'right 1rem center',
                                                             backgroundSize: '1.5rem',
@@ -233,9 +272,9 @@ export function Homepage() {
                                                     <select
                                                         value={bookingData.rooms}
                                                         onChange={(e) => handleInputChange('rooms', e.target.value)}
-                                                        className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
+                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
                                                         style={{
-                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23F97316\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
                                                             backgroundRepeat: 'no-repeat',
                                                             backgroundPosition: 'right 1rem center',
                                                             backgroundSize: '1.5rem',
@@ -257,25 +296,27 @@ export function Homepage() {
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">
                                                     From
                                                 </label>
-                                                <select
-                                                    value={bookingData.from}
-                                                    onChange={(e) => handleInputChange('from', e.target.value)}
-                                                    className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
-                                                    style={{
-                                                        backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23F97316\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
-                                                        backgroundRepeat: 'no-repeat',
-                                                        backgroundPosition: 'right 1rem center',
-                                                        backgroundSize: '1.5rem',
-                                                        appearance: 'none'
-                                                    }}
-                                                >
-                                                    <option value="" className="text-gray-500">Select source city</option>
-                                                    <option value="kathmandu" className="text-gray-900">Kathmandu</option>
-                                                    <option value="pokhara" className="text-gray-900">Pokhara</option>
-                                                    <option value="chitwan" className="text-gray-900">Chitwan</option>
-                                                    <option value="biratnagar" className="text-gray-900">Biratnagar</option>
-                                                    <option value="janakpur" className="text-gray-900">Janakpur</option>
-                                                </select>
+                                                <div className="relative group">
+                                                    <select
+                                                        value={bookingData.from}
+                                                        onChange={(e) => handleInputChange('from', e.target.value)}
+                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
+                                                        style={{
+                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundRepeat: 'no-repeat',
+                                                            backgroundPosition: 'right 1rem center',
+                                                            backgroundSize: '1.5rem',
+                                                            appearance: 'none'
+                                                        }}
+                                                    >
+                                                        <option value="" className="text-gray-500">Select source city</option>
+                                                        <option value="kathmandu" className="text-gray-900">Kathmandu</option>
+                                                        <option value="pokhara" className="text-gray-900">Pokhara</option>
+                                                        <option value="chitwan" className="text-gray-900">Chitwan</option>
+                                                        <option value="biratnagar" className="text-gray-900">Biratnagar</option>
+                                                        <option value="janakpur" className="text-gray-900">Janakpur</option>
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             {/* Swap Button */}
@@ -283,7 +324,7 @@ export function Homepage() {
                                                 <button
                                                     type="button"
                                                     onClick={handleSwap}
-                                                    className="p-3 bg-orange-500 text-white rounded-full hover:bg-orange-600 transform hover:rotate-180 transition-all duration-300 shadow-lg"
+                                                    className="p-3 bg-orange-500 text-white rounded-full hover:bg-orange-600 transform hover:rotate-180 transition-all duration-300 shadow-lg border-4 border-gray-900"
                                                 >
                                                     <ArrowRightLeft size={20} />
                                                 </button>
@@ -294,25 +335,27 @@ export function Homepage() {
                                                 <label className="block text-sm font-semibold text-gray-300 mb-2">
                                                     To
                                                 </label>
-                                                <select
-                                                    value={bookingData.to}
-                                                    onChange={(e) => handleInputChange('to', e.target.value)}
-                                                    className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
-                                                    style={{
-                                                        backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23F97316\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
-                                                        backgroundRepeat: 'no-repeat',
-                                                        backgroundPosition: 'right 1rem center',
-                                                        backgroundSize: '1.5rem',
-                                                        appearance: 'none'
-                                                    }}
-                                                >
-                                                    <option value="" className="text-gray-500">Select destination city</option>
-                                                    <option value="kathmandu" className="text-gray-900">Kathmandu</option>
-                                                    <option value="pokhara" className="text-gray-900">Pokhara</option>
-                                                    <option value="chitwan" className="text-gray-900">Chitwan</option>
-                                                    <option value="biratnagar" className="text-gray-900">Biratnagar</option>
-                                                    <option value="janakpur" className="text-gray-900">Janakpur</option>
-                                                </select>
+                                                <div className="relative group">
+                                                    <select
+                                                        value={bookingData.to}
+                                                        onChange={(e) => handleInputChange('to', e.target.value)}
+                                                        className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20"
+                                                        style={{
+                                                            backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'white\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'%3E%3C/path%3E%3C/svg%3E")',
+                                                            backgroundRepeat: 'no-repeat',
+                                                            backgroundPosition: 'right 1rem center',
+                                                            backgroundSize: '1.5rem',
+                                                            appearance: 'none'
+                                                        }}
+                                                    >
+                                                        <option value="" className="text-gray-500">Select destination city</option>
+                                                        <option value="kathmandu" className="text-gray-900">Kathmandu</option>
+                                                        <option value="pokhara" className="text-gray-900">Pokhara</option>
+                                                        <option value="chitwan" className="text-gray-900">Chitwan</option>
+                                                        <option value="biratnagar" className="text-gray-900">Biratnagar</option>
+                                                        <option value="janakpur" className="text-gray-900">Janakpur</option>
+                                                    </select>
+                                                </div>
                                             </div>
 
                                             {/* Travel Date */}
@@ -325,26 +368,39 @@ export function Homepage() {
                                                     value={bookingData.date}
                                                     onChange={(e) => handleInputChange('date', e.target.value)}
                                                     min={new Date().toISOString().split('T')[0]}
-                                                    className="w-full px-4 py-4 bg-white text-gray-900 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 transition-all outline-none font-medium cursor-pointer"
+                                                    className="w-full px-4 py-4 bg-white/5 text-white border-2 border-white/10 rounded-xl focus:border-orange-500 focus:bg-white/10 focus:ring-4 focus:ring-orange-500/10 transition-all outline-none font-medium cursor-pointer hover:border-white/20 [color-scheme:dark]"
                                                 />
                                             </div>
                                         </>
                                     )}
 
-                                    {/* Search Button */}
-                                    <button
-                                        type="submit"
-                                        className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-lg rounded-xl hover:shadow-2xl hover:shadow-orange-500/50 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2"
-                                    >
-                                        <Search size={20} />
-                                        <span>Search {activeTab === 'bus' ? 'Buses' : activeTab === 'hotel' ? 'Hotels' : 'Flights'}</span>
-                                    </button>
+                                    {/* Search Button & Status */}
+                                    <div className="space-y-4">
+                                        <button
+                                            type="submit"
+                                            className="w-full py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-bold text-lg rounded-xl hover:shadow-2xl hover:shadow-orange-500/50 transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2 sticky bottom-4 z-50 md:static"
+                                        >
+                                            <Search size={20} />
+                                            <span>Search {activeTab === 'bus' ? 'Buses' : activeTab === 'hotel' ? 'Hotels' : 'Flights'}</span>
+                                        </button>
+
+                                        <div className="flex items-center justify-between text-xs text-gray-400 font-medium px-2">
+                                            <span>🔥 Popular routes today</span>
+                                            <span>Starting from NPR 800</span>
+                                        </div>
+                                    </div>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+
+            {/* Social Proof Section */}
+            <SocialProofSection />
+
+            {/* Offers Section */}
+            <OffersSection />
 
             {/* Featured Events Section */}
             <section className="bg-gradient-to-b from-black to-gray-900 py-20">
@@ -389,7 +445,7 @@ export function Homepage() {
             </section>
 
             <Footer />
-        </div>
+        </div >
     );
 }
 

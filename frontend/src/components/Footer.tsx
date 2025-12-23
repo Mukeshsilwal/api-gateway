@@ -47,13 +47,35 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
 
-                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-gray-500 text-sm">
-                        © {new Date().getFullYear()} TicketKatum. All rights reserved.
-                    </p>
-                    <div className="flex gap-6">
-                        <a href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Privacy Policy</a>
-                        <a href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Terms of Service</a>
+                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-8">
+                    <div className="flex flex-col md:flex-row items-center gap-6">
+                        <p className="text-gray-500 text-sm order-2 md:order-1">
+                            © {new Date().getFullYear()} TicketKatum. All rights reserved.
+                        </p>
+                        <div className="flex gap-6 order-1 md:order-2">
+                            <a href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Privacy Policy</a>
+                            <a href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Terms of Service</a>
+                            <a href="#" className="text-gray-500 hover:text-white transition-colors text-sm">Cookie Policy</a>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col items-center md:items-end gap-3">
+                        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Secure Payments Partners</p>
+                        <div className="flex items-center gap-4">
+                            {/* Payment Partner Logos (Placeholders) */}
+                            <div className="h-8 px-3 bg-white rounded-md flex items-center justify-center">
+                                <span className="text-green-600 font-bold text-sm italic">eSewa</span>
+                            </div>
+                            <div className="h-8 px-3 bg-white rounded-md flex items-center justify-center">
+                                <span className="text-purple-700 font-bold text-sm">Khalti</span>
+                            </div>
+                            <div className="h-8 px-3 bg-white rounded-md flex items-center justify-center">
+                                <span className="text-blue-800 font-bold text-sm">IPS</span>
+                            </div>
+                            <div className="h-8 px-3 bg-white rounded-md flex items-center justify-center">
+                                <span className="text-blue-600 font-bold text-sm italic">Visa</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
