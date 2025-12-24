@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                     <div className="col-span-1 md:col-span-2 space-y-4">
                         <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500 flex items-center justify-center shadow-lg shadow-purple-500/20">
                                 <span className="font-display font-bold text-white text-xl">T</span>
                             </div>
                             <span className="text-2xl font-display font-bold text-gray-900">TicketKatum</span>
@@ -20,10 +20,10 @@ const Footer: React.FC = () => {
                     <div>
                         <h3 className="font-bold text-lg mb-6 text-gray-900">Quick Links</h3>
                         <ul className="space-y-3">
-                            <li><Link to="/" className="text-gray-600 hover:text-orange-600 transition-colors hover:translate-x-1 inline-block">Home</Link></li>
-                            <li><Link to="/buslist" className="text-gray-600 hover:text-orange-600 transition-colors hover:translate-x-1 inline-block">Book Tickets</Link></li>
-                            <li><Link to="/hotels" className="text-gray-600 hover:text-orange-600 transition-colors hover:translate-x-1 inline-block">Hotels</Link></li>
-                            <li><Link to="/admin/login" className="text-gray-600 hover:text-orange-600 transition-colors hover:translate-x-1 inline-block">Admin Login</Link></li>
+                            <li><Link to="/" className="text-gray-600 hover:text-purple-600 transition-colors hover:translate-x-1 inline-block">Home</Link></li>
+                            <li><Link to="/buslist" className="text-gray-600 hover:text-purple-600 transition-colors hover:translate-x-1 inline-block">Book Tickets</Link></li>
+                            <li><Link to="/hotels" className="text-gray-600 hover:text-purple-600 transition-colors hover:translate-x-1 inline-block">Hotels</Link></li>
+                            <li><Link to="/admin/login" className="text-gray-600 hover:text-purple-600 transition-colors hover:translate-x-1 inline-block">Admin Login</Link></li>
                         </ul>
                     </div>
 
@@ -31,15 +31,15 @@ const Footer: React.FC = () => {
                         <h3 className="font-bold text-lg mb-6 text-gray-900">Contact</h3>
                         <ul className="space-y-3 text-gray-600">
                             <li className="flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                 support@ticketkatum.com
                             </li>
                             <li className="flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                 +977 1-4445555
                             </li>
                             <li className="flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                                 Kathmandu, Nepal
                             </li>
                         </ul>
@@ -52,9 +52,9 @@ const Footer: React.FC = () => {
                             © {new Date().getFullYear()} TicketKatum. All rights reserved.
                         </p>
                         <div className="flex gap-6 order-1 md:order-2">
-                            <a href="#" className="text-gray-500 hover:text-orange-600 transition-colors text-sm">Privacy Policy</a>
-                            <a href="#" className="text-gray-500 hover:text-orange-600 transition-colors text-sm">Terms of Service</a>
-                            <a href="#" className="text-gray-500 hover:text-orange-600 transition-colors text-sm">Cookie Policy</a>
+                            <a href="#" className="text-gray-500 hover:text-purple-600 transition-colors text-sm">Privacy Policy</a>
+                            <a href="#" className="text-gray-500 hover:text-purple-600 transition-colors text-sm">Terms of Service</a>
+                            <a href="#" className="text-gray-500 hover:text-purple-600 transition-colors text-sm">Cookie Policy</a>
                         </div>
                     </div>
 

@@ -16,4 +16,6 @@ public class CreateUserRequest {
     private String role;
     @Nullable
     private String organizationName;
+    @Nullable
+    private String provider; // OAuth provider: "LOCAL", "GOOGLE", etc.
 }

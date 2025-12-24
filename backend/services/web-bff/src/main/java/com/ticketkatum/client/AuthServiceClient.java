@@ -183,7 +183,7 @@ public class AuthServiceClient {
      */
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
     @Retry(name = SERVICE_NAME)
-    public CompletableFuture<UserDto>   registerUser(CreateUserRequest userDto) {
+    public CompletableFuture<UserDto> registerUser(CreateUserRequest userDto) {
         log.debug("Registering new user: {}", userDto.getEmail());
 
         return getWebClient()
@@ -283,8 +283,29 @@ public class AuthServiceClient {
                 .map(response -> {
                     // response is Map<String, Object> from controller (success, data, count)
                     Object data = response.get("data");
-                    return objectMapper(data, new com.fasterxml.jackson.core.type.TypeReference<List<com.ticketkatum.dto.auth.AdminRegistrationRequestDto>>() {});
+                    return objectMapper(data,
+                            new com.fasterxml.jackson.core.type.TypeReference<List<com.ticketkatum.dto.auth.AdminRegistrationRequestDto>>() {
+                            });
                 })
+                .toFuture();
+    }
+
+    /**
+     * Process OAuth2 login
+     * Delegates OAuth2 user processing to auth-service
+     */
+    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+    @Retry(name = SERVICE_NAME)
+    public CompletableFuture<Map<String, Object>> processOAuth2Login(Map<String, Object> oauth2Request) {
+        log.debug("Processing OAuth2 login for email: {}", oauth2Request.get("email"));
+
+        return getWebClient()
+                .post()
+                .uri("/auth/oauth2/process")
+                .bodyValue(oauth2Request)
+                .retrieve()
+                .bodyToMono(Response.class)
+                .map(response -> (Map<String, Object>) response.getData())
                 .toFuture();
     }
 
@@ -303,8 +324,7 @@ public class AuthServiceClient {
                 SessionValidationResponse.builder()
                         .valid(false)
                         .message("Session validation unavailable")
-                        .build()
-        );
+                        .build());
     }
 
     private CompletableFuture<ActiveSessionsResponse> getActiveSessionsFallback(
@@ -315,8 +335,7 @@ public class AuthServiceClient {
                         .username(username)
                         .sessions(Collections.emptyList())
                         .totalCount(0L)
-                        .build()
-        );
+                        .build());
     }
 
     private CompletableFuture<Long> getOnlineUserCountFallback(Throwable ex) {
@@ -330,14 +349,12 @@ public class AuthServiceClient {
     }
 
     private <T> T objectMapper(Object data, Class<T> clazz) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
         return mapper.convertValue(data, clazz);
     }
 
     private <T> T objectMapper(Object data, com.fasterxml.jackson.core.type.TypeReference<T> typeReference) {
-        com.fasterxml.jackson.databind.ObjectMapper mapper =
-                new com.fasterxml.jackson.databind.ObjectMapper();
+        com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
         return mapper.convertValue(data, typeReference);
     }
 }

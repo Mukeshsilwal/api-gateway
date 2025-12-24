@@ -242,7 +242,7 @@ export function EventDetails() {
         EXHIBITION: 'bg-pink-500',
         FESTIVAL: 'bg-red-500',
         THEATER: 'bg-indigo-500',
-        COMEDY: 'bg-orange-500',
+        COMEDY: 'bg-purple-500',
         OTHER: 'bg-gray-500'
     };
 
@@ -442,7 +442,7 @@ export function EventDetails() {
                                     <button
                                         onClick={handleAddToCart}
                                         disabled={availableTickets === 0 || totalAmount === 0}
-                                        className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                        className="w-full py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                     >
                                         <ShoppingCart size={20} />
                                         {availableTickets === 0 ? 'Sold Out' : 'Add to Cart'}

@@ -57,17 +57,17 @@ const ImageSearchComponent = () => {
 
         {/* Initial State: CTA Card */}
         {!isExpanded && (
-          <div className="bg-gradient-to-br from-orange-500 to-red-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl transform transition-all duration-500 hover:scale-[1.02]">
+          <div className="bg-gradient-to-br from-purple-500 to-red-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl transform transition-all duration-500 hover:scale-[1.02]">
             <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-inner">
               <span className="text-4xl">🚌</span>
             </div>
             <h2 className="text-3xl md:text-5xl font-bold mb-4">Travel Across Nepal</h2>
-            <p className="text-orange-100 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-purple-100 text-lg mb-8 max-w-2xl mx-auto">
               Comfortable buses, scenic routes, and affordable prices. Book your seat today.
             </p>
             <button
               onClick={() => setIsExpanded(true)}
-              className="bg-white text-orange-600 font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-2xl hover:bg-orange-50 transition-all duration-300 transform hover:-translate-y-1"
+              className="bg-white text-purple-600 font-bold py-4 px-10 rounded-full shadow-lg hover:shadow-2xl hover:bg-purple-50 transition-all duration-300 transform hover:-translate-y-1"
             >
               Start Bus Booking
             </button>
@@ -99,7 +99,7 @@ const ImageSearchComponent = () => {
                 <select
                   value={source}
                   onChange={(e) => setSource(e.target.value)}
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 >
                   <option value="">Select source city</option>
                   {busStops.map((city) => (
@@ -114,7 +114,7 @@ const ImageSearchComponent = () => {
                 <select
                   value={destination}
                   onChange={(e) => setDestination(e.target.value)}
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 >
                   <option value="">Select destination city</option>
                   {busStops.map((city) => (
@@ -131,7 +131,7 @@ const ImageSearchComponent = () => {
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   min={today}
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                 />
               </div>
             </div>
@@ -144,7 +144,7 @@ const ImageSearchComponent = () => {
 
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:from-orange-600 hover:to-red-700 transition-all duration-300 transform hover:scale-[1.01]"
+              className="w-full bg-gradient-to-r from-purple-500 to-red-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl hover:from-purple-600 hover:to-red-700 transition-all duration-300 transform hover:scale-[1.01]"
             >
               Search Buses
             </button>

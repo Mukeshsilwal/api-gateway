@@ -689,7 +689,110 @@ class AuthService {
             }
         }
     }
+
+    // ==================== OAuth Methods ====================
+
+    /**
+     * Handle OAuth2 callback and store tokens
+     * @param {Object} oauthData - OAuth callback data containing tokens
+     */
+    async handleOAuthCallback(oauthData) {
+        const { accessToken, refreshToken, sessionId, error } = oauthData;
+
+        if (error) {
+            console.error('OAuth authentication failed:', error);
+            return { success: false, error };
+        }
+
+        if (!accessToken || !refreshToken || !sessionId) {
+            console.error('Invalid OAuth response - missing tokens');
+            return { success: false, error: 'Invalid authentication response' };
+        }
+
+        // Store tokens
+        localStorage.setItem(this.TOKEN_KEY, accessToken);
+        localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
+        localStorage.setItem(this.SESSION_ID_KEY, sessionId);
+
+        // Decode JWT to get user info
+        try {
+            const tokenPayload = this.decodeToken(accessToken);
+            const roles = tokenPayload.roles || tokenPayload.authorities || [];
+
+            // Store token expiration
+            const expiresIn = tokenPayload.exp ? (tokenPayload.exp * 1000 - Date.now()) / 1000 : 3600;
+            const expiryTime = Date.now() + expiresIn * 1000;
+            localStorage.setItem(this.TOKEN_EXPIRY_KEY, expiryTime.toString());
+
+            // Store roles
+            localStorage.setItem(this.ROLES_KEY, JSON.stringify(roles));
+            localStorage.setItem(this.ROLE_KEY, this.normalizeRole(roles));
+
+            // Fetch full user profile
+            const userProfile = await this.fetchUserProfile();
+            if (userProfile) {
+                localStorage.setItem(this.USER_DATA_KEY, JSON.stringify(userProfile));
+            }
+
+            this.startExpirationCheck();
+            return { success: true };
+        } catch (error) {
+            console.error('Failed to process OAuth tokens:', error);
+            this.clearAuth();
+            return { success: false, error: 'Failed to process authentication' };
+        }
+    }
+
+    /**
+     * Decode JWT token (client-side only for reading claims)
+     */
+    decodeToken(token) {
+        try {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(
+                atob(base64)
+                    .split('')
+                    .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+                    .join('')
+            );
+            return JSON.parse(jsonPayload);
+        } catch (error) {
+            console.error('Failed to decode token:', error);
+            return {};
+        }
+    }
+
+    /**
+     * Fetch user profile from backend
+     */
+    async fetchUserProfile() {
+        try {
+            const response = await apiService.get(API_CONFIG.ENDPOINTS.AUTH_DASHBOARD);
+            return response.data?.userProfile || response.data;
+        } catch (error) {
+            console.error('Failed to fetch user profile:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Check if user authenticated via OAuth
+     */
+    isOAuthUser() {
+        const userData = this.getUserData();
+        return userData && userData.provider && userData.provider !== 'LOCAL';
+    }
+
+    /**
+     * Get OAuth provider name
+     */
+    getOAuthProvider() {
+        const userData = this.getUserData();
+        return userData?.provider || null;
+    }
 }
+
 
 // Create singleton instance
 const authService = new AuthService();

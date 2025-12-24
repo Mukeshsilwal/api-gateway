@@ -45,6 +45,18 @@ public class User implements UserDetails {
     @Column(length = 100)
     private String organizationName;
 
+    @Column(length = 50)
+    private String provider; // "LOCAL", "GOOGLE", "FACEBOOK", "GITHUB"
+
+    @Column(length = 255)
+    private String providerId; // OAuth provider's user ID
+
+    @Column(length = 255)
+    private String profileImageUrl; // User's profile picture from OAuth provider
+
+    @Column(nullable = true)
+    private Boolean emailVerified; // Email verification status from OAuth
+
     @Column(nullable = false)
     private Boolean enabled = true;
 

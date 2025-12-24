@@ -88,7 +88,7 @@ export const UnifiedCheckout: React.FC = () => {
                     </p>
                     <button
                         onClick={() => navigate('/')}
-                        className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
                     >
                         Browse Services
                     </button>
@@ -149,7 +149,7 @@ export const UnifiedCheckout: React.FC = () => {
                                 </div>
                                 <div className="border-t border-gray-200 dark:border-gray-700 pt-3 flex justify-between">
                                     <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
-                                    <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                                    <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
                                         NPR {(totalAmount * 1.18).toLocaleString()}
                                     </span>
                                 </div>
@@ -167,7 +167,7 @@ export const UnifiedCheckout: React.FC = () => {
                             <button
                                 onClick={handleCheckout}
                                 disabled={isProcessing}
-                                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 disabled:scale-100 shadow-lg hover:shadow-xl disabled:cursor-not-allowed flex items-center justify-center gap-2"
                             >
                                 {isProcessing ? (
                                     <>

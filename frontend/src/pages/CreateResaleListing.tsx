@@ -147,7 +147,7 @@ const CreateResaleListing: React.FC = () => {
                         Back
                     </button>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                        <Ticket className="w-8 h-8 text-orange-500" />
+                        <Ticket className="w-8 h-8 text-purple-500" />
                         Sell Your Ticket
                     </h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -178,8 +178,8 @@ const CreateResaleListing: React.FC = () => {
                                         key={ticket.id}
                                         onClick={() => setSelectedTicket(ticket)}
                                         className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${selectedTicket?.id === ticket.id
-                                            ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
-                                            : 'border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700'
+                                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20'
+                                            : 'border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700'
                                             }`}
                                     >
                                         <div className="flex justify-between items-start">
@@ -234,7 +234,7 @@ const CreateResaleListing: React.FC = () => {
                                                 value={resalePrice}
                                                 onChange={(e) => setResalePrice(e.target.value)}
                                                 placeholder="0.00"
-                                                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                                 required
                                             />
                                         </div>
@@ -317,11 +317,11 @@ const CreateResaleListing: React.FC = () => {
                                         type="checkbox"
                                         checked={agreedToTerms}
                                         onChange={(e) => setAgreedToTerms(e.target.checked)}
-                                        className="mt-1 w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                                        className="mt-1 w-4 h-4 text-purple-500 border-gray-300 rounded focus:ring-purple-500"
                                     />
                                     <span className="text-sm text-gray-600 dark:text-gray-400">
                                         I agree to the{' '}
-                                        <a href="/terms" className="text-orange-500 hover:underline">
+                                        <a href="/terms" className="text-purple-500 hover:underline">
                                             Terms of Service
                                         </a>{' '}
                                         and understand that my ticket will be locked until sold or the listing expires.
@@ -332,7 +332,7 @@ const CreateResaleListing: React.FC = () => {
                                 <button
                                     type="submit"
                                     disabled={loading || !selectedTicket || !resalePrice || !agreedToTerms}
-                                    className="w-full mt-6 px-6 py-4 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    className="w-full mt-6 px-6 py-4 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                     {loading ? (
                                         <>

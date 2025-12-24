@@ -113,7 +113,7 @@ const BusCard: React.FC<BusCardProps> = ({ bus, onSelect, onViewSeats }) => {
                                 <div className={`font-semibold ${availableSeats > 10
                                         ? 'text-green-600'
                                         : availableSeats > 0
-                                            ? 'text-orange-600'
+                                            ? 'text-purple-600'
                                             : 'text-red-600'
                                     }`}>
                                     {availableSeats}/{totalSeats} seats

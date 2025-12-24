@@ -148,7 +148,7 @@ export const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
             {/* Price */}
             <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Amount</span>
-                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
                     NPR {item.amount.toLocaleString()}
                 </span>
             </div>

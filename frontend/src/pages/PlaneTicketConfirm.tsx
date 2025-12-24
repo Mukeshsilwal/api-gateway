@@ -192,16 +192,16 @@ const PlaneTicketConfirm: React.FC = () => {
             <NavigationBar />
 
             <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto w-full">
-                <div className="bg-white rounded-2xl shadow-lg shadow-orange-500/10 overflow-hidden border border-border">
+                <div className="bg-white rounded-2xl shadow-lg shadow-purple-500/10 overflow-hidden border border-border">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 px-8 py-6 text-white text-center">
+                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 px-8 py-6 text-white text-center">
                         <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
                         <h1 className="text-3xl font-bold font-display">Booking Confirmed!</h1>
-                        <p className="text-orange-50 mt-2">Your flight ticket has been successfully booked.</p>
+                        <p className="text-purple-50 mt-2">Your flight ticket has been successfully booked.</p>
                     </div>
 
                     {/* Ticket Body */}
@@ -290,7 +290,7 @@ const PlaneTicketConfirm: React.FC = () => {
                         </button>
                         <button
                             onClick={() => navigate("/")}
-                            className="px-6 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium hover:from-orange-600 hover:to-orange-700 shadow-md transition-all"
+                            className="px-6 py-2 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg font-medium hover:from-purple-600 hover:to-purple-700 shadow-md transition-all"
                         >
                             Back to Home
                         </button>

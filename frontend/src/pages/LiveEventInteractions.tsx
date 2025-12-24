@@ -146,7 +146,7 @@ const LiveEventInteractions: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
             </div>
         );
     }
@@ -172,7 +172,7 @@ const LiveEventInteractions: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('polls')}
                             className={`px-6 py-4 font-medium border-b-2 transition-colors ${activeTab === 'polls'
-                                ? 'border-orange-500 text-orange-500'
+                                ? 'border-purple-500 text-purple-500'
                                 : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                 }`}
                         >
@@ -184,7 +184,7 @@ const LiveEventInteractions: React.FC = () => {
                         <button
                             onClick={() => setActiveTab('food')}
                             className={`px-6 py-4 font-medium border-b-2 transition-colors ${activeTab === 'food'
-                                ? 'border-orange-500 text-orange-500'
+                                ? 'border-purple-500 text-purple-500'
                                 : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                                 }`}
                         >
@@ -192,7 +192,7 @@ const LiveEventInteractions: React.FC = () => {
                                 <ShoppingBag className="w-5 h-5" />
                                 Food & Beverages
                                 {cart.length > 0 && (
-                                    <span className="px-2 py-0.5 bg-orange-500 text-white text-xs rounded-full">
+                                    <span className="px-2 py-0.5 bg-purple-500 text-white text-xs rounded-full">
                                         {cart.length}
                                     </span>
                                 )}
@@ -263,7 +263,7 @@ const LiveEventInteractions: React.FC = () => {
                                                     key={option}
                                                     onClick={() => handleVote(poll.id, option)}
                                                     disabled={poll.status !== 'ACTIVE'}
-                                                    className="w-full text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-orange-500 dark:hover:border-orange-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    className="w-full text-left p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 hover:border-purple-500 dark:hover:border-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     <div className="flex items-center justify-between mb-2">
                                                         <span className="font-medium text-gray-900 dark:text-white">
@@ -275,7 +275,7 @@ const LiveEventInteractions: React.FC = () => {
                                                     </div>
                                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                                                         <div
-                                                            className="bg-orange-500 h-2 rounded-full transition-all duration-500"
+                                                            className="bg-purple-500 h-2 rounded-full transition-all duration-500"
                                                             style={{ width: `${percentage}%` }}
                                                         ></div>
                                                     </div>
@@ -332,7 +332,7 @@ const LiveEventInteractions: React.FC = () => {
                                             <button
                                                 onClick={() => addToCart(product)}
                                                 disabled={!product.available}
-                                                className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                                className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                             >
                                                 <Plus className="w-4 h-4" />
                                                 Add to Cart
@@ -347,7 +347,7 @@ const LiveEventInteractions: React.FC = () => {
                         <div className="lg:col-span-1">
                             <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 sticky top-4">
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                    <ShoppingCart className="w-6 h-6 text-orange-500" />
+                                    <ShoppingCart className="w-6 h-6 text-purple-500" />
                                     Your Order
                                 </h2>
 
@@ -408,13 +408,13 @@ const LiveEventInteractions: React.FC = () => {
                                                 value={seatLocation}
                                                 onChange={(e) => setSeatLocation(e.target.value)}
                                                 placeholder="e.g., Section A, Row 5, Seat 12"
-                                                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                                className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
 
                                         <button
                                             onClick={handleCheckout}
-                                            className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold flex items-center justify-center gap-2"
+                                            className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold flex items-center justify-center gap-2"
                                         >
                                             <DollarSign className="w-5 h-5" />
                                             Place Order

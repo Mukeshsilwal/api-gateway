@@ -67,9 +67,9 @@ const CrowdFlowHeatmap: React.FC = () => {
                 };
             case 'CROWDED':
                 return {
-                    bg: 'bg-orange-100 dark:bg-orange-900/20',
-                    border: 'border-orange-300 dark:border-orange-700',
-                    text: 'text-orange-700 dark:text-orange-300',
+                    bg: 'bg-purple-100 dark:bg-purple-900/20',
+                    border: 'border-purple-300 dark:border-purple-700',
+                    text: 'text-purple-700 dark:text-purple-300',
                     icon: TrendingUp,
                 };
             case 'FULL':
@@ -112,7 +112,7 @@ const CrowdFlowHeatmap: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
             </div>
         );
     }
@@ -125,7 +125,7 @@ const CrowdFlowHeatmap: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                                <Users className="w-8 h-8 text-orange-500" />
+                                <Users className="w-8 h-8 text-purple-500" />
                                 Crowd Flow Monitor
                             </h1>
                             <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -138,7 +138,7 @@ const CrowdFlowHeatmap: React.FC = () => {
                                     type="checkbox"
                                     checked={autoRefresh}
                                     onChange={(e) => setAutoRefresh(e.target.checked)}
-                                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                                    className="w-4 h-4 text-purple-500 border-gray-300 rounded focus:ring-purple-500"
                                 />
                                 <span className="text-sm text-gray-700 dark:text-gray-300">
                                     Auto-refresh (5s)
@@ -146,7 +146,7 @@ const CrowdFlowHeatmap: React.FC = () => {
                             </label>
                             <button
                                 onClick={fetchHeatmap}
-                                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                                className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium"
                             >
                                 Refresh Now
                             </button>
@@ -166,7 +166,7 @@ const CrowdFlowHeatmap: React.FC = () => {
                                     {getTotalOccupancy().toFixed(0)}%
                                 </p>
                             </div>
-                            <Users className="w-12 h-12 text-orange-500" />
+                            <Users className="w-12 h-12 text-purple-500" />
                         </div>
                     </div>
 
@@ -186,11 +186,11 @@ const CrowdFlowHeatmap: React.FC = () => {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-sm text-gray-600 dark:text-gray-400">Crowded Zones</p>
-                                <p className="text-3xl font-bold text-orange-600 dark:text-orange-400 mt-1">
+                                <p className="text-3xl font-bold text-purple-600 dark:text-purple-400 mt-1">
                                     {getZonesByStatus('CROWDED')}
                                 </p>
                             </div>
-                            <TrendingUp className="w-12 h-12 text-orange-500" />
+                            <TrendingUp className="w-12 h-12 text-purple-500" />
                         </div>
                     </div>
 
@@ -266,7 +266,7 @@ const CrowdFlowHeatmap: React.FC = () => {
                                                     : zone.status === 'MODERATE'
                                                         ? 'bg-yellow-500'
                                                         : zone.status === 'CROWDED'
-                                                            ? 'bg-orange-500'
+                                                            ? 'bg-purple-500'
                                                             : 'bg-red-500'
                                                     }`}
                                                 style={{ width: `${Math.min(occupancyPercentage, 100)}%` }}
@@ -311,8 +311,8 @@ const CrowdFlowHeatmap: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                                <TrendingUp className="w-5 h-5 text-orange-600 dark:text-orange-400" />
+                            <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                             </div>
                             <div>
                                 <p className="font-medium text-gray-900 dark:text-white">Crowded</p>

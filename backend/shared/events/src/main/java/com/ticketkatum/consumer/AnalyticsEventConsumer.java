@@ -52,7 +52,7 @@ public class AnalyticsEventConsumer {
                     payload.getTotalAmount());
             
             // Track metrics
-            // analyticsService.trackBookingInitiated(event.getPayload());
+//             analyticsService.trackBookingInitiated(event.getPayload());
             
             // Example metrics to track:
             // - Total bookings initiated

@@ -45,7 +45,7 @@ export function EventCard({ event }) {
         EXHIBITION: 'bg-pink-500',
         FESTIVAL: 'bg-red-500',
         THEATER: 'bg-indigo-500',
-        COMEDY: 'bg-orange-500',
+        COMEDY: 'bg-purple-500',
         OTHER: 'bg-gray-500'
     };
 

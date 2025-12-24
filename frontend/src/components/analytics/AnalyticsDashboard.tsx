@@ -165,11 +165,11 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
                     bgColor="bg-green-50 dark:bg-green-900/20"
                 />
                 <MetricCard
-                    icon={<DollarSign className="text-orange-600" />}
+                    icon={<DollarSign className="text-purple-600" />}
                     label="Revenue"
                     value={`NPR ${analytics.totalRevenue.toLocaleString()}`}
                     trend={`NPR ${analytics.averageOrderValue.toFixed(0)} avg order`}
-                    bgColor="bg-orange-50 dark:bg-orange-900/20"
+                    bgColor="bg-purple-50 dark:bg-purple-900/20"
                 />
             </div>
 
@@ -210,7 +210,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ eventId 
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-gray-600 dark:text-gray-400">Pending</span>
-                            <span className="font-semibold text-orange-600">
+                            <span className="font-semibold text-purple-600">
                                 {analytics.pendingCheckIns.toLocaleString()}
                             </span>
                         </div>

@@ -20,7 +20,7 @@ export const BookingSuccess: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-400 mb-4">No booking information found</p>
                     <button
                         onClick={() => navigate('/')}
-                        className="bg-orange-600 hover:bg-orange-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+                        className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
                     >
                         Go Home
                     </button>
@@ -52,9 +52,9 @@ export const BookingSuccess: React.FC = () => {
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
                         Your bookings have been confirmed
                     </p>
-                    <div className="inline-block bg-orange-100 dark:bg-orange-900/20 px-4 py-2 rounded-lg">
+                    <div className="inline-block bg-purple-100 dark:bg-purple-900/20 px-4 py-2 rounded-lg">
                         <p className="text-sm text-gray-600 dark:text-gray-400">Transaction ID</p>
-                        <p className="text-lg font-mono font-semibold text-orange-600 dark:text-orange-400">
+                        <p className="text-lg font-mono font-semibold text-purple-600 dark:text-purple-400">
                             {bookingResponse.transactionId}
                         </p>
                     </div>
@@ -84,7 +84,7 @@ export const BookingSuccess: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <p className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                                    <p className="text-lg font-bold text-purple-600 dark:text-purple-400">
                                         NPR {booking.amount.toLocaleString()}
                                     </p>
                                 </div>
@@ -120,7 +120,7 @@ export const BookingSuccess: React.FC = () => {
                         <span className="text-lg font-semibold text-gray-900 dark:text-white">
                             Total Amount
                         </span>
-                        <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                        <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">
                             NPR {bookingResponse.totalAmount.toLocaleString()}
                         </span>
                     </div>
@@ -135,7 +135,7 @@ export const BookingSuccess: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-3">
                     <button
                         onClick={() => navigate('/my-bookings')}
-                        className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
                         <Calendar className="w-5 h-5" />
                         <span>View My Bookings</span>

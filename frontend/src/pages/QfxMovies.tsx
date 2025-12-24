@@ -68,7 +68,7 @@ const QfxMovies = () => {
                         <div className="bg-white rounded-lg shadow-sm p-1 inline-flex">
                             <button
                                 className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'nowShowing'
-                                    ? 'bg-orange-500 text-white'
+                                    ? 'bg-purple-500 text-white'
                                     : 'text-gray-500 hover:text-gray-700'
                                     }`}
                                 onClick={() => setActiveTab('nowShowing')}
@@ -77,7 +77,7 @@ const QfxMovies = () => {
                             </button>
                             <button
                                 className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === 'upcoming'
-                                    ? 'bg-orange-500 text-white'
+                                    ? 'bg-purple-500 text-white'
                                     : 'text-gray-500 hover:text-gray-700'
                                     }`}
                                 onClick={() => setActiveTab('upcoming')}
@@ -89,7 +89,7 @@ const QfxMovies = () => {
 
                     {loading ? (
                         <div className="flex justify-center items-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -117,7 +117,7 @@ const QfxMovies = () => {
                                                 {movie.Duration} min
                                             </span>
                                             {activeTab === 'nowShowing' && (
-                                                <button className="text-sm font-medium text-orange-600 hover:text-orange-500">
+                                                <button className="text-sm font-medium text-purple-600 hover:text-purple-500">
                                                     Book Now &rarr;
                                                 </button>
                                             )}

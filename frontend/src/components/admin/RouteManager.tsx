@@ -229,7 +229,7 @@ export const RouteManager: React.FC = () => {
                     </div>
 
                     {/* Destination */}
-                    <div className="flex items-center gap-2 bg-gradient-to-r from-red-50 to-orange-50 px-3 py-2 rounded-xl border border-red-100">
+                    <div className="flex items-center gap-2 bg-gradient-to-r from-red-50 to-purple-50 px-3 py-2 rounded-xl border border-red-100">
                         <div className="w-3 h-3 bg-red-500 rounded-full"></div>
                         <span className="font-semibold text-red-700">{route.destinationBusStop?.name || route.destination || 'N/A'}</span>
                     </div>
@@ -302,7 +302,7 @@ export const RouteManager: React.FC = () => {
                 </div>
                 <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <Map className="w-6 h-6 text-white" />
                         </div>
                         <div>

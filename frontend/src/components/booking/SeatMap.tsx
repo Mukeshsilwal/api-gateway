@@ -53,7 +53,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
             case 'booked':
                 return 'bg-gray-300 text-gray-500 cursor-not-allowed';
             case 'held':
-                return 'bg-orange-200 text-orange-700 border-orange-300 cursor-not-allowed';
+                return 'bg-purple-200 text-purple-700 border-purple-300 cursor-not-allowed';
             default:
                 return 'bg-white text-gray-700 border-gray-300 hover:border-blue-400 hover:shadow-md';
         }
@@ -98,7 +98,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
                     <span className="text-sm text-gray-700">Selected</span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-orange-200 border-2 border-orange-300 rounded"></div>
+                    <div className="w-8 h-8 bg-purple-200 border-2 border-purple-300 rounded"></div>
                     <span className="text-sm text-gray-700">On Hold</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
                                             {status === 'selected' && <Check size={16} className="absolute top-1 right-1" />}
                                             {status === 'booked' && <X size={16} className="absolute top-1 right-1" />}
                                             {status === 'held' && timer !== undefined && (
-                                                <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1 rounded-full flex items-center gap-0.5">
+                                                <div className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-1 rounded-full flex items-center gap-0.5">
                                                     <Clock size={10} />
                                                     {formatTime(timer)}
                                                 </div>
@@ -169,7 +169,7 @@ const SeatMap: React.FC<SeatMapProps> = ({
                                             {status === 'selected' && <Check size={16} className="absolute top-1 right-1" />}
                                             {status === 'booked' && <X size={16} className="absolute top-1 right-1" />}
                                             {status === 'held' && timer !== undefined && (
-                                                <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-1 rounded-full flex items-center gap-0.5">
+                                                <div className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs px-1 rounded-full flex items-center gap-0.5">
                                                     <Clock size={10} />
                                                     {formatTime(timer)}
                                                 </div>

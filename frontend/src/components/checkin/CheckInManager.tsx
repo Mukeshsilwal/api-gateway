@@ -87,12 +87,12 @@ export const CheckInManager: React.FC<CheckInManagerProps> = ({ eventId, eventNa
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="p-2 rounded-lg bg-orange-50 dark:bg-orange-900/20">
-                                <Clock className="text-orange-600" size={24} />
+                            <div className="p-2 rounded-lg bg-purple-50 dark:bg-purple-900/20">
+                                <Clock className="text-purple-600" size={24} />
                             </div>
                             <span className="text-sm text-gray-600 dark:text-gray-400">Pending</span>
                         </div>
-                        <div className="text-3xl font-bold text-orange-600">{stats.pending}</div>
+                        <div className="text-3xl font-bold text-purple-600">{stats.pending}</div>
                     </div>
 
                     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">

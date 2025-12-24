@@ -81,6 +81,9 @@ const UnifiedCheckout = lazy(() => import("./pages/UnifiedCheckout"));
 const BookingSuccess = lazy(() => import("./pages/BookingSuccess"));
 const BookingFailure = lazy(() => import("./pages/BookingFailure"));
 
+// OAuth Callback
+const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
+
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -99,6 +102,9 @@ const App: React.FC = () => {
                 {/* Public Routes */}
                 <Route path="/" element={<HomePage />} errorElement={<ErrorPage />} />
                 <Route path="/home" element={<HomePage />} errorElement={<ErrorPage />} />
+
+                {/* OAuth Callback Route */}
+                <Route path="/oauth2/callback" element={<OAuthCallback />} errorElement={<ErrorPage />} />
 
                 {/* User Login Routes */}
                 <Route path="/login" element={<UserLogin />} errorElement={<ErrorPage />} />

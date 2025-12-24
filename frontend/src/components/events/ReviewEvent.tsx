@@ -29,7 +29,7 @@ const ReviewEvent: React.FC<ReviewEventProps> = ({ data }) => {
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-sm font-bold text-gray-800 shadow-sm">
                         {data.category}
                     </div>
-                    <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-bold text-white shadow-sm ${data.type === 'ONLINE' ? 'bg-purple-500' : 'bg-orange-500'
+                    <div className={`absolute top-4 left-4 px-3 py-1 rounded-full text-sm font-bold text-white shadow-sm ${data.type === 'ONLINE' ? 'bg-purple-500' : 'bg-purple-500'
                         }`}>
                         {data.type}
                     </div>
@@ -72,7 +72,7 @@ const ReviewEvent: React.FC<ReviewEventProps> = ({ data }) => {
                             <div>
                                 <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-1">Venue</p>
                                 <div className="flex items-start gap-2 text-gray-800">
-                                    <MapPin size={18} className="mt-0.5 text-orange-500 shrink-0" />
+                                    <MapPin size={18} className="mt-0.5 text-purple-500 shrink-0" />
                                     <div>
                                         <p className="font-bold">{data.venue.name}</p>
                                         <p>{data.venue.address?.street}, {data.venue.address?.city}</p>

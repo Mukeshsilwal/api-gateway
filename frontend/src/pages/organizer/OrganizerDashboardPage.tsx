@@ -68,7 +68,7 @@ const OrganizerDashboardPage: React.FC<OrganizerDashboardPageProps> = ({ organiz
             title: 'Total Events',
             value: dashboard.organizer.totalEvents,
             icon: TrendingUp,
-            color: 'bg-orange-500',
+            color: 'bg-purple-500',
             change: 'All time',
         },
     ];

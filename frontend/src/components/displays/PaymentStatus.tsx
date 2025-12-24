@@ -105,7 +105,7 @@ const PaymentStatus: React.FC<PaymentStatusProps> = ({ payment, onRetry }) => {
                 {payment.expiresAt && payment.status === 'PENDING' && (
                     <div className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">Expires</span>
-                        <span className="text-sm font-semibold text-orange-600">
+                        <span className="text-sm font-semibold text-purple-600">
                             {formatExpiry(payment.expiresAt)}
                         </span>
                     </div>

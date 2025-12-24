@@ -1,6 +1,8 @@
 package com.ticketkatum.config;
 
 import com.ticketkatum.security.JwtAuthenticationFilter;
+import com.ticketkatum.security.OAuth2FailureHandler;
+import com.ticketkatum.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +27,8 @@ import java.util.Arrays;
 public class SecurityConfig {
 
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final OAuth2SuccessHandler oauth2SuccessHandler;
+        private final OAuth2FailureHandler oauth2FailureHandler;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,6 +43,8 @@ public class SecurityConfig {
                                                 // Public endpoints - ORDER MATTERS!
                                                 .requestMatchers("/error").permitAll()
                                                 .requestMatchers("/api/bff/v1/auth/**").permitAll()
+                                                // OAuth2 endpoints - must be public
+                                                .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                                                 // Allow gateway public paths to forward to BFF (rewritten by
                                                 // ApiPathRewriteFilter)
                                                 .requestMatchers("/api/web/v1/auth/**").permitAll()
@@ -81,6 +87,10 @@ public class SecurityConfig {
 
                                                 // All other requests require authentication
                                                 .anyRequest().authenticated())
+                                // OAuth2 Login Configuration
+                                .oauth2Login(oauth2 -> oauth2
+                                                .successHandler(oauth2SuccessHandler)
+                                                .failureHandler(oauth2FailureHandler))
                                 // Add custom JWT filter
                                 .addFilterBefore(jwtAuthenticationFilter,
                                                 UsernamePasswordAuthenticationFilter.class);

@@ -5,6 +5,18 @@ import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
  * @param {Object} metric - Web Vital metric object
  */
 function sendToAnalytics(metric) {
+    // Log to console in development
+    if (import.meta.env.DEV) {
+        console.log(`[Web Vitals] ${metric.name}:`, {
+            value: `${Math.round(metric.value)}ms`,
+            rating: metric.rating,
+            id: metric.id,
+        });
+        // Skip sending to backend in development
+        return;
+    }
+
+    // Only send to analytics in production if endpoint exists
     const body = JSON.stringify({
         name: metric.name,
         value: Math.round(metric.value),
@@ -18,21 +30,14 @@ function sendToAnalytics(metric) {
     if (navigator.sendBeacon) {
         navigator.sendBeacon('/api/analytics/vitals', body);
     } else {
-        // Fallback to fetch with keepalive
+        // Fallback to fetch with keepalive - silently fail if endpoint doesn't exist
         fetch('/api/analytics/vitals', {
             body,
             method: 'POST',
             keepalive: true,
             headers: { 'Content-Type': 'application/json' },
-        }).catch(console.error);
-    }
-
-    // Log to console in development
-    if (import.meta.env.DEV) {
-        console.log(`[Web Vitals] ${metric.name}:`, {
-            value: `${Math.round(metric.value)}ms`,
-            rating: metric.rating,
-            id: metric.id,
+        }).catch(() => {
+            // Silently ignore analytics errors
         });
     }
 }

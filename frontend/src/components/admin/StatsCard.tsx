@@ -57,10 +57,10 @@ export const StatsCard: React.FC<StatsCardProps> = ({ label, value, icon, color 
             icon: 'text-emerald-600'
         },
         orange: {
-            bg: 'from-orange-500 to-red-600',
-            text: 'text-orange-600',
-            lightBg: 'bg-orange-50',
-            icon: 'text-orange-600'
+            bg: 'from-purple-500 to-red-600',
+            text: 'text-purple-600',
+            lightBg: 'bg-purple-50',
+            icon: 'text-purple-600'
         },
         purple: {
             bg: 'from-purple-500 to-pink-600',
@@ -75,7 +75,7 @@ export const StatsCard: React.FC<StatsCardProps> = ({ label, value, icon, color 
             icon: 'text-blue-600'
         },
         amber: {
-            bg: 'from-amber-500 to-orange-600',
+            bg: 'from-amber-500 to-purple-600',
             text: 'text-amber-600',
             lightBg: 'bg-amber-50',
             icon: 'text-amber-600'

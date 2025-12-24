@@ -8,7 +8,9 @@ import analytics from "../services/analytics";
 import { parseError, getRecoverySuggestion, ErrorType } from "../utils/errorUtils";
 import Input from "./ui/Input";
 import Button from "./ui/Button";
+import OAuthButton from "./OAuthButton";
 import { Mail, Lock, LogIn } from "lucide-react";
+
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -129,6 +131,18 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
         }
     }
 
+    function handleOAuthLogin(provider: string) {
+        // Use web-BFF for OAuth (same as other API calls)
+        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+        const oauthUrl = `${backendUrl}/oauth2/authorization/${provider}`;
+
+        // Track OAuth attempt
+        analytics.trackEvent('oauth_attempt', { provider });
+
+        // Redirect to OAuth provider via web-BFF
+        window.location.href = oauthUrl;
+    }
+
     const containerClasses = transparent
         ? `w-full max-w-md space-y-8 bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 shadow-2xl ${className}`
         : `w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100 ${className}`;
@@ -185,6 +199,21 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
                     {!isLoading && <LogIn size={20} className="mr-2" />}
                     Sign In
                 </Button>
+
+                {/* OAuth Divider */}
+                <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                        <div className={`w-full border-t ${transparent ? 'border-white/30' : 'border-gray-300'}`}></div>
+                    </div>
+                    <div className="relative flex justify-center text-sm">
+                        <span className={`px-2 ${transparent ? 'bg-white/10 text-indigo-200' : 'bg-white text-gray-500'}`}>
+                            Or continue with
+                        </span>
+                    </div>
+                </div>
+
+                {/* Google OAuth Button */}
+                <OAuthButton provider="google" onLogin={handleOAuthLogin} disabled={isLoading} />
             </div>
 
             <div className="mt-6 flex items-center justify-between text-sm">

@@ -37,7 +37,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
             className={`group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border-2 border-gray-200 dark:border-gray-700 hover:border-${color}-500 dark:hover:border-${color}-500 transition-all cursor-pointer hover:shadow-xl hover:-translate-y-1`}
         >
             {badge && (
-                <span className="absolute top-4 right-4 px-3 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
+                <span className="absolute top-4 right-4 px-3 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">
                     {badge}
                 </span>
             )}
@@ -55,7 +55,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
                 {description}
             </p>
 
-            <div className="flex items-center text-orange-500 font-medium text-sm group-hover:gap-2 transition-all">
+            <div className="flex items-center text-purple-500 font-medium text-sm group-hover:gap-2 transition-all">
                 <span>Explore</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
@@ -116,7 +116,7 @@ const MarketHub: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             {/* Hero Section */}
-            <div className="bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 text-white">
+            <div className="bg-gradient-to-br from-purple-500 via-purple-600 to-red-600 text-white">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
                     <div className="text-center">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full mb-6">
@@ -127,21 +127,21 @@ const MarketHub: React.FC = () => {
                         <h1 className="text-5xl font-bold mb-4">
                             Your Event Marketplace
                         </h1>
-                        <p className="text-xl text-orange-100 max-w-2xl mx-auto mb-8">
+                        <p className="text-xl text-purple-100 max-w-2xl mx-auto mb-8">
                             Discover amazing features to enhance your event experience. From resale tickets to live interactions, we've got you covered.
                         </p>
 
                         <div className="flex flex-wrap items-center justify-center gap-4">
                             <button
                                 onClick={() => navigate('/market/resale/create')}
-                                className="px-8 py-4 bg-white text-orange-600 rounded-xl font-semibold hover:bg-orange-50 transition-colors shadow-lg flex items-center gap-2"
+                                className="px-8 py-4 bg-white text-purple-600 rounded-xl font-semibold hover:bg-purple-50 transition-colors shadow-lg flex items-center gap-2"
                             >
                                 <Ticket className="w-5 h-5" />
                                 Sell Your Ticket
                             </button>
                             <button
                                 onClick={() => navigate('/market/bundles')}
-                                className="px-8 py-4 bg-orange-700 text-white rounded-xl font-semibold hover:bg-orange-800 transition-colors border-2 border-white/20 flex items-center gap-2"
+                                className="px-8 py-4 bg-purple-700 text-white rounded-xl font-semibold hover:bg-purple-800 transition-colors border-2 border-white/20 flex items-center gap-2"
                             >
                                 <Package className="w-5 h-5" />
                                 Browse Bundles
@@ -169,23 +169,23 @@ const MarketHub: React.FC = () => {
                 </div>
 
                 {/* Stats Section */}
-                <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-8 text-white">
+                <div className="bg-gradient-to-r from-purple-500 to-red-500 rounded-2xl p-8 text-white">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                         <div className="text-center">
                             <div className="text-4xl font-bold mb-2">10K+</div>
-                            <div className="text-orange-100">Active Listings</div>
+                            <div className="text-purple-100">Active Listings</div>
                         </div>
                         <div className="text-center">
                             <div className="text-4xl font-bold mb-2">50K+</div>
-                            <div className="text-orange-100">Happy Customers</div>
+                            <div className="text-purple-100">Happy Customers</div>
                         </div>
                         <div className="text-center">
                             <div className="text-4xl font-bold mb-2">$2M+</div>
-                            <div className="text-orange-100">Transactions</div>
+                            <div className="text-purple-100">Transactions</div>
                         </div>
                         <div className="text-center">
                             <div className="text-4xl font-bold mb-2">98%</div>
-                            <div className="text-orange-100">Satisfaction Rate</div>
+                            <div className="text-purple-100">Satisfaction Rate</div>
                         </div>
                     </div>
                 </div>
@@ -198,8 +198,8 @@ const MarketHub: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">1</span>
+                            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">1</span>
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 Browse Features
@@ -210,8 +210,8 @@ const MarketHub: React.FC = () => {
                         </div>
 
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">2</span>
+                            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">2</span>
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 Make Your Choice
@@ -222,8 +222,8 @@ const MarketHub: React.FC = () => {
                         </div>
 
                         <div className="text-center">
-                            <div className="w-16 h-16 bg-orange-100 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <span className="text-2xl font-bold text-orange-600 dark:text-orange-400">3</span>
+                            <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
                             </div>
                             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                                 Enjoy the Event

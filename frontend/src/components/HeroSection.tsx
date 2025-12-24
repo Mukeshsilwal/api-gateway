@@ -194,7 +194,7 @@ const HeroSection: React.FC = () => {
     };
 
     return (
-        <div className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-stone-100 overflow-hidden">
+        <div className="relative min-h-[600px] flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-stone-100 overflow-hidden">
             {/* Background Pattern - Subtle dots/texture */}
             <div className="absolute inset-0 opacity-[0.4]">
                 <div className="absolute inset-0" style={{
@@ -208,7 +208,7 @@ const HeroSection: React.FC = () => {
                 <div className="text-center space-y-6 max-w-4xl">
                     <h1 className="text-4xl lg:text-6xl font-display font-bold leading-tight animate-slide-up text-gray-900">
                         Book Your Next <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-600">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-purple-600">
                             Adventure Today
                         </span>
                     </h1>
@@ -229,7 +229,7 @@ const HeroSection: React.FC = () => {
                                     className={`
                                         flex-1 flex items-center justify-center gap-2 py-4 text-sm font-medium transition-all
                                         ${activeTab === tab.id
-                                            ? 'text-white bg-orange-500'
+                                            ? 'text-white bg-purple-500'
                                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}
                                     `}
                                 >

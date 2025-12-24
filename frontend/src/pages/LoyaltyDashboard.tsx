@@ -101,7 +101,7 @@ const LoyaltyDashboard: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
             </div>
         );
     }
@@ -131,7 +131,7 @@ const LoyaltyDashboard: React.FC = () => {
             <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                        <Trophy className="w-8 h-8 text-orange-500" />
+                        <Trophy className="w-8 h-8 text-purple-500" />
                         Loyalty Rewards
                     </h1>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -168,8 +168,8 @@ const LoyaltyDashboard: React.FC = () => {
                         {/* Points Balance */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                                    <Zap className="w-6 h-6 text-orange-500" />
+                                <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                    <Zap className="w-6 h-6 text-purple-500" />
                                 </div>
                                 <div>
                                     <p className="text-sm text-gray-600 dark:text-gray-400">Available Points</p>
@@ -178,7 +178,7 @@ const LoyaltyDashboard: React.FC = () => {
                                     </p>
                                 </div>
                             </div>
-                            <button className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium">
+                            <button className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium">
                                 Redeem Points
                             </button>
                         </div>
@@ -195,7 +195,7 @@ const LoyaltyDashboard: React.FC = () => {
                                 <div className="space-y-2">
                                     <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                                         <div
-                                            className="bg-gradient-to-r from-orange-500 to-orange-600 h-3 rounded-full transition-all duration-500"
+                                            className="bg-gradient-to-r from-purple-500 to-purple-600 h-3 rounded-full transition-all duration-500"
                                             style={{ width: `${getProgressToNextTier()}%` }}
                                         ></div>
                                     </div>
@@ -209,7 +209,7 @@ const LoyaltyDashboard: React.FC = () => {
                         {/* Tier Benefits */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                             <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                <Gift className="w-5 h-5 text-orange-500" />
+                                <Gift className="w-5 h-5 text-purple-500" />
                                 Your Benefits
                             </h3>
                             <ul className="space-y-3">
@@ -265,7 +265,7 @@ const LoyaltyDashboard: React.FC = () => {
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <Calendar className="w-6 h-6 text-orange-500" />
+                                    <Calendar className="w-6 h-6 text-purple-500" />
                                     Points History
                                 </h2>
                             </div>

@@ -110,7 +110,7 @@ const DynamicPricingDisplay: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                                <TrendingUp className="w-8 h-8 text-orange-500" />
+                                <TrendingUp className="w-8 h-8 text-purple-500" />
                                 Dynamic Pricing
                             </h1>
                             <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -123,7 +123,7 @@ const DynamicPricingDisplay: React.FC = () => {
                                     type="checkbox"
                                     checked={autoRefresh}
                                     onChange={(e) => setAutoRefresh(e.target.checked)}
-                                    className="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                                    className="w-4 h-4 text-purple-500 border-gray-300 rounded focus:ring-purple-500"
                                 />
                                 <span className="text-sm text-gray-700 dark:text-gray-300">
                                     Auto-refresh (10s)
@@ -156,14 +156,14 @@ const DynamicPricingDisplay: React.FC = () => {
                                             min="0"
                                             value={basePrice}
                                             onChange={(e) => setBasePrice(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                            className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
                                 </div>
                                 <button
                                     onClick={calculatePrice}
                                     disabled={loading}
-                                    className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
+                                    className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
                                 >
                                     {loading ? (
                                         <>
@@ -215,7 +215,7 @@ const DynamicPricingDisplay: React.FC = () => {
                             <>
                                 {/* Current Price Card */}
                                 <div className={`rounded-xl p-8 shadow-lg ${calculation.isSurge
-                                    ? 'bg-gradient-to-br from-orange-500 to-red-500'
+                                    ? 'bg-gradient-to-br from-purple-500 to-red-500'
                                     : 'bg-gradient-to-br from-green-500 to-blue-500'
                                     } text-white`}>
                                     <div className="flex items-center justify-between mb-4">
@@ -268,8 +268,8 @@ const DynamicPricingDisplay: React.FC = () => {
                                     <div className="space-y-4">
                                         <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                                                    <Users className="w-5 h-5 text-orange-500" />
+                                                <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                                    <Users className="w-5 h-5 text-purple-500" />
                                                 </div>
                                                 <div>
                                                     <p className="font-medium text-gray-900 dark:text-white">
@@ -350,13 +350,13 @@ const DynamicPricingDisplay: React.FC = () => {
                                                         </span>
                                                         <div className="flex items-center gap-2">
                                                             <span className={`text-sm font-medium ${entry.isSurge
-                                                                ? 'text-orange-600 dark:text-orange-400'
+                                                                ? 'text-purple-600 dark:text-purple-400'
                                                                 : 'text-green-600 dark:text-green-400'
                                                                 }`}>
                                                                 ${entry.price.toFixed(2)}
                                                             </span>
                                                             {entry.isSurge && (
-                                                                <Zap className="w-4 h-4 text-orange-500" />
+                                                                <Zap className="w-4 h-4 text-purple-500" />
                                                             )}
                                                         </div>
                                                     </div>

@@ -1,20 +1,10 @@
-import { useState } from 'react';
-import { UnifiedBookingCart, CartDrawer } from './unified-booking';
-
 /**
  * Cart Integration Component
- * Wraps the app with unified booking cart functionality
+ * Cart is now integrated in the Navbar component
+ * This component just passes through children
  */
 const CartIntegration = ({ children }) => {
-    const [isCartOpen, setIsCartOpen] = useState(false);
-
-    return (
-        <>
-            {children}
-            <UnifiedBookingCart onClick={() => setIsCartOpen(true)} />
-            <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
-        </>
-    );
+    return <>{children}</>;
 };
 
 export default CartIntegration;

@@ -117,7 +117,7 @@ const ResaleMarketplace: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
             </div>
         );
     }
@@ -130,7 +130,7 @@ const ResaleMarketplace: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                                <Ticket className="w-8 h-8 text-orange-500" />
+                                <Ticket className="w-8 h-8 text-purple-500" />
                                 Ticket Resale Marketplace
                             </h1>
                             <p className="mt-2 text-gray-600 dark:text-gray-400">
@@ -139,7 +139,7 @@ const ResaleMarketplace: React.FC = () => {
                         </div>
                         <button
                             onClick={() => navigate('/market/resale/create')}
-                            className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                            className="px-6 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium"
                         >
                             Sell Your Ticket
                         </button>
@@ -153,7 +153,7 @@ const ResaleMarketplace: React.FC = () => {
                     <div className="lg:col-span-1">
                         <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                             <div className="flex items-center gap-2 mb-6">
-                                <Filter className="w-5 h-5 text-orange-500" />
+                                <Filter className="w-5 h-5 text-purple-500" />
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
                                     Filters
                                 </h2>
@@ -192,7 +192,7 @@ const ResaleMarketplace: React.FC = () => {
                                     onChange={(e) =>
                                         setSortBy(e.target.value as typeof sortBy)
                                     }
-                                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                    className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                 >
                                     <option value="newest">Newest First</option>
                                     <option value="price-asc">Price: Low to High</option>
@@ -299,7 +299,7 @@ const ResaleMarketplace: React.FC = () => {
                                                 {/* Action Button */}
                                                 <button
                                                     onClick={() => handleBuyListing(listing.id)}
-                                                    className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium flex items-center justify-center gap-2"
+                                                    className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium flex items-center justify-center gap-2"
                                                 >
                                                     <ShoppingCart className="w-5 h-5" />
                                                     Buy Now

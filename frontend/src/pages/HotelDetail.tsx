@@ -303,7 +303,7 @@ const HotelDetail: React.FC = () => {
                             {/* Amenities Grid */}
                             <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
                                 <div className="flex items-center gap-2"><Wifi size={16} className="text-green-500" /> Free High-Speed Wi-Fi</div>
-                                <div className="flex items-center gap-2"><Coffee size={16} className="text-orange-500" /> Breakfast Included</div>
+                                <div className="flex items-center gap-2"><Coffee size={16} className="text-purple-500" /> Breakfast Included</div>
                                 <div className="flex items-center gap-2"><Car size={16} className="text-blue-500" /> Free Parking</div>
                                 <div className="flex items-center gap-2"><ShieldCheck size={16} className="text-primary" /> 24/7 Security</div>
                             </div>

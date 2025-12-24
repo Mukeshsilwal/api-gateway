@@ -23,7 +23,7 @@ export const UnifiedBookingCart: React.FC<UnifiedBookingCartProps> = ({ onClick 
             aria-label={`Shopping cart with ${itemCount} items`}
         >
             {/* Cart Button */}
-            <div className="relative bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
+            <div className="relative bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110">
                 <ShoppingCart className="w-6 h-6" />
 
                 {/* Item Count Badge */}
@@ -38,7 +38,7 @@ export const UnifiedBookingCart: React.FC<UnifiedBookingCartProps> = ({ onClick 
             <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block">
                 <div className="bg-gray-900 text-white text-sm rounded-lg px-3 py-2 whitespace-nowrap shadow-xl">
                     <div className="font-semibold">{itemCount} {itemCount === 1 ? 'item' : 'items'} in cart</div>
-                    <div className="text-orange-300">NPR {totalAmount.toLocaleString()}</div>
+                    <div className="text-purple-300">NPR {totalAmount.toLocaleString()}</div>
                     <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                 </div>
             </div>

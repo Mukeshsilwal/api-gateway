@@ -17,7 +17,7 @@ export const SocialProofSection = () => {
         <section className="py-20 bg-gray-50 dark:bg-gray-900 relative overflow-hidden transition-colors duration-300">
             {/* Background Accents */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                <div className="absolute top-1/4 -right-64 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl opacity-50 dark:opacity-100"></div>
+                <div className="absolute top-1/4 -right-64 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl opacity-50 dark:opacity-100"></div>
                 <div className="absolute bottom-1/4 -left-64 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl opacity-50 dark:opacity-100"></div>
             </div>
 
@@ -27,23 +27,23 @@ export const SocialProofSection = () => {
                     {/* Trending Routes */}
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-8">
-                            <TrendingUp className="text-orange-500" size={24} />
+                            <TrendingUp className="text-purple-500" size={24} />
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-display">
                                 Trending Routes
                             </h2>
                         </div>
                         <div className="grid gap-4">
                             {trendingRoutes.map((route, index) => (
-                                <div key={index} className="group flex items-center justify-between p-4 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-orange-500/50 hover:bg-orange-50 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none">
+                                <div key={index} className="group flex items-center justify-between p-4 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-purple-500/50 hover:bg-purple-50 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-orange-500/10 dark:bg-orange-500/20 flex items-center justify-center text-orange-600 dark:text-orange-500 font-bold text-sm">
+                                        <div className="w-12 h-12 rounded-full bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-500 font-bold text-sm">
                                             {route.type}
                                         </div>
                                         <div>
                                             <h3 className="text-gray-900 dark:text-white font-semibold">{route.from} → {route.to}</h3>
                                             <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                                                 <span className="flex items-center gap-1">
-                                                    <Star size={12} className="fill-orange-500 text-orange-500" />
+                                                    <Star size={12} className="fill-purple-500 text-purple-500" />
                                                     {route.rating}
                                                 </span>
                                                 <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-600"></span>
@@ -62,14 +62,14 @@ export const SocialProofSection = () => {
                     {/* Top Operators */}
                     <div className="flex-1">
                         <div className="flex items-center gap-2 mb-8">
-                            <Star className="text-orange-500" size={24} />
+                            <Star className="text-purple-500" size={24} />
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-display">
                                 Top Rated Operators
                             </h2>
                         </div>
                         <div className="grid gap-4">
                             {topOperators.map((operator, index) => (
-                                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-orange-500/50 transition-all duration-300 shadow-sm dark:shadow-none">
+                                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-sm dark:shadow-none">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 rounded-full bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg">
                                             {operator.name.charAt(0)}

@@ -19,8 +19,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 24 10% 10%;
 
-    /* Primary Brand: Refined Orange (Orange 500) */
-    --primary: 24 95% 53%;
+    /* Primary Brand: Purple (Purple 600) */
+    --primary: 271 81% 56%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary: Stone 100 for subtle backgrounds */
@@ -31,8 +31,8 @@
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 25 5% 45%;
 
-    /* Accent: Orange 100 for highlights */
-    --accent: 32 98% 88%;
+    /* Accent: Purple 100 for highlights */
+    --accent: 270 100% 95%;
     --accent-foreground: 24 10% 10%;
 
     /* Destructive: Red */
@@ -42,7 +42,7 @@
     /* Borders & Inputs: Stone 200 */
     --border: 24 5% 90%;
     --input: 24 5% 90%;
-    --ring: 24 95% 53%;
+    --ring: 271 81% 56%;
 
     --radius: 0.75rem;
   }
@@ -137,7 +137,7 @@
 
   /* Primary Button - Main CTA */
   .btn-primary {
-    @apply px-6 py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-orange-600 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
+    @apply px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
   }
 
   /* Secondary Button - Alternative actions */
@@ -171,12 +171,12 @@
 
   /* Focus Glow Effect */
   .focus-glow {
-    @apply focus:ring-4 focus:ring-orange-500/20 focus:border-orange-600 transition-all duration-200;
+    @apply focus:ring-4 focus:ring-purple-600/20 focus:border-purple-700 transition-all duration-200;
   }
 
   /* Gradient Background Utilities */
   .bg-gradient-primary {
-    @apply bg-gradient-to-br from-orange-500 to-orange-600;
+    @apply bg-gradient-to-br from-purple-600 to-purple-700;
   }
 
   .bg-gradient-secondary {
@@ -189,10 +189,10 @@
 
   /* Premium Shadow Utilities */
   .shadow-premium {
-    box-shadow: 0 10px 40px -10px rgba(249, 115, 22, 0.25);
+    box-shadow: 0 10px 40px -10px rgba(139, 92, 246, 0.25);
   }
 
   .shadow-premium-lg {
-    box-shadow: 0 20px 60px -15px rgba(249, 115, 22, 0.35);
+    box-shadow: 0 20px 60px -15px rgba(139, 92, 246, 0.35);
   }
 }

@@ -481,6 +481,99 @@ public class AuthController {
     }
 
     /**
+     * Process OAuth2 login
+     * Called by web-BFF after OAuth2 authentication
+     * Creates/updates user, generates tokens, and creates session
+     */
+    @PostMapping("/oauth2/process")
+    public ResponseEntity<Response<Map<String, Object>>> processOAuth2Login(
+            @RequestBody Map<String, Object> oauth2Request) {
+
+        try {
+            String email = (String) oauth2Request.get("email");
+            String name = (String) oauth2Request.get("name");
+            String provider = (String) oauth2Request.get("provider");
+            String ipAddress = (String) oauth2Request.get("ipAddress");
+            String userAgent = (String) oauth2Request.get("userAgent");
+
+            log.info("Processing OAuth2 login for email: {} via provider: {}", email, provider);
+
+            // Find or create user
+            User user;
+            try {
+                user = (User) userDetailsService.loadUserByUsername(email);
+                log.info("Existing user found: {}", email);
+
+                // Update provider if changed
+                if (!provider.equals(user.getProvider())) {
+                    user.setProvider(provider);
+                    userService.updateUserProvider(user.getId(), provider);
+                }
+            } catch (Exception e) {
+                // User doesn't exist, create new user
+                log.info("Creating new OAuth2 user: {}", email);
+
+                CreateUserRequest createUserRequest = new CreateUserRequest();
+                createUserRequest.setEmail(email);
+                createUserRequest.setUsername(email);
+                createUserRequest.setFirstName(name != null ? name.split(" ")[0] : "");
+                createUserRequest.setLastName(name != null && name.split(" ").length > 1 ? name.split(" ")[1] : "");
+                createUserRequest.setRole("USER");
+                createUserRequest.setProvider(provider);
+                // No password needed for OAuth2 users
+                createUserRequest.setPassword(null);
+
+                UserDto userDto = userService.createOAuth2User(createUserRequest);
+                user = (User) userDetailsService.loadUserByUsername(email);
+            }
+
+            // Generate tokens
+            String accessToken = jwtService.generateAccessToken(user);
+            String refreshToken = refreshTokenService.createRefreshToken(user.getEmail());
+
+            // Get user roles
+            List<String> roles = user.getAuthorities()
+                    .stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+
+            // Create session
+            String sessionId = sessionService.createSession(
+                    user.getEmail(),
+                    accessToken,
+                    Map.of(
+                            "ipAddress", ipAddress != null ? ipAddress : "unknown",
+                            "userAgent", userAgent != null ? userAgent : "unknown",
+                            "roles", roles,
+                            "loginTime", System.currentTimeMillis(),
+                            "provider", provider));
+
+            log.info("OAuth2 login successful for user: {} via provider: {}", email, provider);
+
+            // Prepare response
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("accessToken", accessToken);
+            responseData.put("refreshToken", refreshToken);
+            responseData.put("sessionId", sessionId);
+            responseData.put("username", user.getEmail());
+            responseData.put("roles", roles);
+            responseData.put("tokenType", "Bearer");
+            responseData.put("provider", provider);
+
+            Response<Map<String, Object>> response = ResponseHandler.success(
+                    "OAuth2 login successful",
+                    responseData);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("OAuth2 login processing failed", e);
+            Response<Map<String, Object>> response = ResponseHandler.failure(
+                    "OAuth2 login failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
      * Extract client IP address from request
      */
     private String getClientIP(HttpServletRequest request) {

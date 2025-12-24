@@ -100,7 +100,7 @@ const QfxSeatSelection = () => {
         return (
             <MainLayout>
                 <div className="flex justify-center items-center h-screen">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
                 </div>
             </MainLayout>
         );
@@ -211,14 +211,14 @@ const QfxSeatSelection = () => {
                                 </div>
                                 <div className="flex justify-between text-xl font-bold pt-4 border-t border-gray-700">
                                     <span>Total</span>
-                                    <span className="text-orange-500">Rs. {calculateTotal()}</span>
+                                    <span className="text-purple-500">Rs. {calculateTotal()}</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleProceed}
                                 disabled={processing || selectedSeats.length === 0}
-                                className="w-full bg-orange-600 hover:bg-orange-500 disabled:bg-gray-600 text-white font-bold py-3 rounded-lg transition-colors"
+                                className="w-full bg-purple-600 hover:bg-purple-500 disabled:bg-gray-600 text-white font-bold py-3 rounded-lg transition-colors"
                             >
                                 {processing ? 'Processing...' : 'Confirm Booking'}
                             </button>

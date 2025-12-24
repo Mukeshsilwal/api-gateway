@@ -137,6 +137,55 @@ public class UserService {
         log.info("User deleted: {}", id);
     }
 
+    /**
+     * Create OAuth2 user (no password required)
+     */
+    @Transactional
+    public UserDto createOAuth2User(CreateUserRequest request) {
+        log.info("Creating OAuth2 user with email: {}", request.getEmail());
+
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new DuplicateResourceException("User with email already exists: " + request.getEmail());
+        }
+
+        Role role = roleRepository.findByName(request.getRole())
+                .orElseGet(() -> roleRepository.save(Role.builder().name(request.getRole()).build()));
+
+        User user = User.builder()
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .password(null) // No password for OAuth2 users
+                .roles(java.util.Set.of(role))
+                .provider(request.getProvider())
+                .enabled(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true) // OAuth2 users don't need password change
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        user = userRepository.save(user);
+        log.info("OAuth2 user created with ID: {}", user.getId());
+
+        return mapToDto(user);
+    }
+
+    /**
+     * Update user provider
+     */
+    @Transactional
+    public void updateUserProvider(Long id, String provider) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+
+        user.setProvider(provider);
+        user.setUpdatedAt(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Updated provider for user {}: {}", id, provider);
+    }
+
     private UserDto mapToDto(User user) {
         return UserDto.builder()
                 .id(user.getId())

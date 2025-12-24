@@ -21,10 +21,10 @@ export const SeatIcon: React.FC<SeatIconProps> = ({ status, seatNumber, type = '
                 };
             case 'selected':
                 return {
-                    fill: '#f97316', // primary (orange-500)
-                    stroke: '#c2410c', // orange-700
+                    fill: '#f97316', // primary (purple-500)
+                    stroke: '#c2410c', // purple-700
                     text: '#ffffff', // white
-                    accent: '#fb923c' // orange-400
+                    accent: '#fb923c' // purple-400
                 };
             case 'ladies':
                 return {

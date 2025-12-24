@@ -127,19 +127,19 @@ export const BookingFailure: React.FC = () => {
                     </h3>
                     <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                         <li className="flex items-start gap-2">
-                            <span className="text-orange-600 dark:text-orange-400 mt-1">•</span>
+                            <span className="text-purple-600 dark:text-purple-400 mt-1">•</span>
                             <span>Your booking request was processed but encountered an error</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-orange-600 dark:text-orange-400 mt-1">•</span>
+                            <span className="text-purple-600 dark:text-purple-400 mt-1">•</span>
                             <span>No charges have been made to your account</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-orange-600 dark:text-orange-400 mt-1">•</span>
+                            <span className="text-purple-600 dark:text-purple-400 mt-1">•</span>
                             <span>Any successful bookings have been automatically cancelled</span>
                         </li>
                         <li className="flex items-start gap-2">
-                            <span className="text-orange-600 dark:text-orange-400 mt-1">•</span>
+                            <span className="text-purple-600 dark:text-purple-400 mt-1">•</span>
                             <span>Your cart items have been preserved for retry</span>
                         </li>
                     </ul>
@@ -149,7 +149,7 @@ export const BookingFailure: React.FC = () => {
                 <div className="flex flex-col sm:flex-row gap-3">
                     <button
                         onClick={() => navigate('/unified-checkout')}
-                        className="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center gap-2"
                     >
                         <RefreshCw className="w-5 h-5" />
                         <span>Try Again</span>

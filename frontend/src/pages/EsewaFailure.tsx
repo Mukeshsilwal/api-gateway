@@ -33,9 +33,9 @@ const EsewaFailure = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-orange-50 p-4 relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-purple-50 p-4 relative overflow-hidden">
             {/* Background Decoration */}
-            <div className="absolute top-0 right-0 w-full h-64 bg-gradient-to-l from-red-400/10 to-orange-400/10 skew-y-3 origin-top-right"></div>
+            <div className="absolute top-0 right-0 w-full h-64 bg-gradient-to-l from-red-400/10 to-purple-400/10 skew-y-3 origin-top-right"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-red-200/20 rounded-full blur-3xl"></div>
 
             <Card className="max-w-lg w-full text-center relative z-10 shadow-2xl border-red-100">
@@ -52,7 +52,7 @@ const EsewaFailure = () => {
                     </p>
 
                     {/* Error Details */}
-                    <div className="bg-gradient-to-br from-red-50 to-orange-50/30 p-5 rounded-2xl border border-red-200 mb-8">
+                    <div className="bg-gradient-to-br from-red-50 to-purple-50/30 p-5 rounded-2xl border border-red-200 mb-8">
                         <div className="flex items-start gap-3">
                             <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                             <div className="text-left flex-1">
@@ -96,7 +96,7 @@ const EsewaFailure = () => {
                     <div className="space-y-3">
                         <Button
                             onClick={handleRetry}
-                            className="w-full gap-2 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 shadow-lg shadow-red-500/30"
+                            className="w-full gap-2 bg-gradient-to-r from-red-600 to-purple-600 hover:from-red-700 hover:to-purple-700 shadow-lg shadow-red-500/30"
                         >
                             <RefreshCw size={18} />
                             Try Again

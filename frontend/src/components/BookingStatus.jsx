@@ -38,11 +38,11 @@ export default function BookingStatus({ state, retryCount, pollingAttempt, messa
 
             case PAYMENT_STATES.COMPLETING:
                 return {
-                    icon: <Loader2 className="w-12 h-12 text-orange-600 animate-spin" />,
+                    icon: <Loader2 className="w-12 h-12 text-purple-600 animate-spin" />,
                     title: 'Finalizing Booking',
                     description: message || `Completing your booking... ${retryCount > 0 ? `(Retry ${retryCount}/3)` : ''}`,
-                    bgColor: 'from-orange-50 to-amber-50',
-                    iconBg: 'bg-orange-100',
+                    bgColor: 'from-purple-50 to-amber-50',
+                    iconBg: 'bg-purple-100',
                     showWarning: retryCount > 0,
                     warningText: 'Please do not refresh or close this page'
                 };
@@ -52,7 +52,7 @@ export default function BookingStatus({ state, retryCount, pollingAttempt, messa
                     icon: <Clock className="w-12 h-12 text-yellow-600 animate-pulse" />,
                     title: 'Checking Booking Status',
                     description: message || `Verifying your booking status... (${pollingAttempt}/10)`,
-                    bgColor: 'from-yellow-50 to-orange-50',
+                    bgColor: 'from-yellow-50 to-purple-50',
                     iconBg: 'bg-yellow-100',
                     showWarning: true,
                     warningText: 'This may take a moment. Please do not refresh the page.'

@@ -61,7 +61,7 @@ const HotelCard: React.FC<HotelCardProps> = ({ hotel, onBook, onViewDetails }) =
                     <div className={`absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold ${hotel.availableRooms > 5
                             ? 'bg-green-500 text-white'
                             : hotel.availableRooms > 0
-                                ? 'bg-orange-500 text-white'
+                                ? 'bg-purple-500 text-white'
                                 : 'bg-red-500 text-white'
                         }`}>
                         {hotel.availableRooms > 0

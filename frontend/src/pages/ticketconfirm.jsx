@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import NavigationBar from "../components/Navbar";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";

@@ -89,7 +89,7 @@ const QfxMovieDetails = () => {
         return (
             <MainLayout>
                 <div className="flex justify-center items-center h-screen">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
                 </div>
             </MainLayout>
         );
@@ -126,7 +126,7 @@ const QfxMovieDetails = () => {
                             <div className="mb-4">
                                 <h1 className="text-4xl sm:text-5xl font-bold mb-2">{movie.MovieName}</h1>
                                 <div className="flex flex-wrap gap-4 text-sm text-gray-300 mb-4">
-                                    <span className="bg-orange-600 px-2 py-1 rounded text-white font-bold">{movie.Rating}</span>
+                                    <span className="bg-purple-600 px-2 py-1 rounded text-white font-bold">{movie.Rating}</span>
                                     <span>{movie.Duration} min</span>
                                     <span>{movie.Genre}</span>
                                     <span>{movie.Language || 'English'}</span>
@@ -145,7 +145,7 @@ const QfxMovieDetails = () => {
                             type="date"
                             value={selectedDate}
                             onChange={(e) => setSelectedDate(e.target.value)}
-                            className="bg-gray-800 border border-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:border-orange-500"
+                            className="bg-gray-800 border border-gray-700 text-white rounded px-3 py-2 focus:outline-none focus:border-purple-500"
                             min={new Date().toISOString().split('T')[0]}
                         />
                     </div>
@@ -157,19 +157,19 @@ const QfxMovieDetails = () => {
 
                             return (
                                 <div key={cinema.CinemaID} className="bg-gray-800 rounded-lg p-6">
-                                    <h3 className="text-xl font-bold mb-4 text-orange-400">{cinema.Name}</h3>
+                                    <h3 className="text-xl font-bold mb-4 text-purple-400">{cinema.Name}</h3>
                                     <p className="text-sm text-gray-400 mb-4">{cinema.Location}</p>
                                     <div className="flex flex-wrap gap-4">
                                         {cinemaShowtimes.map((showtime) => (
                                             <button
                                                 key={showtime.ShowtimeID}
                                                 onClick={() => handleShowtimeClick(showtime.ShowtimeID)}
-                                                className="px-6 py-3 bg-gray-700 hover:bg-orange-600 rounded-lg transition-colors border border-gray-600 hover:border-orange-500 group"
+                                                className="px-6 py-3 bg-gray-700 hover:bg-purple-600 rounded-lg transition-colors border border-gray-600 hover:border-purple-500 group"
                                             >
                                                 <div className="text-lg font-bold group-hover:text-white">
                                                     {new Date(showtime.ShowTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
-                                                <div className="text-xs text-gray-400 group-hover:text-orange-100">
+                                                <div className="text-xs text-gray-400 group-hover:text-purple-100">
                                                     {showtime.ScreenName}
                                                 </div>
                                             </button>

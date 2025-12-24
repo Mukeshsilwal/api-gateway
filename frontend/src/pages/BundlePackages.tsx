@@ -82,7 +82,7 @@ const BundlePackages: React.FC = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500"></div>
             </div>
         );
     }
@@ -95,16 +95,16 @@ const BundlePackages: React.FC = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                                <Package className="w-8 h-8 text-orange-500" />
+                                <Package className="w-8 h-8 text-purple-500" />
                                 Bundle Packages
                             </h1>
                             <p className="mt-2 text-gray-600 dark:text-gray-400">
                                 Save more with our exclusive package deals
                             </p>
                         </div>
-                        <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                            <Sparkles className="w-5 h-5 text-orange-500" />
-                            <span className="text-sm font-medium text-orange-900 dark:text-orange-100">
+                        <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                            <Sparkles className="w-5 h-5 text-purple-500" />
+                            <span className="text-sm font-medium text-purple-900 dark:text-purple-100">
                                 Save up to 20% with bundles
                             </span>
                         </div>
@@ -135,7 +135,7 @@ const BundlePackages: React.FC = () => {
                                     className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all"
                                 >
                                     {/* Bundle Header */}
-                                    <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 text-white">
+                                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-6 text-white">
                                         <div className="flex items-start justify-between mb-2">
                                             <h3 className="text-xl font-bold">{bundle.name}</h3>
                                             {bundle.discountPercentage > 0 && (
@@ -160,8 +160,8 @@ const BundlePackages: React.FC = () => {
                                                         key={index}
                                                         className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg"
                                                     >
-                                                        <div className="p-2 bg-orange-100 dark:bg-orange-900/20 rounded-lg">
-                                                            <ItemIcon className="w-5 h-5 text-orange-500" />
+                                                        <div className="p-2 bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                                                            <ItemIcon className="w-5 h-5 text-purple-500" />
                                                         </div>
                                                         <div className="flex-1">
                                                             <p className="font-medium text-gray-900 dark:text-white">
@@ -211,7 +211,7 @@ const BundlePackages: React.FC = () => {
                                         {/* Book Button */}
                                         <button
                                             onClick={() => handleBookBundle(bundle.id)}
-                                            className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold flex items-center justify-center gap-2"
+                                            className="w-full px-4 py-3 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-semibold flex items-center justify-center gap-2"
                                         >
                                             <ShoppingCart className="w-5 h-5" />
                                             Book Bundle
@@ -231,8 +231,8 @@ const BundlePackages: React.FC = () => {
                         </h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div className="text-center">
-                                <div className="inline-flex p-4 bg-orange-100 dark:bg-orange-900/20 rounded-full mb-4">
-                                    <TrendingDown className="w-8 h-8 text-orange-500" />
+                                <div className="inline-flex p-4 bg-purple-100 dark:bg-purple-900/20 rounded-full mb-4">
+                                    <TrendingDown className="w-8 h-8 text-purple-500" />
                                 </div>
                                 <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
                                     Save Money

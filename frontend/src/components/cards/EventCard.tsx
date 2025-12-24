@@ -34,7 +34,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onBook, onViewDetails }) =
             'MUSIC': 'bg-purple-100 text-purple-700',
             'SPORTS': 'bg-green-100 text-green-700',
             'CONFERENCE': 'bg-blue-100 text-blue-700',
-            'WORKSHOP': 'bg-orange-100 text-orange-700',
+            'WORKSHOP': 'bg-purple-100 text-purple-700',
             'FESTIVAL': 'bg-pink-100 text-pink-700',
             'EXHIBITION': 'bg-indigo-100 text-indigo-700',
             'THEATER': 'bg-red-100 text-red-700',

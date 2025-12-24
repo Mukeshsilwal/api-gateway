@@ -119,7 +119,7 @@ export const TicketManager: React.FC = () => {
                 label: 'Cancelled'
             },
             'PENDING': {
-                bg: 'bg-gradient-to-r from-amber-500 to-orange-600',
+                bg: 'bg-gradient-to-r from-amber-500 to-purple-600',
                 text: 'text-white',
                 icon: '⏱',
                 label: 'Pending'
@@ -297,7 +297,7 @@ export const TicketManager: React.FC = () => {
                 </div>
                 <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
                     <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>

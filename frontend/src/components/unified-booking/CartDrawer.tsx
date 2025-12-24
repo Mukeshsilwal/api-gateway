@@ -45,11 +45,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
                     <div className="flex items-center gap-2">
-                        <ShoppingBag className="w-5 h-5 text-orange-600" />
+                        <ShoppingBag className="w-5 h-5 text-purple-600" />
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                             Your Cart
                         </h2>
-                        <span className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs font-semibold px-2 py-1 rounded-full">
+                        <span className="bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 text-xs font-semibold px-2 py-1 rounded-full">
                             {itemCount}
                         </span>
                     </div>
@@ -100,7 +100,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             </div>
                             <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
-                                <span className="text-lg font-bold text-orange-600 dark:text-orange-400">
+                                <span className="text-lg font-bold text-purple-600 dark:text-purple-400">
                                     NPR {totalAmount.toLocaleString()}
                                 </span>
                             </div>
@@ -110,7 +110,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         <div className="space-y-2">
                             <button
                                 onClick={handleCheckout}
-                                className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                className="w-full bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
                             >
                                 <span>Proceed to Checkout</span>
                                 <ArrowRight className="w-5 h-5" />

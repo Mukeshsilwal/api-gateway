@@ -104,7 +104,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
             {(formData.type === 'OFFLINE' || formData.type === 'HYBRID') && (
                 <div className="bg-gray-50 p-6 rounded-xl border border-gray-200">
                     <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                        <MapPin className="text-orange-600" size={20} />
+                        <MapPin className="text-purple-600" size={20} />
                         Venue Details
                     </h3>
 
@@ -118,7 +118,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.name || ''}
                                 onChange={(e) => updateVenueField('name', e.target.value)}
                                 placeholder="e.g. Kathmandu Convention Center"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-shadow"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-shadow"
                                 required
                             />
                         </div>
@@ -132,7 +132,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.capacity || ''}
                                 onChange={(e) => updateVenueField('capacity', parseInt(e.target.value))}
                                 placeholder="e.g. 500"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                     </div>
@@ -148,7 +148,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.address?.street || ''}
                                 onChange={(e) => updateAddressField('street', e.target.value)}
                                 placeholder="Street Address"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -157,7 +157,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.address?.city || ''}
                                 onChange={(e) => updateAddressField('city', e.target.value)}
                                 placeholder="City"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -166,7 +166,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.address?.state || ''}
                                 onChange={(e) => updateAddressField('state', e.target.value)}
                                 placeholder="State / Province"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -175,7 +175,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.address?.country || 'Nepal'}
                                 onChange={(e) => updateAddressField('country', e.target.value)}
                                 placeholder="Country"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                         <div>
@@ -184,7 +184,7 @@ const VenueScheduleForm: React.FC<VenueScheduleFormProps> = ({ data, onChange })
                                 value={formData.venue?.address?.postalCode || ''}
                                 onChange={(e) => updateAddressField('postalCode', e.target.value)}
                                 placeholder="Postal Code"
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                             />
                         </div>
                     </div>

@@ -14,7 +14,7 @@ const QfxBookingConfirmation = () => {
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">No Booking Found</h2>
                     <button
                         onClick={() => navigate('/qfx/movies')}
-                        className="px-6 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+                        className="px-6 py-2 bg-purple-500 text-white rounded hover:bg-purple-600"
                     >
                         Browse Movies
                     </button>
@@ -66,7 +66,7 @@ const QfxBookingConfirmation = () => {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-500">Amount Paid</span>
-                                <span className="font-bold text-orange-600">
+                                <span className="font-bold text-purple-600">
                                     Rs. {booking.amount || booking.Amount}
                                 </span>
                             </div>
