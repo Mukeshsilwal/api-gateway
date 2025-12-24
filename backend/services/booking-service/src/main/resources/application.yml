@@ -16,10 +16,15 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
 
-    activemq:
-      broker-url: tcp://localhost:61616
-      user: ${ACTIVEMQ_USER:admin}
-      password: ${ACTIVEMQ_PASSWORD:admin}
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: booking-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.ticketkatum.dto
+      auto-offset-reset: earliest
 
   jpa:
     hibernate:
@@ -81,7 +86,11 @@ server:
 
 sendgrid:
   api:
-    key: ${SENDGRID_API_KEY:REPLACE_ME}
+    key: ${SENDGRID_API_KEY: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}
+  sender:
+    email: ${SENDGRID_SENDER_EMAIL:ticketkatum5@gmail.com}
+    name: ${SENDGRID_SENDER_NAME:Ticket Katum}
+  enabled: ${SENDGRID_ENABLED:true}
 
 management:
   endpoints:

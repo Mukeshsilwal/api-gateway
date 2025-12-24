@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Calendar, MapPin, User, Mail, Phone, ArrowLeft, CheckCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -31,7 +31,7 @@ export function EventBooking() {
     const [attendees, setAttendees] = useState<Attendee[]>([]);
 
     // Check authentication on mount
-    React.useEffect(() => {
+    useEffect(() => {
         const token = localStorage.getItem('token');
 
         if (!token) {
@@ -57,7 +57,7 @@ export function EventBooking() {
     }, [navigate, eventId, event, selectedTickets]);
 
     // Initialize attendees array based on selected tickets
-    React.useEffect(() => {
+    useEffect(() => {
         if (!event || !selectedTickets) {
             // Check if there's a pending booking from session storage
             const pendingBooking = sessionStorage.getItem('pendingBooking');

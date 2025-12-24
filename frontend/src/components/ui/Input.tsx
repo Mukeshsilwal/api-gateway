@@ -33,14 +33,26 @@ const Input: React.FC<InputProps> = ({
                 <input
                     id={id}
                     className={`
-                        block w-full rounded-xl border-gray-200 bg-gray-50 
-                        focus:border-primary focus:ring-primary focus:bg-white 
+                        block w-full rounded-xl 
+                        
+                        /* Base Colors (Light Mode) */
+                        bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400
+                        
+                        /* Dark Mode Overrides */
+                        dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder-gray-500
+                        
+                        /* Interaction States */
+                        focus:border-primary focus:ring-primary focus:bg-white dark:focus:bg-slate-900
+                        
                         transition-all duration-200
-                        disabled:opacity-50 disabled:bg-gray-100
-                        placeholder:text-gray-400 text-gray-900
+                        disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-slate-800
+                        
                         ${Icon ? 'pl-10' : 'pl-4'} 
                         pr-4 py-2.5 
-                        ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-200' : 'border'}
+                        ${error
+                            ? 'border-red-500 focus:border-red-500 focus:ring-red-200 dark:focus:ring-red-900/30'
+                            : 'border'
+                        }
                         ${className}
                     `}
                     {...props}

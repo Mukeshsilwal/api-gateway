@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface ResaleListingRepository extends JpaRepository<ResaleListing, Long> {
     List<ResaleListing> findByEventIdAndStatus(Long eventId, ListingStatus status);
 
+    List<ResaleListing> findByEventId(Long eventId);
+
     List<ResaleListing> findBySellerUserId(long sellerUserId);
 }

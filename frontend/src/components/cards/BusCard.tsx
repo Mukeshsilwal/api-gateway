@@ -1,4 +1,3 @@
-import React from 'react';
 import { BusDto } from '../../types/dto';
 import { Bus, Clock, MapPin, Users, DollarSign } from 'lucide-react';
 

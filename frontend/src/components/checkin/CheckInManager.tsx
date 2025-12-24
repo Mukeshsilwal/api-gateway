@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, CheckCircle, Clock, RefreshCw, QrCode } from 'lucide-react';
 import QRScanner from './QRScanner';
 import apiClient from '../../services/api.client';

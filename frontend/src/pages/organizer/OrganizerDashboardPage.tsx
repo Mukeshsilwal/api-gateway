@@ -1,4 +1,3 @@
-import React from 'react';
 import { useOrganizerDashboard } from '../../hooks/useEvents';
 import EventCard from '../../components/cards/EventCard';
 import { useNavigate } from 'react-router-dom';

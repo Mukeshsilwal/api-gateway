@@ -19,11 +19,12 @@ public class LoyaltyService {
 
     private final LoyaltyProfileRepository profileRepository;
     private final PointTransactionRepository transactionRepository;
+    private final com.ticketkatum.market.events.MarketEventPublisher eventPublisher;
 
     @Transactional
     public void earnPoints(long userId, int spendAmount, String source) {
         LoyaltyProfile profile = getOrCreateProfile(userId);
-        
+
         // Calculate Multiplier based on Tier
         double multiplier = getTierMultiplier(profile.getTierLevel());
         int pointsEarned = (int) (spendAmount * multiplier);
@@ -34,15 +35,17 @@ public class LoyaltyService {
         updateTier(profile);
         profileRepository.save(profile);
 
-        // Record Transaction
         PointTransaction tx = PointTransaction.builder()
                 .userId(userId)
                 .amount(pointsEarned)
                 .source(source)
                 .description("Earned points from purchase")
                 .build();
-        transactionRepository.save(tx);
-        
+        PointTransaction savedTx = transactionRepository.save(tx);
+
+        // Publish event
+        eventPublisher.publishPointsEarned(savedTx);
+
         log.info("User {} earned {} points. New Balance: {}", userId, pointsEarned, profile.getPointsBalance());
     }
 
@@ -63,8 +66,11 @@ public class LoyaltyService {
                 .source(source)
                 .description("Redeemed points for reward")
                 .build();
-        transactionRepository.save(tx);
-        
+        PointTransaction savedTx = transactionRepository.save(tx);
+
+        // Publish event
+        eventPublisher.publishPointsRedeemed(savedTx);
+
         log.info("User {} redeemed {} points. New Balance: {}", userId, pointsToRedeem, profile.getPointsBalance());
     }
 
@@ -89,8 +95,10 @@ public class LoyaltyService {
         int lifetime = profile.getLifetimePoints();
         TierLevel newTier = TierLevel.BRONZE;
 
-        if (lifetime >= 2000) newTier = TierLevel.GOLD;
-        else if (lifetime >= 500) newTier = TierLevel.SILVER;
+        if (lifetime >= 2000)
+            newTier = TierLevel.GOLD;
+        else if (lifetime >= 500)
+            newTier = TierLevel.SILVER;
 
         if (newTier != profile.getTierLevel()) {
             log.info("User {} upgraded to Tier {}", profile.getUserId(), newTier);

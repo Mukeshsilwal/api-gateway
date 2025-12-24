@@ -17,6 +17,7 @@ public class PaymentVerificationResponse {
     private String status;
     private String message;
     private String transactionId;
+    private String bookingId;
     private BigDecimal amount;
     private String currency;
     private Map<String, Object> details;

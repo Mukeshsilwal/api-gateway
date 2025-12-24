@@ -1,4 +1,3 @@
-import React from 'react';
 import { SeatDto } from '../../types/dto';
 
 interface BusSeatPreviewProps {

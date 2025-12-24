@@ -1,7 +1,10 @@
 package com.ticketkatum.service.serviceimpl;
 
 import com.ticketkatum.entity.Hotel;
+import com.ticketkatum.entity.MealPlan;
+import com.ticketkatum.entity.RentType;
 import com.ticketkatum.entity.Room;
+import com.ticketkatum.entity.RoomPricing;
 import com.ticketkatum.exception.HotelNotFoundException;
 import com.ticketkatum.exception.RoomAlreadyExistsException;
 import com.ticketkatum.exception.RoomNotFoundException;
@@ -9,6 +12,9 @@ import com.ticketkatum.mapper.HotelMapper;
 import com.ticketkatum.model.CreateRoomRequest;
 import com.ticketkatum.model.RoomDTO;
 import com.ticketkatum.repository.HotelRepository;
+import com.ticketkatum.repository.MealPlanRepository;
+import com.ticketkatum.repository.RentTypeRepository;
+import com.ticketkatum.repository.RoomPricingRepository;
 import com.ticketkatum.repository.RoomRepository;
 import com.ticketkatum.service.RoomService;
 import com.ticketkatum.utils.ValidationUtils;
@@ -25,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -40,6 +47,9 @@ public class RoomServiceImpl implements RoomService {
     private final HotelRepository hotelRepository;
     private final RoomRepository roomRepository;
     private final HotelMapper hotelMapper;
+    private final RoomPricingRepository roomPricingRepository;
+    private final RentTypeRepository rentTypeRepository;
+    private final MealPlanRepository mealPlanRepository;
 
     /**
      * Add a new room to a hotel
@@ -97,6 +107,13 @@ public class RoomServiceImpl implements RoomService {
             // Initialize amenities and images before mapping (still inside transaction)
             Hibernate.initialize(savedRoom.getAmenities());
             Hibernate.initialize(savedRoom.getImages());
+
+            // Create pricing configurations if provided
+            if (req.getPricingConfigurations() != null && !req.getPricingConfigurations().isEmpty()) {
+                log.info("Creating {} pricing configurations for room {}",
+                        req.getPricingConfigurations().size(), savedRoom.getRoomNumber());
+                createPricingConfigurations(savedRoom, req.getPricingConfigurations());
+            }
 
             log.info("Room added successfully: {} to hotel: {}", savedRoom.getId(), hotelCode);
             return hotelMapper.toRoomDTO(savedRoom);
@@ -275,6 +292,47 @@ public class RoomServiceImpl implements RoomService {
 
         // Validate price range
         ValidationUtils.validatePriceRange(req.getBasePrice(), req.getMaxPrice());
+    }
+
+    /**
+     * Create pricing configurations for a room
+     *
+     * @param room    The room entity
+     * @param configs List of pricing configurations
+     */
+    private void createPricingConfigurations(Room room, List<CreateRoomRequest.PricingConfigDto> configs) {
+        for (CreateRoomRequest.PricingConfigDto config : configs) {
+            try {
+                // Find RentType by code (e.g., "DAILY", "WEEKLY", "MONTHLY")
+                RentType rentType = rentTypeRepository.findByCode(config.getRentType())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Invalid rent type: " + config.getRentType()));
+
+                // Find MealPlan by code (e.g., "NONE", "BREAKFAST", "HALF_BOARD", "FULL_BOARD")
+                MealPlan mealPlan = mealPlanRepository.findByCode(config.getMealPlan())
+                        .orElseThrow(() -> new RuntimeException(
+                                "Invalid meal plan: " + config.getMealPlan()));
+
+                // Create RoomPricing entity
+                RoomPricing pricing = RoomPricing.builder()
+                        .room(room)
+                        .rentType(rentType)
+                        .mealPlan(mealPlan)
+                        .baseRate(config.getPrice())
+                        .mealAddonCost(BigDecimal.ZERO) // Can be calculated or provided separately
+                        .effectiveFrom(LocalDate.now())
+                        .isActive(true)
+                        .build();
+
+                roomPricingRepository.save(pricing);
+                log.debug("Created pricing: {} - {} for room {}",
+                        rentType.getCode(), mealPlan.getCode(), room.getRoomNumber());
+            } catch (Exception e) {
+                log.error("Failed to create pricing configuration for room {}: {}",
+                        room.getRoomNumber(), e.getMessage());
+                // Continue with other configurations even if one fails
+            }
+        }
     }
 
     /**

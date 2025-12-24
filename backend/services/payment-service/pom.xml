@@ -23,15 +23,10 @@
     </properties>
 
     <dependencies>
+        <!-- Spring Kafka for event publishing -->
         <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-client-jakarta</artifactId>
-            <version>5.18.4</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jms</artifactId>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
 
 

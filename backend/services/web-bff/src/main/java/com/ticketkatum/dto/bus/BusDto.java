@@ -10,13 +10,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusDto {
-    @NonNull
     private long routeId;
     @NotNull
     private String busName;

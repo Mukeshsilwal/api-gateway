@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { useBusSeats, useHoldSeats, useCreateBusBooking } from '../../hooks/useApi';
 import SeatMap from '../../components/booking/SeatMap';

@@ -3,8 +3,7 @@ package com.ticketkatum.event;
 import com.ticketkatum.dto.PaymentVerifiedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.jms.core.JmsTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,12 +11,11 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PaymentEventPublisher {
 
-    @Qualifier("topicJmsTemplate")
-    private final JmsTemplate jmsTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private static final String TOPIC = "payment-verified";
 
     public void publishPaymentVerified(PaymentVerifiedEvent event) {
-        jmsTemplate.convertAndSend("payment.verified.queue", event);
-        log.info("Published payment verified event for booking {}", event.getBookingId());
+        kafkaTemplate.send(TOPIC, event.getBookingId(), event);
+        log.info("Published payment verified event to Kafka topic '{}' for booking {}", TOPIC, event.getBookingId());
     }
 }
-

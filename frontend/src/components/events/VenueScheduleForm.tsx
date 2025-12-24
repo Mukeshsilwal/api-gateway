@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { VenueDto, EventType } from '../../types/event-dto';
 import { Calendar, MapPin, Globe, Clock, Map } from 'lucide-react';
 

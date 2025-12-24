@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useHotelSearch } from '../../hooks/useApi';
 import SearchForm, { SearchParams } from '../../components/forms/SearchForm';
 import HotelCard from '../../components/cards/HotelCard';

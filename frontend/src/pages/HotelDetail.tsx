@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import hotelsApi from "../api/hotelsApi";
@@ -148,7 +148,7 @@ const HotelDetail: React.FC = () => {
                 hotelId: parseInt(hotelId),
                 checkIn: `${bookingParams.checkIn}T14:00:00`, // Default times if not provided
                 checkOut: `${bookingParams.checkOut}T11:00:00`,
-                guestsCount: bookingParams.guests || 1
+                guestsCount: bookingParams.guests || 1 // Changed from guests to guestsCount
             };
 
             const response = await bookingService.checkAvailability(request);
@@ -438,35 +438,26 @@ interface RoomCardProps {
     isAvailable: boolean;
 }
 
+
 const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAvailable }) => {
-    // Determine initial state if options exist
-    const [selectedRentType, setSelectedRentType] = useState(room.availableRentTypes?.[0]?.id || "");
-    const [selectedMealPlan, setSelectedMealPlan] = useState(room.availableMealPlans?.[0]?.id || "");
+    // Ensure we always have valid numeric IDs for rent type and meal plan
+    // Initialize with the first available option's ID, or fallback to 1 if none exist
+    const [selectedRentType, setSelectedRentType] = useState<number>(
+        Number(room.availableRentTypes?.[0]?.id) || 1
+    );
+    const [selectedMealPlan, setSelectedMealPlan] = useState<number>(
+        Number(room.availableMealPlans?.[0]?.id) || 1
+    );
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const handleBookClick = () => {
+        // Pass the selected rent type and meal plan IDs as numbers
         onBook({
-            // Pass minimal selected info, but typing needs to be consistent
-            // ID might be number or string, but we cast to Partial<Room> for simplicity in props
-            // Actually availableRentTypes have their own IDs, room has its own.
-            // We'll pass the selection IDs as custom properties if needed by BookingModal
-            // But usually BookingModal expects a Room object.
-            // We can augment it.
-            // For now, let's just pass what was passed in JS.
+            rentTypeId: selectedRentType,
+            mealPlanId: selectedMealPlan
         } as any);
-
-        // Actually, looking at JS:
-        // onBook({
-        //     rentTypeId: selectedRentType,
-        //     mealPlanId: selectedMealPlan
-        // });
-        // The parent merges this spread into the room object.
-        onBook({
-            // We are using `any` here because Room interface doesn't have rentTypeId/mealPlanId directly
-            // but the modal likely uses them.
-            ...({ rentTypeId: selectedRentType, mealPlanId: selectedMealPlan } as any)
-        });
     };
+
 
     const images = room.images && room.images.length > 0 ? room.images : [];
 
@@ -524,7 +515,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAva
                             <select
                                 className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                                 value={selectedRentType}
-                                onChange={(e) => setSelectedRentType(e.target.value)}
+                                onChange={(e) => setSelectedRentType(Number(e.target.value))}
                             >
                                 {room.availableRentTypes.map(type => (
                                     <option key={type.id} value={type.id}>
@@ -541,9 +532,8 @@ const RoomCard: React.FC<RoomCardProps> = ({ room, onBook, isDateSelected, isAva
                             <select
                                 className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
                                 value={selectedMealPlan}
-                                onChange={(e) => setSelectedMealPlan(e.target.value)}
+                                onChange={(e) => setSelectedMealPlan(Number(e.target.value))}
                             >
-                                <option value="">No Meal Plan</option>
                                 {room.availableMealPlans.map(plan => (
                                     <option key={plan.id} value={plan.id}>
                                         {plan.name} (+{plan.price})

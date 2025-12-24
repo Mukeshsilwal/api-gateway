@@ -1,4 +1,3 @@
-import React from 'react';
 import { Star, TrendingUp, Users, ArrowRight } from 'lucide-react';
 
 export const SocialProofSection = () => {

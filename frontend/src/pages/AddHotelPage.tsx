@@ -7,6 +7,14 @@ import { toast } from 'react-toastify';
 import { Plus, Trash2, Hotel, Save, X, Image as ImageIcon } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import ImageUpload from '../components/common/ImageUpload';
+
+interface PricingConfiguration {
+    rentType: string;
+    mealPlan: string;
+    mealService: string;
+    price: string | number;
+}
 
 interface RoomType {
     type: string;
@@ -15,6 +23,11 @@ interface RoomType {
     description: string;
     amenities: string[];
     maxOccupancy: string | number;
+    images: string[];
+    pricingConfigurations: PricingConfiguration[];
+    allowedRentTypes: string[];
+    allowedMealPlans: string[];
+    allowedMealServices: string[];
 }
 
 interface HotelForm {
@@ -30,6 +43,25 @@ interface HotelForm {
     images: string[];
     totalRooms: string | number;
 }
+
+const RENT_TYPES = [
+    { value: 'DAILY', label: 'Daily' },
+    { value: 'WEEKLY', label: 'Weekly' },
+    { value: 'MONTHLY', label: 'Monthly' }
+];
+
+const MEAL_PLANS = [
+    { value: 'NONE', label: 'No Meal' },
+    { value: 'BREAKFAST', label: 'Breakfast' },
+    { value: 'HALF_BOARD', label: 'Half Board' },
+    { value: 'FULL_BOARD', label: 'Full Board' }
+];
+
+const MEAL_SERVICES = [
+    { value: 'BUFFET', label: 'Buffet' },
+    { value: 'ROOM_SERVICE', label: 'Room Service' },
+    { value: 'ALACARTE', label: 'A la Carte' }
+];
 
 /**
  * AddHotelPage
@@ -57,7 +89,19 @@ const AddHotelPage = () => {
 
     // Room Types State
     const [roomTypes, setRoomTypes] = useState<RoomType[]>([
-        { type: '', price: '', availableRooms: '', description: '', amenities: [], maxOccupancy: 2 }
+        {
+            type: '',
+            price: '',
+            availableRooms: '',
+            description: '',
+            amenities: [],
+            maxOccupancy: 2,
+            images: [],
+            pricingConfigurations: [],
+            allowedRentTypes: ['DAILY'],
+            allowedMealPlans: ['NONE'],
+            allowedMealServices: ['BUFFET']
+        }
     ]);
 
     // Available Amenities Options
@@ -88,7 +132,17 @@ const AddHotelPage = () => {
 
     const addRoomType = () => {
         setRoomTypes([...roomTypes, {
-            type: '', price: '', availableRooms: '', description: '', amenities: [], maxOccupancy: 2
+            type: '',
+            price: '',
+            availableRooms: '',
+            description: '',
+            amenities: [],
+            maxOccupancy: 2,
+            images: [],
+            pricingConfigurations: [],
+            allowedRentTypes: ['DAILY'],
+            allowedMealPlans: ['NONE'],
+            allowedMealServices: ['BUFFET']
         }]);
     };
 
@@ -97,6 +151,32 @@ const AddHotelPage = () => {
             const updatedRooms = roomTypes.filter((_, i) => i !== index);
             setRoomTypes(updatedRooms);
         }
+    };
+
+    const handlePricingConfigAdd = (roomIndex: number) => {
+        const updatedRooms = [...roomTypes];
+        updatedRooms[roomIndex].pricingConfigurations.push({
+            rentType: 'DAILY',
+            mealPlan: 'NONE',
+            mealService: 'BUFFET',
+            price: ''
+        });
+        setRoomTypes(updatedRooms);
+    };
+
+    const handlePricingConfigChange = (roomIndex: number, configIndex: number, field: keyof PricingConfiguration, value: string | number) => {
+        const updatedRooms = [...roomTypes];
+        updatedRooms[roomIndex].pricingConfigurations[configIndex] = {
+            ...updatedRooms[roomIndex].pricingConfigurations[configIndex],
+            [field]: value
+        };
+        setRoomTypes(updatedRooms);
+    };
+
+    const handlePricingConfigRemove = (roomIndex: number, configIndex: number) => {
+        const updatedRooms = [...roomTypes];
+        updatedRooms[roomIndex].pricingConfigurations = updatedRooms[roomIndex].pricingConfigurations.filter((_, i) => i !== configIndex);
+        setRoomTypes(updatedRooms);
     };
 
     const validateForm = () => {
@@ -134,16 +214,59 @@ const AddHotelPage = () => {
             const createdHotel = await hotelService.createHotel(hotelPayload);
 
             if (createdHotel && createdHotel.id) {
-                // 2. Add Room Types
-                // Note: This assumes creating a hotel returns an ID we can use.
-                // If the backend requires adding rooms separately, we loop through them.
+                const hotelId = createdHotel.id;
 
-                // For demonstration, we'll simulate adding rooms or assume the backend handles it via a different endpoint
-                // Ideally, hotelService should have addRoomType(hotelId, roomData)
+                // 2. Create Room Types
+                if (roomTypes && roomTypes.length > 0) {
+                    toast.info(`Creating ${roomTypes.length} room type(s)...`);
 
-                console.log('Hotel Created:', createdHotel);
-                toast.success('Hotel added successfully!');
-                navigate('/admin/hotels'); // Redirect to admin hotel list
+                    let createdRoomsCount = 0;
+                    for (let i = 0; i < roomTypes.length; i++) {
+                        const roomType = roomTypes[i];
+                        try {
+                            const roomPayload = {
+                                roomType: roomType.type,
+                                basePrice: parseFloat(roomType.price as string),
+                                maxPrice: parseFloat(roomType.price as string),
+                                capacity: parseInt(roomType.maxOccupancy as string) || 2,
+                                amenities: roomType.amenities || [],
+                                description: roomType.description || '',
+                                active: true,
+                                images: roomType.images || [],
+                                roomNumber: `${roomType.type.substring(0, 3).toUpperCase()}-${i + 1}`,
+                                // Pricing configuration
+                                pricingConfigurations: roomType.pricingConfigurations.map(c => ({
+                                    ...c,
+                                    price: parseFloat(c.price as string)
+                                })),
+                                allowedRentTypes: roomType.allowedRentTypes,
+                                allowedMealPlans: roomType.allowedMealPlans,
+                                allowedMealServices: roomType.allowedMealServices
+                            };
+
+                            await hotelService.addRoom(hotelId, roomPayload);
+                            createdRoomsCount++;
+
+                            // Show progress
+                            if (roomTypes.length > 1) {
+                                toast.info(`Created room ${i + 1} of ${roomTypes.length}`, { autoClose: 1000 });
+                            }
+                        } catch (error: any) {
+                            console.error(`Failed to create room type ${roomType.type}:`, error);
+                            toast.error(`Failed to create room type: ${roomType.type}`);
+                        }
+                    }
+
+                    if (createdRoomsCount > 0) {
+                        toast.success(`Hotel created with ${createdRoomsCount} room type(s)!`);
+                    } else {
+                        toast.warning('Hotel created but no rooms were added. Please add rooms manually.');
+                    }
+                } else {
+                    toast.success('Hotel added successfully!');
+                }
+
+                navigate('/admin/hotels');
             } else {
                 throw new Error('Failed to create hotel - No ID returned');
             }
@@ -263,14 +386,57 @@ const AddHotelPage = () => {
                             type="button"
                             onClick={() => handleHotelAmenityToggle(amenity)}
                             className={`px-3 py-1 rounded-full text-sm border transition-colors ${hotelData.amenities.includes(amenity)
-                                    ? 'bg-indigo-100 border-indigo-300 text-indigo-700'
-                                    : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                ? 'bg-indigo-100 border-indigo-300 text-indigo-700'
+                                : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
                                 }`}
                         >
                             {amenity}
                         </button>
                     ))}
                 </div>
+            </div>
+
+            {/* Hotel Images */}
+            <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Hotel Images</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {hotelData.images.map((imageUrl, index) => (
+                        <div key={index}>
+                            <ImageUpload
+                                value={imageUrl}
+                                onChange={(url) => {
+                                    const newImages = [...hotelData.images];
+                                    if (url) {
+                                        newImages[index] = url;
+                                    } else {
+                                        newImages.splice(index, 1);
+                                    }
+                                    setHotelData(prev => ({ ...prev, images: newImages }));
+                                }}
+                                label={`Image ${index + 1}`}
+                                description="Upload hotel image (recommended 1200x800px)"
+                            />
+                        </div>
+                    ))}
+                    {hotelData.images.length < 5 && (
+                        <div>
+                            <ImageUpload
+                                value=""
+                                onChange={(url) => {
+                                    if (url) {
+                                        setHotelData(prev => ({
+                                            ...prev,
+                                            images: [...prev.images, url]
+                                        }));
+                                    }
+                                }}
+                                label={`Add Image ${hotelData.images.length + 1}`}
+                                description="Upload hotel image (recommended 1200x800px)"
+                            />
+                        </div>
+                    )}
+                </div>
+                <p className="text-xs text-gray-500 mt-2">You can upload up to 5 images. Images are uploaded immediately.</p>
             </div>
 
             <div className="flex justify-end pt-4">
@@ -338,6 +504,119 @@ const AddHotelPage = () => {
                                 onChange={(e) => handleRoomChange(index, 'description', e.target.value)}
                                 className="w-full p-2 border rounded-lg h-20"
                             />
+                        </div>
+                    </div>
+
+                    {/* Room Images */}
+                    <div className="mt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-3">Room Images</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {room.images.map((imageUrl, imgIndex) => (
+                                <div key={imgIndex}>
+                                    <ImageUpload
+                                        value={imageUrl}
+                                        onChange={(url) => {
+                                            const newImages = [...room.images];
+                                            if (url) {
+                                                newImages[imgIndex] = url;
+                                            } else {
+                                                newImages.splice(imgIndex, 1);
+                                            }
+                                            handleRoomChange(index, 'images', newImages);
+                                        }}
+                                        label={`Image ${imgIndex + 1}`}
+                                        description="Upload room image (recommended 1200x800px)"
+                                    />
+                                </div>
+                            ))}
+                            {room.images.length < 3 && (
+                                <div>
+                                    <ImageUpload
+                                        value=""
+                                        onChange={(url) => {
+                                            if (url) {
+                                                handleRoomChange(index, 'images', [...room.images, url]);
+                                            }
+                                        }}
+                                        label={`Add Image ${room.images.length + 1}`}
+                                        description="Upload room image (recommended 1200x800px)"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">You can upload up to 3 images per room type.</p>
+                    </div>
+
+                    {/* Pricing Configuration */}
+                    <div className="mt-6 pt-6 border-t border-gray-200">
+                        <div className="flex items-center justify-between mb-4">
+                            <h4 className="font-semibold text-gray-800">Pricing Configuration</h4>
+                            <button
+                                type="button"
+                                onClick={() => handlePricingConfigAdd(index)}
+                                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                            >
+                                <Plus size={16} /> Add Pricing Rule
+                            </button>
+                        </div>
+
+                        <div className="space-y-3">
+                            {room.pricingConfigurations.length === 0 && (
+                                <p className="text-sm text-gray-500 italic text-center py-2">No pricing rules added. Click "Add Pricing Rule" to configure pricing.</p>
+                            )}
+                            {room.pricingConfigurations.map((config, configIndex) => (
+                                <div key={configIndex} className="flex flex-wrap items-end gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <div className="w-full sm:w-auto flex-1">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Rent Type</label>
+                                        <select
+                                            value={config.rentType}
+                                            onChange={(e) => handlePricingConfigChange(index, configIndex, 'rentType', e.target.value)}
+                                            className="w-full px-2 py-1.5 text-sm border rounded-lg"
+                                        >
+                                            {RENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="w-full sm:w-auto flex-1">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Meal Plan</label>
+                                        <select
+                                            value={config.mealPlan}
+                                            onChange={(e) => handlePricingConfigChange(index, configIndex, 'mealPlan', e.target.value)}
+                                            className="w-full px-2 py-1.5 text-sm border rounded-lg"
+                                        >
+                                            {MEAL_PLANS.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="w-full sm:w-auto flex-1">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Service</label>
+                                        <select
+                                            value={config.mealService}
+                                            onChange={(e) => handlePricingConfigChange(index, configIndex, 'mealService', e.target.value)}
+                                            className="w-full px-2 py-1.5 text-sm border rounded-lg"
+                                        >
+                                            {MEAL_SERVICES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="w-32">
+                                        <label className="block text-xs font-medium text-gray-600 mb-1">Price (NPR)</label>
+                                        <input
+                                            type="number"
+                                            value={config.price}
+                                            onChange={(e) => handlePricingConfigChange(index, configIndex, 'price', e.target.value)}
+                                            className="w-full px-2 py-1.5 text-sm border rounded-lg"
+                                            placeholder="Price"
+                                            min="0"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => handlePricingConfigRemove(index, configIndex)}
+                                        className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Remove rule"
+                                    >
+                                        <Trash2 size={16} />
+                                    </button>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </Card>

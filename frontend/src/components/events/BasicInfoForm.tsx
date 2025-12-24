@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { EventBasicInfoDto, EventCategory, EventType } from '../../types/event-dto';
 import { Tag, Type, Globe } from 'lucide-react';
 import ImageUpload from '../common/ImageUpload';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { EventTicketingDto, TicketTypeDto } from '../../types/event-dto';
 import { Plus, Trash2, Ticket, Calendar, Users } from 'lucide-react';
 

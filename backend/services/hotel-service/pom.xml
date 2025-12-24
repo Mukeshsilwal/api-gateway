@@ -42,24 +42,10 @@
             <version>1.0.0</version>
         </dependency>
 
-        <!-- Spring Boot ActiveMQ Starter (Jakarta) -->
+        <!-- Spring Kafka for event consumption -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-activemq</artifactId>
-        </dependency>
-
-        <!-- Artemis JMS client -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-jms-client</artifactId>
-            <version>2.30.0</version>
-        </dependency>
-
-        <!-- Artemis core client -->
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>artemis-core-client</artifactId>
-            <version>2.30.0</version>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
 
 

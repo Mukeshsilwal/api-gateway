@@ -1,4 +1,3 @@
-import React from 'react';
 import EsewaPaymentUI from '../components/payment/EsewaPaymentUI';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';

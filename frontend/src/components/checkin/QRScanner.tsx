@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { CheckCircle, XCircle, AlertCircle, Loader } from 'lucide-react';
 import apiClient from '../../services/api.client';

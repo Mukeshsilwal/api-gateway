@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Clock, Users, CheckCircle } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, CheckCircle, ShoppingCart } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import eventService from '../services/eventService';
+import { useUnifiedBookingCart } from '../hooks/useUnifiedBookingCart';
 
 interface TicketType {
     id: number;
@@ -50,6 +51,7 @@ export function EventDetails() {
     const [loading, setLoading] = useState(true);
     const [selectedTickets, setSelectedTickets] = useState<{ [key: number]: number }>({});
     const [totalAmount, setTotalAmount] = useState(0);
+    const { addToCart } = useUnifiedBookingCart();
 
     useEffect(() => {
         if (eventId) {
@@ -130,6 +132,58 @@ export function EventDetails() {
                 selectedTickets
             }
         });
+    };
+
+    const handleAddToCart = () => {
+        const hasTickets = Object.values(selectedTickets).some(q => q > 0);
+        if (!hasTickets) {
+            toast.error('Please select at least one ticket');
+            return;
+        }
+
+        if (!event) return;
+
+        // Build cart item payload
+        const ticketSelections = Object.entries(selectedTickets)
+            .filter(([_, quantity]) => quantity > 0)
+            .map(([ticketTypeId, quantity]) => {
+                const ticket = event.ticketTypes?.find(t => t.id === parseInt(ticketTypeId));
+                return {
+                    ticketTypeId: parseInt(ticketTypeId),
+                    quantity,
+                    ticketName: ticket?.name || 'Unknown',
+                    price: ticket?.price || 0
+                };
+            });
+
+        const totalQuantity = Object.values(selectedTickets).reduce((sum, q) => sum + q, 0);
+        const firstTicket = event.ticketTypes?.find(t => selectedTickets[t.id] > 0);
+
+        // Add to cart
+        addToCart({
+            type: 'EVENT',
+            name: event.name,
+            amount: totalAmount,
+            payload: {
+                eventId: event.id,
+                tickets: ticketSelections,
+                email: '', // Will be collected at checkout
+                phone: '', // Will be collected at checkout
+            },
+            metadata: {
+                description: event.description,
+                imageUrl: event.coverImage,
+                eventDate: event.startDateTime,
+                eventLocation: `${event.venue?.city}, ${event.venue?.country}`,
+                ticketType: ticketSelections.length === 1 ? firstTicket?.name : `${ticketSelections.length} types`,
+                quantity: totalQuantity,
+            },
+        });
+
+        toast.success(`Added ${totalQuantity} ticket(s) to cart!`);
+
+        // Reset selections
+        setSelectedTickets({});
     };
 
     if (loading) {
@@ -382,14 +436,31 @@ export function EventDetails() {
                                     </div>
                                 )}
 
-                                {/* Book Now Button */}
-                                <button
-                                    onClick={handleBookNow}
-                                    disabled={availableTickets === 0}
-                                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {availableTickets === 0 ? 'Sold Out' : 'Proceed to Checkout'}
-                                </button>
+                                {/* Action Buttons */}
+                                <div className="space-y-3">
+                                    {/* Add to Cart Button */}
+                                    <button
+                                        onClick={handleAddToCart}
+                                        disabled={availableTickets === 0 || totalAmount === 0}
+                                        className="w-full py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold text-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                                    >
+                                        <ShoppingCart size={20} />
+                                        {availableTickets === 0 ? 'Sold Out' : 'Add to Cart'}
+                                    </button>
+
+                                    {/* Book Now Button */}
+                                    <button
+                                        onClick={handleBookNow}
+                                        disabled={availableTickets === 0 || totalAmount === 0}
+                                        className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-bold text-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {availableTickets === 0 ? 'Sold Out' : 'Book Now'}
+                                    </button>
+
+                                    <p className="text-xs text-gray-500 text-center">
+                                        Add to cart for multi-service booking or book now for instant checkout
+                                    </p>
+                                </div>
 
                                 {/* Trust Badges */}
                                 <div className="grid grid-cols-3 gap-2 mt-4 text-center text-xs text-gray-600">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import NavigationBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import PlaneDetail from "../components/PlaneDetail";

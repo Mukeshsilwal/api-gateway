@@ -25,6 +25,7 @@ public class BundleService {
 
     private final BundleRepository bundleRepository;
     private final BookingServiceClient bookingServiceClient;
+    private final com.ticketkatum.market.events.MarketEventPublisher eventPublisher;
 
     public List<Bundle> getActiveBundles() {
         return bundleRepository.findByActiveTrue();
@@ -47,22 +48,25 @@ public class BundleService {
                 log.info("Processing bundle item: {} - {}", item.getItemType(), item.getItemReferenceId());
 
                 BookingRequest request = createBookingRequest(item, userId, contact, payment);
-                
+
                 // Map ItemType to Category/Service strings expected by BookingService
                 String category = mapToCategory(item.getItemType());
                 String service = mapToService(item.getItemType()); // e.g., "star-hotel" or "qfx"
 
                 Response response = bookingServiceClient.bookTicket(category, service, request);
-                
+
                 // Check if response indicates success (Assuming Response has status or code)
-                // If using standard shared Response, we assume HTTP 200 meant success or check body
-                // For simplicity here, if it didn't throw FeignException, we assume success or check 'code'
-                
+                // If using standard shared Response, we assume HTTP 200 meant success or check
+                // body
+                // For simplicity here, if it didn't throw FeignException, we assume success or
+                // check 'code'
+
                 processedItems.add(item);
             }
-            
-            // If all succeeded, we are good.
-            // In real world, we would also verify Payment for the total Bundle Price here.
+
+            // If all succeeded, publish event
+            eventPublisher.publishBundleBooked(bundle, userId);
+            log.info("Bundle {} successfully booked for user {}", bundleId, userId);
 
         } catch (Exception e) {
             log.error("Bundle booking failed, initiating rollback", e);
@@ -78,9 +82,9 @@ public class BundleService {
             try {
                 log.info("Compensating (Cancelling) item: {}", item.getId());
                 BookingRequest request = createBookingRequest(item, userId, contact, null); // Payment null for cancel?
-                 String category = mapToCategory(item.getItemType());
+                String category = mapToCategory(item.getItemType());
                 String service = mapToService(item.getItemType());
-                
+
                 bookingServiceClient.cancelBooking(category, service, request);
             } catch (Exception e) {
                 log.error("Failed to compensate item: {}", item.getId(), e);
@@ -89,7 +93,8 @@ public class BundleService {
         }
     }
 
-    private BookingRequest createBookingRequest(BundleItem item, UUID userId, ContactDetails contact, PaymentDetails payment) {
+    private BookingRequest createBookingRequest(BundleItem item, UUID userId, ContactDetails contact,
+            PaymentDetails payment) {
         // Construct Request based on Item details
         // This maps the generic BundleItem to the specific Service Request
         return BookingRequest.builder()
@@ -99,7 +104,7 @@ public class BundleService {
                 .numberOfRooms(item.getQuantity())
                 .contactDetails(contact)
                 .paymentDetails(payment)
-                //.checkInDate(...) // In a real app, user selects dates for the bundle
+                // .checkInDate(...) // In a real app, user selects dates for the bundle
                 .build();
     }
 
@@ -111,12 +116,13 @@ public class BundleService {
             default -> "misc";
         };
     }
-    
+
     private String mapToService(ItemType type) {
-         // This is tricky. BookingService expects "service" name like "himchuli" or "qfx".
-         // We might store this in itemReferenceId or subReferenceId?
-         // For now, hardcode or assume it's part of the ID logic.
-         // Let's assume itemReferenceId contains "serviceName" or we default.
-         return "default-service"; 
+        // This is tricky. BookingService expects "service" name like "himchuli" or
+        // "qfx".
+        // We might store this in itemReferenceId or subReferenceId?
+        // For now, hardcode or assume it's part of the ID logic.
+        // Let's assume itemReferenceId contains "serviceName" or we default.
+        return "default-service";
     }
 }

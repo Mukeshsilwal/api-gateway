@@ -1,4 +1,3 @@
-import React from "react";
 import { PaymentProvider } from "../types/common";
 
 interface PaymentProviderSelectorProps {

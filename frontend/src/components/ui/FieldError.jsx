@@ -19,7 +19,7 @@ export default function FieldError({ error, className = '', show }) {
 
     return (
         <div
-            className={`flex items-start gap-1.5 mt-1.5 text-sm text-red-600 animate-fadeIn ${className}`}
+            className={`flex items-start gap-1.5 mt-1.5 text-sm text-red-600 dark:text-red-400 animate-fadeIn ${className}`}
             role="alert"
         >
             <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -66,15 +66,15 @@ export function FormError({ message, suggestion, className = '' }) {
 
     return (
         <div
-            className={`p-4 rounded-lg bg-red-50 border border-red-200 animate-fadeIn ${className}`}
+            className={`p-4 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-900/50 animate-fadeIn ${className}`}
             role="alert"
         >
             <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                    <p className="text-sm font-medium text-red-800">{message}</p>
+                    <p className="text-sm font-medium text-red-800 dark:text-red-200">{message}</p>
                     {suggestion && (
-                        <p className="mt-1 text-sm text-red-700">{suggestion}</p>
+                        <p className="mt-1 text-sm text-red-700 dark:text-red-300">{suggestion}</p>
                     )}
                 </div>
             </div>

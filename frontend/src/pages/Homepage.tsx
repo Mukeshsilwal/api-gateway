@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, Hotel, Plane, ArrowRightLeft, Search } from 'lucide-react';
 import Navbar from '../components/Navbar';

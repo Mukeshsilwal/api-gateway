@@ -1,4 +1,3 @@
-import React from 'react';
 import { EventBasicInfoDto, EventTicketingDto, VenueDto, EventType } from '../../types/event-dto';
 import { Calendar, MapPin, Globe, Ticket, Clock, CheckCircle } from 'lucide-react';
 

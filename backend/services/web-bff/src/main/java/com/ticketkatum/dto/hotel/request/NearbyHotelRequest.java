@@ -8,7 +8,6 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-
 /**
  * Request DTO for finding nearby hotels
  */
@@ -32,6 +31,7 @@ public class NearbyHotelRequest {
     // Radius in kilometers (default: 10km)
     @Min(value = 1, message = "Radius must be at least 1 km")
     @Max(value = 100, message = "Radius cannot exceed 100 km")
+    @Builder.Default
     private Double radiusKm = 10.0;
 
     // Optional filters
@@ -40,13 +40,16 @@ public class NearbyHotelRequest {
     private List<String> amenities; // Filter by amenities
 
     // Sorting
+    @Builder.Default
     private String sortBy = "distance"; // distance, price, rating
 
     // Pagination
     @Min(value = 1, message = "Page must be at least 1")
+    @Builder.Default
     private Integer page = 1;
 
     @Min(value = 1, message = "Limit must be at least 1")
     @Max(value = 50, message = "Limit cannot exceed 50")
+    @Builder.Default
     private Integer limit = 10;
 }

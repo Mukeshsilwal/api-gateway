@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { completeHotelBooking } from "../api/hotel";
 import { PaymentProvider } from "../types/common";
 import { HotelBookingRequest, HotelBookingResponse } from "../types/hotel";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import hotelService from "../services/hotel.service";
@@ -17,7 +17,7 @@ const HotelList = () => {
     const navigate = useNavigate();
     const location = useLocation();
     // Memoize default params to prevent unstable dependency in useCallback
-    const defaultParams = React.useMemo(() => location.state || {}, [location.state]);
+    const defaultParams = useMemo(() => location.state || {}, [location.state]);
 
     const [hotels, setHotels] = useState<any[]>([]);
     const [filteredHotels, setFilteredHotels] = useState<any[]>([]);

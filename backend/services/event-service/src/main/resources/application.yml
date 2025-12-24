@@ -57,16 +57,16 @@ spring:
     redis:
       time-to-live: 300000 # 5 minutes default
   
-  # ActiveMQ Configuration
-  activemq:
-    broker-url: ${ACTIVEMQ_BROKER_URL:tcp://host.docker.internal:61616}
-    user: ${ACTIVEMQ_USER:admin}
-    password: ${ACTIVEMQ_PASSWORD:admin}
-    packages:
-      trust-all: true
-  
-  jms:
-    pub-sub-domain: false  # Use queues, not topics
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: event-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.ticketkatum.dto
+      auto-offset-reset: earliest
 
 # Server Configuration
 server:

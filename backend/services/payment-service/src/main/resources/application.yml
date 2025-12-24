@@ -21,16 +21,13 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
-    activemq:
-      broker-url: ${ACTIVEMQ_BROKER_URL:tcp://host.docker.internal:61616}
-      user: ${ACTIVEMQ_USER:admin}
-      password: ${ACTIVEMQ_PASSWORD:admin}
-      packages:
-        trust-all: true
-    
-    jms:
-      pub-sub-domain: false  # Use queues, not topics
-
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+      retries: 3
 
 esewa:
   merchant-code: EPAYTEST
@@ -39,17 +36,6 @@ esewa:
   base-url: https://rc-epay.esewa.com.np/api/epay/main/v2/form
   verify-url: https://rc-epay.esewa.com.np/api/epay/transaction/status
   secret-key: "8gBm/:&EnhH.1/q"
-
-  kafka:
-    kafka:
-      bootstrap-servers: localhost:9092
-      consumer:
-        auto-offset-reset: earliest
-        enable-auto-commit: false
-        properties:
-          isolation.level: read_committed
-      producer:
-        acks: all
 
 sendgrid:
   api:

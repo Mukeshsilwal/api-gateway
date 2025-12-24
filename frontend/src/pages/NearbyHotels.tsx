@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MapPin, SlidersHorizontal, Loader, AlertCircle } from 'lucide-react';
 import { toast } from 'react-toastify';
 import NavigationBar from '../components/Navbar';

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBookingContext } from '../utils/paymentStorage';
 import BookingStatus from '../components/BookingStatus';

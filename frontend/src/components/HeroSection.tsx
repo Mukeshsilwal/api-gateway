@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, Hotel, Plane, Search, Loader, ArrowRightLeft, ShieldCheck } from 'lucide-react';
 import { toast } from 'react-toastify';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Tag, Percent, DollarSign, Calendar, Users, Check, X } from 'lucide-react';
 import apiClient from '../../services/api.client';
 

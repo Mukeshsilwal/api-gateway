@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -63,5 +64,36 @@ public class CreateRoomRequest {
     @Builder.Default
     private Set<@Pattern(regexp = "^https?://.*", message = "Invalid image URL") String> images = new HashSet<>();
 
-    // REMOVED: imageUrl field (not used in Room entity)
+    // Pricing Configuration
+    private List<PricingConfigDto> pricingConfigurations;
+
+    @Builder.Default
+    private Set<String> allowedRentTypes = new HashSet<>();
+
+    @Builder.Default
+    private Set<String> allowedMealPlans = new HashSet<>();
+
+    @Builder.Default
+    private Set<String> allowedMealServices = new HashSet<>();
+
+    /**
+     * DTO for pricing configuration
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PricingConfigDto {
+        @NotBlank(message = "Rent type is required")
+        private String rentType; // "DAILY", "WEEKLY", "MONTHLY"
+
+        @NotBlank(message = "Meal plan is required")
+        private String mealPlan; // "NONE", "BREAKFAST", "HALF_BOARD", "FULL_BOARD"
+
+        private String mealService; // "BUFFET", "ROOM_SERVICE", "ALACARTE"
+
+        @NotNull(message = "Price is required")
+        @DecimalMin(value = "0.0", message = "Price must be non-negative")
+        private BigDecimal price;
+    }
 }

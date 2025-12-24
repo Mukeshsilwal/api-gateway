@@ -194,6 +194,7 @@ public class EsewaPaymentProvider implements PaymentProvider {
 
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("transactionId", txn.getInternalTxnId());
+            responseData.put("bookingId", txn.getBookingId());
             responseData.put("externalTxnId", result.getRefId());
             responseData.put("amount", txn.getAmount());
             responseData.put("status", "SUCCESS");

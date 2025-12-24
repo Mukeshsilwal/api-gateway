@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import SeatLayout from '../components/SeatLayout';
 import SeatLegend from '../components/SeatLegend';
 import useSeatSelection from '../hooks/useSeatSelection';

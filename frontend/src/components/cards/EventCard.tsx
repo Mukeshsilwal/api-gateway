@@ -1,4 +1,3 @@
-import React from 'react';
 import { EventCardDto } from '../../types/event-dto';
 import { Calendar, MapPin, Users, Tag, TrendingUp } from 'lucide-react';
 

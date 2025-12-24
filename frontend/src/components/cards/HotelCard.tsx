@@ -1,4 +1,3 @@
-import React from 'react';
 import { HotelDto } from '../../types/dto';
 import { Star, MapPin, Users, Wifi, Coffee, Car } from 'lucide-react';
 

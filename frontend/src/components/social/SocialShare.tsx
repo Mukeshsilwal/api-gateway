@@ -1,4 +1,3 @@
-import React from 'react';
 import { Share2, Facebook, Twitter, Linkedin, Copy, Check } from 'lucide-react';
 
 interface SocialShareProps {

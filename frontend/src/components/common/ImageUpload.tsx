@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { CloudUpload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import imageService from '../../services/image.service';

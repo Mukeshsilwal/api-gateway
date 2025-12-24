@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface Step {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { BookingResponseDto } from '../../types/dto';
 import { CheckCircle, Clock, CreditCard, Calendar, MapPin } from 'lucide-react';
 

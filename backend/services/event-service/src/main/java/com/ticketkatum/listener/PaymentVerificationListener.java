@@ -4,12 +4,12 @@ import com.ticketkatum.dto.PaymentVerifiedEvent;
 import com.ticketkatum.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.jms.annotation.JmsListener;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 /**
- * JMS Listener for payment verification events.
- * Listens to payment.verified.queue and updates booking status when payment is
+ * Kafka Listener for payment verification events.
+ * Listens to payment-verified topic and updates booking status when payment is
  * confirmed.
  */
 @Slf4j
@@ -20,15 +20,15 @@ public class PaymentVerificationListener {
     private final BookingService bookingService;
 
     /**
-     * Handle payment verified event from ActiveMQ.
+     * Handle payment verified event from Kafka.
      * Updates event booking status to CONFIRMED when payment is successfully
      * verified.
      *
      * @param event PaymentVerifiedEvent containing payment and booking details
      */
-    @JmsListener(destination = "payment.verified.queue")
+    @KafkaListener(topics = "payment-verified", groupId = "event-service-group")
     public void handlePaymentVerified(PaymentVerifiedEvent event) {
-        log.info("📨 Received payment verified event for booking: {}, type: {}",
+        log.info("📨 Received payment verified event from Kafka for booking: {}, type: {}",
                 event.getBookingId(), event.getBookingType());
 
         try {
@@ -50,7 +50,7 @@ public class PaymentVerificationListener {
         } catch (Exception e) {
             log.error("❌ Failed to process payment verification for booking: {}",
                     event.getBookingId(), e);
-            // TODO: Implement retry mechanism or dead letter queue
+            // TODO: Implement retry mechanism or dead letter topic
             throw new RuntimeException("Payment verification processing failed", e);
         }
     }

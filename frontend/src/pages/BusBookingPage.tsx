@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { completeBusBooking } from "../api/bus";
 import { PaymentProvider } from "../types/common";
 import { BusBookingRequest, BusBookingResponse } from "../types/bus";

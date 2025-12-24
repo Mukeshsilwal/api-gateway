@@ -26,6 +26,7 @@ public class ResaleService {
     private final ResaleListingRepository listingRepository;
     private final ResaleTransactionRepository transactionRepository;
     private final BookingServiceClient bookingServiceClient;
+    private final com.ticketkatum.market.events.MarketEventPublisher eventPublisher;
 
     private static final BigDecimal COMMISSION_RATE = new BigDecimal("0.05"); // 5%
     private static final BigDecimal MAX_PRICE_MARKUP = new BigDecimal("1.10"); // 110% of face value
@@ -63,7 +64,12 @@ public class ResaleService {
                 .expiresAt(LocalDateTime.now().plusDays(7)) // Default 7 days expiry
                 .build();
 
-        return listingRepository.save(listing);
+        ResaleListing savedListing = listingRepository.save(listing);
+
+        // Publish event
+        eventPublisher.publishListingCreated(savedListing);
+
+        return savedListing;
     }
 
     @Transactional
@@ -102,7 +108,12 @@ public class ResaleService {
                 .payoutAmount(listing.getResalePrice().subtract(listing.getCommissionFee()))
                 .build();
 
-        return transactionRepository.save(transaction);
+        ResaleTransaction savedTransaction = transactionRepository.save(transaction);
+
+        // Publish event
+        eventPublisher.publishListingSold(savedTransaction, listing);
+
+        return savedTransaction;
     }
 
     public List<ResaleListing> getActiveListingsForEvent(Long eventId) {

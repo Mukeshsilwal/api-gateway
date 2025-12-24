@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEntitySearch } from '../../hooks/useEntitySearch';
 import { Search, User, Settings, FileText, Shield, Bus, Map, Film, Home, Loader2, Ticket, LucideIcon } from 'lucide-react';

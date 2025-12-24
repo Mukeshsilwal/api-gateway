@@ -20,5 +20,7 @@ public class Bundle {
     private BigDecimal totalPrice;
     private BigDecimal discountPercentage;
     private boolean active;
+
+    @Builder.Default
     private List<BundleItem> items = new ArrayList<>();
 }

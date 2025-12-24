@@ -1,4 +1,3 @@
-import React from 'react';
 import { PricingResponseDto } from '../../types/dto';
 import { Receipt, Tag, Percent } from 'lucide-react';
 

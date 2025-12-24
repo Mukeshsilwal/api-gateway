@@ -1,4 +1,3 @@
-import React from 'react';
 import { PaymentResponseDto } from '../../types/dto';
 import { CheckCircle, XCircle, Clock, AlertCircle, ExternalLink } from 'lucide-react';
 

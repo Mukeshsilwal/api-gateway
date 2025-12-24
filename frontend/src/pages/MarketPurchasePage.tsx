@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { completeMarketPurchase } from "../api/market";
 import { PaymentProvider } from "../types/common";
 import { MarketPurchaseRequest, MarketPurchaseResponse } from "../types/market";

@@ -40,6 +40,7 @@ public class GenericHotelService implements BookingProvider {
     private final ObjectMapper mapper;
     private final HotelEmailService emailService;
     private final EsewaProperties esewaProperties;
+    private final com.ticketkatum.events.publisher.EventPublisher eventPublisher;
 
     @Setter
     private String hotelCode;
@@ -61,7 +62,8 @@ public class GenericHotelService implements BookingProvider {
             HotelConfig config = hotelConfigRepo.findByHotelName(req.getHotelName())
                     .orElseThrow(() -> new RuntimeException("Hotel configuration not found"));
 
-            if (req.getHotelName() == null) req.setHotelName(config.getHotelName());
+            if (req.getHotelName() == null)
+                req.setHotelName(config.getHotelName());
 
             BigDecimal totalAmount = calculateDynamicPrice(req, config);
 
@@ -96,6 +98,25 @@ public class GenericHotelService implements BookingProvider {
 
             sendConfirmationEmail(booking);
 
+            // Publish Kafka Event
+            try {
+                com.ticketkatum.events.hotel.HotelBookingConfirmedEvent event = new com.ticketkatum.events.hotel.HotelBookingConfirmedEvent(
+                        com.ticketkatum.events.hotel.HotelBookingConfirmedEvent.HotelBookingPayload.builder()
+                                .bookingId(booking.getBookingId())
+                                .hotelName(booking.getHotelName())
+                                .roomType(booking.getRoomType())
+                                .checkInDate(booking.getCheckInDate())
+                                .checkOutDate(booking.getCheckOutDate())
+                                .totalAmount(booking.getTotalAmount())
+                                .customerEmail(booking.getContactEmail())
+                                .confirmationNumber(booking.getConfirmationNumber())
+                                .build());
+                eventPublisher.publishEvent(event, booking.getContactEmail()); // Use email as partition key
+            } catch (Exception ex) {
+                log.error("Failed to publish hotel booking event", ex);
+                // Don't fail the transaction just because Kafka failed
+            }
+
             HotelBookingResponse response = HotelBookingResponse.builder()
                     .bookingId(booking.getBookingId())
                     .confirmationNumber(booking.getConfirmationNumber())
@@ -119,7 +140,6 @@ public class GenericHotelService implements BookingProvider {
         }
     }
 
-
     @Transactional
     public void confirmBooking(String bookingId) {
 
@@ -135,7 +155,6 @@ public class GenericHotelService implements BookingProvider {
 
         log.info("Booking {} confirmed successfully", bookingId);
     }
-
 
     @Override
     @Transactional
@@ -170,7 +189,6 @@ public class GenericHotelService implements BookingProvider {
         }
     }
 
-
     @Override
     @Transactional
     public Response refund(Request request) {
@@ -203,30 +221,29 @@ public class GenericHotelService implements BookingProvider {
         HotelBooking booking = hotelBookingRepo.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-            return """
-            <html>
-              <body onload="document.forms[0].submit()">
-                <form action="%s" method="GET">
-                  <input type="hidden" name="amt" value="%s"/>
-                  <input type="hidden" name="psc" value="0"/>
-                  <input type="hidden" name="pdc" value="0"/>
-                  <input type="hidden" name="tAmt" value="%s"/>
-                  <input type="hidden" name="pid" value="%s"/>
-                  <input type="hidden" name="scd" value="%s"/>
-                  <input type="hidden" name="su" value="%s"/>
-                  <input type="hidden" name="fu" value="%s"/>
-                </form>
-              </body>
-            </html>
-            """.formatted(
-                    esewaProperties.getBaseUrl(),
-                    booking.getTotalAmount(),
-                    booking.getTotalAmount(),
-                    booking.getId(),
-                    esewaProperties.getMerchantCode(),
-                    esewaProperties.getSuccessUrl(),
-                    esewaProperties.getFailureUrl()
-            );
+        return """
+                <html>
+                  <body onload="document.forms[0].submit()">
+                    <form action="%s" method="GET">
+                      <input type="hidden" name="amt" value="%s"/>
+                      <input type="hidden" name="psc" value="0"/>
+                      <input type="hidden" name="pdc" value="0"/>
+                      <input type="hidden" name="tAmt" value="%s"/>
+                      <input type="hidden" name="pid" value="%s"/>
+                      <input type="hidden" name="scd" value="%s"/>
+                      <input type="hidden" name="su" value="%s"/>
+                      <input type="hidden" name="fu" value="%s"/>
+                    </form>
+                  </body>
+                </html>
+                """.formatted(
+                esewaProperties.getBaseUrl(),
+                booking.getTotalAmount(),
+                booking.getTotalAmount(),
+                booking.getId(),
+                esewaProperties.getMerchantCode(),
+                esewaProperties.getSuccessUrl(),
+                esewaProperties.getFailureUrl());
     }
 
     private BigDecimal calculateDynamicPrice(HotelBookingRequest request, HotelConfig config) {
@@ -259,12 +276,12 @@ public class GenericHotelService implements BookingProvider {
 
     private BigDecimal calculateDynamicCancellation(HotelConfig config, HotelBooking booking) {
         try {
-            Map<String, Integer> rules =
-                    mapper.readValue(config.getCancellationPolicyJson(), Map.class);
+            Map<String, Integer> rules = mapper.readValue(config.getCancellationPolicyJson(), Map.class);
 
             long hours = ChronoUnit.HOURS.between(LocalDateTime.now(), booking.getCheckInDate().atStartOfDay());
 
-            if (hours > rules.get("free_before_hours")) return BigDecimal.ZERO;
+            if (hours > rules.get("free_before_hours"))
+                return BigDecimal.ZERO;
             if (hours > rules.get("25_percent_before_hours"))
                 return booking.getTotalAmount().multiply(BigDecimal.valueOf(0.25));
             if (hours > rules.get("50_percent_before_hours"))

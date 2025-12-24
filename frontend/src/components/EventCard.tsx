@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Users, Tag } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import BusDetail from "../components/busDetail";
 import Navbar from "../components/Navbar";

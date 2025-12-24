@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import BookingStatus from '../components/BookingStatus';
@@ -30,16 +30,24 @@ export default function PaymentSuccess() {
     // Helper to robustly find booking reference
     const extractBookingRef = (res: any) => {
         if (!res) return null;
-        console.log('🔍 Extracting ref from:', res);
+        console.log('🔍 Extracting ref from:', JSON.stringify(res, null, 2));
 
         // 1. Check inside verificationResponse (Wrapper from verifyPaymentNew)
         if (res.verificationResponse) {
             const vr = res.verificationResponse;
+            console.log('📦 Checking verificationResponse:', vr);
+
             if (vr.bookingReference) return vr.bookingReference;
             if (vr.bookingId) return vr.bookingId;
+            if (vr.transactionId) return vr.transactionId; // Fallback to transactionId if bookingId not available
             if (vr.data?.bookingReference) return vr.data.bookingReference;
             if (vr.data?.bookingId) return vr.data.bookingId;
             if (vr.data?.transaction?.bookingId) return vr.data.transaction.bookingId;
+            if (vr.data?.transaction?.bookingReference) return vr.data.transaction.bookingReference;
+
+            // Check for reference in nested response
+            if (vr.data?.data?.bookingReference) return vr.data.data.bookingReference;
+            if (vr.data?.data?.bookingId) return vr.data.data.bookingId;
         }
 
         // 2. Check direct properties
@@ -51,9 +59,15 @@ export default function PaymentSuccess() {
             if (res.data.bookingReference) return res.data.bookingReference;
             if (res.data.bookingId) return res.data.bookingId;
             if (res.data.transaction?.bookingId) return res.data.transaction.bookingId;
+            if (res.data.transaction?.bookingReference) return res.data.transaction.bookingReference;
             if (res.data.transactionId) return res.data.transactionId;
+
+            // Check for nested data
+            if (res.data.data?.bookingReference) return res.data.data.bookingReference;
+            if (res.data.data?.bookingId) return res.data.data.bookingId;
         }
 
+        console.warn('⚠️ Could not find booking reference in any known location');
         return null;
     };
 
@@ -140,20 +154,37 @@ export default function PaymentSuccess() {
                 clearBookingContext();
                 analytics.trackEvent('purchase', {
                     transaction_id: transactionUuid,
-                    value: parsedData?.total_amount || result?.data?.amount,
+                    value: parsedData?.total_amount || (result as any)?.data?.amount,
                     currency: 'NPR',
                     payment_method: 'esewa'
                 });
 
                 // 6. Navigate to QR/Ticket page after 3 seconds
-                // Extract booking reference from various possible locations
-                // 6. Navigate to QR/Ticket page after 3 seconds
                 const bookingReference = extractBookingRef(result);
+
+                // Check if this is a unified booking
+                const context = sessionStorage.getItem('bookingContext');
+                const isUnifiedBooking = context ? JSON.parse(context).isUnifiedBooking : false;
 
                 console.log('📦 Full verification result:', result);
                 console.log('📦 Extracted booking reference:', bookingReference);
+                console.log('🔗 Is unified booking:', isUnifiedBooking);
 
-                if (bookingReference) {
+                if (isUnifiedBooking) {
+                    // For unified bookings, redirect to unified success page
+                    console.log('🔗 Unified booking detected, redirecting to booking-success');
+                    setTimeout(() => {
+                        // Clear cart after successful payment
+                        localStorage.removeItem('unifiedBookingCart');
+                        navigate('/booking-success', {
+                            state: {
+                                bookingResponse: result.data,
+                                fromPayment: true
+                            }
+                        });
+                    }, 3000);
+                } else if (bookingReference) {
+                    // For single bookings, redirect to tickets page
                     console.log('📱 Navigating to tickets page with booking:', bookingReference);
                     setTimeout(() => {
                         navigate(`/events/booking/${bookingReference}/tickets`);

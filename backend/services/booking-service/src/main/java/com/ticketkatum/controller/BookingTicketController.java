@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookingTicketController {
 
     private final BookingProviderFactory bookingProviderFactory;
+    private final com.ticketkatum.service.BookingOrchestrator bookingOrchestrator;
 
     /**
      * BOOK TICKET
@@ -87,6 +88,35 @@ public class BookingTicketController {
             log.error("Error refunding booking: category={}, service={}", category, service, e);
             Response response = ResponseHandler.failure("Refund failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    /**
+     * UNIFIED BOOKING
+     * POST /api/booking/unified
+     * Books multiple services (EVENT, BUS, HOTEL) in a single transaction
+     */
+    @PostMapping("/unified")
+    public ResponseEntity<Response<com.ticketkatum.model.UnifiedBookingResponse>> unifiedBooking(
+            @RequestBody com.ticketkatum.model.CompositeBookingRequest request) {
+
+        log.info("🔗 Unified Booking Request for Customer: {}", request.getCustomerId());
+
+        try {
+            com.ticketkatum.model.UnifiedBookingResponse result = bookingOrchestrator.processUnifiedBooking(request);
+
+            if ("SUCCESS".equals(result.getStatus())) {
+                return ResponseEntity.ok(ResponseHandler.success("Unified booking completed successfully", result));
+            } else {
+                Response<com.ticketkatum.model.UnifiedBookingResponse> response = ResponseHandler
+                        .failure(result.getMessage());
+                response.setData(result);
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(response);
+            }
+        } catch (Exception e) {
+            log.error("❌ Unified booking failed", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ResponseHandler.failure("Unified booking failed: " + e.getMessage()));
         }
     }
 }

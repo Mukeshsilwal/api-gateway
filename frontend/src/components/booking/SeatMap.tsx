@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { SeatDto } from '../../types/dto';
 import { Check, X, Clock } from 'lucide-react';
 

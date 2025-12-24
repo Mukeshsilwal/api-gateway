@@ -136,27 +136,26 @@ export interface AvailableRoomDto {
 
 export interface AvailabilityRequestDto {
     hotelId: number;
+    roomType?: string; // Optional filter by room type
     checkIn: string; // ISO 8601 date
     checkOut: string; // ISO 8601 date
-    guests: number;
-    rooms: number;
+    guestsCount: number; // Changed from 'guests' to match backend
 }
 
 export interface PricingRequestDto {
     roomId: number;
+    rentTypeId: number; // Changed from rentType enum to ID
+    mealPlanId: number; // Changed from mealPlan enum to ID
     checkIn: string;
     checkOut: string;
-    guests: number;
-    rentType: RentType;
-    mealPlan: MealPlan;
 }
 
 export interface PricingResponseDto {
     roomId: number;
     totalPrice: number;
     breakdown: PriceBreakdown;
-    rentType: RentType;
-    mealPlan: MealPlan;
+    rentTypeId: number;
+    mealPlanId: number;
     taxAmount: number;
     discounts?: Discount[];
 }
@@ -175,8 +174,25 @@ export interface Discount {
     type: 'PERCENTAGE' | 'FIXED';
 }
 
+// Rent Type and Meal Plan Enums (for display purposes)
 export type RentType = 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
 export type MealPlan = 'NO_MEAL' | 'BREAKFAST' | 'HALF_BOARD' | 'FULL_BOARD' | 'ALL_INCLUSIVE';
+
+// ID Mappings for backend communication
+export const RENT_TYPE_IDS: Record<RentType, number> = {
+    'HOURLY': 1,
+    'DAILY': 2,
+    'WEEKLY': 3,
+    'MONTHLY': 4,
+};
+
+export const MEAL_PLAN_IDS: Record<MealPlan, number> = {
+    'NO_MEAL': 1,
+    'BREAKFAST': 2,
+    'HALF_BOARD': 3,
+    'FULL_BOARD': 4,
+    'ALL_INCLUSIVE': 5,
+};
 
 export interface HotelBookingRequestDto {
     hotelId: number;
@@ -185,8 +201,8 @@ export interface HotelBookingRequestDto {
     checkOut: string;
     guests: number;
     guestDetails: GuestDetail[];
-    rentType: RentType;
-    mealPlan: MealPlan;
+    rentTypeId: number; // Changed from rentType enum
+    mealPlanId: number; // Changed from mealPlan enum
     specialRequests?: string;
 }
 

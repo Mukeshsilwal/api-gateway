@@ -13,11 +13,15 @@ spring:
     password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
 
-  activemq:
-    broker-url: tcp://localhost:61616
-    user: ${ACTIVEMQ_USER:admin}
-    password: ${ACTIVEMQ_PASSWORD:admin}
-    pub-sub-domain: true
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: hotel-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.ticketkatum.dto
+      auto-offset-reset: earliest
 
   jpa:
     hibernate:
