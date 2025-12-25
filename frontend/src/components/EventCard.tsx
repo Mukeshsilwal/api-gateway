@@ -4,7 +4,9 @@ import { Calendar, MapPin, Users, Tag } from 'lucide-react';
 export interface EventCardData {
     id: number | string;
     imageUrl?: string;
+    coverImage?: string; // Added backend field
     title: string;
+    name?: string; // Added backend field
     description?: string;
     startDateTime: string;
     endDateTime?: string;
@@ -31,7 +33,21 @@ interface EventCardProps {
 const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
     const navigate = useNavigate();
 
+    // Handle field mismatches between frontend interface and backend entity
+    const displayTitle = event.title || event.name || 'Untitled Event';
+    const displayImage = event.imageUrl || event.coverImage || '/api/placeholder/400/300';
+
+    // Ensure ID is valid for navigation
+    const handleNavigation = (path: string) => {
+        if (event.id) {
+            navigate(path);
+        } else {
+            console.error('Event ID is missing');
+        }
+    };
+
     const formatDate = (dateString: string) => {
+        if (!dateString) return 'Date TBA';
         const date = new Date(dateString);
         return date.toLocaleDateString('en-US', {
             weekday: 'short',
@@ -42,6 +58,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
     };
 
     const formatTime = (dateString: string) => {
+        if (!dateString) return 'Time TBA';
         const date = new Date(dateString);
         return date.toLocaleTimeString('en-US', {
             hour: '2-digit',
@@ -50,7 +67,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
     };
 
     const handleClick = () => {
-        navigate(`/events/${event.id}`);
+        handleNavigation(`/events/${event.id}`);
     };
 
     return (
@@ -65,8 +82,8 @@ const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
             {/* Event Image */}
             <div className="relative h-48 overflow-hidden">
                 <img
-                    src={event.imageUrl || '/api/placeholder/400/300'}
-                    alt={event.title}
+                    src={displayImage}
+                    alt={displayTitle}
                     className="w-full h-full object-cover"
                 />
                 {featured && (
@@ -85,7 +102,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
             <div className="p-4">
                 {/* Title */}
                 <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
-                    {event.title}
+                    {displayTitle}
                 </h3>
 
                 {/* Description */}
@@ -157,7 +174,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/events/${event.id}/book`);
+                            navigate(`/events/${event.id}`);
                         }}
                         className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
                     >

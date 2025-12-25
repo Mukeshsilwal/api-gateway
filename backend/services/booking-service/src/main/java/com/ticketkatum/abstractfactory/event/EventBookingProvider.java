@@ -18,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+import com.ticketkatum.entity.Booking;
+import com.ticketkatum.repository.BookingRepo;
 
 /**
  * Event Booking Provider
@@ -28,10 +30,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class EventBookingProvider implements BookingProvider<Request> {
 
-
     @Autowired
-    private  RestTemplate restTemplate;
+    private RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final BookingRepo bookingRepo;
 
     @Value("${services.event-service.url:http://localhost:8085}")
     private String eventServiceUrl;
@@ -94,6 +96,23 @@ public class EventBookingProvider implements BookingProvider<Request> {
                     Response<Map<String, Object>> successResponse = ResponseHandler.success(
                             "Event booking created successfully", result);
                     successResponse.setStatusCode(200);
+
+                    // Sync to central Booking table
+                    try {
+                        Booking booking = new Booking();
+                        booking.setCustomerId(request.getCustomerId());
+                        booking.setCategory("EVENT");
+                        booking.setProviderName("EVENT_SERVICE");
+                        booking.setAmount(grandTotal.doubleValue());
+                        booking.setStatus("PENDING");
+                        booking.setProviderBookingId(bookingReference);
+                        booking.setCreatedAt(LocalDateTime.now());
+                        bookingRepo.save(booking);
+                    } catch (Exception ex) {
+                        log.error("Failed to sync event booking to central table", ex);
+                        // Continue, don't fail the request
+                    }
+
                     return successResponse;
                 }
             }
@@ -204,6 +223,40 @@ public class EventBookingProvider implements BookingProvider<Request> {
         } catch (Exception e) {
             log.error("❌ Failed to fetch EVENT booking: {}", bookingId, e);
             return "{\"error\": \"" + e.getMessage() + "\"}";
+        }
+    }
+
+    @Override
+    public void confirmBooking(String bookingId, String transactionId) {
+        log.info("💳 Confirming EVENT payment: bookingId={}, txnId={}", bookingId, transactionId);
+
+        try {
+            String url = eventServiceUrl + "/api/bookings/event/" + bookingId + "/confirm";
+
+            Map<String, String> paymentData = new HashMap<>();
+            paymentData.put("paymentId", transactionId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Map<String, String>> httpEntity = new HttpEntity<>(paymentData, headers);
+
+            restTemplate.postForEntity(url, httpEntity, Map.class);
+            log.info("✅ EVENT payment confirmed successfully for {}", bookingId);
+
+            // Sync confirmation to central Booking table
+            try {
+                bookingRepo.findByProviderBookingId(bookingId).ifPresent(booking -> {
+                    booking.setStatus("CONFIRMED");
+                    booking.setProviderTransactionId(transactionId);
+                    bookingRepo.save(booking);
+                });
+            } catch (Exception ex) {
+                log.error("Failed to sync event confirmation to central table", ex);
+            }
+
+        } catch (Exception e) {
+            log.error("❌ Failed to confirm EVENT payment for {}", bookingId, e);
+            throw new RuntimeException("Failed to confirm event booking: " + e.getMessage());
         }
     }
 

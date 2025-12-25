@@ -14,9 +14,11 @@ public class PaymentVerifiedEvent {
 
     private String bookingId;
     private String transactionId;
-    private long hotelId;
+    private Long merchantId;
     private BigDecimal amount;
     private String provider;
     private LocalDateTime verifiedAt;
+    private String bookingType;
+    private String externalTransactionId;
+    private String metadata;
 }
-

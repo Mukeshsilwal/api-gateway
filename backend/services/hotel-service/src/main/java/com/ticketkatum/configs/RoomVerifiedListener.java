@@ -17,8 +17,11 @@ public class RoomVerifiedListener {
     @KafkaListener(topics = "payment-verified", groupId = "hotel-service-group")
     public void handlePaymentVerified(PaymentVerifiedEvent event) {
         try {
-            log.info("📨 Received payment verified event from Kafka for hotel {}", event.getHotelId());
-            hotelRecommendationService.bookedSeat(event.getHotelId());
+            if (!"HOTEL".equalsIgnoreCase(event.getBookingType())) {
+                return;
+            }
+            log.info("📨 Received payment verified event from Kafka for hotel {}", event.getMerchantId());
+            hotelRecommendationService.bookedSeat(event.getMerchantId());
         } catch (Exception e) {
             log.error("❌ Booking confirmation failed for {}", event.getBookingId(), e);
         }

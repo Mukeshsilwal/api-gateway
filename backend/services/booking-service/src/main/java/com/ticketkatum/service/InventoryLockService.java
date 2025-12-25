@@ -3,6 +3,7 @@ package com.ticketkatum.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import com.ticketkatum.common.service.SystemConfigService;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -24,10 +25,10 @@ import java.util.concurrent.TimeUnit;
 public class InventoryLockService {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final SystemConfigService systemConfigService;
 
     private static final String LOCK_PREFIX = "inventory:lock:";
     private static final String INVENTORY_PREFIX = "inventory:available:";
-    private static final long DEFAULT_LOCK_TTL_SECONDS = 300; // 5 minutes
 
     /**
      * Acquire a distributed lock for inventory.
@@ -87,7 +88,8 @@ public class InventoryLockService {
      * Acquire a lock with default TTL (5 minutes).
      */
     public String acquireLock(Long eventId, Long ticketTypeId, Integer quantity) {
-        return acquireLock(eventId, ticketTypeId, quantity, DEFAULT_LOCK_TTL_SECONDS);
+        long ttl = systemConfigService.getLong("INVENTORY_LOCK_TTL", 300L);
+        return acquireLock(eventId, ticketTypeId, quantity, ttl);
     }
 
     /**

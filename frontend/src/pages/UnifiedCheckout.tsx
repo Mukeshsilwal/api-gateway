@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Loader2, AlertCircle, CreditCard } from 'lucide-react';
 import { useUnifiedBookingCart } from '../hooks/useUnifiedBookingCart';
 import { CartItem } from '../components/unified-booking';
+import TripSelector from '../components/TripSelector';
 import unifiedBookingPaymentService from '../services/unifiedBookingPaymentService';
 import { setBookingContext } from '../utils/paymentStorage';
+import { toast } from 'react-toastify';
+import analytics from '../services/analytics';
 
 /**
  * Unified Checkout Page
@@ -15,10 +18,22 @@ export const UnifiedCheckout: React.FC = () => {
     const { cartItems, totalAmount } = useUnifiedBookingCart();
 
     const [isProcessing, setIsProcessing] = useState(false);
+    const [isRedirecting, setIsRedirecting] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
 
     // Get customer ID from auth context or localStorage
     const customerId = localStorage.getItem('userId') || '1'; // Fallback for testing
+
+    // Analytics: Track Checkout Started
+    useState(() => {
+        if (cartItems.length > 0) {
+            analytics.trackEvent(analytics.Events.CHECKOUT_STARTED, {
+                cart_size: cartItems.length,
+                total_amount: totalAmount
+            });
+        }
+    });
 
     const handleCheckout = async () => {
         setIsProcessing(true);
@@ -28,6 +43,7 @@ export const UnifiedCheckout: React.FC = () => {
             // Build unified booking payload
             const payload = {
                 customerId,
+                tripId: selectedTripId, // Added tripId to the unified booking payload
                 bookings: cartItems.map((item) => ({
                     type: item.type,
                     payload: {
@@ -38,7 +54,11 @@ export const UnifiedCheckout: React.FC = () => {
                 totalAmount: totalAmount * 1.18 // Include fees and tax
             };
 
-            console.log('🔗 Initiating unified booking with payment...', payload);
+            analytics.trackEvent(analytics.Events.PAYMENT_INITIATED, {
+                amount: payload.totalAmount,
+                trip_linked: !!selectedTripId,
+                item_count: payload.bookings.length
+            });
 
             // Call unified booking payment service
             const response: any = await unifiedBookingPaymentService.completeUnifiedBooking(payload);
@@ -46,10 +66,10 @@ export const UnifiedCheckout: React.FC = () => {
             const bookingData = response.data.bookingData;
             const paymentData = response.data.paymentData;
 
-            console.log('✅ Booking created, payment initiated:', {
-                bookingId: bookingData.bookingId,
-                transactionId: paymentData.transactionId
-            });
+            // Associate bookings with trip happens automatically on backend now
+            if (selectedTripId) {
+                toast.success('Your bookings will be linked to your trip upon payment confirmation!');
+            }
 
             // Store booking context for payment verification
             const contextToStore = {
@@ -58,18 +78,19 @@ export const UnifiedCheckout: React.FC = () => {
                 htmlForm: paymentData.data.htmlForm,
                 transactionId: paymentData.transactionId,
                 bookingData: bookingData,
-                isUnifiedBooking: true // Flag to identify unified bookings
+                isUnifiedBooking: true, // Flag to identify unified bookings
+                tripId: selectedTripId // Store trip ID for post-payment association
             };
 
             setBookingContext(contextToStore);
 
-            console.log('💾 Stored booking context, redirecting to payment...');
+            setIsRedirecting(true);
 
             // Navigate to payment redirect page
             navigate('/payment/redirect');
 
         } catch (err: any) {
-            console.error('❌ Checkout error:', err);
+            console.error('Checkout error:', err);
             setError(err.message || 'Failed to process booking. Please try again.');
             setIsProcessing(false);
         }
@@ -100,14 +121,21 @@ export const UnifiedCheckout: React.FC = () => {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
             <div className="max-w-4xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                        Checkout
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400">
-                        Review your bookings and complete your purchase
-                    </p>
+                <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                            Checkout
+                        </h1>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            Review your bookings and complete your purchase
+                        </p>
+                    </div>
+                    <button
+                        onClick={() => navigate('/trips/create')}
+                        className="text-purple-600 dark:text-purple-400 font-semibold hover:underline flex items-center gap-1"
+                    >
+                        + Create a new Trip
+                    </button>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -119,6 +147,21 @@ export const UnifiedCheckout: React.FC = () => {
                         {cartItems.map((item) => (
                             <CartItem key={item.id} item={item} onRemove={() => { }} />
                         ))}
+
+                        {/* Trip Selection */}
+                        <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+                            <div className="mb-4">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">Link to a Trip</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    Organize your bookings by linking them to a trip. This helps you track your itinerary and expenses.
+                                </p>
+                            </div>
+                            <TripSelector
+                                selectedTripId={selectedTripId}
+                                onSelectTrip={setSelectedTripId}
+                                bookingAmount={totalAmount * 1.18}
+                            />
+                        </div>
                     </div>
 
                     {/* Summary */}
@@ -172,7 +215,7 @@ export const UnifiedCheckout: React.FC = () => {
                                 {isProcessing ? (
                                     <>
                                         <Loader2 className="w-5 h-5 animate-spin" />
-                                        <span>Processing...</span>
+                                        <span>{isRedirecting ? 'Redirecting to Payment...' : 'Processing...'}</span>
                                     </>
                                 ) : (
                                     <>

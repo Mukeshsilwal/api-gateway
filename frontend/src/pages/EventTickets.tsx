@@ -70,10 +70,10 @@ export default function EventTickets() {
             console.log('📥 Fetching booking details:', bookingReference);
 
             // Fetch from BFF endpoint
-            const response = await apiService.get(`/api/bff/v1/events/bookings/${bookingReference}`);
+            const response = await apiService.get(`/api/bff/v1/bookings/event/${bookingReference}`);
 
             console.log('✅ Booking data received:', response.data);
-            setBooking(response.data.data);
+            setBooking(response.data);
             setLoading(false);
         } catch (err: any) {
             console.error('❌ Error fetching booking:', err);
@@ -249,8 +249,8 @@ export default function EventTickets() {
                                                 <p className="text-sm text-gray-500">{attendee.ticketType.name}</p>
                                             </div>
                                             <div className={`px-3 py-1 rounded-full text-xs font-semibold ${attendee.checkInStatus === 'CHECKED_IN'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-blue-100 text-blue-800'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-blue-100 text-blue-800'
                                                 }`}>
                                                 {attendee.checkInStatus === 'CHECKED_IN' ? 'Checked In' : 'Valid'}
                                             </div>

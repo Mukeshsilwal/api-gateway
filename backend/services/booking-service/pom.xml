@@ -40,6 +40,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        
+        <!-- Spring WebFlux for WebClient -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        
         <!-- Spring Kafka for event consumption -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
@@ -120,6 +127,7 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
+                    <parameters>true</parameters>
                 </configuration>
             </plugin>
         </plugins>

@@ -13,6 +13,7 @@ import org.hibernate.type.SqlTypes;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * Ticket Type Entity
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 public class TicketType implements Serializable {
 
     private static final long serialVersionUID = 1L;

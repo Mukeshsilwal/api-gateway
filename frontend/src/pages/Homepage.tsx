@@ -44,11 +44,23 @@ export function Homepage() {
 
         // Navigate based on active tab
         if (activeTab === 'bus') {
-            navigate(`/bus-search?from=${bookingData.from}&to=${bookingData.to}&date=${bookingData.date}`);
+            navigate('/buslist', {
+                state: {
+                    source: bookingData.from,
+                    destination: bookingData.to,
+                    date: bookingData.date
+                }
+            });
         } else if (activeTab === 'hotel') {
             navigate(`/hotels?city=${bookingData.city}&checkIn=${bookingData.checkIn}&checkOut=${bookingData.checkOut}&guests=${bookingData.guests}&rooms=${bookingData.rooms}`);
         } else if (activeTab === 'flight') {
-            navigate(`/flights?from=${bookingData.from}&to=${bookingData.to}&date=${bookingData.date}`);
+            navigate('/plane-list', {
+                state: {
+                    source: bookingData.from,
+                    destination: bookingData.to,
+                    date: bookingData.date
+                }
+            });
         }
     };
 

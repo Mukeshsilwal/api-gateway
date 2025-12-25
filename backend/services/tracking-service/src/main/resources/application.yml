@@ -1,0 +1,116 @@
+server:
+  port: 8097
+  servlet:
+    context-path: /tracking-service
+
+spring:
+  application:
+    name: tracking-service
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/tracking_db}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 60000
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      acks: all
+    consumer:
+      group-id: tracking-service-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: "*"
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:your-secret-key-change-this-in-production}
+  expiration: 86400000
+
+# WebSocket Configuration
+websocket:
+  allowed-origins: ${WEBSOCKET_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  heartbeat-interval: 10000
+  disconnect-timeout: 60000
+
+# Tracking Configuration
+tracking:
+  location-update-interval: 30000
+  history-retention-days: 90
+  max-speed-kmh: 200
+  geofence-radius-meters: 100
+
+# Service URLs
+services:
+  trip-service:
+    url: ${TRIP_SERVICE_URL:http://localhost:8087/trip-service}
+  alert-service:
+    url: ${ALERT_SERVICE_URL:http://localhost:8089/alert-service}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.ticketkatum.trackingservice: DEBUG
+    org.springframework.web: INFO
+    org.springframework.websocket: DEBUG
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+# Resilience4j
+resilience4j:
+  circuitbreaker:
+    instances:
+      tripService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50

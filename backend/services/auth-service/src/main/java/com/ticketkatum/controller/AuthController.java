@@ -515,11 +515,9 @@ public class AuthController {
 
                 CreateUserRequest createUserRequest = new CreateUserRequest();
                 createUserRequest.setEmail(email);
-                createUserRequest.setUsername(email);
                 createUserRequest.setFirstName(name != null ? name.split(" ")[0] : "");
                 createUserRequest.setLastName(name != null && name.split(" ").length > 1 ? name.split(" ")[1] : "");
                 createUserRequest.setRole("USER");
-                createUserRequest.setProvider(provider);
                 // No password needed for OAuth2 users
                 createUserRequest.setPassword(null);
 

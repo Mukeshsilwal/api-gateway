@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface BookingRepo extends JpaRepository<Booking, Long> {
     List<Booking> findByCustomerId(String customerId);
+
+    java.util.Optional<Booking> findByProviderBookingId(String providerBookingId);
 }

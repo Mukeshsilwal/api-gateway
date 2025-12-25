@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     LayoutDashboard,
     Users,
@@ -67,7 +67,8 @@ export function Sidebar({ activeTab, setActiveTab, onLogout, isCollapsed, onTogg
                 { id: 'hotels', label: 'Hotel Manager', icon: Hotel },
                 { id: 'cinemas', label: 'Cinema Manager', icon: Film },
                 { id: 'tickets', label: 'Ticket Manager', icon: Ticket },
-                { id: 'scheduler', label: 'Trip Scheduler', icon: Calendar }
+                { id: 'scheduler', label: 'Trip Scheduler', icon: Calendar },
+                { id: 'war-room', label: 'Safety War Room', icon: Shield }
             ]
         },
         {

@@ -39,4 +39,9 @@ public class BusBookingProvider implements BookingProvider<Request> {
     public String getBooking(String bookingId) {
         return "Simulated Bus Booking Details";
     }
+
+    @Override
+    public void confirmBooking(String bookingId, String transactionId) {
+        throw new UnsupportedOperationException("Bus booking confirmation not yet implemented");
+    }
 }

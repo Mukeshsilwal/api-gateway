@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRightLeft, Search, Loader } from 'lucide-react';
+import { ArrowRightLeft, Search, Loader, MapPin, Calendar, Flame } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useBusSearch } from '../hooks/useBusSearch';
 import Button from './ui/Button';
@@ -18,7 +18,7 @@ interface BusSearchProps {
 }
 
 /**
- * Reusable Bus Search Component
+ * Reusable Bus Search Component - Premium Design
  */
 const BusSearchComponent: React.FC<BusSearchProps> = ({
     onSearch,
@@ -109,107 +109,152 @@ const BusSearchComponent: React.FC<BusSearchProps> = ({
                 <h3 className="text-lg font-bold text-gray-900 mb-4">Search Buses</h3>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
+                {/* From & To Section with Swap */}
                 <div className="relative">
-                    <div className="space-y-4">
-                        {/* Source */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <div className="grid grid-cols-1 gap-4">
+                        {/* From Field */}
+                        <div className="relative group">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-purple-500" />
                                 From
                             </label>
-                            <select
-                                value={searchData.source}
-                                onChange={(e) => handleChange('source', e.target.value)}
-                                className="input-field w-full focus-glow"
-                                required
-                                disabled={busStopsLoading}
-                            >
-                                <option value="">
-                                    {busStopsLoading ? 'Loading...' : 'Select source city'}
-                                </option>
-                                {busStops.map((stop: any, index: number) => {
-                                    const { name, value } = extractStopData(stop);
-                                    return (
-                                        <option key={`source-${index}-${value}`} value={value}>
-                                            {name}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                            <div className="relative">
+                                <select
+                                    value={searchData.source}
+                                    onChange={(e) => handleChange('source', e.target.value)}
+                                    className="w-full px-4 py-3.5 pl-11 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white font-medium focus:border-purple-500 focus:ring-4 focus:ring-purple-500/20 transition-all duration-200 appearance-none cursor-pointer hover:border-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    required
+                                    disabled={busStopsLoading}
+                                >
+                                    <option value="">
+                                        {busStopsLoading ? 'Loading...' : 'Select City'}
+                                    </option>
+                                    {busStops.map((stop: any, index: number) => {
+                                        const { name, value } = extractStopData(stop);
+                                        return (
+                                            <option key={`source-${index}-${value}`} value={value}>
+                                                {name}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <div className="w-6 h-6 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                                        <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
 
-                        {/* Destination */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {/* To Field */}
+                        <div className="relative group">
+                            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-orange-500" />
                                 To
                             </label>
-                            <select
-                                value={searchData.destination}
-                                onChange={(e) => handleChange('destination', e.target.value)}
-                                className="input-field w-full focus-glow"
-                                required
-                                disabled={busStopsLoading}
-                            >
-                                <option value="">
-                                    {busStopsLoading ? 'Loading...' : 'Select destination city'}
-                                </option>
-                                {busStops.map((stop: any, index: number) => {
-                                    const { name, value } = extractStopData(stop);
-                                    return (
-                                        <option key={`dest-${index}-${value}`} value={value}>
-                                            {name}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                            <div className="relative">
+                                <select
+                                    value={searchData.destination}
+                                    onChange={(e) => handleChange('destination', e.target.value)}
+                                    className="w-full px-4 py-3.5 pl-11 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white font-medium focus:border-orange-500 focus:ring-4 focus:ring-orange-500/20 transition-all duration-200 appearance-none cursor-pointer hover:border-orange-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    required
+                                    disabled={busStopsLoading}
+                                >
+                                    <option value="">
+                                        {busStopsLoading ? 'Loading...' : 'Select City'}
+                                    </option>
+                                    {busStops.map((stop: any, index: number) => {
+                                        const { name, value } = extractStopData(stop);
+                                        return (
+                                            <option key={`dest-${index}-${value}`} value={value}>
+                                                {name}
+                                            </option>
+                                        );
+                                    })}
+                                </select>
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <div className="w-6 h-6 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                                        <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                                    </div>
+                                </div>
+                                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Swap Button */}
+                    {/* Swap Button - Centered between fields */}
                     <button
                         type="button"
                         onClick={handleSwap}
-                        className="absolute right-4 top-[38%] -translate-y-1/2 p-2 bg-gray-100 rounded-full hover:bg-primary hover:text-white transition-all shadow-sm z-10"
+                        className="absolute right-4 top-[calc(50%-12px)] -translate-y-1/2 p-3 bg-gradient-to-br from-purple-500 to-pink-500 text-white rounded-full hover:scale-110 hover:rotate-180 transition-all duration-300 shadow-lg hover:shadow-xl z-10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:rotate-0"
                         title="Swap Locations"
                         disabled={busStopsLoading}
                     >
-                        <ArrowRightLeft size={16} />
+                        <ArrowRightLeft size={18} />
                     </button>
                 </div>
 
-                {/* Date */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                {/* Date Field */}
+                <div className="relative group">
+                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-blue-500" />
                         Travel Date
                     </label>
-                    <input
-                        type="date"
-                        value={searchData.date}
-                        onChange={(e) => handleChange('date', e.target.value)}
-                        min={today}
-                        className="input-field w-full focus-glow"
-                        required
-                    />
+                    <div className="relative">
+                        <input
+                            type="date"
+                            value={searchData.date}
+                            onChange={(e) => handleChange('date', e.target.value)}
+                            min={today}
+                            className="w-full px-4 py-3.5 pl-11 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-gray-900 dark:text-white font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 transition-all duration-200 cursor-pointer hover:border-blue-300"
+                            required
+                        />
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                                <Calendar className="w-3.5 h-3.5 text-blue-500" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Popular Routes Badge */}
+                <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 px-1">
+                    <Flame className="w-4 h-4 text-orange-500" />
+                    <span className="font-medium">Popular routes today</span>
+                    <span className="ml-auto font-semibold text-purple-600 dark:text-purple-400">Starting from NPR 800</span>
                 </div>
 
                 {/* Submit Button */}
                 <Button
                     type="submit"
                     size="lg"
-                    className="w-full group"
+                    className="w-full group relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-0.5"
                     disabled={isSearching || busStopsLoading}
                 >
-                    {isSearching ? (
-                        <>
-                            <Loader className="mr-2 animate-spin" size={20} />
-                            Searching...
-                        </>
-                    ) : (
-                        <>
-                            <Search className="mr-2 group-hover:scale-110 transition-transform" size={20} />
-                            Search Buses
-                        </>
-                    )}
+                    <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                    <div className="relative flex items-center justify-center gap-2">
+                        {isSearching ? (
+                            <>
+                                <Loader className="animate-spin" size={22} />
+                                <span className="text-base">Searching...</span>
+                            </>
+                        ) : (
+                            <>
+                                <Search className="group-hover:scale-110 transition-transform" size={22} />
+                                <span className="text-base">Search Buses</span>
+                            </>
+                        )}
+                    </div>
                 </Button>
             </form>
         </div>

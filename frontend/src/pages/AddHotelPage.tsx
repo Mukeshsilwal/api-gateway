@@ -67,7 +67,7 @@ const MEAL_SERVICES = [
  * AddHotelPage
  * Admin/Partner page to add new hotels and rooms
  */
-const AddHotelPage = () => {
+export const AddHotelPage = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [currentStep, setCurrentStep] = useState(1);

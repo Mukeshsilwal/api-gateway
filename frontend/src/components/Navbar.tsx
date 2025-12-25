@@ -62,8 +62,7 @@ const Navbar: React.FC = () => {
     { name: 'Home', path: '/' },
     { name: 'Bus', path: '/buslist' },
     { name: 'Hotels', path: '/hotels' },
-    { name: 'Flights', path: '/plane-list' },
-    { name: 'Movies', path: '/qfx/movies' },
+    { name: 'Events', path: '/events' },
     { name: 'Market', path: '/market' },
   ];
 
@@ -141,6 +140,18 @@ const Navbar: React.FC = () => {
                 >
                   My Bookings
                 </Link>
+                <Link
+                  to="/trips"
+                  className={`text-sm font-medium hover:underline text-orange-600`}
+                >
+                  My Trips
+                </Link>
+                <Link
+                  to="/alerts"
+                  className={`text-sm font-medium hover:underline text-red-600`}
+                >
+                  Alerts
+                </Link>
                 <Button
                   variant={'ghost'}
                   size="sm"
@@ -215,6 +226,26 @@ const Navbar: React.FC = () => {
                   >
                     <Ticket size={18} />
                     My Bookings
+                  </Link>
+                  <Link
+                    to="/trips"
+                    className="text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg flex items-center gap-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                    </svg>
+                    My Trips
+                  </Link>
+                  <Link
+                    to="/alerts"
+                    className="text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg flex items-center gap-2"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Alerts
                   </Link>
                   <Button
                     variant="outline"

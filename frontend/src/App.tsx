@@ -11,6 +11,7 @@ import AnalyticsObserver from "./components/AnalyticsObserver";
 import { initAnalytics } from "./services/analytics";
 import AIChatbot from "./components/chatbot/AIChatbot";
 import CartIntegration from "./components/CartIntegration.jsx";
+import SafetyWidget from "./components/shared/SafetyWidget";
 
 // Lazy load components for code splitting
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
@@ -21,9 +22,9 @@ const UserLogin = lazy(() => import("./pages/UserLogin"));
 const UserRegister = lazy(() => import("./pages/UserRegister"));
 const HomePage = lazy(() => import("./pages/Homepage"));
 const BusList = lazy(() => import("./pages/BusList"));
-const TicketDetails = lazy(() => import("./pages/ticketDetails"));
+const TicketDetails = lazy(() => import("./pages/TicketDetails"));
 const ErrorPage = lazy(() => import("./pages/ErrorPage"));
-const TicketConfirmed = lazy(() => import("./pages/ticketconfirm"));
+const TicketConfirmed = lazy(() => import("./pages/TicketConfirm"));
 const AdminPanel = lazy(() => import("./pages/admin").then(module => ({ default: module.AdminPanel })));
 const PlaneList = lazy(() => import("./pages/PlaneList"));
 const PlaneSeatSelection = lazy(() => import("./pages/PlaneSeatSelection"));
@@ -83,6 +84,14 @@ const BookingFailure = lazy(() => import("./pages/BookingFailure"));
 
 // OAuth Callback
 const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
+
+// Trip Management Routes
+const MyTrips = lazy(() => import("./pages/MyTrips"));
+const TripDashboard = lazy(() => import("./pages/TripDashboard"));
+const CreateTrip = lazy(() => import("./pages/CreateTrip"));
+const AlertCenter = lazy(() => import("./pages/AlertCenter"));
+
+
 
 
 const App: React.FC = () => {
@@ -258,6 +267,17 @@ const App: React.FC = () => {
                   errorElement={<ErrorPage />}
                 />
 
+                {/* Redirect /admin to /admin/panel */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                  errorElement={<ErrorPage />}
+                />
+
                 {/* Super Admin Panel Route */}
                 <Route
                   path="/super-admin/panel"
@@ -338,6 +358,14 @@ const App: React.FC = () => {
                 <Route path="/booking-success" element={<BookingSuccess />} errorElement={<ErrorPage />} />
                 <Route path="/booking-failure" element={<BookingFailure />} errorElement={<ErrorPage />} />
 
+                {/* Trip Management Routes */}
+                <Route path="/trips" element={<MyTrips />} errorElement={<ErrorPage />} />
+                <Route path="/trips/new" element={<CreateTrip />} errorElement={<ErrorPage />} />
+                <Route path="/trips/:tripId" element={<TripDashboard />} errorElement={<ErrorPage />} />
+                <Route path="/alerts" element={<AlertCenter />} errorElement={<ErrorPage />} />
+
+
+
                 <Route
                   path="/change-password"
                   element={<ChangePassword />}
@@ -365,6 +393,7 @@ const App: React.FC = () => {
 
         {/* AI Chatbot - Floating widget available on all pages */}
         <AIChatbot />
+        <SafetyWidget />
       </ErrorBoundary>
     </div>
   );

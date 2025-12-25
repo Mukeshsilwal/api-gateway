@@ -4,6 +4,7 @@ import { Search, MapPin, Calendar, Users } from 'lucide-react';
 interface SearchFormProps {
     onSearch: (params: SearchParams) => void;
     type: 'hotel' | 'bus';
+    initialValues?: SearchParams;
 }
 
 export interface SearchParams {
@@ -21,10 +22,11 @@ export interface SearchParams {
  * Unified Search Form Component
  * Supports both hotel and bus searches
  */
-const SearchForm: React.FC<SearchFormProps> = ({ onSearch, type }) => {
+const SearchForm: React.FC<SearchFormProps> = ({ onSearch, type, initialValues }) => {
     const [params, setParams] = useState<SearchParams>({
         guests: 2,
         rooms: 1,
+        ...initialValues
     });
 
     const handleSubmit = (e: React.FormEvent) => {

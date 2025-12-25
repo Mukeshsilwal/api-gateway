@@ -12,6 +12,8 @@ import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 /**
  * Event Booking Entity
@@ -107,6 +109,10 @@ public class EventBooking {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Attendee> attendees;
 
     public enum PaymentStatus {
         PENDING, PAID, FAILED, REFUNDED

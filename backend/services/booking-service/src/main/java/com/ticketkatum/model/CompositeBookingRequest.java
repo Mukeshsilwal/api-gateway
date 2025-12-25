@@ -10,6 +10,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CompositeBookingRequest {
     private String customerId; // Top level customer ID for the transaction
+    private Long tripId; // Optional: Trip ID to associate bookings with
     private List<BookingRequestItem> bookings;
 
     @Data

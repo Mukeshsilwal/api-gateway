@@ -32,7 +32,7 @@ export const initAnalytics = (trackingId = ANALYTICS_ID) => {
     gtag('config', trackingId);
     window.gtag = gtag; // Expose to window for other methods if needed
     */
-    
+
     console.log('[Analytics] Production Init (Simulated)');
 
   } catch (error) {
@@ -97,10 +97,10 @@ export const identifyUser = (userId, traits = {}) => {
 
     // Vendor specific call
     if (window.gtag) {
-        window.gtag('config', ANALYTICS_ID, {
-            'user_id': userId,
-            ...traits
-        });
+      window.gtag('config', ANALYTICS_ID, {
+        'user_id': userId,
+        ...traits
+      });
     }
 
   } catch (error) {
@@ -108,9 +108,24 @@ export const identifyUser = (userId, traits = {}) => {
   }
 };
 
+export const AnalyticsEvents = {
+  // Funnel: Trip Conversion
+  TRIP_VIEWED: 'trip_viewed',
+  CHECKOUT_STARTED: 'checkout_started',
+  PAYMENT_INITIATED: 'payment_initiated',
+  PURCHASE_COMPLETED: 'purchase_completed',
+  PURCHASE_FAILED: 'purchase_failed',
+
+  // Interaction
+  ADD_TO_CART: 'add_to_cart',
+  REMOVE_FROM_CART: 'remove_from_cart',
+  TRIP_LINKED: 'trip_linked',
+};
+
 export default {
   init: initAnalytics,
   trackPageView,
   trackEvent,
   identifyUser,
+  Events: AnalyticsEvents,
 };

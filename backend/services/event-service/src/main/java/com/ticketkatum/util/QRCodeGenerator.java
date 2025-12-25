@@ -7,6 +7,8 @@ import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import lombok.extern.slf4j.Slf4j;
+import com.ticketkatum.common.service.SystemConfigService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
@@ -22,10 +24,10 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class QRCodeGenerator {
 
-    private static final int DEFAULT_WIDTH = 300;
-    private static final int DEFAULT_HEIGHT = 300;
+    private final SystemConfigService systemConfigService;
 
     /**
      * Generate unique ticket ID
@@ -38,15 +40,17 @@ public class QRCodeGenerator {
      * Generate QR code as Base64 string
      */
     public String generateQRCodeBase64(String data) throws WriterException, IOException {
-        return generateQRCodeBase64(data, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        int width = systemConfigService.getInt("QR_WIDTH", 300);
+        int height = systemConfigService.getInt("QR_HEIGHT", 300);
+        return generateQRCodeBase64(data, width, height);
     }
 
     /**
      * Generate QR code with custom dimensions
      */
-    public String generateQRCodeBase64(String data, int width, int height) 
+    public String generateQRCodeBase64(String data, int width, int height)
             throws WriterException, IOException {
-        
+
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         Map<EncodeHintType, Object> hints = new HashMap<>();
         hints.put(EncodeHintType.CHARACTER_SET, "UTF-8");
@@ -56,7 +60,7 @@ public class QRCodeGenerator {
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
-        
+
         byte[] qrCodeBytes = outputStream.toByteArray();
         return "data:image/png;base64," + Base64.getEncoder().encodeToString(qrCodeBytes);
     }

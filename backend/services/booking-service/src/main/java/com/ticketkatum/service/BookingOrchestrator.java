@@ -30,6 +30,7 @@ public class BookingOrchestrator {
 
     private final BookingProviderFactory bookingProviderFactory;
     private final ObjectMapper objectMapper;
+    private final TripBookingService tripBookingService;
 
     /**
      * Process unified booking across multiple services.
@@ -95,14 +96,33 @@ public class BookingOrchestrator {
                         transactionId, type, bookingId, bookingAmount);
             }
 
-            // Phase 2: All bookings successful
-            log.info("🎉 [{}] All bookings completed successfully. Total: {} bookings, Amount: NPR {}",
-                    transactionId, bookingResults.size(), totalAmount);
+            // Phase 3: Associate bookings with trip if tripId is provided
+            if (compositeRequest.getTripId() != null) {
+                log.info("🔗 [{}] Associating {} bookings with trip: {}",
+                        transactionId, bookingResults.size(), compositeRequest.getTripId());
+                for (UnifiedBookingResponse.BookingResult result : bookingResults) {
+                    try {
+                        tripBookingService.associateBookingWithTrip(
+                                compositeRequest.getTripId(),
+                                result.getType(),
+                                Long.parseLong(result.getBookingId()),
+                                result.getConfirmationNumber(),
+                                result.getAmount());
+                    } catch (Exception e) {
+                        log.error("❌ [{}] Failed to associate {} booking (ID: {}) with trip {}: {}",
+                                transactionId, result.getType(), result.getBookingId(), compositeRequest.getTripId(),
+                                e.getMessage());
+                        // Important: Trip association is secondary to the booking itself,
+                        // but we should ideally have a retry mechanism or a "partial trip" state.
+                    }
+                }
+            }
 
             // Build unified response
             return UnifiedBookingResponse.builder()
                     .transactionId(transactionId)
                     .customerId(compositeRequest.getCustomerId())
+                    .tripId(compositeRequest.getTripId())
                     .bookings(bookingResults)
                     .totalAmount(totalAmount)
                     .status("SUCCESS")

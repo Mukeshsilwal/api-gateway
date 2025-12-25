@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: shared-common
+
+# Default JPA configuration for shared entities
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+# Shared Configurations can be defined here

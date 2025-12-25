@@ -18,6 +18,7 @@ const unifiedBookingPaymentService = {
             // Step 1: Create the unified booking
             const bookingResponse = await apiService.post('/api/booking/unified', {
                 customerId: payload.customerId,
+                tripId: payload.tripId, // Pass tripId to the backend
                 bookings: payload.bookings
             });
 

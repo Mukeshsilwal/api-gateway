@@ -1,6 +1,8 @@
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavigationBar from '../components/Navbar';
 import Footer from '../components/Footer';
+import analytics from '../services/analytics';
 
 interface BookingData {
     bookingId?: string;
@@ -36,13 +38,26 @@ const PaymentStatus = () => {
     } = (location.state || {}) as LocationState;
 
     React.useEffect(() => {
+        if (status === 'success') {
+            analytics.trackEvent(analytics.Events.PURCHASE_COMPLETED, {
+                booking_id: bookingData?.bookingId,
+                transaction_id: bookingData?.transactionId,
+                amount: bookingData?.amount
+            });
+        } else if (status === 'failed' || status === 'error') {
+            analytics.trackEvent(analytics.Events.PURCHASE_FAILED, {
+                reason: message,
+                amount: bookingData?.amount
+            });
+        }
+
         if (autoRedirect && redirectUrl && status === 'success') {
             const timer = setTimeout(() => {
                 navigate(redirectUrl);
             }, 3000);
             return () => clearTimeout(timer);
         }
-    }, [autoRedirect, redirectUrl, status, navigate]);
+    }, [autoRedirect, redirectUrl, status, navigate, bookingData, message]);
 
     const getStatusConfig = () => {
         switch (status) {
@@ -140,21 +155,43 @@ const PaymentStatus = () => {
                         )}
 
                         {/* Actions */}
-                        <div className="flex gap-4 justify-center">
+                        <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             {status === 'success' && (
                                 <>
-                                    <button
-                                        onClick={() => navigate('/')}
-                                        className="px-6 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition-colors"
-                                    >
-                                        Back to Home
-                                    </button>
+                                    {(() => {
+                                        const contextStr = sessionStorage.getItem('pendingBookingContext');
+                                        let tripId = null;
+                                        try {
+                                            const context = JSON.parse(contextStr || '{}');
+                                            tripId = context.tripId;
+                                        } catch (e) { }
+
+                                        if (tripId) {
+                                            return (
+                                                <button
+                                                    onClick={() => navigate(`/trips/${tripId}`)}
+                                                    className="px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-bold hover:shadow-lg hover:scale-105 transition-all"
+                                                >
+                                                    View Trip Dashboard
+                                                </button>
+                                            );
+                                        }
+                                        return (
+                                            <button
+                                                onClick={() => navigate('/')}
+                                                className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
+                                            >
+                                                Back to Home
+                                            </button>
+                                        );
+                                    })()}
+
                                     {redirectUrl && (
                                         <button
                                             onClick={() => navigate(redirectUrl)}
-                                            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
+                                            className="px-6 py-3 border-2 border-slate-200 text-slate-600 rounded-xl font-semibold hover:border-slate-300 hover:bg-slate-50 transition-colors"
                                         >
-                                            View Booking
+                                            View Receipt
                                         </button>
                                     )}
                                 </>
@@ -163,16 +200,16 @@ const PaymentStatus = () => {
                             {(status === 'failed' || status === 'error') && (
                                 <>
                                     <button
-                                        onClick={() => navigate('/')}
-                                        className="px-6 py-3 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition-colors"
-                                    >
-                                        Back to Home
-                                    </button>
-                                    <button
-                                        onClick={() => navigate(-2)}
+                                        onClick={() => navigate(-1)}
                                         className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors"
                                     >
                                         Try Again
+                                    </button>
+                                    <button
+                                        onClick={() => navigate('/')}
+                                        className="px-6 py-3 bg-slate-100 text-slate-700 rounded-xl font-semibold hover:bg-slate-200 transition-colors"
+                                    >
+                                        Back to Home
                                     </button>
                                 </>
                             )}

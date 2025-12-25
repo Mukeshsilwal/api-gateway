@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../services/authService";
 import { Sidebar } from "../components/admin/Sidebar";
@@ -16,8 +16,8 @@ import TicketingDashboard from "../components/admin/ticketing/TicketingDashboard
 import RoomMaintenancePage from "../components/admin/maintenance/RoomMaintenancePage";
 import UserManagement from "../components/admin/UserManager";
 import { EventManager } from "../components/admin/EventManager";
-import { StaffManager } from "../components/admin/StaffManager";
 import RoleManager from "../components/admin/RoleManager";
+import SafetyWarRoom from "../components/admin/SafetyWarRoom";
 
 // Define valid tab keys for type safety
 type AdminTab =
@@ -34,8 +34,8 @@ type AdminTab =
     | 'scheduler'
     | 'support'
     | 'room-maintenance'
-    | 'staff'
-    | 'roles';
+    | 'roles'
+    | 'war-room';
 
 export function AdminPanel() {
     const navigate = useNavigate();
@@ -89,8 +89,6 @@ export function AdminPanel() {
                 return <EventManager />;
             case 'users':
                 return <UserManagement />;
-            case 'staff':
-                return <StaffManager />;
             case 'roles':
                 return <RoleManager />;
             case 'settings':
@@ -101,6 +99,8 @@ export function AdminPanel() {
                 return <TicketingDashboard />;
             case 'room-maintenance':
                 return <RoomMaintenancePage />;
+            case 'war-room':
+                return <SafetyWarRoom />;
             default:
                 return <Dashboard />;
         }

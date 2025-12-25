@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  eureka-server:
+    image: mukeshsilwal/eureka-server:latest
+    ports:
+      - "8761:8761"
+    networks:
+      - ticket-network
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  gateway:
+    image: mukeshsilwal/gateway:latest
+    ports:
+      - "8222:8222"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  auth-service:
+    image: mukeshsilwal/auth-service:latest
+    ports:
+      - "8081:8081"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  booking-service:
+    image: mukeshsilwal/booking-service:latest
+    ports:
+      - "8082:8082"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  payment-service:
+    image: mukeshsilwal/payment-service:latest
+    ports:
+      - "8083:8083"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  web-bff:
+    image: mukeshsilwal/web-bff:latest
+    ports:
+      - "8084:8084"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  hotel-service:
+    image: mukeshsilwal/hotel-service:latest
+    ports:
+      - "8085:8085"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  bus-service:
+    image: mukeshsilwal/bus-service:latest
+    ports:
+      - "8086:8086"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  market-service:
+    image: mukeshsilwal/market-service:latest
+    ports:
+      - "8087:8087"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  event-service:
+    image: mukeshsilwal/event-service:latest
+    ports:
+      - "8088:8088"
+    depends_on:
+      - eureka-server
+    networks:
+      - ticket-network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+
+  frontend:
+    image: mukeshsilwal/frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+    networks:
+      - ticket-network
+
+networks:
+  ticket-network:
+    driver: bridge

@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useBusSearch } from '../../hooks/useApi';
 import SearchForm, { SearchParams } from '../../components/forms/SearchForm';
 import BusCard from '../../components/cards/BusCard';
-import { useNavigate } from 'react-router-dom';
-import { Filter, SlidersHorizontal } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Filter, SlidersHorizontal, MapPin } from 'lucide-react';
+import { useEffect } from 'react';
 
 /**
  * Bus Search Page
@@ -12,6 +13,13 @@ import { Filter, SlidersHorizontal } from 'lucide-react';
 const BusSearchPage: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
+
+    // Trip Context
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const tripId = queryParams.get('tripId');
+    const tripName = queryParams.get('tripName');
+
     const [filters, setFilters] = useState({
         busType: 'all',
         minPrice: 0,
@@ -19,6 +27,17 @@ const BusSearchPage: React.FC = () => {
         departureTime: 'all', // morning, afternoon, evening, night
     });
     const [showFilters, setShowFilters] = useState(false);
+
+    // Auto-search if query params exist
+    useEffect(() => {
+        const origin = queryParams.get('origin');
+        const destination = queryParams.get('destination');
+        const date = queryParams.get('date');
+
+        if (origin && destination && date && !searchParams) {
+            setSearchParams({ origin, destination, date });
+        }
+    }, [queryParams]);
 
     const { data: buses, isLoading, error } = useBusSearch(
         {
@@ -31,16 +50,27 @@ const BusSearchPage: React.FC = () => {
 
     const handleSearch = (params: SearchParams) => {
         setSearchParams(params);
+        // Persist tripId in URL if searching again
+        if (tripId) {
+            const newParams = new URLSearchParams();
+            if (params.origin) newParams.set('origin', params.origin);
+            if (params.destination) newParams.set('destination', params.destination);
+            if (params.date) newParams.set('date', params.date);
+            newParams.set('tripId', tripId);
+            if (tripName) newParams.set('tripName', tripName);
+            navigate(`?${newParams.toString()}`, { replace: true });
+        }
     };
 
     const handleViewSeats = (busId: number) => {
         navigate(`/buses/${busId}/seats`, {
-            state: { searchParams }
+            state: { searchParams, tripId: tripId ? Number(tripId) : undefined }
         });
     };
 
     // Apply filters
     const filteredBuses = buses?.filter(bus => {
+        // ... existing filter logic ...
         // Bus type filter
         if (filters.busType !== 'all' && bus.busType !== filters.busType) {
             return false;
@@ -75,13 +105,43 @@ const BusSearchPage: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
+            {/* Trip Context Banner */}
+            {tripId && (
+                <div className="bg-orange-600 text-white px-4 py-3 shadow-md">
+                    <div className="max-w-7xl mx-auto flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <span className="bg-white/20 p-1.5 rounded-full">
+                                <MapPin size={16} />
+                            </span>
+                            <span className="font-medium">
+                                Planning for Trip: <strong>{tripName || `Trip #${tripId}`}</strong>
+                            </span>
+                        </div>
+                        <button
+                            onClick={() => navigate(`/trips/${tripId}`)}
+                            className="text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded transition"
+                        >
+                            Return to Dashboard
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Hero Section with Search */}
             <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white py-12">
                 <div className="max-w-7xl mx-auto px-4">
                     <h1 className="text-4xl font-bold mb-2">Book Your Bus Tickets</h1>
                     <p className="text-blue-100 mb-8">Travel comfortably across Nepal</p>
 
-                    <SearchForm type="bus" onSearch={handleSearch} />
+                    <SearchForm
+                        type="bus"
+                        onSearch={handleSearch}
+                        initialValues={{
+                            origin: queryParams.get('origin') || undefined,
+                            destination: queryParams.get('destination') || undefined,
+                            date: queryParams.get('date') || undefined
+                        }}
+                    />
                 </div>
             </div>
 

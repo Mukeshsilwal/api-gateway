@@ -11,6 +11,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.ticketkatum.common.service.SystemConfigService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 
@@ -27,6 +31,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
     private static final String AUTHORITIES_CLAIM = "authorities";
@@ -34,16 +39,13 @@ public class JwtService {
     private static final String ROLES_CLAIM = "roles";
     private static final String USER_ID_CLAIM = "userId";
 
-    @Value("${jwt.expiration.time:3600000}")
-    private long jwtExpirationTime;
-
-    @Value("${jwt.refresh.expiration.time:86400000}")
-    private long refreshExpirationTime;
-
-    @Value("${jwt.secret:dMbz7o4YE45aAyT6BUYMsO_ireJ00J96Xxbv6AQ65xb0Ajauql1fScOEP4hEb7oyBtjHfTjvkeXBfpSjE8uyoA}")
-    private String jwtSecret;
+    private final SystemConfigService systemConfigService;
 
     private SecretKey getSigningKey() {
+        String jwtSecret = systemConfigService.getString("JWT_SECRET");
+        if (jwtSecret == null || jwtSecret.isEmpty()) {
+            throw new IllegalStateException("JWT_SECRET not configured in System Config");
+        }
         return Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -113,14 +115,18 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
-        return buildToken(claims, user.getUsername(), jwtExpirationTime);
+        // Default 1h
+        long expirationTime = systemConfigService.getLong("JWT_EXPIRATION_MS", 3600000L);
+        return buildToken(claims, user.getUsername(), expirationTime);
     }
 
     /**
      * Generate refresh token for authenticated user
      */
     public String generateRefreshToken(UserDetails userDetails) {
-        return buildToken(new HashMap<>(), userDetails.getUsername(), refreshExpirationTime);
+        // Default 24h
+        long refreshExpiration = systemConfigService.getLong("JWT_REFRESH_EXPIRATION_MS", 86400000L);
+        return buildToken(new HashMap<>(), userDetails.getUsername(), refreshExpiration);
     }
 
     // Kept for backward compatibility if needed, but prefer
@@ -146,7 +152,8 @@ public class JwtService {
             claims.put(ROLES_CLAIM, roles);
         }
 
-        return buildToken(claims, userDetails.getUsername(), jwtExpirationTime);
+        long expirationTime = systemConfigService.getLong("JWT_EXPIRATION_MS", 3600000L);
+        return buildToken(claims, userDetails.getUsername(), expirationTime);
     }
 
     /**
@@ -158,7 +165,8 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
 
-        return buildToken(claims, userDetails.getUsername(), jwtExpirationTime);
+        long expirationTime = systemConfigService.getLong("JWT_EXPIRATION_MS", 3600000L);
+        return buildToken(claims, userDetails.getUsername(), expirationTime);
     }
 
     /**

@@ -7,11 +7,13 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Attachments;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import com.ticketkatum.common.service.SystemConfigService;
 import com.ticketkatum.entity.HotelBooking;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -19,18 +21,30 @@ import java.util.Base64;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class HotelEmailService {
 
-    @Value("${sendgrid.api.key}")
-    private String sendGridApiKey;
+    private final SystemConfigService systemConfigService;
 
-    private static final String FROM_EMAIL = "ticketkatum5@gmail.com";
+    private String sendGridApiKey;
+    private String fromEmail;
+
+    // private static final String FROM_EMAIL = "ticketkatum5@gmail.com"; // Removed
+    // in favor of config
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy");
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
 
-    /* -------------------------------------------------------------------------
-     *  CORE SEND LOGIC (Shared by every email)
-     * ------------------------------------------------------------------------- */
+    @PostConstruct
+    public void init() {
+        this.sendGridApiKey = systemConfigService.getString("SENDGRID_API_KEY");
+        this.fromEmail = systemConfigService.getString("EMAIL_FROM_ADDRESS", "ticketkatum5@gmail.com");
+    }
+
+    /*
+     * -------------------------------------------------------------------------
+     * CORE SEND LOGIC (Shared by every email)
+     * -------------------------------------------------------------------------
+     */
     private void sendSafely(Mail mail) {
         try {
             SendGrid sg = new SendGrid(sendGridApiKey);
@@ -51,28 +65,35 @@ public class HotelEmailService {
         }
     }
 
-    /* -------------------------------------------------------------------------
-     *  BASE EMAIL FACTORY
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * BASE EMAIL FACTORY
+     * -------------------------------------------------------------------------
+     */
     private Mail buildHtmlMail(String to, String subject, String htmlBody) {
-        Email from = new Email(FROM_EMAIL);
+        Email from = new Email(fromEmail);
         Email recipient = new Email(to);
         Content content = new Content("text/html", htmlBody);
 
         return new Mail(from, subject, recipient, content);
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND SIMPLE HTML EMAIL
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * SEND SIMPLE HTML EMAIL
+     * -------------------------------------------------------------------------
+     */
     public void sendHtml(String to, String subject, String htmlBody) {
         sendSafely(buildHtmlMail(to, subject, htmlBody));
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND EMAIL WITH PDF ATTACHMENT (Voucher/Invoice)
-     * ------------------------------------------------------------------------- */
-    public void sendEmailWithAttachment(String to, String subject, String htmlBody, byte[] pdfContent, String filename) {
+    /*
+     * -------------------------------------------------------------------------
+     * SEND EMAIL WITH PDF ATTACHMENT (Voucher/Invoice)
+     * -------------------------------------------------------------------------
+     */
+    public void sendEmailWithAttachment(String to, String subject, String htmlBody, byte[] pdfContent,
+            String filename) {
         Mail mail = buildHtmlMail(to, subject, htmlBody);
 
         // Encode PDF
@@ -87,9 +108,11 @@ public class HotelEmailService {
         sendSafely(mail);
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND HOTEL BOOKING CONFIRMATION EMAIL
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * SEND HOTEL BOOKING CONFIRMATION EMAIL
+     * -------------------------------------------------------------------------
+     */
     public void sendBookingConfirmation(HotelBooking booking) {
         String subject = "🏨 Hotel Booking Confirmation - " + booking.getConfirmationNumber();
 
@@ -132,17 +155,17 @@ public class HotelEmailService {
                             <h1>🏨 Booking Confirmed!</h1>
                             <p>Your hotel reservation is confirmed and ready</p>
                         </div>
-                        
+
                         <div class="content">
                             <div style="text-align: center;">
                                 <span class="success-badge">✓ CONFIRMED</span>
                             </div>
-                            
+
                             <div class="hotel-info">
                                 <div class="hotel-name">%s</div>
                                 <div class="room-info">%s Room × %d</div>
                             </div>
-                            
+
                             <div class="booking-details">
                                 <div class="detail-row">
                                     <span class="detail-label">Confirmation Number</span>
@@ -173,12 +196,12 @@ public class HotelEmailService {
                                     <span class="detail-value">%s</span>
                                 </div>
                             </div>
-                            
+
                             <div class="total-amount">
                                 <div class="total-label">Total Amount Paid</div>
                                 <div class="total-value">NPR %,.2f</div>
                             </div>
-                            
+
                             <div class="important-info">
                                 <h3>📋 Important Information</h3>
                                 <ul>
@@ -188,14 +211,14 @@ public class HotelEmailService {
                                     <li>Cancellation allowed up to 24 hours before check-in</li>
                                 </ul>
                             </div>
-                            
+
                             <div style="text-align: center;">
                                 <p style="color: #6b7280; margin: 20px 0;">
                                     Need help? Contact us at <strong>support@ticketkatum.com</strong>
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div class="footer">
                             <p><strong>Thank you for choosing TicketKatum!</strong></p>
                             <p>© 2024 TicketKatum. All rights reserved.</p>
@@ -203,26 +226,28 @@ public class HotelEmailService {
                     </div>
                 </body>
                 </html>
-                """.formatted(
-                booking.getHotelName(),
-                booking.getRoomType(),
-                booking.getNumberOfRooms(),
-                booking.getConfirmationNumber(),
-                booking.getBookingId(),
-                booking.getCheckInDate().format(DATE_FORMATTER),
-                booking.getCheckOutDate().format(DATE_FORMATTER),
-                numberOfNights,
-                booking.getNumberOfGuests(),
-                booking.getBookingDateTime().format(DATETIME_FORMATTER),
-                booking.getTotalAmount()
-        );
+                """
+                .formatted(
+                        booking.getHotelName(),
+                        booking.getRoomType(),
+                        booking.getNumberOfRooms(),
+                        booking.getConfirmationNumber(),
+                        booking.getBookingId(),
+                        booking.getCheckInDate().format(DATE_FORMATTER),
+                        booking.getCheckOutDate().format(DATE_FORMATTER),
+                        numberOfNights,
+                        booking.getNumberOfGuests(),
+                        booking.getBookingDateTime().format(DATETIME_FORMATTER),
+                        booking.getTotalAmount());
 
         sendSafely(buildHtmlMail(booking.getContactEmail(), subject, html));
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND HOTEL CANCELLATION EMAIL
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * SEND HOTEL CANCELLATION EMAIL
+     * -------------------------------------------------------------------------
+     */
     public void sendCancellationEmail(HotelBooking booking, BigDecimal cancellationCharge, BigDecimal refundAmount) {
         String subject = "Hotel Booking Cancelled - " + booking.getConfirmationNumber();
 
@@ -254,16 +279,16 @@ public class HotelEmailService {
                             <h1>Booking Cancelled</h1>
                             <p>Your hotel reservation has been cancelled</p>
                         </div>
-                        
+
                         <div class="content">
                             <div style="text-align: center;">
                                 <span class="cancel-badge">✕ CANCELLED</span>
                             </div>
-                            
+
                             <p style="color: #374151; line-height: 1.6;">
                                 Your booking at <strong>%s</strong> has been successfully cancelled.
                             </p>
-                            
+
                             <div class="booking-details">
                                 <div class="detail-row">
                                     <span class="detail-label">Confirmation Number</span>
@@ -286,7 +311,7 @@ public class HotelEmailService {
                                     <span class="detail-value">%s</span>
                                 </div>
                             </div>
-                            
+
                             <div class="refund-info">
                                 <div class="refund-title">💰 Refund Details</div>
                                 <div class="refund-row">
@@ -305,38 +330,40 @@ public class HotelEmailService {
                                     ℹ️ The refund will be processed within 7-10 business days to your original payment method.
                                 </p>
                             </div>
-                            
+
                             <div style="text-align: center; margin-top: 30px;">
                                 <p style="color: #6b7280;">
                                     Questions? Contact us at <strong>support@ticketkatum.com</strong>
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div class="footer">
                             <p>© 2024 TicketKatum. All rights reserved.</p>
                         </div>
                     </div>
                 </body>
                 </html>
-                """.formatted(
-                booking.getHotelName(),
-                booking.getConfirmationNumber(),
-                booking.getHotelName(),
-                booking.getRoomType(),
-                booking.getCheckInDate().format(DATE_FORMATTER),
-                booking.getCancellationDateTime().format(DATETIME_FORMATTER),
-                booking.getTotalAmount(),
-                cancellationCharge,
-                refundAmount
-        );
+                """
+                .formatted(
+                        booking.getHotelName(),
+                        booking.getConfirmationNumber(),
+                        booking.getHotelName(),
+                        booking.getRoomType(),
+                        booking.getCheckInDate().format(DATE_FORMATTER),
+                        booking.getCancellationDateTime().format(DATETIME_FORMATTER),
+                        booking.getTotalAmount(),
+                        cancellationCharge,
+                        refundAmount);
 
         sendSafely(buildHtmlMail(booking.getContactEmail(), subject, html));
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND REFUND CONFIRMATION EMAIL
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * SEND REFUND CONFIRMATION EMAIL
+     * -------------------------------------------------------------------------
+     */
     public void sendRefundConfirmation(HotelBooking booking) {
         String subject = "✅ Refund Processed - " + booking.getConfirmationNumber();
 
@@ -363,16 +390,16 @@ public class HotelEmailService {
                         <div class="header">
                             <h1>Refund Processed Successfully</h1>
                         </div>
-                        
+
                         <div class="content">
                             <div class="success-icon">✅</div>
-                            
+
                             <div class="refund-box">
                                 <p style="margin: 0; color: #065f46; font-size: 18px;">Your refund amount</p>
                                 <div class="refund-amount">NPR %,.2f</div>
                                 <p style="margin: 10px 0 0; color: #047857;">has been initiated and will be credited within 7-10 business days</p>
                             </div>
-                            
+
                             <div class="booking-details">
                                 <div class="detail-row">
                                     <span>Confirmation Number:</span>
@@ -387,15 +414,15 @@ public class HotelEmailService {
                                     <span><strong>%s</strong></span>
                                 </div>
                             </div>
-                            
+
                             <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
                                 <p style="margin: 0; color: #92400e; font-size: 14px;">
-                                    <strong>📌 Note:</strong> The refund will be credited to your original payment method. 
+                                    <strong>📌 Note:</strong> The refund will be credited to your original payment method.
                                     If you have any questions, please contact our support team.
                                 </p>
                             </div>
                         </div>
-                        
+
                         <div class="footer">
                             <p><strong>Thank you for using TicketKatum!</strong></p>
                             <p>© 2024 TicketKatum. All rights reserved.</p>
@@ -403,19 +430,21 @@ public class HotelEmailService {
                     </div>
                 </body>
                 </html>
-                """.formatted(
-                booking.getRefundAmount(),
-                booking.getConfirmationNumber(),
-                booking.getHotelName(),
-                booking.getRefundDateTime().format(DATETIME_FORMATTER)
-        );
+                """
+                .formatted(
+                        booking.getRefundAmount(),
+                        booking.getConfirmationNumber(),
+                        booking.getHotelName(),
+                        booking.getRefundDateTime().format(DATETIME_FORMATTER));
 
         sendSafely(buildHtmlMail(booking.getContactEmail(), subject, html));
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND BOOKING REMINDER (1 day before check-in)
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * SEND BOOKING REMINDER (1 day before check-in)
+     * -------------------------------------------------------------------------
+     */
     public void sendCheckInReminder(HotelBooking booking) {
         String subject = "⏰ Check-in Reminder - Tomorrow at " + booking.getHotelName();
 
@@ -436,40 +465,42 @@ public class HotelEmailService {
                     <div class="container">
                         <div class="reminder-icon">🏨</div>
                         <h2 style="text-align: center; color: #333;">Your Check-in is Tomorrow!</h2>
-                        
+
                         <div class="hotel-name">%s</div>
-                        
+
                         <div class="check-in-time">
                             <p style="margin: 0; font-size: 14px; color: #92400e;">Check-in Date</p>
                             <p style="margin: 5px 0 0; font-size: 20px; font-weight: bold; color: #78350f;">%s</p>
                         </div>
-                        
+
                         <div class="details">
                             <p><strong>Confirmation Number:</strong> %s</p>
                             <p><strong>Room Type:</strong> %s × %d</p>
                             <p><strong>Check-in Time:</strong> 2:00 PM onwards</p>
                         </div>
-                        
+
                         <p style="color: #6b7280; text-align: center;">
                             Don't forget to bring a valid ID proof!
                         </p>
                     </div>
                 </body>
                 </html>
-                """.formatted(
-                booking.getHotelName(),
-                booking.getCheckInDate().format(DATE_FORMATTER),
-                booking.getConfirmationNumber(),
-                booking.getRoomType(),
-                booking.getNumberOfRooms()
-        );
+                """
+                .formatted(
+                        booking.getHotelName(),
+                        booking.getCheckInDate().format(DATE_FORMATTER),
+                        booking.getConfirmationNumber(),
+                        booking.getRoomType(),
+                        booking.getNumberOfRooms());
 
         sendSafely(buildHtmlMail(booking.getContactEmail(), subject, html));
     }
 
-    /* -------------------------------------------------------------------------
-     *  SEND BOOKING WITH VOUCHER ATTACHMENT
-     * ------------------------------------------------------------------------- */
+    /*
+     * -------------------------------------------------------------------------
+     * SEND BOOKING WITH VOUCHER ATTACHMENT
+     * -------------------------------------------------------------------------
+     */
     public void sendBookingWithVoucher(HotelBooking booking, byte[] voucherPdf) {
         String subject = "🏨 Hotel Booking Voucher - " + booking.getConfirmationNumber();
 
@@ -489,7 +520,6 @@ public class HotelEmailService {
                 subject,
                 html,
                 voucherPdf,
-                "hotel-voucher-" + booking.getConfirmationNumber() + ".pdf"
-        );
+                "hotel-voucher-" + booking.getConfirmationNumber() + ".pdf");
     }
 }

@@ -5,6 +5,7 @@ import com.google.zxing.WriterException;
 import com.ticketkatum.entity.*;
 import com.ticketkatum.repository.*;
 import com.ticketkatum.util.QRCodeGenerator;
+import org.hibernate.Hibernate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -156,6 +157,7 @@ public class BookingService {
         eventRepository.save(event);
 
         log.info("Booking created: {}", bookingReference);
+        Hibernate.initialize(savedBooking.getAttendees());
         return savedBooking;
     }
 
@@ -164,8 +166,10 @@ public class BookingService {
      */
     public EventBooking getBooking(String bookingReference) {
         log.info("Fetching booking: {}", bookingReference);
-        return bookingRepository.findByBookingReference(bookingReference)
+        EventBooking booking = bookingRepository.findByBookingReference(bookingReference)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
+        Hibernate.initialize(booking.getAttendees());
+        return booking;
     }
 
     /**
@@ -183,7 +187,9 @@ public class BookingService {
         booking.setStatus(EventBooking.BookingStatus.CONFIRMED);
         booking.setConfirmedAt(LocalDateTime.now());
 
-        return bookingRepository.save(booking);
+        EventBooking savedBooking = bookingRepository.save(booking);
+        Hibernate.initialize(savedBooking.getAttendees());
+        return savedBooking;
     }
 
     /**

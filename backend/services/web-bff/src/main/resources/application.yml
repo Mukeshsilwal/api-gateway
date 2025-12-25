@@ -16,8 +16,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID:your-client-id}
-            client-secret: ${GOOGLE_CLIENT_SECRET:your-client-secret}
+            client-id: ${GOOGLE_CLIENT_ID:130041322678-e82m79prh88nhesanq9p3m2s48a85psk.apps.googleusercontent.com}
+            client-secret: ${GOOGLE_CLIENT_SECRET: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}
             scope:
               - email
               - profile
@@ -38,8 +38,8 @@ microservices:
   # Core Services
   event-service-url: ${EVENT_SERVICE_URL:http://localhost:8081}
   booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8082}
-  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:8088}
-  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8087}
+  payment-service-url: ${PAYMENT_SERVICE_URL:http://localhost:9091}
+  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8099}
   auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8089}
   bus-service-url: ${BUS_SERVICE_URL:http://localhost:8083}
   market-service-url: ${MARKET_SERVICE_URL:http://localhost:8092}
@@ -47,7 +47,7 @@ microservices:
   # Hotel Management Services
   recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8087}
   maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8087}
-  staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8087}
+  staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8099}
   
   # Support Services
   image-service-url: ${IMAGE_SERVICE_URL:http://localhost:8086}

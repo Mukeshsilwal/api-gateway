@@ -1,0 +1,69 @@
+server:
+  port: 8092
+  servlet:
+    context-path: /alert-service
+
+spring:
+  application:
+    name: alert-service
+  
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/alert_db}
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+  
+  cache:
+    type: redis
+    redis:
+      time-to-live: 600000
+  
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:your-secret-key}
+
+# Service URLs
+services:
+  trip-service:
+    url: ${TRIP_SERVICE_URL:http://localhost:8087/trip-service}
+  notification-service:
+    url: ${NOTIFICATION_SERVICE_URL:http://localhost:8090/notification-service}
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.ticketkatum.alertservice: DEBUG
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus

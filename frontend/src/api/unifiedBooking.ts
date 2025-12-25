@@ -7,6 +7,7 @@ export interface BookingItem {
 
 export interface UnifiedBookingRequest {
     customerId: string;
+    tripId?: number; // Optional: Associate booking with a trip
     bookings: BookingItem[];
 }
 

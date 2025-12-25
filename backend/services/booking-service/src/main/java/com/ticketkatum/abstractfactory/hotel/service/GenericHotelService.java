@@ -140,8 +140,9 @@ public class GenericHotelService implements BookingProvider {
         }
     }
 
+    @Override
     @Transactional
-    public void confirmBooking(String bookingId) {
+    public void confirmBooking(String bookingId, String transactionId) {
 
         HotelBooking booking = hotelBookingRepo.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));

@@ -21,6 +21,7 @@ public class UnifiedBookingResponse {
 
     private String transactionId;
     private String customerId;
+    private Long tripId; // Trip ID if bookings are associated with a trip
     private List<BookingResult> bookings;
     private PaymentInfo paymentInfo;
     private BigDecimal totalAmount;
