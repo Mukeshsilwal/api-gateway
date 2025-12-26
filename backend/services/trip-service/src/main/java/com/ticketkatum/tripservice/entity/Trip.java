@@ -35,6 +35,9 @@ public class Trip {
     @Column(name = "trip_name", nullable = false)
     private String tripName;
 
+    @Column(name = "guide_id")
+    private Long guideId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "trip_type", nullable = false)
     private TripType tripType = TripType.LEISURE;
@@ -87,11 +90,11 @@ public class Trip {
 
     // Enums
     public enum TripType {
-        LEISURE,        // Vacation, relaxation
-        BUSINESS,       // Work-related travel
-        ADVENTURE,      // Trekking, hiking, extreme sports
-        CULTURAL,       // Heritage sites, museums
-        PILGRIMAGE      // Religious sites
+        LEISURE, // Vacation, relaxation
+        BUSINESS, // Work-related travel
+        ADVENTURE, // Trekking, hiking, extreme sports
+        CULTURAL, // Heritage sites, museums
+        PILGRIMAGE // Religious sites
     }
 
     public enum TouristType {

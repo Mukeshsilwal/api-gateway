@@ -31,17 +31,6 @@ export type AdminSummary = {
     systemHealth: { status: 'ok' | 'degraded' | 'down'; lastCheckTs: string };
 };
 
-export type BusLocation = {
-    id: string;
-    lat: number;
-    lng: number;
-    speedKmph: number;
-};
-
-export type LiveSnapshot = {
-    activeBuses: number;
-    buses: BusLocation[];
-};
 
 export type SearchResultItem = {
     id: string;
@@ -64,15 +53,6 @@ export const adminApi = {
         return response.data.data;
     },
 
-    /**
-     * Fallback polling endpoint for live bus locations.
-     */
-    getLiveSnapshot: async (tz: string = 'Asia/Kathmandu'): Promise<LiveSnapshot> => {
-        const response = await client.get<BffResponse<LiveSnapshot>>('/api/bff/v1/admin/live/buses/snapshot', {
-            params: { tz }
-        });
-        return response.data.data;
-    },
 
     /**
      * Global search across entities.

@@ -30,6 +30,21 @@ export function EventBooking() {
     });
     const [attendees, setAttendees] = useState<Attendee[]>([]);
 
+    // Extract tripId from URL params if present
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const tripId = params.get('tripId');
+
+        if (tripId) {
+            // Store tripId in booking context for later use
+            sessionStorage.setItem('bookingContext', JSON.stringify({
+                tripId: tripId,
+                isUnifiedBooking: false
+            }));
+            console.log('🎯 Trip context stored:', tripId);
+        }
+    }, [location.search]);
+
     // Check authentication on mount
     useEffect(() => {
         const token = localStorage.getItem('token');

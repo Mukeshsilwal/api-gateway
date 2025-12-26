@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useAdminSummary } from '../../hooks/useAdminSummary';
-import { useLiveBusTracking } from '../../hooks/useLiveBusTracking';
 import {
     Bus,
     Ticket,
@@ -30,7 +29,6 @@ export function Dashboard() {
 
     // Fetch Data
     const { data: summary, isLoading, isError, error, refetch } = useAdminSummary(timeRange);
-    const { status: liveStatus, isPolling } = useLiveBusTracking();
 
     if (isError) {
         return (
@@ -67,7 +65,7 @@ export function Dashboard() {
             title: "Active Buses",
             value: isLoading ? "..." : liveTracking?.activeBuses ?? 0,
             icon: <Bus className="w-6 h-6 text-blue-600" />,
-            trend: liveStatus === 'connected' ? 'Live GPS' : 'GPS Offline',
+            trend: 'Today',
             color: "blue",
             bg: "bg-blue-50",
             border: "border-blue-100"
@@ -99,11 +97,6 @@ export function Dashboard() {
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                         Dashboard Overview
-                        {isPolling && (
-                            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full border border-yellow-200">
-                                Polling Mode
-                            </span>
-                        )}
                         {!isLoading && systemHealth?.status !== 'ok' && (
                             <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full border border-red-200">
                                 System Degraded

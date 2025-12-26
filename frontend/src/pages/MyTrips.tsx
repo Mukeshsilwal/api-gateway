@@ -79,8 +79,8 @@ const MyTripsPage: React.FC = () => {
                                 key={status}
                                 onClick={() => setFilter(status)}
                                 className={`px-4 py-2 rounded-lg font-semibold transition ${filter === status
-                                        ? 'bg-orange-500 text-white'
-                                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                                    ? 'bg-orange-500 text-white'
+                                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                                     }`}
                             >
                                 {status.replace('_', ' ')}
@@ -104,65 +104,83 @@ const MyTripsPage: React.FC = () => {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredTrips.map((trip) => (
-                            <div
-                                key={trip.tripId}
-                                onClick={() => navigate(`/trips/${trip.tripId}`)}
-                                className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
-                            >
-                                {/* Header */}
-                                <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-6 text-white">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <h3 className="text-xl font-bold">{trip.tripName}</h3>
-                                            <p className="text-sm opacity-90 mt-1">{trip.tripType}</p>
+                        {filteredTrips.map((trip) => {
+                            // Determine navigation based on trip status
+                            const handleTripClick = () => {
+                                // For PLANNED trips (incomplete), redirect to continue planning
+                                if (trip.status === 'PLANNED' && trip.progressPercentage < 100) {
+                                    navigate(`/trips/${trip.tripId}/continue`);
+                                } else {
+                                    // For other statuses, go to trip dashboard
+                                    navigate(`/trips/${trip.tripId}`);
+                                }
+                            };
+
+                            return (
+                                <div
+                                    key={trip.tripId}
+                                    onClick={handleTripClick}
+                                    className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition cursor-pointer overflow-hidden"
+                                >
+                                    {/* Header */}
+                                    <div className="bg-gradient-to-r from-orange-500 to-pink-500 p-6 text-white">
+                                        <div className="flex items-start justify-between">
+                                            <div>
+                                                <h3 className="text-xl font-bold">{trip.tripName}</h3>
+                                                <p className="text-sm opacity-90 mt-1">{trip.tripType}</p>
+                                            </div>
+                                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(trip.status)}`}>
+                                                {trip.status}
+                                            </span>
                                         </div>
-                                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(trip.status)}`}>
-                                            {trip.status}
-                                        </span>
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="p-6 space-y-4">
+                                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                            <Calendar className="w-4 h-4" />
+                                            <span className="text-sm">
+                                                {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
+                                            </span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                            <DollarSign className="w-4 h-4" />
+                                            <span className="text-sm">Budget: NPR {trip.budget.toLocaleString()}</span>
+                                        </div>
+
+                                        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                                            <MapPin className="w-4 h-4" />
+                                            <span className="text-sm">Progress: {trip.progressPercentage}%</span>
+                                        </div>
+
+                                        {/* Progress Bar */}
+                                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                            <div
+                                                className="bg-orange-500 h-2 rounded-full transition-all"
+                                                style={{ width: `${trip.progressPercentage}%` }}
+                                            ></div>
+                                        </div>
+
+                                        {trip.description && (
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{trip.description}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {trip.durationDays} days • NPR {trip.budgetRemaining.toLocaleString()} remaining
+                                        </p>
+                                        {trip.status === 'PLANNED' && trip.progressPercentage < 100 && (
+                                            <p className="text-xs text-orange-600 dark:text-orange-400 mt-1 font-semibold">
+                                                Click to continue planning →
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
-
-                                {/* Content */}
-                                <div className="p-6 space-y-4">
-                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                        <Calendar className="w-4 h-4" />
-                                        <span className="text-sm">
-                                            {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                        <DollarSign className="w-4 h-4" />
-                                        <span className="text-sm">Budget: NPR {trip.budget.toLocaleString()}</span>
-                                    </div>
-
-                                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-                                        <MapPin className="w-4 h-4" />
-                                        <span className="text-sm">Progress: {trip.progressPercentage}%</span>
-                                    </div>
-
-                                    {/* Progress Bar */}
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                                        <div
-                                            className="bg-orange-500 h-2 rounded-full transition-all"
-                                            style={{ width: `${trip.progressPercentage}%` }}
-                                        ></div>
-                                    </div>
-
-                                    {trip.description && (
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{trip.description}</p>
-                                    )}
-                                </div>
-
-                                {/* Footer */}
-                                <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
-                                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                                        {trip.durationDays} days • NPR {trip.budgetRemaining.toLocaleString()} remaining
-                                    </p>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

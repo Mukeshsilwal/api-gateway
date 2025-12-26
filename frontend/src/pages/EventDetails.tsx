@@ -125,8 +125,15 @@ export function EventDetails() {
             return;
         }
 
+        // Check if tripId exists in URL params
+        const params = new URLSearchParams(window.location.search);
+        const tripId = params.get('tripId');
+
+        // Build navigation path with tripId if present
+        const bookingPath = `/events/${eventId}/book${tripId ? `?tripId=${tripId}` : ''}`;
+
         // Navigate to booking page with selected tickets
-        navigate(`/events/${eventId}/book`, {
+        navigate(bookingPath, {
             state: {
                 event,
                 selectedTickets

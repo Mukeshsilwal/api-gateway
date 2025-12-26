@@ -15,7 +15,8 @@ import {
     ChevronLeft,
     Menu,
     Calendar,
-    LifeBuoy
+    LifeBuoy,
+    UserCheck
 } from 'lucide-react';
 import authService from '../../services/authService';
 
@@ -64,6 +65,7 @@ export function Sidebar({ activeTab, setActiveTab, onLogout, isCollapsed, onTogg
                 { id: 'buses', label: 'Bus Manager', icon: Bus },
                 { id: 'routes', label: 'Route Manager', icon: Map },
                 { id: 'events', label: 'Event Manager', icon: Calendar },
+                { id: 'guides', label: 'Guide Manager', icon: UserCheck },
                 { id: 'hotels', label: 'Hotel Manager', icon: Hotel },
                 { id: 'cinemas', label: 'Cinema Manager', icon: Film },
                 { id: 'tickets', label: 'Ticket Manager', icon: Ticket },

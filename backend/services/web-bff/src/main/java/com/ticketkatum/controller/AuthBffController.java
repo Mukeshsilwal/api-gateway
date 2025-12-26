@@ -14,6 +14,7 @@ import com.ticketkatum.dto.auth.response.LogoutAllResponse;
 import com.ticketkatum.dto.auth.response.LogoutResponse;
 import com.ticketkatum.dto.auth.response.RefreshTokenResponse;
 import com.ticketkatum.dto.auth.response.SessionValidationResponse;
+import com.ticketkatum.dto.request.UpdateUserRequest;
 import com.ticketkatum.service.AuthAggregator;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -324,7 +325,7 @@ public class AuthBffController {
     @Operation(summary = "Update user profile")
     public CompletableFuture<ResponseEntity<Response<UserDto>>> updateProfile(
             @PathVariable Integer userId,
-            @Valid @RequestBody UserDto userDto) {
+            @Valid @RequestBody UpdateUserRequest userDto) {
 
         log.info("BFF: Updating user profile: {}", userId);
 

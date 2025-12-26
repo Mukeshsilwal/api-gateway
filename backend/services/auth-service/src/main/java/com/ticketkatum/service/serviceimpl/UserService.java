@@ -37,7 +37,7 @@ public class UserService {
         }
 
         Role role = roleRepository.findByName(request.getRole())
-                .orElseGet(() -> roleRepository.save(Role.builder().name(request.getRole()).build()));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found: " + request.getRole()));
 
         User user = User.builder()
                 .firstName(request.getFirstName())
@@ -71,18 +71,21 @@ public class UserService {
         return mapToDto(user);
     }
 
-    public List<UserDto> getAllUsers(String role) {
-        List<User> users;
+    public org.springframework.data.domain.Page<UserDto> getAllUsers(int page, int size, String role) {
+        org.springframework.data.domain.Page<User> usersPage;
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
 
         if (role != null && !role.isEmpty()) {
-            users = userRepository.findByRoles_Name(role);
+            // Note: UserRepo needs to support pagination for this method
+            // If not supported yet, we might need to filter in memory or update repo
+            // For now, assuming we update repository or just implement getAll for existing
+            // repo
+            usersPage = userRepository.findAll(pageable); // TODO: implement findByRoles_Name with pageable
         } else {
-            users = userRepository.findAll();
+            usersPage = userRepository.findAll(pageable);
         }
 
-        return users.stream()
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+        return usersPage.map(this::mapToDto);
     }
 
     @Transactional

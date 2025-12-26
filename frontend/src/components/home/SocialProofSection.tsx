@@ -1,4 +1,4 @@
-import { Star, TrendingUp, Users, ArrowRight } from 'lucide-react';
+import { TrendingUp, Star, ArrowRight } from 'lucide-react';
 
 export const SocialProofSection = () => {
     const trendingRoutes = [
@@ -22,37 +22,48 @@ export const SocialProofSection = () => {
             </div>
 
             <div className="container mx-auto px-4 relative z-10">
-                <div className="flex flex-col md:flex-row gap-12">
+                <div className="flex flex-col lg:flex-row gap-16">
 
                     {/* Trending Routes */}
                     <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-8">
-                            <TrendingUp className="text-purple-500" size={24} />
-                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-display">
-                                Trending Routes
-                            </h2>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-3 rounded-2xl bg-purple-100 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                                <TrendingUp size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-display">
+                                    Trending Routes
+                                </h2>
+                                <p className="text-gray-500 dark:text-gray-400">Most frequent journeys today</p>
+                            </div>
                         </div>
-                        <div className="grid gap-4">
+                        <div className="space-y-4">
                             {trendingRoutes.map((route, index) => (
-                                <div key={index} className="group flex items-center justify-between p-4 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-purple-500/50 hover:bg-purple-50 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer shadow-sm dark:shadow-none">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-purple-500/10 dark:bg-purple-500/20 flex items-center justify-center text-purple-600 dark:text-purple-500 font-bold text-sm">
-                                            {route.type}
+                                <div key={index} className="group flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5 dark:hover:bg-white/10 transition-all duration-300 cursor-pointer">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-14 h-14 rounded-2xl bg-gray-50 dark:bg-white/5 flex items-center justify-center text-gray-600 dark:text-gray-300 group-hover:bg-purple-500 group-hover:text-white transition-colors duration-300">
+                                            {route.type === 'Bus' && (
+                                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                                            )}
                                         </div>
                                         <div>
-                                            <h3 className="text-gray-900 dark:text-white font-semibold">{route.from} → {route.to}</h3>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-                                                <span className="flex items-center gap-1">
-                                                    <Star size={12} className="fill-purple-500 text-purple-500" />
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                                {route.from}
+                                                <span className="text-gray-400">→</span>
+                                                {route.to}
+                                            </h3>
+                                            <div className="flex items-center gap-3 mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                <span className="flex items-center gap-1 text-amber-500 font-medium">
+                                                    <Star size={14} className="fill-current" />
                                                     {route.rating}
                                                 </span>
-                                                <span className="w-1 h-1 rounded-full bg-gray-400 dark:bg-gray-600"></span>
-                                                <span>Starting from NPR {route.price}</span>
+                                                <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-700"></span>
+                                                <span>From <span className="font-bold text-brand-orange-500">NPR {route.price}</span></span>
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="w-8 h-8 rounded-full bg-gray-100 dark:bg-white/10 flex items-center justify-center text-gray-900 dark:text-white opacity-0 group-hover:opacity-100 transform translate-x-2 group-hover:translate-x-0 transition-all">
-                                        <ArrowRight size={16} />
+                                    <div className="w-10 h-10 rounded-full border border-gray-200 dark:border-white/10 flex items-center justify-center text-gray-400 group-hover:border-purple-500 group-hover:text-purple-500 transition-all transform group-hover:translate-x-1">
+                                        <ArrowRight size={20} />
                                     </div>
                                 </div>
                             ))}
@@ -61,28 +72,33 @@ export const SocialProofSection = () => {
 
                     {/* Top Operators */}
                     <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-8">
-                            <Star className="text-purple-500" size={24} />
-                            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-display">
-                                Top Rated Operators
-                            </h2>
+                        <div className="flex items-center gap-3 mb-8">
+                            <div className="p-3 rounded-2xl bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                                <Star size={24} />
+                            </div>
+                            <div>
+                                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white font-display">
+                                    Top Rated Operators
+                                </h2>
+                                <p className="text-gray-500 dark:text-gray-400">Travel with the best in class</p>
+                            </div>
                         </div>
-                        <div className="grid gap-4">
+                        <div className="space-y-4">
                             {topOperators.map((operator, index) => (
-                                <div key={index} className="flex items-center justify-between p-4 rounded-xl bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 hover:border-purple-500/50 transition-all duration-300 shadow-sm dark:shadow-none">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-full bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg">
+                                <div key={index} className="flex items-center justify-between p-5 rounded-2xl bg-white dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xl border border-blue-100 dark:border-blue-500/20">
                                             {operator.name.charAt(0)}
                                         </div>
                                         <div>
-                                            <h3 className="text-gray-900 dark:text-white font-semibold">{operator.name}</h3>
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">{operator.name}</h3>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">{operator.reviews} happy travelers</p>
                                         </div>
                                     </div>
                                     <div className="flex flex-col items-end">
-                                        <div className="flex items-center gap-1 bg-green-500/10 dark:bg-green-500/20 px-2 py-1 rounded-lg">
-                                            <span className="text-green-600 dark:text-green-400 font-bold">{operator.rating}</span>
-                                            <Star size={12} className="fill-green-500 dark:fill-green-400 text-green-500 dark:text-green-400" />
+                                        <div className="flex items-center gap-1 bg-green-500/10 dark:bg-green-500/20 px-3 py-1.5 rounded-full border border-green-500/20">
+                                            <span className="text-green-700 dark:text-green-400 font-bold">{operator.rating}</span>
+                                            <Star size={14} className="fill-green-600 dark:fill-green-400 text-green-600 dark:text-green-400" />
                                         </div>
                                     </div>
                                 </div>
@@ -93,26 +109,34 @@ export const SocialProofSection = () => {
                 </div>
 
                 {/* Recently Booked Banner */}
-                <div className="mt-12 p-6 rounded-2xl bg-white dark:bg-gradient-to-r dark:from-gray-900 dark:to-gray-800 border border-gray-200 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg dark:shadow-none">
-                    <div className="flex items-center gap-4">
-                        <div className="flex -space-x-4">
+                <div className="mt-16 p-8 rounded-3xl bg-gradient-to-r from-gray-900 to-gray-800 dark:from-white/10 dark:to-white/5 border border-gray-800 dark:border-white/10 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-purple-500/30 transition-all duration-700"></div>
+
+                    <div className="flex items-center gap-6 relative z-10">
+                        <div className="flex -space-x-5">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-gray-900 bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs text-gray-700 dark:text-white font-bold">
-                                    {/* Placeholder avatars */}
+                                <div key={i} className="w-12 h-12 rounded-full border-4 border-gray-900 dark:border-black bg-gray-700 dark:bg-gray-800 flex items-center justify-center text-sm text-white font-bold ring-2 ring-white/10">
                                     U{i}
                                 </div>
                             ))}
+                            <div className="w-12 h-12 rounded-full border-4 border-gray-900 dark:border-black bg-brand-orange-500 flex items-center justify-center text-sm text-white font-bold ring-2 ring-white/10">
+                                +500
+                            </div>
                         </div>
                         <div>
-                            <p className="text-gray-900 dark:text-white font-semibold">Recently booked by 500+ users today</p>
-                            <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
-                                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                            <p className="text-white text-lg font-bold mb-1">Join 1M+ Travelers</p>
+                            <p className="text-sm text-gray-400 flex items-center gap-2">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
                                 Live bookings happening now
                             </p>
                         </div>
                     </div>
-                    <button className="px-6 py-3 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 text-gray-900 dark:text-white font-semibold rounded-xl transition-all border border-gray-200 dark:border-white/20">
+                    <button className="px-8 py-4 bg-white text-gray-900 hover:bg-gray-100 font-bold rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 relative z-10 flex items-center gap-2">
                         View All Routes
+                        <ArrowRight size={18} />
                     </button>
                 </div>
             </div>

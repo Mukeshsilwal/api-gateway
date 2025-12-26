@@ -393,7 +393,7 @@ public class RoomBookingService {
     private void createMealServices(RoomBooking booking) {
         String mealCode = booking.getMealPlan().getCode();
 
-        if ("RO".equals(mealCode)) {
+        if ("NONE".equals(mealCode)) {
             return; // Room only, no meals
         }
 
@@ -403,14 +403,14 @@ public class RoomBookingService {
         List<MealService> mealServices = new ArrayList<>();
 
         for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-            if ("BB".equals(mealCode)) {
+            if ("BREAKFAST".equals(mealCode)) {
                 // Breakfast only
                 mealServices.add(createMealService(booking, MealType.BREAKFAST, date));
-            } else if ("HB".equals(mealCode)) {
+            } else if ("HALF_BOARD".equals(mealCode)) {
                 // Breakfast + Dinner
                 mealServices.add(createMealService(booking, MealType.BREAKFAST, date));
                 mealServices.add(createMealService(booking, MealType.DINNER, date));
-            } else if ("FB".equals(mealCode)) {
+            } else if ("FULL_BOARD".equals(mealCode) || "ALL_INCLUSIVE".equals(mealCode)) {
                 // All meals
                 mealServices.add(createMealService(booking, MealType.BREAKFAST, date));
                 mealServices.add(createMealService(booking, MealType.LUNCH, date));

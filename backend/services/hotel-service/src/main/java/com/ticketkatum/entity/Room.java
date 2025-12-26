@@ -54,6 +54,29 @@ public class Room {
     @Builder.Default
     private Set<String> images = new HashSet<>();
 
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "room_pricing_configs", joinColumns = @JoinColumn(name = "room_id"))
+    @Builder.Default
+    private List<PricingConfiguration> pricingConfigurations = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "room_allowed_rent_types", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "rent_type")
+    @Builder.Default
+    private Set<String> allowedRentTypes = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "room_allowed_meal_plans", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "meal_plan")
+    @Builder.Default
+    private Set<String> allowedMealPlans = new HashSet<>();
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "room_allowed_meal_services", joinColumns = @JoinColumn(name = "room_id"))
+    @Column(name = "meal_service")
+    @Builder.Default
+    private Set<String> allowedMealServices = new HashSet<>();
+
     @Builder.Default
     private boolean active = true;
 

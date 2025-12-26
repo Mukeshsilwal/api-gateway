@@ -1,4 +1,20 @@
-import { HotelDto, AvailableRoomDto } from './dto';
+import { AvailableRoomDto } from './dto';
+import { PaymentProvider, PaymentResponseData } from './common';
+
+export interface HotelBookingRequest {
+    hotelId: string | number;
+    roomId: string | number;
+    checkInDate: string;
+    checkOutDate: string;
+    guestName: string;
+    guestEmail: string;
+    guestPhone: string;
+    paymentProvider: PaymentProvider;
+}
+
+export interface HotelBookingResponse {
+    paymentData: PaymentResponseData;
+}
 
 export interface StaffDto {
     id: number;

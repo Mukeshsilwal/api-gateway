@@ -28,7 +28,6 @@ public class ServiceUrlConfig {
     private String authServiceUrl;
     private String userServiceUrl;
 
-
     // ============ Bus Ticketing Services ============
     private String busServiceUrl;
     private String busStopServiceUrl;
@@ -41,6 +40,16 @@ public class ServiceUrlConfig {
     private String notificationServiceUrl;
     private String emailServiceUrl;
     private String smsServiceUrl;
+    private String guideServiceUrl;
+    private String trackingServiceUrl;
+    private String eventServiceUrl;
+    private String marketServiceUrl;
+    private String tripServiceUrl;
+    private String aiServiceUrl;
+    private String timelineServiceUrl;
+    private String analyticsServiceUrl;
+    private String sosServiceUrl;
+    private String alertServiceUrl;
 
     // Timeouts
     private TimeoutConfig timeout = new TimeoutConfig();
@@ -62,6 +71,12 @@ public class ServiceUrlConfig {
         }
         if (busServiceUrl == null || busServiceUrl.isEmpty()) {
             throw new IllegalStateException("Bus service URL is not configured");
+        }
+        if (guideServiceUrl == null || guideServiceUrl.isEmpty()) {
+            throw new IllegalStateException("Guide service URL is not configured");
+        }
+        if (trackingServiceUrl == null || trackingServiceUrl.isEmpty()) {
+            throw new IllegalStateException("Tracking service URL is not configured");
         }
     }
 }

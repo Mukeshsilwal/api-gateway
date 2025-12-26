@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createTrip, type CreateTripRequest, type Trip } from '../services/tripService';
+import { createTrip, updateTrip, type CreateTripRequest, type Trip } from '../services/tripService';
 import { Calendar, DollarSign, FileText, MapPin, Users, CheckCircle, Bus, Hotel, Ticket, X } from 'lucide-react';
 import { toast } from 'react-toastify';
+import GuideSelection from '../components/trips/GuideSelection';
+import TimelineBuilder, { Checkpoint } from '../components/trips/TimelineBuilder';
+import { Guide } from '../services/guideService';
 
 const CreateTripPage: React.FC = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState<1 | 2>(1); // 1: Details, 2: Add-ons
     const [createdTrip, setCreatedTrip] = useState<Trip | null>(null);
+    const [activeTab, setActiveTab] = useState<'bookings' | 'itinerary' | 'guide'>('bookings');
+    const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
+    const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
+
     const [formData, setFormData] = useState<CreateTripRequest>({
         tripName: '',
         tripType: 'LEISURE',
@@ -234,7 +241,7 @@ const CreateTripPage: React.FC = () => {
                     </form>
                 )}
 
-                {/* Step 2: Integrated Booking Wizard */}
+                {/* Step 2: Integrated Trip Builder */}
                 {step === 2 && createdTrip && (
                     <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
                         {/* Success Banner */}
@@ -243,68 +250,136 @@ const CreateTripPage: React.FC = () => {
                             <div>
                                 <h3 className="font-semibold text-green-900 dark:text-green-300">Trip Created Successfully!</h3>
                                 <p className="text-sm text-green-800 dark:text-green-400">
-                                    You can now immediately book services for this trip. We've pre-filled your dates.
+                                    You can now build your journey. Add bookings, set your itinerary, or hire a guide.
                                 </p>
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-6">
-                            {/* Option 1: Bus */}
-                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:border-orange-500 transition-colors cursor-pointer group p-6"
-                                onClick={() => navigateToSearch('bus')}>
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition">
-                                            <Bus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Book Bus Tickets</h3>
-                                            <p className="text-gray-500 dark:text-gray-400">Find comfortable rides for your journey</p>
-                                        </div>
-                                    </div>
-                                    <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-600 dark:text-gray-300 group-hover:bg-orange-100 group-hover:text-orange-700">
-                                        Start Search →
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Tabs */}
+                        <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+                            {['bookings', 'itinerary', 'guide'].map((tab) => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab as any)}
+                                    className={`px-6 py-3 font-medium text-sm whitespace-nowrap transition-colors border-b-2 ${activeTab === tab
+                                        ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
+                                        }`}
+                                >
+                                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                                </button>
+                            ))}
+                        </div>
 
-                            {/* Option 2: Hotel */}
-                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:border-orange-500 transition-colors cursor-pointer group p-6"
-                                onClick={() => navigateToSearch('hotel')}>
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition">
-                                            <Hotel className="w-6 h-6 text-purple-600 dark:text-purple-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Reserve Hotels</h3>
-                                            <p className="text-gray-500 dark:text-gray-400">Stay in top-rated places</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-b-lg shadow-sm border border-t-0 border-gray-200 dark:border-gray-700 p-6 min-h-[400px]">
+                            {/* BOOKINGS TAB */}
+                            {activeTab === 'bookings' && (
+                                <div className="grid grid-cols-1 gap-6">
+                                    {/* Option 1: Bus */}
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:border-orange-500 transition-colors cursor-pointer group p-6"
+                                        onClick={() => navigateToSearch('bus')}>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/40 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition">
+                                                    <Bus className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Book Bus Tickets</h3>
+                                                    <p className="text-gray-500 dark:text-gray-400">Find comfortable rides for your journey</p>
+                                                </div>
+                                            </div>
+                                            <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-600 dark:text-gray-300 group-hover:bg-orange-100 group-hover:text-orange-700">
+                                                Start Search →
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-600 dark:text-gray-300 group-hover:bg-orange-100 group-hover:text-orange-700">
-                                        Start Search →
-                                    </div>
-                                </div>
-                            </div>
 
-                            {/* Option 3: Event */}
-                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:border-orange-500 transition-colors cursor-pointer group p-6"
-                                onClick={() => navigateToSearch('event')}>
-                                <div className="flex items-start justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center group-hover:bg-green-200 transition">
-                                            <Ticket className="w-6 h-6 text-green-600 dark:text-green-400" />
-                                        </div>
-                                        <div>
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">Find Events</h3>
-                                            <p className="text-gray-500 dark:text-gray-400">Discover local activities</p>
+                                    {/* Option 2: Hotel */}
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:border-orange-500 transition-colors cursor-pointer group p-6"
+                                        onClick={() => navigateToSearch('hotel')}>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center group-hover:bg-purple-200 transition">
+                                                    <Hotel className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Reserve Hotels</h3>
+                                                    <p className="text-gray-500 dark:text-gray-400">Stay in top-rated places</p>
+                                                </div>
+                                            </div>
+                                            <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-600 dark:text-gray-300 group-hover:bg-orange-100 group-hover:text-orange-700">
+                                                Start Search →
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-600 dark:text-gray-300 group-hover:bg-orange-100 group-hover:text-orange-700">
-                                        Start Search →
+
+                                    {/* Option 3: Event */}
+                                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 hover:border-orange-500 transition-colors cursor-pointer group p-6"
+                                        onClick={() => navigateToSearch('event')}>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center group-hover:bg-green-200 transition">
+                                                    <Ticket className="w-6 h-6 text-green-600 dark:text-green-400" />
+                                                </div>
+                                                <div>
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white">Find Events</h3>
+                                                    <p className="text-gray-500 dark:text-gray-400">Discover local activities</p>
+                                                </div>
+                                            </div>
+                                            <div className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-600 dark:text-gray-300 group-hover:bg-orange-100 group-hover:text-orange-700">
+                                                Start Search →
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
+
+                            {/* ITINERARY TAB */}
+                            {activeTab === 'itinerary' && (
+                                <div>
+                                    <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                        Plan your journey step-by-step. Add checkpoints to create a detailed timeline.
+                                    </p>
+                                    <TimelineBuilder
+                                        checkpoints={checkpoints} // Need to add state for this
+                                        onAddCheckpoint={() => alert('Add checkpoint modal would open here')}
+                                        onRemoveCheckpoint={(index) => alert('Remove checkpoint logic')}
+                                    />
+                                </div>
+                            )}
+
+                            {/* GUIDE TAB */}
+                            {activeTab === 'guide' && (
+                                <div>
+                                    <div className="flex justify-between items-center mb-6">
+                                        <p className="text-gray-600 dark:text-gray-400">
+                                            Hire a local expert to enhance your trip experience.
+                                        </p>
+                                    </div>
+                                    <GuideSelection
+                                        onSelect={async (guide) => {
+                                            if (!createdTrip) return;
+                                            try {
+                                                // Optimistic update
+                                                setSelectedGuide(guide);
+
+                                                // Persist selection
+                                                await updateTrip(createdTrip.tripId, { guideId: guide.guideId });
+
+                                                // Update local trip state
+                                                setCreatedTrip(prev => prev ? { ...prev, guideId: guide.guideId } : null);
+
+                                                toast.success(`Guide ${guide.fullName} assigned to your trip!`);
+                                            } catch (error) {
+                                                console.error("Failed to assign guide", error);
+                                                toast.error("Failed to assign guide. Please try again.");
+                                                setSelectedGuide(null); // Revert on failure
+                                            }
+                                        }}
+                                        selectedGuideId={selectedGuide?.guideId || createdTrip.guideId}
+                                    />
+                                </div>
+                            )}
                         </div>
 
                         {/* Final Action */}
@@ -314,7 +389,7 @@ const CreateTripPage: React.FC = () => {
                                 className="px-8 py-4 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg font-bold hover:shadow-lg transition flex items-center gap-2"
                             >
                                 <CheckCircle className="w-5 h-5" />
-                                I'm Done Adding Items
+                                I'm Done Planning
                             </button>
                         </div>
                     </div>

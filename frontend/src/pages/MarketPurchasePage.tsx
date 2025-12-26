@@ -11,7 +11,7 @@ const MarketPurchasePage: React.FC = () => {
     const { loading, error, execute } = useAsync<MarketPurchaseResponse>();
 
     const [formData, setFormData] = useState<Omit<MarketPurchaseRequest, "paymentProvider">>({
-        itemId: "dummy-item-id",
+        itemId: "",
         quantity: 1,
         buyerName: "",
         buyerEmail: "",

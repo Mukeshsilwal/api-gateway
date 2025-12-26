@@ -20,6 +20,8 @@ tripApi.interceptors.request.use((config) => {
 
 export interface Trip {
     tripId: number;
+    userId: number;
+    guideId?: number;
     tripName: string;
     tripType: string;
     touristType: string;
@@ -45,6 +47,7 @@ export interface CreateTripRequest {
     endDate: string;
     budget: number;
     description?: string;
+    guideId?: number;
 }
 
 export interface TripDashboard {

@@ -1,6 +1,6 @@
 package com.ticketkatum.model;
 
-import jakarta.annotation.Nullable;
+import org.springframework.lang.Nullable;
 import lombok.*;
 
 @Data

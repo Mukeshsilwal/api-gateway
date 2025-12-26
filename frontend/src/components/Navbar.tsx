@@ -25,11 +25,29 @@ const Navbar: React.FC = () => {
   const isHome = location.pathname === '/' || location.pathname === '/home';
   const { itemCount, totalAmount } = useUnifiedBookingCart();
 
+  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [lastScrollY, setLastScrollY] = useState<number>(0);
+
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      const currentScrollY = window.scrollY;
+
+      // Determine if scrolled more than threshold
+      setScrolled(currentScrollY > 20);
+
+      // Smart sticky logic
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        // Scrolling down & passed threshold -> Hide
+        setIsVisible(false);
+      } else {
+        // Scrolling up -> Show
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener('scroll', handleScroll);
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     // Update user state on location change (login/logout)
     const currentUser = authService.getCurrentUser();
@@ -37,7 +55,7 @@ const Navbar: React.FC = () => {
     setUser(currentUser as User | null);
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [location]);
+  }, [location, lastScrollY]);
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -68,15 +86,19 @@ const Navbar: React.FC = () => {
 
   const navbarClasses = `
         fixed top-0 left-0 right-0 z-50 transition-all duration-300
-        ${scrolled || !isHome ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}
+        ${isVisible ? 'translate-y-0' : '-translate-y-full'}
+        ${scrolled || !isHome
+      ? 'bg-white/90 dark:bg-black/90 backdrop-blur-md shadow-sm py-3'
+      : 'bg-transparent py-5'}
     `;
 
   const linkClasses = (path: string) => `
-        text-sm font-medium transition-colors hover:text-primary
-        ${location.pathname === path
+    font-medium transition-colors duration-200
+    ${location.pathname === path
       ? 'text-primary font-bold'
-      : 'text-gray-700 hover:text-purple-600'}
-    `;
+      : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary-400'
+    }
+  `;
 
   return (
     <>
@@ -87,7 +109,7 @@ const Navbar: React.FC = () => {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">
               T
             </div>
-            <span className={`text-xl font-display font-bold text-gray-900`}>
+            <span className="text-xl font-display font-bold text-gray-900 dark:text-white">
               TicketKatum
             </span>
           </Link>
@@ -107,7 +129,7 @@ const Navbar: React.FC = () => {
             {/* Cart Icon */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 rounded-full transition-colors hover:bg-gray-100 text-gray-700"
+              className="relative p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200"
               aria-label="Open cart"
             >
               <ShoppingCart size={20} />
@@ -121,7 +143,7 @@ const Navbar: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className={`p-2 rounded-full transition-colors hover:bg-gray-100 text-gray-700`}
+              className="p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200"
             >
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
             </button>
@@ -131,31 +153,31 @@ const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-4">
-                <span className={`text-sm font-medium text-gray-700`}>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   Hi, {user.firstName || 'User'}
                 </span>
                 <Link
                   to="/my-bookings"
-                  className={`text-sm font-medium hover:underline text-indigo-600`}
+                  className="text-sm font-medium hover:underline text-indigo-600 dark:text-indigo-400"
                 >
                   My Bookings
                 </Link>
                 <Link
                   to="/trips"
-                  className={`text-sm font-medium hover:underline text-orange-600`}
+                  className="text-sm font-medium hover:underline text-orange-600 dark:text-orange-400"
                 >
                   My Trips
                 </Link>
                 <Link
                   to="/alerts"
-                  className={`text-sm font-medium hover:underline text-red-600`}
+                  className="text-sm font-medium hover:underline text-red-600 dark:text-red-400"
                 >
                   Alerts
                 </Link>
                 <Button
                   variant={'ghost'}
                   size="sm"
-                  className={''}
+                  className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
                   onClick={handleLogout}
                 >
                   <LogOut size={16} className="mr-2" />
@@ -168,7 +190,7 @@ const Navbar: React.FC = () => {
                   <Button
                     variant={'ghost'}
                     size="sm"
-                    className={'text-gray-700 hover:bg-gray-100'}
+                    className="text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-white/10"
                   >
                     Sign In
                   </Button>

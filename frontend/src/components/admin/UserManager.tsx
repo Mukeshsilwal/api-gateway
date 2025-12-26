@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Shield, Mail, Phone, MoreVertical, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Edit2, Trash2, RefreshCw } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { DataTable } from './DataTable';
 import SlideOver from './SlideOver';
 import ConfirmationModal from './ConfirmationModal';
-import api from '../../services/api.service';
+import userService from '../../services/userApiService';
 
 interface User {
     id: string | number;
@@ -22,6 +22,8 @@ interface UserFormData {
     firstName: string;
     lastName: string;
     email: string;
+    password?: string;
+    confirmPassword?: string;
     role: string;
     status: string;
 }
@@ -32,34 +34,100 @@ const UserManager: React.FC = () => {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isSlideOverOpen, setIsSlideOverOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [availableRoles, setAvailableRoles] = useState<Array<{ id: number, name: string, description?: string }>>([]);
+
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+    const itemsPerPage = 10;
 
     // Default form data
     const [formData, setFormData] = useState<UserFormData>({
         firstName: '',
         lastName: '',
         email: '',
+        password: '',
+        confirmPassword: '',
         role: 'CUSTOMER',
         status: 'active'
     });
 
-    useEffect(() => {
-        fetchUsers();
+    // Memoized change handlers to prevent focus loss
+    const handleInputChange = useCallback((field: keyof UserFormData, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
     }, []);
 
-    const fetchUsers = async () => {
+    // Fetch roles only once on mount
+    useEffect(() => {
+        fetchRoles();
+    }, []);
+
+    // Fetch users when page changes
+    useEffect(() => {
+        fetchUsers(currentPage);
+    }, [currentPage]);
+
+    const fetchRoles = async () => {
+        try {
+            const response = await userService.getRoles();
+            if (response.data && Array.isArray(response.data)) {
+                setAvailableRoles(response.data);
+            }
+        } catch (error) {
+            console.error('Failed to fetch roles:', error);
+            // Fallback to default roles if API fails
+            setAvailableRoles([
+                { id: 1, name: 'USER' },
+                { id: 2, name: 'ADMIN' },
+                { id: 3, name: 'SUPER_ADMIN' }
+            ]);
+        }
+    };
+
+    const fetchUsers = async (page: number) => {
         setLoading(true);
         try {
-            // Using the BFF endpoint as seen in UserManagement.jsx
-            const response = await api.get('/api/bff/v1/users');
-            // Check if response is array or wrapped in data
-            const usersData = Array.isArray(response) ? response : (response.data || []);
-            setUsers(usersData);
+            // API expects 0-indexed page
+            const response = await userService.getAllUsers({
+                page: page - 1,
+                size: itemsPerPage
+            });
+
+            // Handle different response structures (PageImpl vs List)
+            // Handle different response structures
+            // Case 1: Wrapped Response<RestResponsePage> (Current BFF structure)
+            if (response.data && response.data.content) {
+                setUsers(response.data.content);
+                setTotalItems(response.data.totalElements);
+            }
+            // Case 2: Direct PageImpl (Direct Service call)
+            else if (response.content) {
+                setUsers(response.content);
+                setTotalItems(response.totalElements);
+            }
+            // Case 3: Wrapped List Response
+            else if (response.data && Array.isArray(response.data)) {
+                setUsers(response.data);
+                setTotalItems(response.totalElements || response.data.length);
+            }
+            // Case 4: Direct List
+            else if (Array.isArray(response)) {
+                setUsers(response);
+                setTotalItems(response.length);
+            } else {
+                setUsers([]);
+                setTotalItems(0);
+            }
         } catch (error) {
             console.error('Failed to fetch users:', error);
             toast.error('Failed to load users');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     const columns = [
@@ -87,8 +155,8 @@ const UserManager: React.FC = () => {
                         <span
                             key={idx}
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${role === 'SUPER_ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                    role === 'ADMIN' ? 'bg-blue-100 text-blue-800' :
-                                        'bg-gray-100 text-gray-800'
+                                role === 'ADMIN' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-800'
                                 }`}
                         >
                             {role.replace('_', ' ')}
@@ -138,6 +206,8 @@ const UserManager: React.FC = () => {
             firstName: user.firstName || '',
             lastName: user.lastName || '',
             email: user.email || '',
+            password: '',
+            confirmPassword: '',
             role: user.roles?.[0] || 'CUSTOMER',
             status: user.enabled ? 'active' : 'inactive'
         });
@@ -153,7 +223,7 @@ const UserManager: React.FC = () => {
         if (!selectedUser) return;
 
         try {
-            await api.delete(`/api/bff/v1/users/${selectedUser.id}`);
+            await userService.deleteUser(selectedUser.id);
             setUsers(users.filter(u => u.id !== selectedUser.id));
             toast.success('User deleted successfully');
         } catch (error) {
@@ -167,26 +237,47 @@ const UserManager: React.FC = () => {
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Note: Actual implementation depends on backend create/update endpoints
-        // For now simulating success or using what exists
+        // Validate passwords for new users
+        if (!selectedUser) {
+            if (!formData.password) {
+                toast.error('Password is required for new users');
+                return;
+            }
+            if (formData.password !== formData.confirmPassword) {
+                toast.error('Passwords do not match');
+                return;
+            }
+            if (formData.password.length < 8) {
+                toast.error('Password must be at least 8 characters long');
+                return;
+            }
+        }
+
         try {
             // Construct payload
-            // const payload = { ...formData, enabled: formData.status === 'active' };
+            const payload = {
+                ...formData,
+                enabled: formData.status === 'active'
+            };
 
-            // if (selectedUser) {
-            //    await api.put(`/api/bff/v1/users/${selectedUser.id}`, payload);
-            // } else {
-            //    await api.post('/api/bff/v1/users', payload);
-            // }
+            if (selectedUser) {
+                // Update - remove password fields if empty
+                const { password, confirmPassword, ...updatePayload } = payload;
+                await userService.updateUser(selectedUser.id, updatePayload);
+                toast.success('User updated successfully');
+            } else {
+                // Create - include password
+                const { confirmPassword, ...createPayload } = payload;
+                await userService.createUser(createPayload);
+                toast.success('User created successfully');
+            }
 
-            toast.info('User save functionality would go here (backend dependency)');
-
-            // Refetch to be safe
-            // await fetchUsers();
             setIsSlideOverOpen(false);
+            fetchUsers(currentPage);
         } catch (error) {
             console.error('Failed to save user:', error);
             toast.error('Failed to save user');
+            // Don't close the slide-over on error so user can fix issues
         }
     };
 
@@ -204,7 +295,7 @@ const UserManager: React.FC = () => {
                 </div>
                 <div className="flex gap-2">
                     <button
-                        onClick={fetchUsers}
+                        onClick={() => fetchUsers(currentPage)}
                         className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2"
                     >
                         <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
@@ -213,7 +304,7 @@ const UserManager: React.FC = () => {
                     <button
                         onClick={() => {
                             setSelectedUser(null);
-                            setFormData({ firstName: '', lastName: '', email: '', role: 'items', status: 'active' });
+                            setFormData({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '', role: 'CUSTOMER', status: 'active' });
                             setIsSlideOverOpen(true);
                         }}
                         className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
@@ -230,7 +321,9 @@ const UserManager: React.FC = () => {
                 loading={loading}
                 searchable={true}
                 selectable={true}
-                itemsPerPage={10}
+                itemsPerPage={itemsPerPage}
+                totalItems={totalItems}
+                onPageChange={handlePageChange}
                 bulkActions={[
                     { label: 'Delete Selected', onClick: handleBulkDelete },
                     { label: 'Deactivate', onClick: (ids) => console.log('Deactivate', ids) }
@@ -268,7 +361,7 @@ const UserManager: React.FC = () => {
                                 type="text"
                                 required
                                 value={formData.firstName}
-                                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                                onChange={e => handleInputChange('firstName', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         </div>
@@ -278,7 +371,7 @@ const UserManager: React.FC = () => {
                                 type="text"
                                 required
                                 value={formData.lastName}
-                                onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                                onChange={e => handleInputChange('lastName', e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                             />
                         </div>
@@ -289,27 +382,55 @@ const UserManager: React.FC = () => {
                             type="email"
                             required
                             value={formData.email}
-                            onChange={e => setFormData({ ...formData, email: e.target.value })}
+                            onChange={e => handleInputChange('email', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                         />
                     </div>
+                    {!selectedUser && (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={formData.password || ''}
+                                    onChange={e => handleInputChange('password', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                    placeholder="Minimum 8 characters"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                <input
+                                    type="password"
+                                    required
+                                    value={formData.confirmPassword || ''}
+                                    onChange={e => handleInputChange('confirmPassword', e.target.value)}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                                    placeholder="Re-enter password"
+                                />
+                            </div>
+                        </>
+                    )}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                         <select
                             value={formData.role}
-                            onChange={e => setFormData({ ...formData, role: e.target.value })}
+                            onChange={e => handleInputChange('role', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                         >
-                            <option value="CUSTOMER">Customer</option>
-                            <option value="ADMIN">Admin</option>
-                            <option value="SUPER_ADMIN">Super Admin</option>
+                            {availableRoles.map(role => (
+                                <option key={role.id} value={role.name}>
+                                    {role.name.replace('_', ' ')}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
                         <select
                             value={formData.status}
-                            onChange={e => setFormData({ ...formData, status: e.target.value })}
+                            onChange={e => handleInputChange('status', e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
                         >
                             <option value="active">Active</option>

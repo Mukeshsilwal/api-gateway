@@ -11,10 +11,10 @@ const HotelBookingPage: React.FC = () => {
     const { loading, error, execute } = useAsync<HotelBookingResponse>();
 
     const [formData, setFormData] = useState<Omit<HotelBookingRequest, "paymentProvider">>({
-        hotelId: "dummy-hotel-id",
-        roomId: "dummy-room-id",
-        checkInDate: "2024-01-01",
-        checkOutDate: "2024-01-02",
+        hotelId: "",
+        roomId: "",
+        checkInDate: new Date().toISOString().split('T')[0],
+        checkOutDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],
         guestName: "",
         guestEmail: "",
         guestPhone: "",

@@ -67,71 +67,62 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Check if this is a public endpoint - skip JWT validation
-        boolean isPublic = isPublicEndpoint(path);
-        log.info("Request to path: {} - isPublic: {}", path, isPublic);
-
-        if (isPublic) {
-            log.info("Skipping JWT validation for public endpoint: {}", path);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String authHeader = request.getHeader("Authorization");
 
-        // No Authorization header - let Spring Security handle it
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        // Standard Pattern: If header is present and valid, attempt authentication
+        // regardless of whether the endpoint is public or protected.
+        // This ensures that protected sub-resources (like /lock) are handled correctly.
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            try {
+                String token = authHeader.substring(7);
 
-        try {
-            String token = authHeader.substring(7);
+                // Use HMAC secret key for HS256 verification
+                javax.crypto.SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(
+                        jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
 
-            // Use HMAC secret key for HS256 verification
-            javax.crypto.SecretKey key = io.jsonwebtoken.security.Keys.hmacShaKeyFor(
-                    jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
 
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                String username = claims.getSubject();
+                @SuppressWarnings("unchecked")
+                List<String> roles = claims.get("roles", List.class);
 
-            String username = claims.getSubject();
-            @SuppressWarnings("unchecked")
-            List<String> roles = claims.get("roles", List.class);
+                if (username != null && roles != null) {
+                    List<SimpleGrantedAuthority> authorities = roles.stream()
+                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                            .collect(Collectors.toList());
 
-            if (username != null && roles != null) {
-                // Spring Security's hasRole() expects authorities with "ROLE_" prefix
-                List<SimpleGrantedAuthority> authorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList());
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            username,
+                            null,
+                            authorities);
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username,
-                        null,
-                        authorities);
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request));
 
-                authentication.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // Add user info to request attributes for downstream services
+                    request.setAttribute("userId", claims.get("userId"));
+                    request.setAttribute("username", username);
+                    request.setAttribute("roles", roles);
 
-                // Add user info to request attributes for downstream services
-                request.setAttribute("userId", claims.get("userId"));
-                request.setAttribute("username", username);
-                request.setAttribute("roles", roles);
-
-                log.debug("Successfully authenticated user: {}", username);
-            } else {
-                log.warn("JWT token missing required claims - username: {}, roles: {}", username, roles);
+                    log.debug("Successfully authenticated user: {}", username);
+                } else {
+                    log.warn("JWT token missing required claims - username: {}, roles: {}", username, roles);
+                }
+            } catch (Exception e) {
+                // If token is invalid, we log it but allow request to proceed (context remains
+                // anonymous).
+                // SecurityConfig will block if it's a protected endpoint.
+                log.error("JWT authentication failed for path {}: {}", path, e.getMessage());
             }
-        } catch (Exception e) {
-            log.error("JWT authentication failed for path {}: {}", path, e.getMessage());
-            // Don't set authentication - Spring Security will handle as unauthorized
         }
 
+        // Always continue the filter chain
         filterChain.doFilter(request, response);
     }
 

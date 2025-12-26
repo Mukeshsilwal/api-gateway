@@ -6,14 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripParticipantDTO {
-    
+public class TripParticipantDTO implements Serializable {
+
     private Long participantId;
     private Long tripId;
     private Long userId;
@@ -23,12 +24,12 @@ public class TripParticipantDTO {
     private String role;
     private String status;
     private LocalDateTime createdAt;
-    
+
     public static TripParticipantDTO fromEntity(TripParticipant participant) {
         if (participant == null) {
             return null;
         }
-        
+
         return TripParticipantDTO.builder()
                 .participantId(participant.getParticipantId())
                 .tripId(participant.getTrip() != null ? participant.getTrip().getTripId() : null)

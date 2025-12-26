@@ -44,6 +44,26 @@ const TripDashboardPage: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout;
+
+        if (dashboard?.trip?.status === 'IN_PROGRESS') {
+            intervalId = setInterval(async () => {
+                try {
+                    // Poll for latest tracking info
+                    const data = await getTripDashboard(Number(tripId));
+                    setDashboard(prev => prev ? { ...prev, liveTracking: data.liveTracking } : data);
+                } catch (e) {
+                    console.error("Failed to poll tracking data", e);
+                }
+            }, 30000); // Poll every 30 seconds
+        }
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [dashboard?.trip?.status, tripId]);
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-pulse">

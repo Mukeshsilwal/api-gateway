@@ -33,12 +33,6 @@ public class TripManagementController {
         // Extract userId from JWT token
         Long userId = extractUserIdFromRequest(request);
 
-        // TEMPORARY: Use default userId for testing if extraction fails
-        if (userId == null) {
-            log.warn("Failed to extract userId from request - using default userId 1 for testing");
-            userId = 1L; // TODO: Remove this fallback in production
-        }
-
         log.info("BFF: Creating trip for user: {}", userId);
 
         return tripManagementService.createTrip(userId, tripRequest)
@@ -89,23 +83,25 @@ public class TripManagementController {
         }
 
         log.warn("Could not extract userId from request - no attribute and no valid token");
-        return null;
+        throw new RuntimeException("User not authenticated");
     }
 
     @GetMapping("/{tripId}")
     @Operation(summary = "Get trip", description = "Get trip by ID via BFF")
-    public Mono<ResponseEntity<Map>> getTripById(@PathVariable("tripId") Long tripId) {
-        log.info("BFF: Fetching trip: {}", tripId);
-        return tripManagementService.getTripById(tripId)
+    public Mono<ResponseEntity<Map>> getTripById(@PathVariable("tripId") Long tripId, HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Fetching trip: {} for user: {}", tripId, userId);
+        return tripManagementService.getTripById(tripId, userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{tripId}/details")
     @Operation(summary = "Get trip details", description = "Get trip details with checkpoints via BFF")
-    public Mono<ResponseEntity<Map>> getTripDetails(@PathVariable("tripId") Long tripId) {
-        log.info("BFF: Fetching trip details: {}", tripId);
-        return tripManagementService.getTripDetails(tripId)
+    public Mono<ResponseEntity<Map>> getTripDetails(@PathVariable("tripId") Long tripId, HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Fetching trip details: {} for user: {}", tripId, userId);
+        return tripManagementService.getTripDetails(tripId, userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -114,9 +110,11 @@ public class TripManagementController {
     @Operation(summary = "Update trip", description = "Update trip details via BFF")
     public Mono<ResponseEntity<Map>> updateTrip(
             @PathVariable("tripId") Long tripId,
-            @RequestBody Map<String, Object> updateRequest) {
-        log.info("BFF: Updating trip: {}", tripId);
-        return tripManagementService.updateTrip(tripId, updateRequest)
+            @RequestBody Map<String, Object> updateRequest,
+            HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Updating trip: {} for user: {}", tripId, userId);
+        return tripManagementService.updateTrip(tripId, updateRequest, userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -125,27 +123,31 @@ public class TripManagementController {
     @Operation(summary = "Update trip status", description = "Update trip status via BFF")
     public Mono<ResponseEntity<Map>> updateTripStatus(
             @PathVariable("tripId") Long tripId,
-            @RequestBody Map<String, Object> statusRequest) {
-        log.info("BFF: Updating trip status: {}", tripId);
+            @RequestBody Map<String, Object> statusRequest,
+            HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Updating trip status: {} for user: {}", tripId, userId);
         String status = (String) statusRequest.get("status");
-        return tripManagementService.updateTripStatus(tripId, status)
+        return tripManagementService.updateTripStatus(tripId, status, userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{tripId}")
     @Operation(summary = "Delete trip", description = "Delete trip via BFF")
-    public Mono<ResponseEntity<Void>> deleteTrip(@PathVariable("tripId") Long tripId) {
-        log.info("BFF: Deleting trip: {}", tripId);
-        return tripManagementService.deleteTrip(tripId)
+    public Mono<ResponseEntity<Void>> deleteTrip(@PathVariable("tripId") Long tripId, HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Deleting trip: {} for user: {}", tripId, userId);
+        return tripManagementService.deleteTrip(tripId, userId)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{tripId}/bookings")
     @Operation(summary = "Get trip bookings", description = "Get all bookings for a trip via BFF")
-    public Flux<Map> getTripBookings(@PathVariable("tripId") Long tripId) {
-        log.info("BFF: Fetching bookings for trip: {}", tripId);
-        return tripManagementService.getTripBookings(tripId);
+    public Flux<Map> getTripBookings(@PathVariable("tripId") Long tripId, HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Fetching bookings for trip: {} for user: {}", tripId, userId);
+        return tripManagementService.getTripBookings(tripId, userId);
     }
 }

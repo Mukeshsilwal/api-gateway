@@ -89,6 +89,7 @@ const OAuthCallback = lazy(() => import("./pages/OAuthCallback"));
 const MyTrips = lazy(() => import("./pages/MyTrips"));
 const TripDashboard = lazy(() => import("./pages/TripDashboard"));
 const CreateTrip = lazy(() => import("./pages/CreateTrip"));
+const ContinueTrip = lazy(() => import("./pages/ContinueTrip"));
 const AlertCenter = lazy(() => import("./pages/AlertCenter"));
 
 
@@ -361,6 +362,7 @@ const App: React.FC = () => {
                 {/* Trip Management Routes */}
                 <Route path="/trips" element={<MyTrips />} errorElement={<ErrorPage />} />
                 <Route path="/trips/new" element={<CreateTrip />} errorElement={<ErrorPage />} />
+                <Route path="/trips/:tripId/continue" element={<ContinueTrip />} errorElement={<ErrorPage />} />
                 <Route path="/trips/:tripId" element={<TripDashboard />} errorElement={<ErrorPage />} />
                 <Route path="/alerts" element={<AlertCenter />} errorElement={<ErrorPage />} />
 

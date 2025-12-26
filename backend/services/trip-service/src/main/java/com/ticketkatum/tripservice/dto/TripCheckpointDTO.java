@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -13,8 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripCheckpointDTO {
-    
+public class TripCheckpointDTO implements Serializable {
+
     private Long checkpointId;
     private Long tripId;
     private String checkpointType;
@@ -27,17 +28,17 @@ public class TripCheckpointDTO {
     private String notes;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    
+
     // Computed fields
     private Integer delayMinutes;
     private Boolean isUpcoming;
     private Boolean isOverdue;
-    
+
     public static TripCheckpointDTO fromEntity(TripCheckpoint checkpoint) {
         if (checkpoint == null) {
             return null;
         }
-        
+
         TripCheckpointDTO dto = TripCheckpointDTO.builder()
                 .checkpointId(checkpoint.getCheckpointId())
                 .tripId(checkpoint.getTrip() != null ? checkpoint.getTrip().getTripId() : null)
@@ -52,25 +53,24 @@ public class TripCheckpointDTO {
                 .createdAt(checkpoint.getCreatedAt())
                 .updatedAt(checkpoint.getUpdatedAt())
                 .build();
-        
+
         // Calculate delay
         if (checkpoint.getActualTime() != null && checkpoint.getScheduledTime() != null) {
             long minutes = java.time.Duration.between(
-                    checkpoint.getScheduledTime(), 
-                    checkpoint.getActualTime()
-            ).toMinutes();
+                    checkpoint.getScheduledTime(),
+                    checkpoint.getActualTime()).toMinutes();
             dto.setDelayMinutes((int) minutes);
         }
-        
+
         // Check if upcoming
         LocalDateTime now = LocalDateTime.now();
         if (checkpoint.getScheduledTime() != null) {
-            dto.setIsUpcoming(checkpoint.getScheduledTime().isAfter(now) && 
+            dto.setIsUpcoming(checkpoint.getScheduledTime().isAfter(now) &&
                     checkpoint.getStatus() == TripCheckpoint.CheckpointStatus.PENDING);
-            dto.setIsOverdue(checkpoint.getScheduledTime().isBefore(now) && 
+            dto.setIsOverdue(checkpoint.getScheduledTime().isBefore(now) &&
                     checkpoint.getStatus() == TripCheckpoint.CheckpointStatus.PENDING);
         }
-        
+
         return dto;
     }
 }

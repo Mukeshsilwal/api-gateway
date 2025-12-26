@@ -151,7 +151,7 @@ const HotelDetail: React.FC = () => {
                 guestsCount: bookingParams.guests || 1 // Changed from guests to guestsCount
             };
 
-            const response = await bookingService.checkAvailability(request);
+            const response: any = await bookingService.checkAvailability(request);
 
             if (response && response.data) {
                 // Update rooms with availability info or replace rooms list
@@ -162,12 +162,47 @@ const HotelDetail: React.FC = () => {
 
                 const availableRoomIds = new Set(response.data.map((r: any) => r.roomId || r.id));
 
-                setRooms(prevRooms => prevRooms.map(room => ({
-                    ...room,
-                    isAvailable: availableRoomIds.has(room.id),
-                    // If the API returns specific price/details for this date, merge them
-                    ...response.data.find((r: any) => (r.roomId === room.id || r.id === room.id))
-                })));
+                setRooms(prevRooms => prevRooms.map(room => {
+                    // Find availability data for this room
+                    const availRoom = response.data.find((r: any) => (r.roomId === room.id || r.id === room.id));
+
+                    if (availRoom && availRoom.pricingOptions) {
+                        // Extract unique Rent Types
+                        const rentTypesMap = new Map();
+                        const mealPlansMap = new Map();
+
+                        availRoom.pricingOptions.forEach((opt: any) => {
+                            if (!rentTypesMap.has(opt.rentTypeId)) {
+                                rentTypesMap.set(opt.rentTypeId, {
+                                    id: opt.rentTypeId,
+                                    name: opt.rentTypeName
+                                });
+                            }
+                            if (!mealPlansMap.has(opt.mealPlanId)) {
+                                mealPlansMap.set(opt.mealPlanId, {
+                                    id: opt.mealPlanId,
+                                    name: opt.mealPlanName,
+                                    price: 0 // Pricing is dynamic via calculatePrice, this is just for selection
+                                });
+                            }
+                        });
+
+                        return {
+                            ...room,
+                            isAvailable: true,
+                            // Map the unique options to the format expected by RoomCard
+                            availableRentTypes: Array.from(rentTypesMap.values()),
+                            availableMealPlans: Array.from(mealPlansMap.values()),
+                            pricingOptions: availRoom.pricingOptions
+                        };
+                    }
+
+                    // If not found in availability response, assume unavailable for selected dates
+                    return {
+                        ...room,
+                        isAvailable: false
+                    };
+                }));
             }
         } catch (error) {
             console.error("Error checking availability:", error);

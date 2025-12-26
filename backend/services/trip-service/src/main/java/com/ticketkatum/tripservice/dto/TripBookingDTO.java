@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -13,8 +14,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TripBookingDTO {
-    
+public class TripBookingDTO implements Serializable {
+
     private Long id;
     private Long tripId;
     private String bookingType;
@@ -24,12 +25,12 @@ public class TripBookingDTO {
     private BigDecimal amount;
     private String status;
     private LocalDateTime createdAt;
-    
+
     public static TripBookingDTO fromEntity(TripBooking booking) {
         if (booking == null) {
             return null;
         }
-        
+
         return TripBookingDTO.builder()
                 .id(booking.getId())
                 .tripId(booking.getTrip() != null ? booking.getTrip().getTripId() : null)

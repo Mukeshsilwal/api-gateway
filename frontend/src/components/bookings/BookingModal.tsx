@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import bookingService from '../../services/bookingService';
 import paymentService from '../../services/paymentService'; // Import payment service
 import { toast } from 'react-toastify';
 import { X, Loader } from 'lucide-react';
 
-const BookingModal = ({ room, context, onClose }) => {
-    const [priceDetails, setPriceDetails] = useState(null);
+interface BookingModalProps {
+    room: any;
+    context: any;
+    onClose: () => void;
+}
+
+const BookingModal: React.FC<BookingModalProps> = ({ room, context, onClose }) => {
+    const [priceDetails, setPriceDetails] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [confirming, setConfirming] = useState(false);
 
@@ -25,7 +32,7 @@ const BookingModal = ({ room, context, onClose }) => {
                     checkIn: checkIn,
                     checkOut: checkOut
                 };
-                const response = await bookingService.calculatePrice(payload);
+                const response: any = await bookingService.calculatePrice(payload);
                 if (response.statusCode === 200) {
                     setPriceDetails(response.data);
                 } else {
@@ -43,6 +50,9 @@ const BookingModal = ({ room, context, onClose }) => {
         }
     }, [room, context]);
 
+    const navigate = useNavigate();
+    const location = useLocation();
+
     const handleConfirm = async () => {
         setConfirming(true);
         try {
@@ -51,41 +61,32 @@ const BookingModal = ({ room, context, onClose }) => {
 
             const bookingRequest = {
                 hotelId: room.hotelId,
-                roomType: room.roomType || room.name, // Adjust based on API expectation
+                roomType: room.roomType || room.name,
                 rentTypeId: parseInt(room.rentTypeId),
                 mealPlanId: room.mealPlanId ? parseInt(room.mealPlanId) : null,
                 checkIn: checkIn,
                 checkOut: checkOut,
                 guestsCount: context.guests,
-                specialRequests: "", // Could add field for this
-                // Customer details should ideally come from Auth Context or Form
-                // For now, assuming user is authenticated and backend pulls from context, 
-                // OR we need to pass them if the API requires explicit guest details.
-                // The prompt says "Prerequisite: Authenticated User", so backend typically knows who it is.
-                // But the request body in prompt has customerName/valid fields.
-                // We might need a small form or fetch from profile.
-                // Let's assume we send minimal or placeholder if auth handles it, 
-                // but the prompt explicitly listed them in the request body.
-                customerName: "Guest User", // TODO: Fetch from AuthContext
+                specialRequests: "",
+                customerName: "Guest User",
                 customerEmail: "guest@example.com",
                 customerPhone: "9800000000"
             };
 
             // Lock Room
-            const response = await bookingService.lockRoom(bookingRequest);
+            const response: any = await bookingService.lockRoom(bookingRequest);
 
             if (response.statusCode === 201 && response.data) {
                 const bookingData = response.data;
                 toast.success("Room Locked! Redirecting to payment...");
 
                 // Initiate Payment
-                // Current User ID should be fetched from auth service/context
                 const currentUser = JSON.parse(sessionStorage.getItem('user')) || { id: 'GUEST', name: 'Guest', email: 'guest@example.com' };
 
                 const paymentData = {
                     customerId: currentUser.id,
                     amount: bookingData.totalAmount || priceDetails.total,
-                    tid: bookingData.bookingReference, // Using bookingReference as Transaction ID
+                    tid: bookingData.bookingReference,
                     bookingType: 'HOTEL',
                     bookingDetails: {
                         hotelId: room.hotelId,
@@ -95,20 +96,26 @@ const BookingModal = ({ room, context, onClose }) => {
                     },
                     customerName: currentUser.name || bookingRequest.customerName,
                     customerEmail: currentUser.email || bookingRequest.customerEmail,
-                    successUrl: `${window.location.origin}/hotel-booking-confirmation`, // Or let paymentService handle default
+                    successUrl: `${window.location.origin}/hotel-booking-confirmation`,
                     failureUrl: `${window.location.origin}/payment/failed`
                 };
 
-                // Use Payment Service to process
-                await paymentService.processPayment('esewa', paymentData);
-                // Note: processPayment will handle redirection
+                await paymentService.initiatePayment('esewa', paymentData);
 
             } else {
                 toast.error("Failed to initiate booking (Lock failed).");
             }
-        } catch (err) {
+        } catch (err: any) {
             console.error("Booking error", err);
-            toast.error(err.message || "Booking Failed");
+            if (err.response && err.response.status === 403) {
+                toast.warn("Please log in to complete your booking.");
+                navigate('/login', { state: { from: location } });
+            } else if (err.status === 403) { // Fallback if err.response is not set but status is
+                toast.warn("Please log in to complete your booking.");
+                navigate('/login', { state: { from: location } });
+            } else {
+                toast.error(err.message || "Booking Failed");
+            }
         } finally {
             setConfirming(false);
         }

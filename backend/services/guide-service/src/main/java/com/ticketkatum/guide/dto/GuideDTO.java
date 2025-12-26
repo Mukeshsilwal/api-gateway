@@ -33,7 +33,10 @@ public class GuideDTO {
     private BigDecimal rating;
     private Integer reviewCount;
     private Boolean isActive;
-    
+    private String rejectionReason;
+    private Long verifiedBy;
+    private String verifiedAt;
+
     // Additional fields for creation/update
     private List<String> specialties;
     private List<String> languages;
@@ -51,6 +54,9 @@ public class GuideDTO {
                 .rating(guide.getRating())
                 .reviewCount(guide.getReviewCount())
                 .isActive(guide.getIsActive())
+                .rejectionReason(guide.getRejectionReason())
+                .verifiedBy(guide.getVerifiedBy())
+                .verifiedAt(guide.getVerifiedAt() != null ? guide.getVerifiedAt().toString() : null)
                 .specialties(specialties)
                 .languages(languages)
                 .build();

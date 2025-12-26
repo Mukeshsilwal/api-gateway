@@ -24,7 +24,6 @@ public class BookingRequestDto {
     private Long mealPlanId;
 
     @NotNull(message = "Check-in time is required")
-    @Future(message = "Check-in must be in the future")
     private LocalDateTime checkIn;
 
     @NotNull(message = "Check-out time is required")

@@ -43,7 +43,7 @@ public interface RoomBookingRepository extends JpaRepository<RoomBooking, Long> 
     @Query("""
                 SELECT r FROM Room r
                 WHERE r.hotel.id = :hotelId
-                AND r.roomType = :roomType
+                AND (:roomType IS NULL OR r.roomType = :roomType)
                 AND r.active = true
                 AND r.capacity >= :guestCount
                 AND r.id NOT IN (
@@ -60,6 +60,7 @@ public interface RoomBookingRepository extends JpaRepository<RoomBooking, Long> 
                 )
                 ORDER BY r.roomNumber
             """)
+
     List<Room> findAvailableRooms(
             @Param("hotelId") Long hotelId,
             @Param("roomType") String roomType,

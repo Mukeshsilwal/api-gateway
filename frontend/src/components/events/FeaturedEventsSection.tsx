@@ -61,15 +61,15 @@ export function FeaturedEventsSection() {
     };
 
     return (
-        <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+        <section className="py-20 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-black dark:to-gray-900 transition-colors duration-300">
             <div className="container mx-auto px-4">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8">
                     <div>
-                        <h2 className="text-4xl font-display font-bold text-gray-900 mb-2">
+                        <h2 className="text-4xl font-display font-bold text-gray-900 dark:text-white mb-2">
                             Upcoming Events
                         </h2>
-                        <p className="text-gray-600 text-lg">
+                        <p className="text-gray-600 dark:text-gray-400 text-lg">
                             Discover concerts, sports, conferences and more
                         </p>
                     </div>
@@ -89,7 +89,7 @@ export function FeaturedEventsSection() {
                             onClick={() => setActiveFilter(category)}
                             className={`px-6 py-2.5 rounded-xl font-semibold transition-all ${activeFilter === category
                                 ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
-                                : 'bg-white text-gray-700 hover:bg-gray-100'
+                                : 'bg-white dark:bg-white/5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/10'
                                 }`}
                         >
                             {category}
@@ -103,13 +103,13 @@ export function FeaturedEventsSection() {
                         {[...Array(6)].map((_, index) => (
                             <div
                                 key={index}
-                                className="bg-white rounded-2xl overflow-hidden animate-pulse"
+                                className="bg-white dark:bg-white/5 rounded-2xl overflow-hidden animate-pulse"
                             >
-                                <div className="h-48 bg-gray-200"></div>
+                                <div className="h-48 bg-gray-200 dark:bg-white/10"></div>
                                 <div className="p-6">
-                                    <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                                    <div className="h-6 bg-gray-200 dark:bg-white/10 rounded mb-2"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-3/4 mb-4"></div>
+                                    <div className="h-4 bg-gray-200 dark:bg-white/10 rounded w-1/2"></div>
                                 </div>
                             </div>
                         ))}
@@ -123,10 +123,10 @@ export function FeaturedEventsSection() {
                 ) : (
                     <div className="text-center py-16">
                         <div className="text-6xl mb-4">🎭</div>
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                             No events found
                         </h3>
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
                             {activeFilter === 'ALL'
                                 ? 'No upcoming events at the moment. Check back soon!'
                                 : `No ${activeFilter.toLowerCase()} events found. Try another category.`}
@@ -142,13 +142,13 @@ export function FeaturedEventsSection() {
 
                 {/* Quick Search CTA */}
                 {events.length > 0 && (
-                    <div className="mt-12 bg-white rounded-2xl p-8 shadow-lg">
+                    <div className="mt-12 bg-white dark:bg-white/5 dark:border dark:border-white/10 rounded-2xl p-8 shadow-lg">
                         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                             <div>
-                                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                                     Looking for something specific?
                                 </h3>
-                                <p className="text-gray-600">
+                                <p className="text-gray-600 dark:text-gray-400">
                                     Search events by name, location, or date
                                 </p>
                             </div>

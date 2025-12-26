@@ -40,12 +40,13 @@ public class TripManagementService {
     /**
      * Get trip by ID
      */
-    public Mono<Map> getTripById(Long tripId) {
-        log.debug("Fetching trip: {}", tripId);
+    public Mono<Map> getTripById(Long tripId, Long userId) {
+        log.debug("Fetching trip: {} for user: {}", tripId, userId);
 
         return webClientBuilder.build()
                 .get()
                 .uri(tripServiceUrl + "/api/trips/" + tripId)
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .doOnError(e -> log.error("Failed to fetch trip: {}", tripId, e));
@@ -54,12 +55,13 @@ public class TripManagementService {
     /**
      * Get trip details with checkpoints
      */
-    public Mono<Map> getTripDetails(Long tripId) {
-        log.debug("Fetching trip details: {}", tripId);
+    public Mono<Map> getTripDetails(Long tripId, Long userId) {
+        log.debug("Fetching trip details: {} for user: {}", tripId, userId);
 
         return webClientBuilder.build()
                 .get()
                 .uri(tripServiceUrl + "/api/trips/" + tripId + "/details")
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .doOnError(e -> log.error("Failed to fetch trip details: {}", tripId, e));
@@ -69,39 +71,28 @@ public class TripManagementService {
      * Get user's trips
      */
     public Flux<Map> getMyTrips() {
-        log.debug("Fetching user trips");
-
-        return webClientBuilder.build()
-                .get()
-                .uri(tripServiceUrl + "/api/trips/my-trips")
-                .retrieve()
-                .bodyToFlux(Map.class)
-                .doOnError(e -> log.error("Failed to fetch user trips", e));
+        // Deprecated: Use getUserTrips
+        return Flux.error(new UnsupportedOperationException("Use getUserTrips instead"));
     }
 
     /**
      * Get user's trips by status
      */
     public Flux<Map> getMyTripsByStatus(String status) {
-        log.debug("Fetching user trips with status: {}", status);
-
-        return webClientBuilder.build()
-                .get()
-                .uri(tripServiceUrl + "/api/trips/my-trips/status/" + status)
-                .retrieve()
-                .bodyToFlux(Map.class)
-                .doOnError(e -> log.error("Failed to fetch trips by status", e));
+        // Deprecated: Use getUserTripsByStatus with userId
+        return Flux.error(new UnsupportedOperationException("Use getUserTripsByStatus with userId instead"));
     }
 
     /**
      * Update trip
      */
-    public Mono<Map> updateTrip(Long tripId, Map<String, Object> updateRequest) {
-        log.debug("Updating trip: {}", tripId);
+    public Mono<Map> updateTrip(Long tripId, Map<String, Object> updateRequest, Long userId) {
+        log.debug("Updating trip: {} for user: {}", tripId, userId);
 
         return webClientBuilder.build()
                 .put()
                 .uri(tripServiceUrl + "/api/trips/" + tripId)
+                .header("X-User-Id", String.valueOf(userId))
                 .bodyValue(updateRequest)
                 .retrieve()
                 .bodyToMono(Map.class)
@@ -112,12 +103,13 @@ public class TripManagementService {
     /**
      * Update trip status
      */
-    public Mono<Map> updateTripStatus(Long tripId, String status) {
-        log.debug("Updating trip status: {} to {}", tripId, status);
+    public Mono<Map> updateTripStatus(Long tripId, String status, Long userId) {
+        log.debug("Updating trip status: {} to {} for user: {}", tripId, status, userId);
 
         return webClientBuilder.build()
                 .put()
                 .uri(tripServiceUrl + "/api/trips/" + tripId + "/status?status=" + status)
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToMono(Map.class)
                 .doOnSuccess(trip -> log.debug("Trip status updated: {}", tripId))
@@ -127,12 +119,13 @@ public class TripManagementService {
     /**
      * Delete trip
      */
-    public Mono<Void> deleteTrip(Long tripId) {
-        log.debug("Deleting trip: {}", tripId);
+    public Mono<Void> deleteTrip(Long tripId, Long userId) {
+        log.debug("Deleting trip: {} for user: {}", tripId, userId);
 
         return webClientBuilder.build()
                 .delete()
                 .uri(tripServiceUrl + "/api/trips/" + tripId)
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .doOnSuccess(v -> log.debug("Trip deleted: {}", tripId))
@@ -142,12 +135,13 @@ public class TripManagementService {
     /**
      * Get trip bookings
      */
-    public Flux<Map> getTripBookings(Long tripId) {
-        log.debug("Fetching bookings for trip: {}", tripId);
+    public Flux<Map> getTripBookings(Long tripId, Long userId) {
+        log.debug("Fetching bookings for trip: {} for user: {}", tripId, userId);
 
         return webClientBuilder.build()
                 .get()
                 .uri(tripServiceUrl + "/api/trips/" + tripId + "/bookings")
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToFlux(Map.class)
                 .doOnError(e -> log.error("Failed to fetch trip bookings: {}", tripId, e));

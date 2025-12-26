@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -50,14 +50,39 @@ interface BookingData {
 export default function EventTickets() {
     const { bookingReference } = useParams<{ bookingReference: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [booking, setBooking] = useState<BookingData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [tripId, setTripId] = useState<string | null>(null);
 
     useEffect(() => {
         fetchBookingDetails();
+        checkTripContext();
     }, [bookingReference]);
+
+    const checkTripContext = () => {
+        // Check navigation state first
+        const state = (location as any).state;
+        if (state?.fromPayment && state?.tripId) {
+            setTripId(state.tripId);
+            return;
+        }
+
+        // Check sessionStorage as fallback
+        const context = sessionStorage.getItem('bookingContext');
+        if (context) {
+            try {
+                const parsedContext = JSON.parse(context);
+                if (parsedContext.tripId) {
+                    setTripId(parsedContext.tripId);
+                }
+            } catch (e) {
+                console.error('Failed to parse booking context:', e);
+            }
+        }
+    };
 
     const fetchBookingDetails = async () => {
         if (!bookingReference) {
@@ -337,22 +362,32 @@ export default function EventTickets() {
                 </Card>
 
                 {/* Action Buttons - Hide on print */}
-                <div className="mt-8 flex gap-4 print:hidden">
-                    <Button
-                        className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white h-12"
-                        onClick={handlePrint}
-                    >
-                        <Download size={18} className="mr-2" />
-                        Print Tickets
-                    </Button>
-                    <Button
-                        variant="outline"
-                        className="flex-1 h-12"
-                        onClick={() => navigate('/')}
-                    >
-                        <Home size={18} className="mr-2" />
-                        Back to Home
-                    </Button>
+                <div className="mt-8 flex flex-col gap-3 print:hidden">
+                    {tripId && (
+                        <Button
+                            className="w-full bg-orange-600 hover:bg-orange-700 text-white h-14 text-lg font-bold shadow-lg"
+                            onClick={() => navigate(`/trips/${tripId}`)}
+                        >
+                            🎯 Continue Planning Your Trip
+                        </Button>
+                    )}
+                    <div className="flex gap-4">
+                        <Button
+                            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white h-12"
+                            onClick={handlePrint}
+                        >
+                            <Download size={18} className="mr-2" />
+                            Print Tickets
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="flex-1 h-12"
+                            onClick={() => navigate('/')}
+                        >
+                            <Home size={18} className="mr-2" />
+                            Back to Home
+                        </Button>
+                    </div>
                 </div>
             </div>
 

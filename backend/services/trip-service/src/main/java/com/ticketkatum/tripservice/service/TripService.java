@@ -36,6 +36,7 @@ public class TripService {
 
         Trip trip = Trip.builder()
                 .userId(userId)
+                .guideId(request.getGuideId())
                 .tripName(request.getTripName())
                 .tripType(request.getTripType())
                 .touristType(request.getTouristType())
@@ -117,7 +118,7 @@ public class TripService {
         if (request.getStatus() != null) {
             Trip.TripStatus oldStatus = trip.getStatus();
             trip.setStatus(request.getStatus());
-            
+
             // Publish status change events
             if (oldStatus != request.getStatus()) {
                 handleStatusChange(trip, oldStatus, request.getStatus());
@@ -134,6 +135,9 @@ public class TripService {
         }
         if (request.getDescription() != null) {
             trip.setDescription(request.getDescription());
+        }
+        if (request.getGuideId() != null) {
+            trip.setGuideId(request.getGuideId());
         }
 
         Trip updatedTrip = tripRepository.save(trip);
@@ -266,7 +270,7 @@ public class TripService {
         if (!trip.getBookings().isEmpty()) {
             trip.setStatus(Trip.TripStatus.PARTIAL_BOOKING);
             log.info("Trip {} marked as PARTIAL_BOOKING due to booking failure", tripId);
-            
+
             // Trigger Alert for user intervention
             publishTripEvent("trip.booking_failed_partial", trip);
         } else {
@@ -282,12 +286,12 @@ public class TripService {
         log.info("Compensating (rolling back) trip: {}", tripId);
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() -> new RuntimeException("Trip not found: " + tripId));
-        
+
         // Logic to trigger refunds for existing bookings would go here
         // For MVP, we just mark as CANCELLED and alert admin
         trip.setStatus(Trip.TripStatus.CANCELLED);
         tripRepository.save(trip);
-        
+
         publishTripEvent("trip.compensated", trip);
     }
 
@@ -309,7 +313,7 @@ public class TripService {
         booking.setStatus(TripBooking.BookingStatus.valueOf((String) bookingRequest.get("status")));
 
         trip.getBookings().add(booking);
-        
+
         // Update actual cost
         BigDecimal amount = (BigDecimal) bookingRequest.get("amount");
         if (amount != null) {

@@ -17,7 +17,6 @@ public class AvailabilityRequestDto {
     @NotNull
     private Long hotelId;
 
-    @NotNull
     private String roomType;
 
     @NotNull

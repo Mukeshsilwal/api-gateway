@@ -117,7 +117,7 @@ const bookingService = {
     checkAvailability: async (availabilityRequest) => {
         try {
             const response = await apiService.post('/api/bff/v1/hotels/bookings/availability', availabilityRequest);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error checking availability:', error);
             throw error;
@@ -132,7 +132,7 @@ const bookingService = {
     calculatePrice: async (pricingRequest) => {
         try {
             const response = await apiService.post('/api/bff/v1/hotels/bookings/price', pricingRequest);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error calculating price:', error);
             throw error;
@@ -147,7 +147,7 @@ const bookingService = {
     lockRoom: async (bookingRequest) => {
         try {
             const response = await apiService.post('/api/bff/v1/hotels/bookings/lock', bookingRequest);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error locking room:', error);
             throw error;
@@ -162,7 +162,7 @@ const bookingService = {
     confirmBooking: async (reference) => {
         try {
             const response = await apiService.post(`/api/bff/v1/hotels/bookings/${reference}/confirm`);
-            return response.data;
+            return response;
         } catch (error) {
             console.error('Error confirming booking:', error);
             throw error;

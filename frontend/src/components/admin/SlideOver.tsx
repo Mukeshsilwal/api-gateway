@@ -11,6 +11,7 @@ interface SlideOverProps {
 
 const SlideOver: React.FC<SlideOverProps> = ({ isOpen, onClose, title, children, footer }) => {
     const panelRef = useRef<HTMLDivElement>(null);
+    const wasOpenRef = useRef(false);
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -22,10 +23,14 @@ const SlideOver: React.FC<SlideOverProps> = ({ isOpen, onClose, title, children,
         if (isOpen) {
             document.body.style.overflow = 'hidden';
             window.addEventListener('keydown', handleKeyDown);
-            // Focus trap could be implemented here
-            panelRef.current?.focus();
+            // Only focus when transitioning from closed to open
+            if (!wasOpenRef.current) {
+                panelRef.current?.focus();
+            }
+            wasOpenRef.current = true;
         } else {
             document.body.style.overflow = 'unset';
+            wasOpenRef.current = false;
         }
 
         return () => {

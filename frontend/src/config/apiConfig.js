@@ -162,7 +162,7 @@ apiClient.interceptors.response.use(
                     });
 
                     const { accessToken } = response.data.data;
-                    localStorage.setItem('accessToken', accessToken);
+                    localStorage.setItem('token', accessToken);
 
                     // Retry original request
                     originalRequest.headers.Authorization = `Bearer ${accessToken}`;
@@ -170,7 +170,7 @@ apiClient.interceptors.response.use(
                 }
             } catch (refreshError) {
                 // Refresh failed, logout user
-                localStorage.removeItem('accessToken');
+                localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
                 window.location.href = '/login';
                 return Promise.reject(refreshError);

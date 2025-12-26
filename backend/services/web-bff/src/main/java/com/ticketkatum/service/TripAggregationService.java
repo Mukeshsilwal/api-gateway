@@ -48,12 +48,12 @@ public class TripAggregationService {
     /**
      * Get comprehensive trip dashboard data
      */
-    public Mono<Map<String, Object>> getTripDashboard(Long tripId) {
-        log.info("Aggregating dashboard data for trip: {}", tripId);
+    public Mono<Map<String, Object>> getTripDashboard(Long tripId, Long userId) {
+        log.info("Aggregating dashboard data for trip: {} for user: {}", tripId, userId);
 
         return Mono.zip(
-                getTripDetails(tripId),
-                getTripBookings(tripId),
+                getTripDetails(tripId, userId),
+                getTripBookings(tripId, userId),
                 getLiveTracking(tripId),
                 getActiveAlerts(tripId)).flatMap(tuple -> {
                     Map<String, Object> dashboard = new HashMap<>();
@@ -84,12 +84,12 @@ public class TripAggregationService {
     /**
      * Get aggregated timeline for trip
      */
-    public Mono<Map<String, Object>> getTripTimeline(Long tripId) {
-        log.info("Aggregating timeline data for trip: {}", tripId);
+    public Mono<Map<String, Object>> getTripTimeline(Long tripId, Long userId) {
+        log.info("Aggregating timeline data for trip: {} for user: {}", tripId, userId);
 
         return Mono.zip(
-                getTripDetails(tripId),
-                getTripBookings(tripId),
+                getTripDetails(tripId, userId),
+                getTripBookings(tripId, userId),
                 getLiveTracking(tripId)).map(tuple -> {
                     Map<String, Object> tripDetails = tuple.getT1();
                     List<Map<String, Object>> bookings = tuple.getT2();
@@ -122,6 +122,7 @@ public class TripAggregationService {
         return webClientBuilder.build()
                 .get()
                 .uri(tripServiceUrl + "/api/trips/user/" + userId)
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToFlux(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
@@ -135,10 +136,11 @@ public class TripAggregationService {
      * Get trip details from trip-service
      */
     @org.springframework.cache.annotation.Cacheable(value = "tripDetails", key = "#tripId")
-    public Mono<Map<String, Object>> getTripDetails(Long tripId) {
+    public Mono<Map<String, Object>> getTripDetails(Long tripId, Long userId) {
         return webClientBuilder.build()
                 .get()
                 .uri(tripServiceUrl + "/api/trips/" + tripId + "/details")
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {
                 })
@@ -150,10 +152,12 @@ public class TripAggregationService {
      * Get trip bookings from booking-service
      */
     @org.springframework.cache.annotation.Cacheable(value = "tripBookings", key = "#tripId")
-    public Mono<List<Map<String, Object>>> getTripBookings(Long tripId) {
+    public Mono<List<Map<String, Object>>> getTripBookings(Long tripId, Long userId) {
         return webClientBuilder.build()
                 .get()
                 .uri(bookingServiceUrl + "/api/bookings/trip/" + tripId)
+                // Note: Booking Service might also need X-User-Id, adding it for consistency
+                .header("X-User-Id", String.valueOf(userId))
                 .retrieve()
                 .bodyToFlux(new ParameterizedTypeReference<Map<String, Object>>() {
                 })

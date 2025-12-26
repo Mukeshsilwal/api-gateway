@@ -29,9 +29,8 @@ public class UserController {
         UserDto user = userService.createUser(request);
         Response<UserDto> response = ResponseHandler.success(
                 "User registered successfully",
-                user
-        );
-        return  ResponseEntity.status(HttpStatus.CREATED).body(response);
+                user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{id}")
@@ -45,9 +44,11 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers(
-            @RequestParam(required = false) String role) {
-        return ResponseEntity.ok(userService.getAllUsers(role));
+    public ResponseEntity<org.springframework.data.domain.Page<UserDto>> getAllUsers(
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "role", required = false) String role) {
+        return ResponseEntity.ok(userService.getAllUsers(page, size, role));
     }
 
     @PutMapping("/{id}")

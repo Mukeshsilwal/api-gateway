@@ -24,18 +24,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         log.info("Authenticating user: {}", username);
 
-        User user = userRepo.findByEmail(username).
-                orElse(null);
+        User user = userRepo.findByEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
 
+        log.info("User found in Users table: {}", username);
 
-            log.info("User found in Users table: {}", username);
-
-            return org.springframework.security.core.userdetails.User.builder()
-                    .username(user.getUsername())
-                    .password(user.getPassword())
-                    .disabled(!user.isEnabled())
-                    .authorities(user.getAuthorities())
-                    .build();
+        return user;
     }
 
 }

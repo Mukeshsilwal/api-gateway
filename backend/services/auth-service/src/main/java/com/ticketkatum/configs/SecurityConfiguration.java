@@ -104,6 +104,7 @@ public class SecurityConfiguration {
                                                                 "/swagger-ui.html",
                                                                 "/error",
                                                                 "/api/users/**",
+                                                                "/api/roles",
                                                                 "/api/registration/**")
                                                 .permitAll()
 

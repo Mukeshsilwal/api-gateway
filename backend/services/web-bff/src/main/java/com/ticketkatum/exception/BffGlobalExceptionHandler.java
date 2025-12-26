@@ -42,6 +42,21 @@ public class BffGlobalExceptionHandler {
         }
 
         /**
+         * Handle access denied exceptions
+         */
+        @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+        public ResponseEntity<Response<?>> handleAccessDeniedException(
+                        org.springframework.security.access.AccessDeniedException ex) {
+                log.warn("Access denied: {}", ex.getMessage());
+
+                Response<?> response = Response.builder()
+                                .statusCode(403)
+                                .message("Access Denied: You are not authorized to perform this action.")
+                                .build();
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        /**
          * Handle generic exceptions
          */
         @ExceptionHandler(Exception.class)

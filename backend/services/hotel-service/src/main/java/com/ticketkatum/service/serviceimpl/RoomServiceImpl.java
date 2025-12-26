@@ -96,6 +96,18 @@ public class RoomServiceImpl implements RoomService {
                     .maxPrice(req.getMaxPrice())
                     .amenities(req.getAmenities())
                     .images(req.getImages())
+                    .allowedRentTypes(req.getAllowedRentTypes())
+                    .allowedMealPlans(req.getAllowedMealPlans())
+                    .allowedMealServices(req.getAllowedMealServices())
+                    // Map generic pricing configs to Room entity for read access
+                    .pricingConfigurations(req.getPricingConfigurations().stream()
+                            .map(pc -> com.ticketkatum.entity.PricingConfiguration.builder()
+                                    .rentType(pc.getRentType())
+                                    .mealPlan(pc.getMealPlan())
+                                    .mealService(pc.getMealService())
+                                    .price(pc.getPrice())
+                                    .build())
+                            .collect(java.util.stream.Collectors.toList()))
                     .active(req.getActive() != null ? req.getActive() : true)
                     .hotel(hotel)
                     .createdAt(LocalDateTime.now())
@@ -104,11 +116,15 @@ public class RoomServiceImpl implements RoomService {
 
             Room savedRoom = roomRepository.save(room);
 
-            // Initialize amenities and images before mapping (still inside transaction)
+            // Initialize collections
             Hibernate.initialize(savedRoom.getAmenities());
             Hibernate.initialize(savedRoom.getImages());
+            Hibernate.initialize(savedRoom.getAllowedRentTypes());
+            Hibernate.initialize(savedRoom.getAllowedMealPlans());
+            Hibernate.initialize(savedRoom.getAllowedMealServices());
+            Hibernate.initialize(savedRoom.getPricingConfigurations());
 
-            // Create pricing configurations if provided
+            // Create searchable pricing configurations (RoomPricing entities)
             if (req.getPricingConfigurations() != null && !req.getPricingConfigurations().isEmpty()) {
                 log.info("Creating {} pricing configurations for room {}",
                         req.getPricingConfigurations().size(), savedRoom.getRoomNumber());
@@ -164,13 +180,33 @@ public class RoomServiceImpl implements RoomService {
             room.setMaxPrice(req.getMaxPrice());
             room.setAmenities(req.getAmenities());
             room.setImages(req.getImages());
+            room.setAllowedRentTypes(req.getAllowedRentTypes());
+            room.setAllowedMealPlans(req.getAllowedMealPlans());
+            room.setAllowedMealServices(req.getAllowedMealServices());
+
+            // Update pricing configs
+            if (req.getPricingConfigurations() != null) {
+                room.setPricingConfigurations(req.getPricingConfigurations().stream()
+                        .map(pc -> com.ticketkatum.entity.PricingConfiguration.builder()
+                                .rentType(pc.getRentType())
+                                .mealPlan(pc.getMealPlan())
+                                .mealService(pc.getMealService())
+                                .price(pc.getPrice())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()));
+            }
+
             room.setUpdatedAt(LocalDateTime.now());
 
             Room updatedRoom = roomRepository.save(room);
 
-            // Initialize amenities and images before mapping (still inside transaction)
+            // Initialize collections
             Hibernate.initialize(updatedRoom.getAmenities());
             Hibernate.initialize(updatedRoom.getImages());
+            Hibernate.initialize(updatedRoom.getAllowedRentTypes());
+            Hibernate.initialize(updatedRoom.getAllowedMealPlans());
+            Hibernate.initialize(updatedRoom.getAllowedMealServices());
+            Hibernate.initialize(updatedRoom.getPricingConfigurations());
 
             log.info("Room updated successfully: {}", updatedRoom.getId());
             return hotelMapper.toRoomDTO(updatedRoom);
@@ -330,7 +366,7 @@ public class RoomServiceImpl implements RoomService {
             } catch (Exception e) {
                 log.error("Failed to create pricing configuration for room {}: {}",
                         room.getRoomNumber(), e.getMessage());
-                // Continue with other configurations even if one fails
+                throw new RuntimeException("Failed to create pricing configuration: " + e.getMessage());
             }
         }
     }

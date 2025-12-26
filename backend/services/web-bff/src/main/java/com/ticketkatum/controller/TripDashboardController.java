@@ -13,6 +13,8 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 
+import com.ticketkatum.util.JwtUtil;
+
 @RestController
 @RequestMapping("/api/bff/trips")
 @RequiredArgsConstructor
@@ -21,21 +23,25 @@ import java.util.Map;
 public class TripDashboardController {
 
     private final TripAggregationService tripAggregationService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/{tripId}/dashboard")
     @Operation(summary = "Get trip dashboard", description = "Get comprehensive trip dashboard with all aggregated data")
-    public Mono<ResponseEntity<Map<String, Object>>> getTripDashboard(@PathVariable("tripId") Long tripId) {
-        log.info("Fetching trip dashboard for trip: {}", tripId);
+    public Mono<ResponseEntity<Map<String, Object>>> getTripDashboard(@PathVariable("tripId") Long tripId,
+            Authentication authentication, @RequestHeader(name = "Authorization", required = false) String token) {
+        Long userId = extractUserId(authentication, token);
+        log.info("Fetching trip dashboard for trip: {} for user: {}", tripId, userId);
 
-        return tripAggregationService.getTripDashboard(tripId)
+        return tripAggregationService.getTripDashboard(tripId, userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/my-trips")
     @Operation(summary = "Get my trips", description = "Get all trips for authenticated user with summary data")
-    public Mono<ResponseEntity<List<Map<String, Object>>>> getMyTrips(Authentication authentication) {
-        Long userId = extractUserId(authentication);
+    public Mono<ResponseEntity<List<Map<String, Object>>>> getMyTrips(Authentication authentication,
+            @RequestHeader(name = "Authorization", required = false) String token) {
+        Long userId = extractUserId(authentication, token);
         log.info("Fetching trips for user: {}", userId);
 
         return tripAggregationService.getUserTrips(userId)
@@ -55,19 +61,28 @@ public class TripDashboardController {
 
     @GetMapping("/{tripId}/timeline")
     @Operation(summary = "Get trip timeline", description = "Get aggregated timeline for a trip")
-    public Mono<ResponseEntity<Map<String, Object>>> getTripTimeline(@PathVariable("tripId") Long tripId) {
-        log.info("Fetching timeline for trip: {}", tripId);
+    public Mono<ResponseEntity<Map<String, Object>>> getTripTimeline(@PathVariable("tripId") Long tripId,
+            Authentication authentication, @RequestHeader(name = "Authorization", required = false) String token) {
+        Long userId = extractUserId(authentication, token);
+        log.info("Fetching timeline for trip: {} for user: {}", tripId, userId);
 
-        return tripAggregationService.getTripTimeline(tripId)
+        return tripAggregationService.getTripTimeline(tripId, userId)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    private Long extractUserId(Authentication authentication) {
-        // TODO: Extract from JWT token
+    private Long extractUserId(Authentication authentication, String token) {
+        // Try extracting from Authentication object first (if populated by filter)
         if (authentication != null && authentication.getPrincipal() != null) {
-            return 1L; // Placeholder
+            // Logic depends on how Authentication is populated.
+            // Assuming it might be generic, let's try token first as it is more reliable
+            // with JwtUtil
         }
+
+        if (token != null && token.startsWith("Bearer ")) {
+            return jwtUtil.extractUserIdFromToken(token);
+        }
+
         throw new RuntimeException("User not authenticated");
     }
 }

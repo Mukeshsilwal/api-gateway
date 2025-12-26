@@ -9,6 +9,7 @@ interface ImageUploadProps {
     label?: string;
     description?: string;
     className?: string;
+    onUploadStatusChange?: (isUploading: boolean) => void;
 }
 
 const ImageUpload: React.FC<ImageUploadProps> = ({
@@ -16,7 +17,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     onChange,
     label = "Upload Image",
     description = "Drag & drop an image here, or click to select",
-    className = ""
+    className = "",
+    onUploadStatusChange
 }) => {
     const [preview, setPreview] = useState<string | null>(value || null);
     const [isUploading, setIsUploading] = useState(false);
@@ -30,6 +32,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 setIsUploading(true);
                 setUploadError(null);
                 setUploadProgress(0);
+                if (onUploadStatusChange) onUploadStatusChange(true);
 
                 // Show local preview immediately
                 const objectUrl = URL.createObjectURL(file);
@@ -54,9 +57,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             } finally {
                 setIsUploading(false);
                 setUploadProgress(0);
+                if (onUploadStatusChange) onUploadStatusChange(false);
             }
         }
-    }, [onChange]);
+    }, [onChange, onUploadStatusChange]);
 
     const removeImage = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -90,38 +94,54 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             >
                 <input {...getInputProps()} />
 
-                {preview && !isUploading ? (
+                {preview ? (
                     <div className="relative w-full h-64 bg-gray-100 rounded-xl overflow-hidden group">
                         <img
                             src={preview}
                             alt="Preview"
-                            className="w-full h-full object-cover"
+                            className={`w-full h-full object-cover ${isUploading ? 'opacity-50 blur-sm' : ''}`}
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <p className="text-white font-medium flex items-center gap-2">
-                                <CloudUpload size={20} />
-                                Change Image
-                            </p>
-                        </div>
-                        <button
-                            onClick={removeImage}
-                            className="absolute top-2 right-2 p-1.5 bg-white rounded-full text-gray-700 hover:text-red-600 shadow-md transition-colors z-10"
-                            title="Remove image"
-                        >
-                            <X size={18} />
-                        </button>
+
+                        {isUploading ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center z-20">
+                                <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-2" />
+                                <div className="text-blue-700 font-bold text-lg">{uploadProgress}%</div>
+                                <div className="w-32 h-1.5 bg-gray-200 rounded-full mt-2 overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-600 transition-all duration-300"
+                                        style={{ width: `${uploadProgress}%` }}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <p className="text-white font-medium flex items-center gap-2">
+                                        <CloudUpload size={20} />
+                                        Change Image
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={removeImage}
+                                    className="absolute top-2 right-2 p-1.5 bg-white rounded-full text-gray-700 hover:text-red-600 shadow-md transition-colors z-10"
+                                    title="Remove image"
+                                >
+                                    <X size={18} />
+                                </button>
+                            </>
+                        )}
                     </div>
                 ) : isUploading ? (
+                    // Fallback if no preview implies we shouldn't be here given the logic, but handled for safety
                     <div className="flex flex-col items-center justify-center py-12">
                         <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-                        <p className="text-gray-900 font-medium mb-2">Uploading image...</p>
+                        <p className="text-gray-900 font-medium mb-2">Uploading...</p>
                         <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-blue-600 transition-all duration-300"
                                 style={{ width: `${uploadProgress}%` }}
                             />
                         </div>
-                        <p className="text-sm text-gray-500 mt-2">{uploadProgress}% complete</p>
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center py-6">

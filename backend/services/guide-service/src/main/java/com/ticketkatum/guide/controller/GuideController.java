@@ -32,6 +32,12 @@ public class GuideController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping
+    @Operation(summary = "Get All Guides", description = "Get list of all registered guides")
+    public ResponseEntity<List<GuideDTO>> getAllGuides() {
+        return ResponseEntity.ok(guideService.getAllGuides());
+    }
+
     @GetMapping("/{guideId}")
     @Operation(summary = "Get Guide", description = "Get guide profile by ID")
     public ResponseEntity<GuideDTO> getGuide(@PathVariable Long guideId) {
@@ -53,7 +59,7 @@ public class GuideController {
     @PostMapping("/{guideId}/packages")
     @Operation(summary = "Add Package", description = "Add a new service package")
     public ResponseEntity<ServicePackageDTO> createPackage(
-            @PathVariable Long guideId, 
+            @PathVariable Long guideId,
             @Valid @RequestBody ServicePackageDTO request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(guideService.createPackage(guideId, request));
     }
@@ -74,5 +80,34 @@ public class GuideController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam String status) {
         return ResponseEntity.ok(guideService.setAvailability(guideId, date, status));
+    }
+
+    @PatchMapping("/{guideId}/verify")
+    @Operation(summary = "Verify Guide", description = "Approve guide profile (SUPER_ADMIN only)")
+    public ResponseEntity<GuideDTO> verifyGuide(
+            @PathVariable Long guideId,
+            @RequestParam Long verifiedBy) {
+        return ResponseEntity.ok(guideService.verifyGuide(guideId, verifiedBy));
+    }
+
+    @PatchMapping("/{guideId}/reject")
+    @Operation(summary = "Reject Guide", description = "Reject guide profile with reason (SUPER_ADMIN only)")
+    public ResponseEntity<GuideDTO> rejectGuide(
+            @PathVariable Long guideId,
+            @RequestParam String reason,
+            @RequestParam Long rejectedBy) {
+        return ResponseEntity.ok(guideService.rejectGuide(guideId, reason, rejectedBy));
+    }
+
+    @PatchMapping("/{guideId}/activate")
+    @Operation(summary = "Activate Guide", description = "Activate guide profile")
+    public ResponseEntity<GuideDTO> activateGuide(@PathVariable Long guideId) {
+        return ResponseEntity.ok(guideService.activateGuide(guideId));
+    }
+
+    @PatchMapping("/{guideId}/deactivate")
+    @Operation(summary = "Deactivate Guide", description = "Deactivate guide profile")
+    public ResponseEntity<GuideDTO> deactivateGuide(@PathVariable Long guideId) {
+        return ResponseEntity.ok(guideService.deactivateGuide(guideId));
     }
 }

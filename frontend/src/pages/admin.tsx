@@ -16,6 +16,7 @@ import TicketingDashboard from "../components/admin/ticketing/TicketingDashboard
 import RoomMaintenancePage from "../components/admin/maintenance/RoomMaintenancePage";
 import UserManagement from "../components/admin/UserManager";
 import { EventManager } from "../components/admin/EventManager";
+import { GuideManager } from "../components/admin/GuideManager";
 import RoleManager from "../components/admin/RoleManager";
 import SafetyWarRoom from "../components/admin/SafetyWarRoom";
 
@@ -29,6 +30,7 @@ type AdminTab =
     | 'hotels'
     | 'cinemas'
     | 'events'
+    | 'guides'
     | 'users'
     | 'settings'
     | 'scheduler'
@@ -87,6 +89,8 @@ export function AdminPanel() {
                 return <CinemaManager />;
             case 'events':
                 return <EventManager />;
+            case 'guides':
+                return <GuideManager />;
             case 'users':
                 return <UserManagement />;
             case 'roles':

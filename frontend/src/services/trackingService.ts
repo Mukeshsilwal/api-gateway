@@ -1,22 +1,5 @@
-import axios from 'axios';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8088/tracking-service';
-
-const trackingApi = axios.create({
-    baseURL: API_BASE_URL,
-    headers: {
-        'Content-Type': 'application/json',
-    },
-});
-
-// Add auth token to requests
-trackingApi.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
+import client from '../api/client';
+import API_CONFIG from '../config/api';
 
 export interface LocationUpdate {
     tripId?: number;
@@ -65,12 +48,12 @@ export interface POI {
 
 // Submit location update
 export const submitLocation = async (locationData: LocationUpdate): Promise<void> => {
-    await trackingApi.post('/api/tracking/location', locationData);
+    await client.post(`${API_CONFIG.BFF_PREFIX}/tracking/location`, locationData);
 };
 
 // Get latest location
 export const getLatestLocation = async (entityType: string, entityId: number): Promise<Location> => {
-    const response = await trackingApi.get(`/api/tracking/${entityType}/${entityId}/latest`);
+    const response = await client.get(`${API_CONFIG.BFF_PREFIX}/tracking/${entityType}/${entityId}/latest`);
     return response.data;
 };
 
@@ -80,7 +63,7 @@ export const getLocationHistory = async (
     entityId: number,
     hours: number = 24
 ): Promise<Location[]> => {
-    const response = await trackingApi.get(`/api/tracking/${entityType}/${entityId}/history`, {
+    const response = await client.get(`${API_CONFIG.BFF_PREFIX}/tracking/${entityType}/${entityId}/history`, {
         params: { hours },
     });
     return response.data;
@@ -88,7 +71,7 @@ export const getLocationHistory = async (
 
 // Get trip locations
 export const getTripLocations = async (tripId: number): Promise<Location[]> => {
-    const response = await trackingApi.get(`/api/tracking/trip/${tripId}`);
+    const response = await client.get(`${API_CONFIG.BFF_PREFIX}/tracking/trip/${tripId}`);
     return response.data;
 };
 
@@ -98,7 +81,7 @@ export const findNearbyPOIs = async (
     longitude: number,
     radiusKm: number = 5
 ): Promise<POI[]> => {
-    const response = await trackingApi.get('/api/poi/nearby', {
+    const response = await client.get(`${API_CONFIG.BFF_PREFIX}/tracking/poi/nearby`, {
         params: { latitude, longitude, radiusKm },
     });
     return response.data;
@@ -111,7 +94,7 @@ export const findPOIsByCategory = async (
     longitude?: number,
     radiusKm: number = 10
 ): Promise<POI[]> => {
-    const response = await trackingApi.get(`/api/poi/category/${category}`, {
+    const response = await client.get(`${API_CONFIG.BFF_PREFIX}/tracking/poi/category/${category}`, {
         params: { latitude, longitude, radiusKm },
     });
     return response.data;

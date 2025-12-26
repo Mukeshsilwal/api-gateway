@@ -12,8 +12,8 @@ const BusBookingPage: React.FC = () => {
 
     // State for form fields
     const [formData, setFormData] = useState<Omit<BusBookingRequest, "paymentProvider">>({
-        tripId: "dummy-trip-id", // In real app, this comes from selection
-        seatIds: ["A1", "A2"],   // In real app, this comes from selection
+        tripId: "", // To be populated from selection
+        seatIds: [],   // To be populated from selection
         passengerName: "",
         passengerEmail: "",
         passengerPhone: "",

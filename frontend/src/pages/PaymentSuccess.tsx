@@ -23,6 +23,7 @@ export default function PaymentSuccess() {
     const [error, setError] = useState<string | null>(null);
     const [verificationResult, setVerificationResult] = useState<any>(null);
     const [decodedData, setDecodedData] = useState<any>(null);
+    const [redirectTripId, setRedirectTripId] = useState<string | null>(null);
 
     // Use ref to prevent double verification in StrictMode
     const verificationAttempted = useRef(false);
@@ -159,16 +160,29 @@ export default function PaymentSuccess() {
                     payment_method: 'esewa'
                 });
 
-                // 6. Navigate to QR/Ticket page after 3 seconds
+                // 6. Navigate based on context after 3 seconds
                 const bookingReference = extractBookingRef(result);
 
-                // Check if this is a unified booking
+                // Check if this is a unified booking or has trip context
                 const context = sessionStorage.getItem('bookingContext');
-                const isUnifiedBooking = context ? JSON.parse(context).isUnifiedBooking : false;
+                let parsedContext = null;
+                let isUnifiedBooking = false;
+                let tripId = null;
+
+                if (context) {
+                    try {
+                        parsedContext = JSON.parse(context);
+                        isUnifiedBooking = parsedContext.isUnifiedBooking || false;
+                        tripId = parsedContext.tripId || null;
+                    } catch (e) {
+                        console.error('Failed to parse booking context:', e);
+                    }
+                }
 
                 console.log('📦 Full verification result:', result);
                 console.log('📦 Extracted booking reference:', bookingReference);
                 console.log('🔗 Is unified booking:', isUnifiedBooking);
+                console.log('🎯 Trip ID from context:', tripId);
 
                 if (isUnifiedBooking) {
                     // For unified bookings, redirect to unified success page
@@ -183,8 +197,22 @@ export default function PaymentSuccess() {
                             }
                         });
                     }, 3000);
+                } else if (tripId) {
+                    // For bookings with trip context, redirect to trip dashboard
+                    console.log('🎯 Trip context detected, redirecting to trip dashboard:', tripId);
+                    setRedirectTripId(tripId); // Store for UI display
+                    setTimeout(() => {
+                        navigate(`/trips/${tripId}`, {
+                            state: {
+                                bookingAdded: true,
+                                bookingReference: bookingReference,
+                                fromPayment: true
+                            }
+                        });
+                        toast.success('Booking added to your trip!');
+                    }, 3000);
                 } else if (bookingReference) {
-                    // For single bookings, redirect to tickets page
+                    // For single bookings without trip context, redirect to tickets page
                     console.log('📱 Navigating to tickets page with booking:', bookingReference);
                     setTimeout(() => {
                         navigate(`/events/booking/${bookingReference}/tickets`);
@@ -274,7 +302,11 @@ export default function PaymentSuccess() {
                             <CheckCircle className="w-10 h-10 text-white drop-shadow-md" strokeWidth={3} />
                         </div>
                         <h1 className="text-3xl font-bold mb-2 tracking-tight">Payment Successful!</h1>
-                        <p className="text-emerald-100 text-lg font-medium">Your booking has been confirmed</p>
+                        <p className="text-emerald-100 text-lg font-medium">
+                            {redirectTripId
+                                ? 'Booking added to your trip!'
+                                : 'Your booking has been confirmed'}
+                        </p>
                     </div>
                 </div>
 
