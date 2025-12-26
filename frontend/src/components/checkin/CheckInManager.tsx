@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Users, CheckCircle, Clock, RefreshCw, QrCode } from 'lucide-react';
 import QRScanner from './QRScanner';
-import apiClient from '../../services/api.client';
+import apiService from '../../services/api.service';
 
 interface CheckInManagerProps {
     eventId: number;
@@ -23,7 +23,7 @@ export const CheckInManager: React.FC<CheckInManagerProps> = ({ eventId, eventNa
     const fetchStats = async () => {
         try {
             setLoading(true);
-            const response = await apiClient.get(`/api/bff/v1/events/${eventId}/check-in/stats`);
+            const response = await apiService.get(`/api/bff/v1/events/${eventId}/check-in/stats`);
             setStats(response.data.data || response.data);
         } catch (err) {
             console.error('Error fetching check-in stats:', err);
