@@ -120,7 +120,7 @@ export default defineConfig({
                     'react-router': ['react-router-dom'],
                     // UI Components
                     'ui-icons': ['lucide-react'],
-                    'ui-toast': ['react-toastify', 'react-hot-toast'],
+                    'ui-toast': ['react-hot-toast'],
                     'ui-charts': ['recharts'],
                     // Lazy load utilities
                     'lazy-load': ['react-lazy-load-image-component'],
