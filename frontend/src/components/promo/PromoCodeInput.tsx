@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Tag, Percent, DollarSign, Calendar, Users, Check, X } from 'lucide-react';
-import apiClient from '../../services/api.client';
+import apiService from '../../services/api.service';
 
 interface PromoCodeInputProps {
     eventId: number;
@@ -22,7 +22,7 @@ export const PromoCodeInput: React.FC<PromoCodeInputProps> = ({ eventId, totalAm
         setError(null);
 
         try {
-            const response = await apiClient.post(`/api/bff/v1/promo-codes/validate`, {
+            const response = await apiService.post(`/api/bff/v1/promo-codes/validate`, {
                 eventId,
                 code: code.toUpperCase(),
                 amount: totalAmount

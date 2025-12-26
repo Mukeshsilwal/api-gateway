@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
-import apiClient from '../../services/api.client';
+import apiService from '../../services/api.service';
 
 interface EventCloneButtonProps {
     eventId: number;
@@ -16,7 +16,7 @@ export const EventCloneButton: React.FC<EventCloneButtonProps> = ({ eventId, eve
     const handleClone = async () => {
         setLoading(true);
         try {
-            const response = await apiClient.post(`/api/bff/v1/events/${eventId}/clone`);
+            const response = await apiService.post(`/api/bff/v1/events/${eventId}/clone`);
             const clonedEvent = response.data.data || response.data;
 
             setSuccess(true);

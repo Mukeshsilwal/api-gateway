@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Mail, Bell, CheckCircle } from 'lucide-react';
-import apiClient from '../../services/api.client';
+import apiService from '../../services/api.service';
 
 interface WaitlistButtonProps {
     eventId: number;
@@ -18,7 +18,7 @@ export const WaitlistButton: React.FC<WaitlistButtonProps> = ({ eventId, eventNa
 
         setLoading(true);
         try {
-            await apiClient.post(`/api/bff/v1/events/${eventId}/waitlist`, { email });
+            await apiService.post(`/api/bff/v1/events/${eventId}/waitlist`, { email });
             setJoined(true);
             setShowForm(false);
         } catch (error) {

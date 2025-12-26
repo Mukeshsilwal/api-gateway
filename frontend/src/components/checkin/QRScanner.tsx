@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Html5QrcodeScanner } from 'html5-qrcode';
 import { CheckCircle, XCircle, AlertCircle, Loader } from 'lucide-react';
-import apiClient from '../../services/api.client';
+import apiService from '../../services/api.service';
 
 interface QRScannerProps {
     eventId: number;
@@ -51,7 +51,7 @@ export const QRScanner: React.FC<QRScannerProps> = ({ eventId, onSuccess }) => {
         setError(null);
 
         try {
-            const response = await apiClient.post('/api/bff/v1/check-in', {
+            const response = await apiService.post('/api/bff/v1/check-in', {
                 qrCode: decodedText,
                 eventId: eventId,
                 checkedInBy: 'Admin', // TODO: Get from auth context
