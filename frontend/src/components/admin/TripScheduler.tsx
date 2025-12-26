@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, Bus, ChevronLeft, ChevronRight, Filter, Plus, MoreVertical } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 // Interfaces for local mock data
 interface MockBus {
@@ -81,7 +81,7 @@ const TripScheduler: React.FC = () => {
             setSelectedTrip(null);
         } else {
             setSelectedTrip(trip);
-            toast.info(`Selected ${trip.route}. Click a calendar slot to assign.`);
+            toast(`Selected ${trip.route}. Click a calendar slot to assign.`, { icon: 'ℹ️' });
         }
     };
 

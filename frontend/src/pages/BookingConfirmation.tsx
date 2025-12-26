@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { CheckCircle, Calendar, MapPin, Mail, Phone, Download, Share2, Home } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import eventService from '../services/eventService';
@@ -71,7 +71,7 @@ export function BookingConfirmation() {
     };
 
     const handleDownloadTickets = () => {
-        toast.info('Downloading tickets... (Feature coming soon)');
+        toast('Downloading tickets... (Feature coming soon)', { icon: 'ℹ️' });
         // TODO: Implement PDF download
     };
 

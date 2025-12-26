@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import BookingStatus from '../components/BookingStatus';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -131,7 +131,7 @@ export default function PaymentSuccess() {
             // Verify txnId matches data if both exist
             if (cleanTxnId && parsedData?.transaction_uuid && cleanTxnId !== parsedData.transaction_uuid) {
                 console.warn('⚠️ Mismatch between param txnId and decoded transaction_uuid');
-                toast.warning('Transaction ID mismatch detected');
+                toast('Transaction ID mismatch detected', { icon: '⚠️' });
             }
 
             // 4. Verification call - PUBLIC ENDPOINT (NO AUTH)

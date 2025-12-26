@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import authService from "../services/authService";
 import { formatErrorForForm } from "../utils/errorUtils";
 import Input from "../components/ui/Input";
@@ -55,11 +55,11 @@ export default function UserRegister() {
             console.error("Registration error:", error);
             const errorInfo = formatErrorForForm(error);
 
-            if (errorInfo.fieldErrors && Object.keys(errorInfo.fieldErrors).length > 0) {
-                setFieldErrors(errorInfo.fieldErrors);
+            if ((errorInfo as any).fieldErrors && Object.keys((errorInfo as any).fieldErrors).length > 0) {
+                setFieldErrors((errorInfo as any).fieldErrors);
                 toast.error("Please fix the errors in the form");
             } else {
-                toast.error(errorInfo.message || "Registration failed. Please try again.");
+                toast.error((errorInfo as any).message || "Registration failed. Please try again.");
             }
         } finally {
             setIsLoading(false);

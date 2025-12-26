@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getTripById, updateTrip, type Trip } from '../services/tripService';
 import { CheckCircle, Bus, Hotel, Ticket } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import GuideSelection from '../components/trips/GuideSelection';
 import TimelineBuilder, { Checkpoint } from '../components/trips/TimelineBuilder';
 import { Guide } from '../services/guideService';

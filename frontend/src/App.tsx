@@ -1,6 +1,5 @@
 import "./App.css";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import "./App.css";
 import { lazy, Suspense, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ROLES } from "./services/authService";
@@ -29,10 +28,7 @@ const AdminPanel = lazy(() => import("./pages/admin").then(module => ({ default:
 const PlaneList = lazy(() => import("./pages/PlaneList"));
 const PlaneSeatSelection = lazy(() => import("./pages/PlaneSeatSelection"));
 const PlaneTicketConfirm = lazy(() => import("./pages/PlaneTicketConfirm"));
-const QfxMovies = lazy(() => import("./pages/QfxMovies"));
-const QfxMovieDetails = lazy(() => import("./pages/QfxMovieDetails"));
-const QfxSeatSelection = lazy(() => import("./pages/QfxSeatSelection"));
-const QfxBookingConfirmation = lazy(() => import("./pages/QfxBookingConfirmation"));
+
 
 // Hotel Routes
 const HotelList = lazy(() => import("./pages/HotelList"));
@@ -198,27 +194,7 @@ const App: React.FC = () => {
                   errorElement={<ErrorPage />}
                 />
 
-                {/* QFX Cinema Routes */}
-                <Route
-                  path="/qfx/movies"
-                  element={<QfxMovies />}
-                  errorElement={<ErrorPage />}
-                />
-                <Route
-                  path="/qfx/movie/:id"
-                  element={<QfxMovieDetails />}
-                  errorElement={<ErrorPage />}
-                />
-                <Route
-                  path="/qfx/seats/:showtimeId"
-                  element={<QfxSeatSelection />}
-                  errorElement={<ErrorPage />}
-                />
-                <Route
-                  path="/qfx/confirmation"
-                  element={<QfxBookingConfirmation />}
-                  errorElement={<ErrorPage />}
-                />
+
 
                 {/* Hotel Routes */}
                 <Route
@@ -380,19 +356,6 @@ const App: React.FC = () => {
             </Suspense>
           </CartIntegration>
         </BrowserRouter>
-        <ToastContainer
-          position="bottom-left"
-          autoClose={5000}
-          hideProgressBar={true}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-
         {/* AI Chatbot - Floating widget available on all pages */}
         <AIChatbot />
         <SafetyWidget />

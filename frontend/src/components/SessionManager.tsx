@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import authService from '../services/authService';
 
 const SessionManager = () => {
@@ -85,8 +85,8 @@ const SessionManager = () => {
                         <div
                             key={session.sessionId}
                             className={`flex items-center justify-between p-4 rounded-xl border ${session.sessionId === currentSessionId
-                                    ? 'bg-indigo-50 border-indigo-200'
-                                    : 'bg-gray-50 border-gray-100'
+                                ? 'bg-indigo-50 border-indigo-200'
+                                : 'bg-gray-50 border-gray-100'
                                 }`}
                         >
                             <div className="flex items-center gap-4">

@@ -6,7 +6,7 @@ import { CartItem } from '../components/unified-booking';
 import TripSelector from '../components/TripSelector';
 import unifiedBookingPaymentService from '../services/unifiedBookingPaymentService';
 import { setBookingContext } from '../utils/paymentStorage';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import analytics from '../services/analytics';
 
 /**

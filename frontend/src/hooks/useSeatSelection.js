@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const useSeatSelection = (initialSeats = [], maxSeats = 6) => {
     const [selectedSeats, setSelectedSeats] = useState([]);
@@ -19,7 +19,7 @@ const useSeatSelection = (initialSeats = [], maxSeats = 6) => {
             } else {
                 // Select
                 if (prev.length >= maxSeats) {
-                    toast.warning(`You can only select up to ${maxSeats} seats.`);
+                    toast(`You can only select up to ${maxSeats} seats.`, { icon: '⚠️' });
                     return prev;
                 }
                 return [...prev, seat];

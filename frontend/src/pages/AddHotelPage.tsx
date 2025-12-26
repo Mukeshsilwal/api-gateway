@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import NavigationBar from '../components/Navbar';
 import Footer from '../components/Footer';
 import hotelService from '../services/hotel.service';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { Hotel, Save, MapPin } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';

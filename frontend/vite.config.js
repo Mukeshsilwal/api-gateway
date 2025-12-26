@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import svgr from 'vite-plugin-svgr';
 import { VitePWA } from 'vite-plugin-pwa';
+import viteCompression from 'vite-plugin-compression';
 import path from 'path';
 
 // Custom plugin to fix malformed eSewa URLs (double question marks)
@@ -26,6 +27,7 @@ export default defineConfig({
         react(),
         svgr(),
         malformedUrlFix(),
+        viteCompression(),
         VitePWA({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],

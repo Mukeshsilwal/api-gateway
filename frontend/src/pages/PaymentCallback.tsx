@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import paymentService from '../services/payment.service';
 import NavigationBar from '../components/Navbar';
 import Footer from '../components/Footer';

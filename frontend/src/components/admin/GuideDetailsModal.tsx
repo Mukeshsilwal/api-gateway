@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, Star, CheckCircle, XCircle, Clock, User, Award, Globe, MapPin, Calendar, Shield } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import { Guide } from '../../services/guideService';
 import guideService from '../../services/guideService';
 

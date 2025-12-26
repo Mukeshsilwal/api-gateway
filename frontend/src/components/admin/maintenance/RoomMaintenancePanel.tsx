@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { Save, Loader2, UserPlus, AlertCircle, Wrench } from 'lucide-react';
 import MaintenanceStatusSelector from './MaintenanceStatusSelector';
 import AmenitiesChecklist from './AmenitiesChecklist';
@@ -94,7 +94,7 @@ const RoomMaintenancePanel: React.FC<RoomMaintenancePanelProps> = ({
     };
 
     const handleStaffAssigned = (staffData: any) => {
-        toast.info(`Staff assigned: ${staffData.name || 'Unknown'}`, {
+        toast(`Staff assigned: ${staffData.name || 'Unknown'}`, {
             icon: '👤'
         });
 

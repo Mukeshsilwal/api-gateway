@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createTrip, updateTrip, type CreateTripRequest, type Trip } from '../services/tripService';
 import { Calendar, DollarSign, FileText, MapPin, Users, CheckCircle, Bus, Hotel, Ticket, X } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import GuideSelection from '../components/trips/GuideSelection';
 import TimelineBuilder, { Checkpoint } from '../components/trips/TimelineBuilder';
 import { Guide } from '../services/guideService';

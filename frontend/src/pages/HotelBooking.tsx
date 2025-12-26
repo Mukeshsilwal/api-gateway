@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import NavigationBar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { ShieldCheck, CreditCard, User, Calendar, MapPin, Info, Mail, Phone } from 'lucide-react';

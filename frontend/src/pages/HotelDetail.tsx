@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import hotelsApi from "../api/hotelsApi";
 import NavigationBar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -212,7 +212,7 @@ const HotelDetail: React.FC = () => {
 
     const handleBookRoom = (room: Room) => {
         if (!bookingParams.checkIn || !bookingParams.checkOut) {
-            toast.warn("Please select check-in and check-out dates first.");
+            toast("Please select check-in and check-out dates first.", { icon: '⚠️' });
             return;
         }
 
@@ -376,7 +376,7 @@ const HotelDetail: React.FC = () => {
                                             // Better UX: if dates selected, strict check. If not, show all as "Select Dates"
                                             onBook={(roomWithSelection) => {
                                                 if (!bookingParams.checkIn || !bookingParams.checkOut) {
-                                                    toast.warn("Please select check-in and check-out dates first.");
+                                                    toast("Please select check-in and check-out dates first.", { icon: '⚠️' });
                                                     return;
                                                 }
                                                 setBookingModalData({

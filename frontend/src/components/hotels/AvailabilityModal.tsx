@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import hotelsApi from '../../api/hotelsApi';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import { useNavigate } from 'react-router-dom';
 
 export function AvailabilityModal({ isOpen, onClose, hotel }) {
@@ -21,6 +21,7 @@ export function AvailabilityModal({ isOpen, onClose, hotel }) {
 
         try {
             const response = await hotelsApi.checkAvailability(hotel.hotelId, {
+                hotelId: hotel.hotelId,
                 checkInDate: checkIn,
                 checkOutDate: checkOut,
                 numberOfRooms: rooms,

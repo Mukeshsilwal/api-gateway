@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { CheckCircle, Download, Home, Receipt } from 'lucide-react';
@@ -64,7 +64,7 @@ const EsewaSuccess = () => {
     }, [searchParams]);
 
     const handleDownloadTicket = () => {
-        toast.info('Ticket download feature coming soon!');
+        toast('Ticket download feature coming soon!', { icon: 'ℹ️' });
     };
 
     const handleViewBooking = () => {

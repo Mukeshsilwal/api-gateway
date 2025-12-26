@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import imageService from '../../services/image.service';
 import { AvailableRoomDto } from '../../types/dto';
 import ImageUpload from '../common/ImageUpload';

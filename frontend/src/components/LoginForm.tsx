@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import API_CONFIG from "../config/api";
 import apiService from "../services/api.service";
@@ -122,7 +122,7 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
 
             if (suggestion && (errorInfo as any).type !== ErrorType.VALIDATION) {
                 toast.error(errorMessage);
-                toast.info(suggestion, { autoClose: 5000 });
+                toast(suggestion, { duration: 5000, icon: 'ℹ️' });
             } else {
                 toast.error(errorMessage);
             }

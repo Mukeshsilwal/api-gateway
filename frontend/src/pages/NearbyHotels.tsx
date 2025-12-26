@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MapPin, SlidersHorizontal, Loader, AlertCircle } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import NavigationBar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { HotelCard } from '../components/hotels/HotelCard';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2, Check } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import guideService, { CreateGuideRequest } from '../../services/guideService';
 import ImageUpload from '../common/ImageUpload';
 

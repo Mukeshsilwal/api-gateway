@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import { X, UserPlus, Users, Loader2 } from 'lucide-react';
 import staffService from '../../services/staff.service';
 import { HotelDto } from '../../types/dto';

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import authService from '../services/authService';
 import analytics from '../services/analytics';
 import { Loader2 } from 'lucide-react';

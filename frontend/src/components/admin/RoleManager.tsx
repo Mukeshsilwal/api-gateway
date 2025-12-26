@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Check, X, Plus } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 interface RoleDefinition {
     id: string;

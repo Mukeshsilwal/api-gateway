@@ -82,7 +82,7 @@ public class UniversalPassController {
             return true;
         }
         if ("EVENT_GATE".equals(context)
-                && ("CINEMA".equals(booking.getCategory()) || "EVENT".equals(booking.getCategory()))) {
+                && "EVENT".equals(booking.getCategory())) {
             // Mapping Cinema/Event to Event Gate
             return true;
         }

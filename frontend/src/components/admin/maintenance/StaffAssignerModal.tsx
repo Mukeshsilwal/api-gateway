@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, UserPlus, Loader2, CheckCircle } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import roomMaintenanceService from '../../../services/roomMaintenance.service';
 
 interface StaffAssignerModalProps {

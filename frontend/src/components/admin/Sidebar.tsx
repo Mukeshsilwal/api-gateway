@@ -6,7 +6,7 @@ import {
     Bus,
     Map,
     Hotel,
-    Film,
+
     Ticket,
     FileText,
     Activity,
@@ -67,7 +67,7 @@ export function Sidebar({ activeTab, setActiveTab, onLogout, isCollapsed, onTogg
                 { id: 'events', label: 'Event Manager', icon: Calendar },
                 { id: 'guides', label: 'Guide Manager', icon: UserCheck },
                 { id: 'hotels', label: 'Hotel Manager', icon: Hotel },
-                { id: 'cinemas', label: 'Cinema Manager', icon: Film },
+
                 { id: 'tickets', label: 'Ticket Manager', icon: Ticket },
                 { id: 'scheduler', label: 'Trip Scheduler', icon: Calendar },
                 { id: 'war-room', label: 'Safety War Room', icon: Shield }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, MoreVertical, Loader2, Star, UserCheck, Eye, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import guideService, { Guide } from '../../services/guideService';
 import { AddGuideModal } from './AddGuideModal';
 import { GuideDetailsModal } from './GuideDetailsModal';

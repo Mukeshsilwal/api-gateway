@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { redirectToPaymentGateway } from '../utils/paymentUtils';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 /**
  * Custom hook to handle payment redirection with loading state

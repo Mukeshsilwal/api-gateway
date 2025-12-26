@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, Search, Filter } from 'lucide-react';
 import EventCard from './EventCard';
 import eventService from '../../services/eventService';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 /**
  * FeaturedEventsSection Component
@@ -23,7 +23,7 @@ export function FeaturedEventsSection() {
         try {
             setLoading(true);
 
-            const searchParams = {
+            const searchParams: any = {
                 status: 'PUBLISHED',
                 limit: 6, // Show only 6 events on homepage
                 sort: 'startDateTime',

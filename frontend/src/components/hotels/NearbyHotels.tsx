@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import hotelsApi from '../../api/hotelsApi';
 import { HotelCard } from './HotelCard';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 export function NearbyHotels() {
     const [hotels, setHotels] = useState([]);

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bus, Hotel, Plane, Search, Loader, ArrowRightLeft, ShieldCheck } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import hotelsApi from '../api/hotelsApi';
 import analytics from '../services/analytics';
 import Button from './ui/Button';

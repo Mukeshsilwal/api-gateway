@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import hotelService from "../services/hotel.service";
 import NavigationBar from "../components/Navbar";
 import Footer from "../components/Footer";

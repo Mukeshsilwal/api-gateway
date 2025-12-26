@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import ApiService from '../../services/api.service';
 import API_CONFIG from '../../config/api';
 import authService from '../../services/authService';

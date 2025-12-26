@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, RefreshCw } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { DataTable } from './DataTable';
 import SlideOver from './SlideOver';
 import ConfirmationModal from './ConfirmationModal';
@@ -283,7 +283,7 @@ const UserManager: React.FC = () => {
 
     const handleBulkDelete = (ids: (string | number)[]) => {
         // Implement bulk delete API call here
-        toast.info(`Bulk delete not yet implemented for ${ids.length} users`);
+        toast(`Bulk delete not yet implemented for ${ids.length} users`, { icon: 'ℹ️' });
     };
 
     return (

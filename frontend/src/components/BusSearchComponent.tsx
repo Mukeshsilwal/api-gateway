@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ArrowRightLeft, Search, Loader, MapPin, Calendar, Flame } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import { useBusSearch } from '../hooks/useBusSearch';
 import Button from './ui/Button';
 

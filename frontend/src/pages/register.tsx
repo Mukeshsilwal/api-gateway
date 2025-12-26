@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import { useFormik } from "formik";
 import { adminRegistrationValidation } from "../validations/auth.validations";
 import { authService } from "../services/authService";

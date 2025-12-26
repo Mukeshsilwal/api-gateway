@@ -4,7 +4,7 @@ import NavigationBar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ApiService from "../services/api.service";
 import API_CONFIG from "../config/api";
-import { toast } from "react-toastify";
+import toast from 'react-hot-toast';
 import paymentService from "../services/payment.service";
 
 interface Flight {

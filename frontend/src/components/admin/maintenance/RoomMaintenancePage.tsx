@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 import { Wrench, Search, Filter, RefreshCw } from 'lucide-react';
 import { DataTable } from '../DataTable';
 import RoomMaintenancePanel from './RoomMaintenancePanel';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import roomMaintenanceService from '../../services/roomMaintenance.service';
 import staffService from '../../services/staff.service';
 import { AvailableRoomDto, HotelDto } from '../../types/dto';
@@ -171,7 +171,7 @@ export const RoomStatusManager: React.FC<RoomStatusManagerProps> = ({ isOpen, on
         // Check if we are turning off a critical amenity
         const isTurningOff = roomData.amenitiesStatus[key];
         if (isTurningOff && CRITICAL_AMENITIES.includes(key)) {
-            toast.warning(`Critical amenity ${key} failed! Room marked as Under Maintenance.`);
+            toast(`Critical amenity ${key} failed! Room marked as Under Maintenance.`, { icon: '⚠️' });
         }
 
         setRoomData(prev => {

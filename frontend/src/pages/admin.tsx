@@ -9,7 +9,7 @@ import { RouteManager } from "../components/admin/RouteManager";
 import { TicketManager } from "../components/admin/TicketManager";
 import { AdminRequestManager } from "../components/admin/AdminRequestManager";
 import { HotelManager } from "../components/admin/HotelManager";
-import { CinemaManager } from "../components/admin/CinemaManager";
+
 import { Settings } from "../components/admin/Settings";
 import TripScheduler from "../components/admin/TripScheduler";
 import TicketingDashboard from "../components/admin/ticketing/TicketingDashboard";
@@ -28,7 +28,7 @@ type AdminTab =
     | 'tickets'
     | 'requests'
     | 'hotels'
-    | 'cinemas'
+
     | 'events'
     | 'guides'
     | 'users'
@@ -85,8 +85,7 @@ export function AdminPanel() {
                 return <AdminRequestManager />;
             case 'hotels':
                 return <HotelManager />;
-            case 'cinemas':
-                return <CinemaManager />;
+
             case 'events':
                 return <EventManager />;
             case 'guides':

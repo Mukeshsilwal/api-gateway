@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import bookingService from '../../services/bookingService';
 import paymentService from '../../services/paymentService'; // Import payment service
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import { X, Loader } from 'lucide-react';
 
 interface BookingModalProps {
@@ -108,10 +108,10 @@ const BookingModal: React.FC<BookingModalProps> = ({ room, context, onClose }) =
         } catch (err: any) {
             console.error("Booking error", err);
             if (err.response && err.response.status === 403) {
-                toast.warn("Please log in to complete your booking.");
+                toast("Please log in to complete your booking.", { icon: '⚠️' });
                 navigate('/login', { state: { from: location } });
             } else if (err.status === 403) { // Fallback if err.response is not set but status is
-                toast.warn("Please log in to complete your booking.");
+                toast("Please log in to complete your booking.", { icon: '⚠️' });
                 navigate('/login', { state: { from: location } });
             } else {
                 toast.error(err.message || "Booking Failed");

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Calendar, MapPin, User, Mail, Phone, ArrowLeft, CheckCircle } from 'lucide-react';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import eventService from '../services/eventService';
@@ -51,7 +51,7 @@ export function EventBooking() {
 
         if (!token) {
             // User not authenticated, redirect to login
-            toast.info('Please login to continue booking');
+            toast('Please login to continue booking', { icon: 'ℹ️' });
 
             // Save current booking details to session storage to restore after login
             if (event && selectedTickets) {
@@ -277,7 +277,7 @@ export function EventBooking() {
             } else {
                 // Navigate to confirmation (for free events or if payment failed)
                 console.warn('⚠️ No payment method found in response, navigating to confirmation');
-                toast.warning('Payment method not available. Please contact support.');
+                toast('Payment method not available. Please contact support.', { icon: '⚠️' });
                 navigate(`/events/booking/${bookingReference}/confirmation`);
             }
         } catch (error: any) {

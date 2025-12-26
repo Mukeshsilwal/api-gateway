@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import NavigationBar from "../components/Navbar";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import API_CONFIG from "../config/api";
 import ApiService from "../services/api.service";
 

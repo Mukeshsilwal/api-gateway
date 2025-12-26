@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { toast } from "react-toastify";
+import toast from "react-hot-toast";
 import SelectedBusContext from "../context/selectedbus";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
@@ -102,7 +102,7 @@ export default function TicketDetails() {
         // Force Login Check
         const token = localStorage.getItem("token");
         if (!token) {
-            toast.info("Please login to proceed with payment.");
+            toast("Please login to proceed with payment.", { icon: 'ℹ️' });
             navigate("/login", { state: { from: location } });
             return;
         }

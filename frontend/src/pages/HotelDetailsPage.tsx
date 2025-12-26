@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import hotelsApi from '../api/hotelsApi';
 import { AvailabilityModal } from '../components/hotels/AvailabilityModal';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 interface Hotel {
     hotelName: string;

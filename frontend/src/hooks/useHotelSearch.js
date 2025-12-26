@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import hotelsApi from '../api/hotelsApi';
-import { toast } from 'react-toastify';
+import toast from "react-hot-toast";
 
 export const useHotelSearch = () => {
     const location = useLocation();
