@@ -197,7 +197,8 @@ export function EventBooking() {
                 tickets: tickets,
                 attendees: attendees,
                 contactEmail: contactInfo.email,
-                contactPhone: contactInfo.phone
+                contactPhone: contactInfo.phone,
+                tripId: JSON.parse(sessionStorage.getItem('bookingContext') || '{}').tripId || undefined
             };
 
             console.log('📤 Creating event booking with data:', bookingData);

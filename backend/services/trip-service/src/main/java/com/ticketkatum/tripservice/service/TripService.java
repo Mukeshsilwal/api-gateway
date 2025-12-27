@@ -4,9 +4,14 @@ import com.ticketkatum.tripservice.dto.TripDTO;
 import com.ticketkatum.tripservice.dto.request.CreateTripRequest;
 import com.ticketkatum.tripservice.dto.request.UpdateTripRequest;
 import com.ticketkatum.tripservice.entity.Trip;
+import com.ticketkatum.tripservice.entity.Journey;
 import com.ticketkatum.tripservice.entity.TripBooking;
 import com.ticketkatum.tripservice.entity.TripCheckpoint;
+import com.ticketkatum.tripservice.repository.JourneyRepository;
+import com.ticketkatum.tripservice.repository.TripCheckpointRepository;
 import com.ticketkatum.tripservice.repository.TripRepository;
+import com.ticketkatum.tripservice.dto.JourneyDTO;
+import com.ticketkatum.tripservice.dto.TripCheckpointDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,6 +32,9 @@ import java.util.stream.Collectors;
 public class TripService {
 
     private final TripRepository tripRepository;
+    private final JourneyRepository journeyRepository;
+    private final TripCheckpointRepository tripCheckpointRepository;
+    private final ItineraryService itineraryService;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private static final String TRIP_EVENTS_TOPIC = "trip-events";
 
@@ -344,6 +352,83 @@ public class TripService {
                     return bookingMap;
                 })
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public JourneyDTO initializeJourney(Long tripId, Long userId) {
+        log.info("Initializing journey for trip: {}", tripId);
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found with ID: " + tripId));
+
+        // Check if journey already exists
+        if (!trip.getJourneys().isEmpty()) {
+            return JourneyDTO.fromEntity(trip.getJourneys().get(0));
+        }
+
+        Journey journey = Journey.builder()
+                .trip(trip)
+                .userId(userId)
+                .status(Journey.JourneyStatus.PLANNED)
+                .bookingReference(new java.util.HashMap<>()) // Empty map
+                .totalEstimatedCost(BigDecimal.ZERO)
+                .build();
+
+        // Add type for frontend compatibility
+        journey.getBookingReference().put("type", "GENERAL");
+
+        journey = journeyRepository.save(journey);
+
+        return JourneyDTO.fromEntity(journey);
+    }
+
+    @Transactional
+    public void initializeItinerary(Long tripId) {
+        log.info("Initializing itinerary for trip: {}", tripId);
+        Trip trip = tripRepository.findById(tripId)
+                .orElseThrow(() -> new RuntimeException("Trip not found with ID: " + tripId));
+
+        if (trip.getStartDate() == null || trip.getEndDate() == null) {
+            throw new RuntimeException("Cannot initialize itinerary: Trip dates are missing");
+        }
+
+        trip.getStartDate().datesUntil(trip.getEndDate().plusDays(1))
+                .forEach(date -> itineraryService.ensureDayForDate(tripId, date));
+    }
+
+    @Transactional
+    public TripCheckpointDTO addCheckpoint(Long journeyId, TripCheckpointDTO checkpointDTO) {
+        log.info("Adding checkpoint to journey: {}", journeyId);
+        Journey journey = journeyRepository.findById(journeyId)
+                .orElseThrow(() -> new RuntimeException("Journey not found with ID: " + journeyId));
+
+        TripCheckpoint checkpoint = TripCheckpoint.builder()
+                .trip(journey.getTrip())
+                .journey(journey)
+                .locationName(checkpointDTO.getLocationName())
+                .scheduledTime(checkpointDTO.getScheduledTime())
+                .checkpointType(TripCheckpoint.CheckpointType.valueOf(checkpointDTO.getCheckpointType()))
+                .status(TripCheckpoint.CheckpointStatus.PENDING)
+                .notes(checkpointDTO.getNotes())
+                .build();
+
+        checkpoint = tripCheckpointRepository.save(checkpoint);
+
+        return TripCheckpointDTO.fromEntity(checkpoint);
+    }
+
+    @Transactional
+    public void deleteCheckpoint(Long journeyId, Long checkpointId) {
+        log.info("Deleting checkpoint: {} from journey: {}", checkpointId, journeyId);
+        TripCheckpoint checkpoint = tripCheckpointRepository.findById(checkpointId)
+                .orElseThrow(() -> new RuntimeException("Checkpoint not found with ID: " + checkpointId));
+
+        // precise validation could be added here to ensure checkpoint belongs to
+        // journey
+        if (checkpoint.getJourney() != null && !checkpoint.getJourney().getJourneyId().equals(journeyId)) {
+            throw new RuntimeException("Checkpoint does not belong to the specified journey");
+        }
+
+        tripCheckpointRepository.delete(checkpoint);
     }
 
     // Inner class for Kafka events

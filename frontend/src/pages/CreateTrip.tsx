@@ -1,20 +1,31 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { createTrip, updateTrip, type CreateTripRequest, type Trip } from '../services/tripService';
+import { createTrip, updateTrip, generateJourney, addCheckpoint, deleteCheckpoint, type CreateTripRequest, type Trip, type JourneyDTO, type CheckpointDTO } from '../services/tripService';
 import { Calendar, DollarSign, FileText, MapPin, Users, CheckCircle, Bus, Hotel, Ticket, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import GuideSelection from '../components/trips/GuideSelection';
 import TimelineBuilder, { Checkpoint } from '../components/trips/TimelineBuilder';
 import { Guide } from '../services/guideService';
+import Button from '../components/ui/Button';
 
 const CreateTripPage: React.FC = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [step, setStep] = useState<1 | 2>(1); // 1: Details, 2: Add-ons
     const [createdTrip, setCreatedTrip] = useState<Trip | null>(null);
+    const [currentJourney, setCurrentJourney] = useState<JourneyDTO | null>(null);
     const [activeTab, setActiveTab] = useState<'bookings' | 'itinerary' | 'guide'>('bookings');
     const [selectedGuide, setSelectedGuide] = useState<Guide | null>(null);
     const [checkpoints, setCheckpoints] = useState<Checkpoint[]>([]);
+
+    // Checkpoint Modal State
+    const [showCheckpointModal, setShowCheckpointModal] = useState(false);
+    const [newCheckpoint, setNewCheckpoint] = useState<Partial<CheckpointDTO>>({
+        locationName: '',
+        scheduledTime: '',
+        checkpointType: 'TRANSIT',
+        notes: ''
+    });
 
     const [formData, setFormData] = useState<CreateTripRequest>({
         tripName: '',
@@ -27,16 +38,105 @@ const CreateTripPage: React.FC = () => {
     });
 
     // Step 1: Submit Details & Create Trip
+    // Step 1: Submit Details & Create Trip
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             setLoading(true);
+
+            // 1. Create Trip
             const trip = await createTrip(formData);
             setCreatedTrip(trip);
+
+            // 2. Generate Journey automatically
+            try {
+                // Assuming we have the user info stored or available. 
+                // For now, using trip.userId if valid, or falling back to a stored ID.
+                const userId = trip.userId || JSON.parse(localStorage.getItem('user') || '{}').id;
+
+                if (userId) {
+                    const journey = await generateJourney(trip.tripId, userId);
+                    setCurrentJourney(journey);
+                    toast.success('Journey initialized!');
+                }
+            } catch (jErr) {
+                console.error("Failed to generate journey", jErr);
+                toast.error("Trip created, but failed to initialize journey.");
+            }
+
             setStep(2); // Move to "Integrated Booking" step
             toast.success('Trip created successfully! Now let\'s add some bookings.');
         } catch (err: any) {
             alert('Failed to create trip: ' + (err.message || 'Unknown error'));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Helper: Add Checkpoint
+    const handleAddCheckpoint = async () => {
+        if (!currentJourney) {
+            toast.error("Journey not initialized. Please refresh or try again.");
+            return;
+        }
+        if (!newCheckpoint.locationName || !newCheckpoint.scheduledTime) {
+            toast.error("Please fill in location and time");
+            return;
+        }
+
+        try {
+            const addedCp = await addCheckpoint(currentJourney.journeyId, {
+                ...newCheckpoint,
+                journeyId: currentJourney.journeyId
+            } as CheckpointDTO);
+
+            // Update local state (Optimistic or from response)
+            const uiCheckpoint: Checkpoint = {
+                checkpointId: addedCp.checkpointId,
+                locationName: addedCp.locationName,
+                scheduledTime: addedCp.scheduledTime,
+                checkpointType: addedCp.checkpointType,
+                notes: addedCp.notes
+            };
+
+            setCheckpoints(prev => [...prev, uiCheckpoint].sort((a, b) =>
+                new Date(a.scheduledTime).getTime() - new Date(b.scheduledTime).getTime()
+            ));
+
+            setShowCheckpointModal(false);
+            setNewCheckpoint({ locationName: '', scheduledTime: '', checkpointType: 'TRANSIT', notes: '' });
+            toast.success("Checkpoint added!");
+        } catch (error) {
+            console.error("Failed to add checkpoint", error);
+            toast.error("Failed to add stop");
+        }
+    };
+
+    // Helper: Remove Checkpoint
+    const handleRemoveCheckpoint = async (index: number) => {
+        const cpToRemove = checkpoints[index];
+        if (!currentJourney || !cpToRemove.checkpointId) return;
+
+        try {
+            await deleteCheckpoint(currentJourney.journeyId, cpToRemove.checkpointId);
+            setCheckpoints(prev => prev.filter((_, i) => i !== index));
+            toast.success("Stop removed");
+        } catch (error) {
+            toast.error("Failed to remove stop");
+        }
+    };
+
+    const handleRetryJourney = async () => {
+        if (!createdTrip) return;
+        setLoading(true);
+        try {
+            const userId = createdTrip.userId || JSON.parse(localStorage.getItem('user') || '{}').id;
+            const journey = await generateJourney(createdTrip.tripId, userId);
+            setCurrentJourney(journey);
+            toast.success('Journey initialized!');
+        } catch (error) {
+            console.error("Retry failed", error);
+            toast.error("Failed to initialize journey. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -337,14 +437,97 @@ const CreateTripPage: React.FC = () => {
                             {/* ITINERARY TAB */}
                             {activeTab === 'itinerary' && (
                                 <div>
-                                    <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                        Plan your journey step-by-step. Add checkpoints to create a detailed timeline.
-                                    </p>
-                                    <TimelineBuilder
-                                        checkpoints={checkpoints} // Need to add state for this
-                                        onAddCheckpoint={() => alert('Add checkpoint modal would open here')}
-                                        onRemoveCheckpoint={(index) => alert('Remove checkpoint logic')}
-                                    />
+                                    {!currentJourney ? (
+                                        <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700">
+                                            <p className="text-red-500 mb-4">Journey not initialized properly.</p>
+                                            <Button
+                                                onClick={handleRetryJourney}
+                                                disabled={loading}
+                                                className="bg-orange-500 text-white"
+                                            >
+                                                {loading ? 'Initializing...' : 'Initialize Journey'}
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <p className="text-gray-600 dark:text-gray-400 mb-6">
+                                                Plan your journey step-by-step. Add checkpoints to create a detailed timeline.
+                                            </p>
+                                            <TimelineBuilder
+                                                checkpoints={checkpoints}
+                                                onAddCheckpoint={() => setShowCheckpointModal(true)}
+                                                onRemoveCheckpoint={handleRemoveCheckpoint}
+                                            />
+                                        </>
+                                    )}
+
+                                    {/* Add Checkpoint Modal */}
+                                    {showCheckpointModal && (
+                                        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                                            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Add Journey Stop</h3>
+                                                    <button onClick={() => setShowCheckpointModal(false)}><X className="text-gray-500" /></button>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Location Name *</label>
+                                                        <input
+                                                            type="text"
+                                                            className="w-full border rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                            value={newCheckpoint.locationName}
+                                                            onChange={e => setNewCheckpoint({ ...newCheckpoint, locationName: e.target.value })}
+                                                            placeholder="e.g. Hotel Check-in, Bus Station"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Scheduled Time *</label>
+                                                        <input
+                                                            type="datetime-local"
+                                                            className="w-full border rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                            value={newCheckpoint.scheduledTime}
+                                                            onChange={e => setNewCheckpoint({ ...newCheckpoint, scheduledTime: e.target.value })}
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Type *</label>
+                                                        <select
+                                                            className="w-full border rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                            value={newCheckpoint.checkpointType}
+                                                            onChange={e => setNewCheckpoint({ ...newCheckpoint, checkpointType: e.target.value as any })}
+                                                        >
+                                                            <option value="DEPARTURE">Departure</option>
+                                                            <option value="TRANSIT">Transit</option>
+                                                            <option value="ARRIVAL">Arrival</option>
+                                                            <option value="HOTEL_CHECKIN">Hotel Check-in</option>
+                                                            <option value="HOTEL_CHECKOUT">Hotel Check-out</option>
+                                                            <option value="ACTIVITY">Activity</option>
+                                                            <option value="RETURN">Return</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Notes</label>
+                                                        <textarea
+                                                            className="w-full border rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                                                            rows={3}
+                                                            value={newCheckpoint.notes}
+                                                            onChange={e => setNewCheckpoint({ ...newCheckpoint, notes: e.target.value })}
+                                                            placeholder="Any details to remember..."
+                                                        />
+                                                    </div>
+
+                                                    <div className="flex gap-3 mt-6">
+                                                        <Button variant="outline" onClick={() => setShowCheckpointModal(false)} className="flex-1">Cancel</Button>
+                                                        <Button onClick={handleAddCheckpoint} className="flex-1 bg-orange-500 hover:bg-orange-600 text-white">Add Stop</Button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

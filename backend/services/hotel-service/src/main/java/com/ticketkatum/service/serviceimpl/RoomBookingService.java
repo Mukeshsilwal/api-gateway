@@ -8,6 +8,7 @@ import com.ticketkatum.entity.RoomBooking;
 import com.ticketkatum.entity.RoomPricing;
 import com.ticketkatum.enums.BookingStatus;
 import com.ticketkatum.enums.MealType;
+import com.ticketkatum.entity.RoomMaintenance;
 import com.ticketkatum.model.*;
 import com.ticketkatum.repository.*;
 import jakarta.transaction.Transactional;
@@ -55,6 +56,7 @@ public class RoomBookingService {
 
         RoomPricing pricing = pricingRepository
                 .findApplicablePricing(
+                        request.getHotelId(),
                         request.getRoomId(),
                         request.getRentTypeId(),
                         request.getMealPlanId(),
@@ -161,6 +163,7 @@ public class RoomBookingService {
             for (MealPlan mealPlan : mealPlans) {
                 try {
                     PricingRequestDto pricingReq = PricingRequestDto.builder()
+                            .hotelId(room.getHotel().getId())
                             .roomId(room.getId())
                             .rentTypeId(rentType.getId())
                             .mealPlanId(mealPlan.getId())
@@ -180,14 +183,36 @@ public class RoomBookingService {
                 }
             }
         }
-        return AvailableRoomDto.builder()
-                .roomId(room.getId())
-                .roomNumber(room.getRoomNumber())
-                .roomType(room.getRoomType())
-                .capacity(room.getCapacity())
-                .amenities(room.getAmenities())
+
+        // Extract status from latest maintenance record
+        String roomStatus = "Available";
+        String cleaningStatus = "Pending";
+        String maintenanceStatus = "None";
+
+        if (room.getMaintenanceRecords() != null && !room.getMaintenanceRecords().isEmpty()) {
+            try {
+                RoomMaintenance latest = room.getMaintenanceRecords().stream()
+                        .filter(rm -> rm.getLastUpdated() != null)
+                        .sorted((a, b) -> b.getLastUpdated().compareTo(a.getLastUpdated()))
+                        .findFirst()
+                        .orElse(null);
+
+                if (latest != null) {
+                    roomStatus = latest.getRoomStatus() != null ? latest.getRoomStatus() : roomStatus;
+                    cleaningStatus = latest.getCleaningStatus() != null ? latest.getCleaningStatus() : cleaningStatus;
+                    maintenanceStatus = latest.getMaintenanceStatus() != null ? latest.getMaintenanceStatus()
+                            : maintenanceStatus;
+                }
+            } catch (Exception e) {
+                log.warn("Error fetching maintenance status for room {}: {}", room.getId(), e.getMessage());
+            }
+        }
+
+        return AvailableRoomDto.builder().roomId(room.getId()).roomNumber(room.getRoomNumber())
+                .roomType(room.getRoomType()).capacity(room.getCapacity()).amenities(room.getAmenities())
                 .pricingOptions(pricingOptions)
-                .build();
+                // Status Mapping
+                .roomStatus(roomStatus).cleaningStatus(cleaningStatus).maintenanceStatus(maintenanceStatus).build();
     }
 
     /**

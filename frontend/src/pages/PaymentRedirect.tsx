@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBookingContext } from '../utils/paymentStorage';
 import BookingStatus from '../components/BookingStatus';
+// @ts-ignore
 import { PAYMENT_STATES } from '../hooks/useEsewaPayment';
 import Logger from '../utils/logger';
 
@@ -32,22 +33,33 @@ export default function PaymentRedirect() {
                 htmlFormLength: context?.htmlForm?.length
             });
 
+            const logDebug = (msg: string) => {
+                console.log(msg);
+                const el = document.getElementById('debug-log');
+                if (el) {
+                    const p = document.createElement('div');
+                    p.innerText = `${new Date().toLocaleTimeString()} - ${msg}`;
+                    el.appendChild(p);
+                    el.scrollTop = el.scrollHeight;
+                }
+            };
+
             if (!context) {
                 Logger.error('No booking context found');
-                navigate('/');
+                logDebug('❌ No booking context found in sessionStorage');
+                // navigate('/'); // Don't redirect immediately so user can see error
                 return;
             }
 
             const { htmlForm, transactionId } = context;
 
             if (!htmlForm) {
-                console.error('❌ Missing htmlForm in context:', context);
+                logDebug('❌ Missing htmlForm in context');
                 Logger.error('Missing HTML form in context');
-                navigate('/');
                 return;
             }
 
-            console.log('✅ htmlForm found, extracting form element...');
+            logDebug('✅ htmlForm found, extracting...');
             Logger.info('Injecting eSewa payment form', { transactionId });
 
             // Decode HTML entities (in case backend sent escaped HTML like &lt;html&gt;)
@@ -59,7 +71,7 @@ export default function PaymentRedirect() {
 
             let processableHtml = htmlForm;
             if (htmlForm.trim().startsWith('&lt;') || htmlForm.includes('&lt;html')) {
-                console.log('⚠️ Detected encoded HTML, decoding...');
+                logDebug('⚠️ Detected encoded HTML, decoding...');
                 processableHtml = decodeHtml(htmlForm);
             }
 
@@ -69,41 +81,35 @@ export default function PaymentRedirect() {
             const form = doc.querySelector('form');
 
             if (!form) {
-                console.error('❌ No form element found in htmlForm!');
+                logDebug('❌ No form element found in parsed HTML');
                 console.log('htmlForm content:', htmlForm);
                 Logger.error('No form element in HTML');
-                navigate('/');
                 return;
             }
 
-            console.log('✅ Form element extracted');
-            console.log('Original Form action:', form.action);
-            console.log('Original Form method:', form.method);
+            logDebug(`✅ Form found. Action: ${form.action}`);
 
             // Force POST if using eSewa V2 API (rc-epay or epay/main/v2)
             if (form.action.includes('/v2/form') || form.action.includes('rc-epay')) {
-                console.log('⚠️ Detected eSewa V2/Test API, forcing method="POST"');
+                logDebug('⚠️ forcing method="POST" for V2 API');
                 form.method = 'POST';
             }
-
-            console.log('Final Form method:', form.method);
-            console.log('Form inputs:', form.querySelectorAll('input').length);
 
             // Clone the form and append to body
             const clonedForm = form.cloneNode(true) as HTMLFormElement;
             clonedForm.style.display = 'none';
             document.body.appendChild(clonedForm);
 
-            console.log('✅ Form appended to body');
-            console.log('📋 Forms in document:', document.forms.length);
+            logDebug('✅ Form appended to body. Submitting in 100ms...');
 
             // Submit the form immediately
             setTimeout(() => {
-                console.log('🚀 Submitting form to eSewa...');
+                logDebug('🚀 Submitting form...');
                 try {
                     clonedForm.submit();
-                    console.log('✅ Form submitted successfully');
+                    logDebug('✅ Submit called.');
                 } catch (error) {
+                    logDebug(`❌ Submit Error: ${error}`);
                     console.error('❌ Form submission error:', error);
                     // Show manual button
                     const btn = document.getElementById('manual-pay-btn');
@@ -132,6 +138,9 @@ export default function PaymentRedirect() {
             <BookingStatus
                 state={PAYMENT_STATES.REDIRECTING}
                 message="Redirecting you to eSewa payment gateway..."
+                retryCount={0}
+                pollingAttempt={0}
+                error={null}
             />
 
             {/* Fallback button in case auto-redirect fails */}
@@ -143,6 +152,12 @@ export default function PaymentRedirect() {
             >
                 Click here if you are not redirected automatically
             </button>
+
+            {/* Debug Info for User/Dev */}
+            <div className="mt-8 p-4 bg-gray-100 rounded text-xs font-mono text-left w-full max-w-lg overflow-auto max-h-40 border border-gray-300">
+                <p className="font-bold border-b border-gray-300 mb-2 pb-1">Debug Status:</p>
+                <div id="debug-log">Initializing...</div>
+            </div>
 
             <p className="mt-4 text-sm text-gray-500">
                 Please do not close this window or click the back button.

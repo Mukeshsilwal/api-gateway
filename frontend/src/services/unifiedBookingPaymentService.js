@@ -33,13 +33,16 @@ const unifiedBookingPaymentService = {
             };
 
             const paymentResponse = await apiService.post(
-                API_CONFIG.ENDPOINTS.PAYMENT_INITIATE,
+                `${API_CONFIG.ENDPOINTS.PAYMENT_INITIATE}/${paymentPayload.gateway.toLowerCase()}`,
                 paymentPayload
             );
 
             const paymentData = paymentResponse.data?.data || paymentResponse.data;
 
             // Return combined response similar to hotel booking
+            // Extract data from nested response structure
+            const innerPaymentData = paymentData.paymentResponse?.data || paymentData.data || paymentData;
+
             return {
                 data: {
                     bookingData: {
@@ -51,8 +54,8 @@ const unifiedBookingPaymentService = {
                     paymentData: {
                         transactionId: paymentData.transactionId,
                         data: {
-                            htmlForm: paymentData.htmlForm,
-                            transactionId: paymentData.transactionId
+                            htmlForm: innerPaymentData.htmlForm,
+                            transactionId: innerPaymentData.transactionId || paymentData.transactionId
                         }
                     }
                 }

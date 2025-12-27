@@ -45,7 +45,7 @@ public class PaymentBffController {
     @Operation(summary = "Initiate payment with validation",
             description = "Initiate payment after validating booking")
     public CompletableFuture<ResponseEntity<Response<PaymentInitiationResponse>>> initiatePayment(
-            @PathVariable String provider,
+            @PathVariable("provider") String provider,
             @Valid @RequestBody PaymentRequest paymentRequest) {
 
 
@@ -89,7 +89,7 @@ public class PaymentBffController {
     @Operation(summary = "Get transaction details",
             description = "Get complete transaction information")
     public CompletableFuture<ResponseEntity<Response<TransactionDetailsResponse>>> getTransactionDetails(
-            @PathVariable String transactionId) {
+            @PathVariable("transactionId") String transactionId) {
 
         log.info("BFF: Fetching transaction details: {}", transactionId);
 
@@ -128,7 +128,7 @@ public class PaymentBffController {
     @GetMapping("/status/{transactionId}")
     @Operation(summary = "Get transaction status")
     public CompletableFuture<ResponseEntity<Response<TransactionStatusResponse>>> getTransactionStatus(
-            @PathVariable String transactionId) {
+            @PathVariable("transactionId") String transactionId) {
 
         log.info("BFF: Getting transaction status: {}", transactionId);
 
@@ -148,7 +148,7 @@ public class PaymentBffController {
     @PostMapping("/cancel/{transactionId}")
     @Operation(summary = "Cancel transaction")
     public CompletableFuture<ResponseEntity<Response<CancelTransactionResponse>>> cancelTransaction(
-            @PathVariable String transactionId) {
+            @PathVariable("transactionId") String transactionId) {
 
         log.info("BFF: Cancelling transaction: {}", transactionId);
 

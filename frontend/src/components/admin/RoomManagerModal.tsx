@@ -188,16 +188,31 @@ export const RoomManagerModal: React.FC<RoomManagerModalProps> = ({ isOpen, onCl
                                     >
                                         {/* Room Header */}
                                         <div className={`bg-gradient-to-r ${ROOM_TYPE_COLORS[room.roomType || room.type] || 'from-gray-500 to-gray-600'} p-4`}>
-                                            <div className="flex items-start justify-between">
+                                            <div className="flex items-start justify-between gap-2">
                                                 <div>
                                                     <div className="text-white/80 text-xs font-semibold mb-1">Room {room.roomNumber}</div>
                                                     <div className="text-white text-lg font-bold">{room.roomType || room.type}</div>
                                                 </div>
-                                                <div className={`px-3 py-1 rounded-full text-xs font-semibold ${room.active !== false
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : 'bg-gray-100 text-gray-700'
-                                                    }`}>
-                                                    {room.active !== false ? 'Active' : 'Inactive'}
+                                                <div className="flex flex-col items-end gap-1">
+                                                    <div className={`px-3 py-1 rounded-full text-xs font-semibold ${room.active !== false
+                                                        ? 'bg-green-100 text-green-700'
+                                                        : 'bg-gray-100 text-gray-700'
+                                                        }`}>
+                                                        {room.active !== false ? 'Active' : 'Inactive'}
+                                                    </div>
+                                                    {/* Status Badges */}
+                                                    {(room.maintenanceStatus === 'In Progress' || room.maintenanceStatus === 'Reported' || room.status === 'Under Maintenance' || room.roomStatus === 'Under Maintenance') && (
+                                                        <div className="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 border border-red-200 flex items-center gap-1 shadow-sm">
+                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                                            Maintenance
+                                                        </div>
+                                                    )}
+                                                    {(room.cleaningStatus === 'Pending' || room.status === 'Needs Cleaning' || room.roomStatus === 'Needs Cleaning') && (
+                                                        <div className="px-2 py-0.5 rounded text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1 shadow-sm">
+                                                            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                                                            Needs Cleaning
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

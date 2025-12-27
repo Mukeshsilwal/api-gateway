@@ -136,6 +136,16 @@ export default function TicketDetails() {
             const seatIds = selectedSeats.map(s => s.id);
 
             // Unified Bus Booking Payload
+            const queryParams = new URLSearchParams(location.search);
+            const tripId = queryParams.get('tripId');
+
+            if (tripId) {
+                sessionStorage.setItem('bookingContext', JSON.stringify({
+                    tripId: tripId,
+                    isUnifiedBooking: false
+                }));
+            }
+
             const bookingPayload = {
                 type: 'bus',
                 busId: selectedBus.id || selectedBus._id,
@@ -160,7 +170,8 @@ export default function TicketDetails() {
                 paymentMethod: provider,
                 amount: totalPrice,
                 redirectUrl: `${window.location.origin}/payments/${provider}/success`,
-                failureUrl: `${window.location.origin}/payments/${provider}/failure`
+                failureUrl: `${window.location.origin}/payments/${provider}/failure`,
+                tripId: tripId ? Number(tripId) : undefined
             };
 
             // Call Unified Endpoint (Aggregator API)

@@ -56,7 +56,7 @@ const API_CONFIG = {
     MARKET_ORGANIZER_DASHBOARD: '/api/bff/market/dashboard/organizer/', // + {eventId}
 
     // === Payment BFF ===
-    PAYMENT_INITIATE: '/api/bff/v1/payments/initiate', // + /{provider}
+    PAYMENT_INITIATE: '/api/bff/v1/payments/initiate/', // + /{provider}
     PAYMENT_VERIFY: '/api/bff/v1/payments/verify',
     PAYMENT_TRANSACTION: '/api/bff/v1/payments/transaction/', // + {transactionId}
     PAYMENT_CANCEL: '/api/bff/v1/payments/cancel',

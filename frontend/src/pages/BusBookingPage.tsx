@@ -7,12 +7,16 @@ import PaymentProviderSelector from "../components/PaymentProviderSelector";
 import Loader from "../components/Loader";
 import ErrorBanner from "../components/ErrorBanner";
 
+import { useSearchParams } from "react-router-dom";
+
 const BusBookingPage: React.FC = () => {
     const { loading, error, execute } = useAsync<BusBookingResponse>();
+    const [searchParams] = useSearchParams();
+    const tripIdParam = searchParams.get("tripId") || "";
 
     // State for form fields
     const [formData, setFormData] = useState<Omit<BusBookingRequest, "paymentProvider">>({
-        tripId: "", // To be populated from selection
+        tripId: tripIdParam,
         seatIds: [],   // To be populated from selection
         passengerName: "",
         passengerEmail: "",

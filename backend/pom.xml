@@ -30,10 +30,8 @@
         <module>services/tracking-service</module>
         <module>services/alert-service</module>
         <module>services/analytics-service</module>
-        <module>services/journey-service</module>
         <module>services/sos-service</module>
         <module>services/guide-service</module>
-        <module>services/timeline-service</module>
     </modules>
 
     <properties>

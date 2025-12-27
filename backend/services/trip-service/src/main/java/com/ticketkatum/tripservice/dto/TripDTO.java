@@ -1,6 +1,9 @@
 package com.ticketkatum.tripservice.dto;
 
 import com.ticketkatum.tripservice.entity.Trip;
+import com.ticketkatum.tripservice.entity.Journey;
+import com.ticketkatum.tripservice.entity.TimelineEvent;
+import com.ticketkatum.tripservice.dto.JourneyDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,6 +37,9 @@ public class TripDTO implements Serializable {
     private List<TripCheckpointDTO> checkpoints;
     private List<TripBookingDTO> bookings;
     private List<TripParticipantDTO> participants;
+    private List<ItineraryDayDTO> itineraryDays;
+    private List<JourneyDTO> journeys;
+    private List<java.util.Map<String, Object>> timelineEvents;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -116,6 +122,34 @@ public class TripDTO implements Serializable {
         if (trip.getParticipants() != null) {
             dto.setParticipants(trip.getParticipants().stream()
                     .map(TripParticipantDTO::fromEntity)
+                    .toList());
+        }
+
+        // Add itinerary days
+        if (trip.getItineraryDays() != null) {
+            dto.setItineraryDays(trip.getItineraryDays().stream()
+                    .map(ItineraryDayDTO::fromEntity)
+                    .toList());
+        }
+
+        // Add journeys
+        if (trip.getJourneys() != null) {
+            dto.setJourneys(trip.getJourneys().stream()
+                    .map(JourneyDTO::fromEntity)
+                    .toList());
+        }
+
+        // Add timeline events
+        if (trip.getTimelineEvents() != null) {
+            dto.setTimelineEvents(trip.getTimelineEvents().stream()
+                    .map(event -> {
+                        java.util.Map<String, Object> map = new java.util.HashMap<>();
+                        map.put("eventId", event.getEventId());
+                        map.put("type", event.getEventType());
+                        map.put("description", event.getDescription());
+                        map.put("createdAt", event.getCreatedAt());
+                        return map;
+                    })
                     .toList());
         }
 

@@ -56,19 +56,21 @@ export const RoomStatusManager: React.FC<RoomStatusManagerProps> = ({ isOpen, on
                 // Use existing values or defaults
                 roomStatus: incomingRoom.status || incomingRoom.roomStatus || 'Available',
                 cleaningStatus: incomingRoom.cleaningStatus || 'Pending',
-                amenitiesStatus: incomingRoom.amenities || { // Convert array to object if needed, or use default object
-                    ac: true,
-                    tv: true,
-                    wifi: true,
-                    hot_water: true,
-                    furniture: true,
-                    lock: true,
-                    smoke_detector: true,
-                    fire_extinguisher: true,
-                    towels: true,
-                    toiletries: true,
-                    bedding: true
-                },
+                amenitiesStatus: Array.isArray(incomingRoom.amenities)
+                    ? incomingRoom.amenities.reduce((acc: any, amenity: string) => ({ ...acc, [amenity]: true }), {})
+                    : (incomingRoom.amenities || {
+                        ac: true,
+                        tv: true,
+                        wifi: true,
+                        hot_water: true,
+                        furniture: true,
+                        lock: true,
+                        smoke_detector: true,
+                        fire_extinguisher: true,
+                        towels: true,
+                        toiletries: true,
+                        bedding: true
+                    }),
                 maintenanceStatus: incomingRoom.maintenanceStatus || 'None',
                 assignedStaff: incomingRoom.assignedStaff || '',
                 // lastUpdated: new Date().toISOString() // removed lastUpdated from state to avoid re-renders or confusion, added to DTO on save

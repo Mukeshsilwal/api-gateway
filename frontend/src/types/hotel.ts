@@ -10,6 +10,7 @@ export interface HotelBookingRequest {
     guestEmail: string;
     guestPhone: string;
     paymentProvider: PaymentProvider;
+    tripId?: string | number;
 }
 
 export interface HotelBookingResponse {

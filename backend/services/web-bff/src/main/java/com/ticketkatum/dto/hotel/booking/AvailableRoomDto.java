@@ -19,4 +19,9 @@ public class AvailableRoomDto {
     private Integer capacity;
     private Set<String> amenities;
     private List<PricingOptionDto> pricingOptions;
+
+    // Status Fields
+    private String roomStatus;
+    private String cleaningStatus;
+    private String maintenanceStatus;
 }

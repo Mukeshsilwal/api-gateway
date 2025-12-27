@@ -39,6 +39,30 @@ export interface Trip {
     participants?: any[];
 }
 
+export interface JourneyDTO {
+    journeyId: number;
+    tripId: number;
+    userId: number;
+    status: string;
+    itineraryDayId?: number;
+    bookingReference?: any;
+    totalEstimatedCost?: number;
+    type?: string;
+}
+
+export interface CheckpointDTO {
+    checkpointId?: number;
+    journeyId?: number;
+    tripId?: number;
+    locationName: string;
+    scheduledTime: string;
+    checkpointType: 'DEPARTURE' | 'TRANSIT' | 'ARRIVAL' | 'HOTEL_CHECKIN' | 'HOTEL_CHECKOUT' | 'ACTIVITY' | 'RETURN';
+    status?: 'PENDING' | 'REACHED' | 'SKIPPED';
+    notes?: string;
+    latitude?: number;
+    longitude?: number;
+}
+
 export interface CreateTripRequest {
     tripName: string;
     tripType: 'LEISURE' | 'BUSINESS' | 'ADVENTURE' | 'CULTURAL' | 'PILGRIMAGE';
@@ -140,6 +164,36 @@ export const getTripBookings = async (tripId: number): Promise<any[]> => {
     return response.data;
 };
 
+// Get full itinerary (Trip + Days + Journeys)
+export const getTripFullItinerary = async (tripId: number): Promise<any> => {
+    const response = await tripApi.get(`/${tripId}/itinerary`);
+    return response.data;
+};
+
+// Initialize itinerary days
+export const initializeItinerary = async (tripId: number): Promise<void> => {
+    await tripApi.post(`/${tripId}/itinerary/initialize`);
+};
+
+// Generate journey for trip
+export const generateJourney = async (tripId: number, userId: number): Promise<any> => {
+    const response = await tripApi.post(`/${tripId}/journeys/generate`, null, {
+        params: { tripId, userId } // Redundant but harmless, some proxies might use params
+    });
+    return response.data;
+};
+
+// Add checkpoint to journey
+export const addCheckpoint = async (journeyId: number, checkpoint: any): Promise<any> => {
+    const response = await tripApi.post(`/journeys/${journeyId}/checkpoints`, checkpoint);
+    return response.data;
+};
+
+// Delete checkpoint from journey
+export const deleteCheckpoint = async (journeyId: number, checkpointId: number): Promise<void> => {
+    await tripApi.delete(`/journeys/${journeyId}/checkpoints/${checkpointId}`);
+};
+
 export default {
     getTripDashboard,
     getMyTrips,
@@ -150,4 +204,11 @@ export default {
     updateTrip,
     updateTripStatus,
     deleteTrip,
+    addBookingToTrip,
+    getTripBookings,
+    getTripFullItinerary,
+    initializeItinerary,
+    generateJourney,
+    addCheckpoint,
+    deleteCheckpoint
 };

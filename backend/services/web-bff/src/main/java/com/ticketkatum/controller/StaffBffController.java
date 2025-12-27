@@ -101,7 +101,7 @@ public class StaffBffController {
     @PutMapping("/{staffId}/status")
     public CompletableFuture<ResponseEntity<Response<StaffResponse>>> updateStaffStatus(
             @PathVariable("staffId") Long staffId,
-            @RequestParam String status) {
+            @RequestParam(name = "status") String status) {
 
         log.info("Updating staff {} status to: {}", staffId, status);
 

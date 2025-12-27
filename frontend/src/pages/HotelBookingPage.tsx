@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
 import { completeHotelBooking } from "../api/hotel";
 import { PaymentProvider } from "../types/common";
 import { HotelBookingRequest, HotelBookingResponse } from "../types/hotel";
@@ -27,13 +28,25 @@ const HotelBookingPage: React.FC = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const location = useLocation();
+    const { tripId } = (location.state as any) || {};
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Store trip context for post-payment redirection
+        if (tripId) {
+            sessionStorage.setItem('bookingContext', JSON.stringify({
+                tripId: tripId,
+                isUnifiedBooking: false
+            }));
+        }
 
         try {
             const requestData: HotelBookingRequest = {
                 ...formData,
                 paymentProvider,
+                tripId: tripId ? String(tripId) : undefined
             };
 
             const response = await execute(completeHotelBooking(requestData));

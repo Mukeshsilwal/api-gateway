@@ -1,5 +1,7 @@
 package com.ticketkatum.tripservice.entity;
 
+import com.ticketkatum.tripservice.entity.Journey;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +31,10 @@ public class TripCheckpoint {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trip_id", nullable = false)
     private Trip trip;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "journey_id")
+    private Journey journey;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "checkpoint_type", nullable = false)

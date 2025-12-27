@@ -106,6 +106,17 @@ public class TripManagementController {
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/{tripId}/itinerary")
+    @Operation(summary = "Get trip full itinerary", description = "Get trip details with bookings and journeys aggregated via BFF")
+    public Mono<ResponseEntity<Map>> getTripFullItinerary(@PathVariable("tripId") Long tripId,
+            HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Fetching trip full itinerary: {} for user: {}", tripId, userId);
+        return tripManagementService.getTripFullItinerary(tripId, userId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{tripId}")
     @Operation(summary = "Update trip", description = "Update trip details via BFF")
     public Mono<ResponseEntity<Map>> updateTrip(
@@ -149,5 +160,52 @@ public class TripManagementController {
         Long userId = extractUserIdFromRequest(request);
         log.info("BFF: Fetching bookings for trip: {} for user: {}", tripId, userId);
         return tripManagementService.getTripBookings(tripId, userId);
+    }
+
+    @PostMapping("/{tripId}/journeys/generate")
+    @Operation(summary = "Generate journey", description = "Generate/initialize journey via BFF")
+    public Mono<ResponseEntity<Map>> generateJourney(@PathVariable("tripId") Long tripId, HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request);
+        log.info("BFF: Generating journey for trip: {} for user: {}", tripId, userId);
+        return tripManagementService.generateJourney(tripId, userId)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @PostMapping("/{tripId}/itinerary/initialize")
+    @Operation(summary = "Initialize itinerary", description = "Initialize itinerary for a trip via BFF")
+    public Mono<ResponseEntity<Void>> initializeItinerary(@PathVariable("tripId") Long tripId,
+            HttpServletRequest request) {
+        Long userId = extractUserIdFromRequest(request); // Assuming userId might be needed for authorization/logging
+        log.info("BFF: Initializing itinerary for trip: {} for user: {}", tripId, userId);
+        return tripManagementService.initializeItinerary(tripId)
+                .then(Mono.just(ResponseEntity.ok().<Void>build()))
+                .defaultIfEmpty(ResponseEntity.badRequest().build()); // Or appropriate error response
+    }
+
+    @PostMapping("/journeys/{journeyId}/checkpoints")
+    @Operation(summary = "Add checkpoint", description = "Add checkpoint via BFF")
+    public Mono<ResponseEntity<Map>> addCheckpoint(
+            @PathVariable("journeyId") Long journeyId,
+            @RequestBody Map<String, Object> checkpointRequest,
+            HttpServletRequest request) {
+
+        log.info("BFF: Adding checkpoint to journey: {}", journeyId);
+        return tripManagementService.addCheckpoint(journeyId, checkpointRequest)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.badRequest().build());
+    }
+
+    @DeleteMapping("/journeys/{journeyId}/checkpoints/{checkpointId}")
+    @Operation(summary = "Delete checkpoint", description = "Delete checkpoint via BFF")
+    public Mono<ResponseEntity<Void>> deleteCheckpoint(
+            @PathVariable("journeyId") Long journeyId,
+            @PathVariable("checkpointId") Long checkpointId,
+            HttpServletRequest request) {
+
+        log.info("BFF: Deleting checkpoint: {} from journey: {}", checkpointId, journeyId);
+        return tripManagementService.deleteCheckpoint(journeyId, checkpointId)
+                .then(Mono.just(ResponseEntity.noContent().<Void>build()))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

@@ -53,6 +53,22 @@ public class TripManagementService {
     }
 
     /**
+     * Initialize itinerary for a trip
+     */
+    public Mono<Void> initializeItinerary(Long tripId) {
+        log.debug("Initializing itinerary for trip: {}", tripId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(tripServiceUrl + "/api/trips/{tripId}/itinerary/initialize", tripId)
+                .retrieve()
+                .toBodilessEntity()
+                .then() // Convert Mono<ResponseEntity<Void>> to Mono<Void>
+                .doOnSuccess(v -> log.debug("Itinerary initialized for trip: {}", tripId))
+                .doOnError(e -> log.error("Failed to initialize itinerary for trip: {}", tripId, e));
+    }
+
+    /**
      * Get trip details with checkpoints
      */
     public Mono<Map> getTripDetails(Long tripId, Long userId) {
@@ -145,5 +161,61 @@ public class TripManagementService {
                 .retrieve()
                 .bodyToFlux(Map.class)
                 .doOnError(e -> log.error("Failed to fetch trip bookings: {}", tripId, e));
+    }
+
+    /**
+     * Get trip with full itinerary (days + journeys)
+     */
+    public Mono<Map> getTripFullItinerary(Long tripId, Long userId) {
+        log.debug("Fetching trip full itinerary: {} for user: {}", tripId, userId);
+
+        // Since Trip Service now aggregates everything (Journeys, ItineraryDays),
+        // we just fetch the detailed trip which includes everything.
+        return getTripDetails(tripId, userId);
+    }
+
+    /**
+     * Generate journey for trip
+     */
+    public Mono<Map> generateJourney(Long tripId, Long userId) {
+        log.debug("Generating journey via BFF for trip: {}", tripId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(tripServiceUrl + "/api/trips/" + tripId + "/journeys/generate")
+                .header("X-User-Id", String.valueOf(userId))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .doOnError(e -> log.error("Failed to generate journey for trip: {}", tripId, e));
+    }
+
+    /**
+     * Add checkpoint to journey
+     */
+    public Mono<Map> addCheckpoint(Long journeyId, Map<String, Object> checkpointRequest) {
+        log.debug("Adding checkpoint via BFF to journey: {}", journeyId);
+
+        return webClientBuilder.build()
+                .post()
+                .uri(tripServiceUrl + "/api/trips/journeys/" + journeyId + "/checkpoints")
+                .bodyValue(checkpointRequest)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .doOnError(e -> log.error("Failed to add checkpoint to journey: {}", journeyId, e));
+    }
+
+    /**
+     * Delete checkpoint from journey
+     */
+    public Mono<Void> deleteCheckpoint(Long journeyId, Long checkpointId) {
+        log.debug("Deleting checkpoint via BFF: {} from journey: {}", checkpointId, journeyId);
+
+        return webClientBuilder.build()
+                .delete()
+                .uri(tripServiceUrl + "/api/trips/journeys/" + journeyId + "/checkpoints/" + checkpointId)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .doOnError(
+                        e -> log.error("Failed to delete checkpoint: {} from journey: {}", checkpointId, journeyId, e));
     }
 }

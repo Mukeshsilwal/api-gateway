@@ -12,7 +12,10 @@ class PaymentService {
      */
     async initiatePayment(paymentData) {
         try {
-            const response = await apiClient.post(API_ENDPOINTS.PAYMENTS.INITIATE, paymentData);
+            const url = paymentData.provider
+                ? `${API_ENDPOINTS.PAYMENTS.INITIATE}/${paymentData.provider}`
+                : API_ENDPOINTS.PAYMENTS.INITIATE;
+            const response = await apiClient.post(url, paymentData);
             return response.data;
         } catch (error) {
             console.error('Initiate payment error:', error);

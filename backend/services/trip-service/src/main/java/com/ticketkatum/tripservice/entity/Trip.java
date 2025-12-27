@@ -80,6 +80,12 @@ public class Trip {
     @Builder.Default
     private List<TripParticipant> participants = new ArrayList<>();
 
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
+    @OrderBy("day_number ASC")
+    @Builder.Default
+    private List<ItineraryDay> itineraryDays = new ArrayList<>();
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -139,5 +145,36 @@ public class Trip {
     public void removeParticipant(TripParticipant participant) {
         participants.remove(participant);
         participant.setTrip(null);
+    }
+
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
+    @Builder.Default
+    private List<Journey> journeys = new ArrayList<>();
+
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.Fetch(org.hibernate.annotations.FetchMode.SUBSELECT)
+    @OrderBy("createdAt DESC")
+    @Builder.Default
+    private List<TimelineEvent> timelineEvents = new ArrayList<>();
+
+    public void addJourney(Journey journey) {
+        journeys.add(journey);
+        journey.setTrip(this);
+    }
+
+    public void removeJourney(Journey journey) {
+        journeys.remove(journey);
+        journey.setTrip(null);
+    }
+
+    public void addTimelineEvent(TimelineEvent event) {
+        timelineEvents.add(event);
+        event.setTrip(this);
+    }
+
+    public void removeTimelineEvent(TimelineEvent event) {
+        timelineEvents.remove(event);
+        event.setTrip(null);
     }
 }

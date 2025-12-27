@@ -6,6 +6,7 @@ import apiService from '../services/api.service';
 import paymentService from '../services/paymentService';
 import API_CONFIG from '../config/api';
 import { setBookingContext, getBookingContext, clearBookingContext } from '../utils/paymentStorage';
+import { submitEsewaForm, submitHtmlForm } from '../utils/paymentUtils';
 import Logger from '../utils/logger';
 
 /**
@@ -55,25 +56,48 @@ export default function useEsewaPayment() {
 
             const completeResponse = response.data || response;
 
-            // The response structure is: { bookingData: {...}, paymentData: {...} }
-            const bookingInfo = completeResponse.bookingData;
-            const paymentInfo = completeResponse.paymentData;
+            // Flexible Extraction Logic to handle both Booking and Payment endpoints
+            let bookingInfo, paymentInfo;
+
+            if (completeResponse.bookingData && completeResponse.paymentData) {
+                // Case 1: CompleteBookingResponse (from /bookings/complete)
+                bookingInfo = completeResponse.bookingData;
+                paymentInfo = completeResponse.paymentData;
+            } else if (completeResponse.paymentResponse) {
+                // Case 2: PaymentInitiationResponse (from /payments/initiate)
+                bookingInfo = {
+                    bookingId: completeResponse.bookingId,
+                    totalAmount: completeResponse.paymentResponse.amount || 0
+                };
+                paymentInfo = completeResponse.paymentResponse;
+            } else {
+                // Case 3: Flat or unknown structure - try direct access
+                bookingInfo = {
+                    bookingId: completeResponse.bookingId || 'UNKNOWN',
+                    totalAmount: completeResponse.amount || 0
+                };
+                paymentInfo = completeResponse;
+            }
 
             if (!bookingInfo || !paymentInfo) {
                 console.error('Invalid response structure:', completeResponse);
-                throw new Error('Invalid response from booking service - missing bookingData or paymentData');
+                throw new Error('Invalid response from service - missing booking or payment info');
             }
 
-            const extractedBookingId = bookingInfo.bookingId;
-            const amount = bookingInfo.totalAmount || completeResponse.totalAmount;
+            const extractedBookingId = bookingInfo.bookingId || completeResponse.bookingId;
+            const amount = bookingInfo.totalAmount || completeResponse.totalAmount || paymentInfo.amount;
 
-            // Extract htmlForm from paymentData.data.htmlForm
-            const htmlForm = paymentInfo.data?.htmlForm;
-            const transactionId = paymentInfo.data?.transactionId || paymentInfo.transactionId;
+            // Robust htmlForm extraction
+            const innerData = paymentInfo.data || paymentInfo;
+            const htmlForm = innerData.htmlForm || paymentInfo.htmlForm;
+            const transactionId = innerData.transactionId || paymentInfo.transactionId || paymentInfo.providerTxnId;
 
             if (!extractedBookingId || !amount) {
-                console.error('Missing required fields:', { extractedBookingId, amount, bookingInfo });
-                throw new Error('Invalid response from booking service - missing bookingId or amount');
+                // Allow fallback if bookingId is missing but we have payment info (e.g. direct payment)
+                if (!transactionId) {
+                    console.error('Missing required fields:', { extractedBookingId, amount, bookingInfo });
+                    throw new Error('Invalid response - missing bookingId/amount/transactionId');
+                }
             }
 
             if (!htmlForm) {
@@ -104,12 +128,23 @@ export default function useEsewaPayment() {
 
             setBookingContext(contextToStore);
 
-            console.log('✅ Stored in sessionStorage, navigating to /payment/redirect');
-            Logger.info('Payment initiated, redirecting to eSewa...', { bookingId: extractedBookingId, transactionId });
+            setBookingContext(contextToStore);
 
-            // Navigate to redirect page
+            console.log('✅ Stored in sessionStorage');
+            Logger.info('Payment initiated, performing direct submit to eSewa...', { bookingId: extractedBookingId, transactionId });
+
+            // Direct Submission (Bypassing /payment/redirect page for reliability)
             setState(PAYMENT_STATES.REDIRECTING);
-            navigate('/payment/redirect');
+
+            // Give UI a moment to show "Redirecting" state
+            setTimeout(() => {
+                try {
+                    submitHtmlForm(htmlForm);
+                } catch (e) {
+                    console.error("Direct submit failed, falling back to redirect page", e);
+                    navigate('/payment/redirect');
+                }
+            }, 500);
 
         } catch (err) {
             console.error('❌ Payment initiation failed:', err);

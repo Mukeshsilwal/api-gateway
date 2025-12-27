@@ -18,6 +18,7 @@ public class TripCheckpointDTO implements Serializable {
 
     private Long checkpointId;
     private Long tripId;
+    private Long journeyId;
     private String checkpointType;
     private String locationName;
     private LocalDateTime scheduledTime;
@@ -42,6 +43,7 @@ public class TripCheckpointDTO implements Serializable {
         TripCheckpointDTO dto = TripCheckpointDTO.builder()
                 .checkpointId(checkpoint.getCheckpointId())
                 .tripId(checkpoint.getTrip() != null ? checkpoint.getTrip().getTripId() : null)
+                .journeyId(checkpoint.getJourney() != null ? checkpoint.getJourney().getJourneyId() : null)
                 .checkpointType(checkpoint.getCheckpointType().name())
                 .locationName(checkpoint.getLocationName())
                 .scheduledTime(checkpoint.getScheduledTime())

@@ -132,6 +132,11 @@ export interface AvailableRoomDto {
     images: string[];
     maxOccupancy: number;
     bedType?: string;
+    // Status Fields
+    status?: string; // e.g., 'Available', 'Occupied'
+    roomStatus?: string; // Alias for status
+    cleaningStatus?: string; // 'Pending', 'In Progress', 'Completed'
+    maintenanceStatus?: string; // 'None', 'Reported', 'In Progress'
 }
 
 export interface AvailabilityRequestDto {

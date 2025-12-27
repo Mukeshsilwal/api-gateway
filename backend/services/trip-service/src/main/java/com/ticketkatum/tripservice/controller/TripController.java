@@ -44,6 +44,14 @@ public class TripController {
         return ResponseEntity.status(HttpStatus.CREATED).body(trip);
     }
 
+    @PostMapping("/{tripId}/itinerary/initialize")
+    @Operation(summary = "Initialize trip itinerary", description = "Initializes the itinerary for a given trip")
+    public ResponseEntity<Void> initializeItinerary(@PathVariable Long tripId) {
+        log.info("Initializing itinerary for trip: {}", tripId);
+        tripService.initializeItinerary(tripId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/{tripId}")
     @Operation(summary = "Get trip by ID", description = "Retrieves trip details by trip ID")
     public ResponseEntity<TripDTO> getTripById(
@@ -169,6 +177,45 @@ public class TripController {
         log.info("Adding booking to trip: {}", tripId);
         tripService.addBookingToTrip(tripId, bookingRequest);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PostMapping("/{tripId}/journeys/generate")
+    @Operation(summary = "Generate journey", description = "Generates/initializes a journey for a trip")
+    public ResponseEntity<com.ticketkatum.tripservice.dto.JourneyDTO> generateJourney(
+            @PathVariable("tripId") Long tripId,
+            @RequestHeader(value = "X-User-Id", required = false) Long userId,
+            Authentication authentication) {
+
+        if (userId == null) {
+            userId = extractUserId(authentication);
+        }
+
+        log.info("Generating journey for trip: {}", tripId);
+        com.ticketkatum.tripservice.dto.JourneyDTO journey = tripService.initializeJourney(tripId, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(journey);
+    }
+
+    @PostMapping("/journeys/{journeyId}/checkpoints")
+    @Operation(summary = "Add checkpoint", description = "Adds a checkpoint to a journey")
+    public ResponseEntity<com.ticketkatum.tripservice.dto.TripCheckpointDTO> addCheckpoint(
+            @PathVariable("journeyId") Long journeyId,
+            @RequestBody com.ticketkatum.tripservice.dto.TripCheckpointDTO checkpointDTO) {
+
+        log.info("Adding checkpoint to journey: {}", journeyId);
+        com.ticketkatum.tripservice.dto.TripCheckpointDTO createdCheckpoint = tripService.addCheckpoint(journeyId,
+                checkpointDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdCheckpoint);
+    }
+
+    @DeleteMapping("/journeys/{journeyId}/checkpoints/{checkpointId}")
+    @Operation(summary = "Delete checkpoint", description = "Deletes a checkpoint from a journey")
+    public ResponseEntity<Void> deleteCheckpoint(
+            @PathVariable("journeyId") Long journeyId,
+            @PathVariable("checkpointId") Long checkpointId) {
+
+        log.info("Deleting checkpoint: {} from journey: {}", checkpointId, journeyId);
+        tripService.deleteCheckpoint(journeyId, checkpointId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{tripId}/bookings")

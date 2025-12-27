@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, MapPin, Users, Tag } from 'lucide-react';
 
 export interface EventCardData {
@@ -37,10 +37,14 @@ const EventCard: React.FC<EventCardProps> = ({ event, featured = false }) => {
     const displayTitle = event.title || event.name || 'Untitled Event';
     const displayImage = event.imageUrl || event.coverImage || '/api/placeholder/400/300';
 
+    const location = useLocation();
+
     // Ensure ID is valid for navigation
     const handleNavigation = (path: string) => {
         if (event.id) {
-            navigate(path);
+            const params = new URLSearchParams(location.search);
+            const tripId = params.get('tripId');
+            navigate(`${path}${tripId ? `?tripId=${tripId}` : ''}`);
         } else {
             console.error('Event ID is missing');
         }

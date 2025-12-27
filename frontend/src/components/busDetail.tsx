@@ -1,6 +1,6 @@
 import React, { useContext, useMemo, useCallback, useState } from "react";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import SelectedBusContext from "../context/selectedbus";
 import busIcon from "../assets/bus.svg";
 import { SeatIcon } from "./SeatIcon";
@@ -12,6 +12,7 @@ const BusDetail = ({ bus }) => {
   const navigate = useNavigate();
   const { setSelectedBus } = useContext(SelectedBusContext);
 
+  const location = useLocation();
   const handleClick = useCallback(() => {
     const stored = JSON.parse(localStorage.getItem("busListDetails")) || { busList: [] };
     const newData = {
@@ -26,8 +27,12 @@ const BusDetail = ({ bus }) => {
     }
 
     setSelectedBus(bus);
-    navigate("/ticket-details");
-  }, [bus, setSelectedBus, navigate]);
+
+    // Preserve tripId if present in current URL
+    const params = new URLSearchParams(location.search);
+    const tripId = params.get('tripId');
+    navigate(`/ticket-details${tripId ? `?tripId=${tripId}` : ''}`);
+  }, [bus, setSelectedBus, navigate, location.search]);
 
   const departure = bus?.departureDateTime ? new Date(bus.departureDateTime) : null;
   const departureDate = departure ? departure.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : "TBD";

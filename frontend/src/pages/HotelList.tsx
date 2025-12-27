@@ -102,12 +102,16 @@ const HotelList = () => {
 
     const handleHotelClick = (hotel: any) => {
         const hotelId = hotel.hotelId || hotel.hotelCode || hotel.id;
+        const params = new URLSearchParams(location.search);
+        const tripId = params.get('tripId');
+
         navigate(`/hotels/${hotelId}`, {
             state: {
                 hotel, // Pass the full hotel object to avoid redundant fetching
                 checkIn: defaultParams.checkInDate,
                 checkOut: defaultParams.checkOutDate,
-                guests: defaultParams.guests
+                guests: defaultParams.guests,
+                tripId: tripId // Pass tripId to details page
             }
         });
     };

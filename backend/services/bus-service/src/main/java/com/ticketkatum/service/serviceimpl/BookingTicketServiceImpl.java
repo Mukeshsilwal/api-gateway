@@ -25,6 +25,7 @@ public class BookingTicketServiceImpl implements BookingTicketService {
     private final SeatRepo seatRepo;
     private final com.ticketkatum.service.SeatService seatService; // Added dependency
     private final BookingMapper mapper;
+    private final org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
 
     @Override
     public List<BookingTicketDto> getAllBooking() {
@@ -80,6 +81,31 @@ public class BookingTicketServiceImpl implements BookingTicketService {
         booking.setTickets(tickets);
 
         BookingTicket saved = bookingTicketRepo.save(booking);
+
+        // Publish Event
+        if (!confirmedSeats.isEmpty()) {
+            com.ticketkatum.entity.Seat firstSeat = confirmedSeats.get(0);
+            com.ticketkatum.entity.Bus bus = firstSeat.getBus();
+            if (bus != null && bus.getRoute() != null) {
+                com.ticketkatum.events.BusBookingCreatedEvent event = com.ticketkatum.events.BusBookingCreatedEvent
+                        .builder()
+                        .bookingId(saved.getId())
+                        .tripId(dto.getTripId())
+                        .userId(dto.getUserId())
+                        .source(bus.getRoute().getSourceBusStop().getName())
+                        .destination(bus.getRoute().getDestinationBusStop().getName())
+                        .departureTime(bus.getDepartureDateTime())
+                        .arrivalTime(bus.getDepartureDateTime().plusHours(6)) // Estimated: Move to Route entity later
+                        .build();
+
+                try {
+                    kafkaTemplate.send("bus.booking.created", event);
+                } catch (Exception e) {
+                    // Log but don't fail transaction
+                    e.printStackTrace();
+                }
+            }
+        }
 
         return mapper.toDto(saved);
     }

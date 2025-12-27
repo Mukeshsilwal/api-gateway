@@ -67,16 +67,16 @@ export const API_ENDPOINTS = {
         STATUS: (id) => `${BFF_BASE_URL}/payments/${id}/status`,
         CALLBACK: `${BFF_BASE_URL}/payments/callback`,
         ESEWA: {
-            INITIATE: `${BFF_BASE_URL}/payments/esewa/initiate`,
-            VERIFY: `${BFF_BASE_URL}/payments/esewa/verify`,
+            INITIATE: `${BFF_BASE_URL}/payments/initiate/esewa`,
+            VERIFY: `${BFF_BASE_URL}/payments/verify/esewa`,
         },
         KHALTI: {
-            INITIATE: `${BFF_BASE_URL}/payments/khalti/initiate`,
-            VERIFY: `${BFF_BASE_URL}/payments/khalti/verify`,
+            INITIATE: `${BFF_BASE_URL}/payments/initiate/khalti`,
+            VERIFY: `${BFF_BASE_URL}/payments/verify/khalti`,
         },
         IMEPAY: {
-            INITIATE: `${BFF_BASE_URL}/payments/imepay/initiate`,
-            VERIFY: `${BFF_BASE_URL}/payments/imepay/verify`,
+            INITIATE: `${BFF_BASE_URL}/payments/initiate/imepay`,
+            VERIFY: `${BFF_BASE_URL}/payments/verify/imepay`,
         },
     },
 

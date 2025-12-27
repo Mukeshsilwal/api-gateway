@@ -26,6 +26,7 @@ const BookingModal: React.FC<BookingModalProps> = ({ room, context, onClose }) =
                 const checkOut = context.checkOutDate.includes('T') ? context.checkOutDate : `${context.checkOutDate}T11:00:00`;
 
                 const payload = {
+                    hotelId: room.hotelId,
                     roomId: room.id,
                     rentTypeId: parseInt(room.rentTypeId),
                     mealPlanId: room.mealPlanId ? parseInt(room.mealPlanId) : null,
@@ -81,7 +82,8 @@ const BookingModal: React.FC<BookingModalProps> = ({ room, context, onClose }) =
                 toast.success("Room Locked! Redirecting to payment...");
 
                 // Initiate Payment
-                const currentUser = JSON.parse(sessionStorage.getItem('user')) || { id: 'GUEST', name: 'Guest', email: 'guest@example.com' };
+                const storedUser = sessionStorage.getItem('user');
+                const currentUser = storedUser ? JSON.parse(storedUser) : { id: 'GUEST', name: 'Guest', email: 'guest@example.com' };
 
                 const paymentData = {
                     customerId: currentUser.id,

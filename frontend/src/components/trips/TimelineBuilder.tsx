@@ -6,7 +6,7 @@ export interface Checkpoint {
     checkpointId?: number;
     locationName: string;
     scheduledTime: string; // ISO date string
-    type: 'DEPARTURE' | 'TRANSIT' | 'ARRIVAL' | 'HOTEL_CHECKIN' | 'HOTEL_CHECKOUT' | 'ACTIVITY' | 'RETURN';
+    checkpointType: 'DEPARTURE' | 'TRANSIT' | 'ARRIVAL' | 'HOTEL_CHECKIN' | 'HOTEL_CHECKOUT' | 'ACTIVITY' | 'RETURN';
     notes?: string;
 }
 
@@ -42,7 +42,7 @@ const TimelineBuilder: React.FC<TimelineBuilderProps> = ({ checkpoints, onAddChe
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <div className="text-xs font-bold text-orange-600 dark:text-orange-400 mb-1 uppercase tracking-wider">
-                                            {point.type.replace('_', ' ')}
+                                            {point.checkpointType.replace('_', ' ')}
                                         </div>
                                         <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
                                             <MapPin className="w-4 h-4 text-gray-400" />

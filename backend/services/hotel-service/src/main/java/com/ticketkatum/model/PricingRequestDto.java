@@ -14,6 +14,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class PricingRequestDto {
     @NotNull
+    private Long hotelId;
+
+    @NotNull
     private Long roomId;
 
     @NotNull

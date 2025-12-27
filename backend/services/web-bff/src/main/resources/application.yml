@@ -47,6 +47,7 @@ microservices:
   tracking-service-url: ${TRACKING_SERVICE_URL:http://localhost:8097}
   trip-service-url: ${TRIP_SERVICE_URL:http://localhost:8095}
   ai-service-url: ${AI_SERVICE_URL:http://localhost:8096}
+  journey-service-url: ${JOURNEY_SERVICE_URL:http://localhost:8087}
   timeline-service-url: ${TIMELINE_SERVICE_URL:http://localhost:8088}
   analytics-service-url: ${ANALYTICS_SERVICE_URL:http://localhost:8093}
   sos-service-url: ${SOS_SERVICE_URL:http://localhost:8098}
@@ -54,7 +55,7 @@ microservices:
   
   # Hotel Management Services
   recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8087} # Journey Service
-  maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8087}
+  maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8099}
   staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8099} # Hotel Service
   
   # Support Services

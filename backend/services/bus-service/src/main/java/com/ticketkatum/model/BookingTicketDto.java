@@ -17,4 +17,5 @@ public class BookingTicketDto {
     private Long userId;
     private String email;
     private List<Long> seatIds;
+    private Long tripId;
 }

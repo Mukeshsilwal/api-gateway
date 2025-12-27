@@ -14,31 +14,32 @@ import java.util.Optional;
 public interface RoomPricingRepository extends JpaRepository<RoomPricing, Long> {
 
     @Query("""
-        SELECT rp FROM RoomPricing rp
-        WHERE rp.room.id = :roomId
-        AND rp.rentType.id = :rentTypeId
-        AND rp.mealPlan.id = :mealPlanId
-        AND rp.isActive = true
-        AND rp.effectiveFrom <= :date
-        AND (rp.effectiveTo IS NULL OR rp.effectiveTo >= :date)
-        ORDER BY rp.effectiveFrom DESC
-        LIMIT 1
-    """)
+                SELECT rp FROM RoomPricing rp
+                WHERE rp.room.id = :roomId
+                AND rp.room.hotel.id = :hotelId
+                AND rp.rentType.id = :rentTypeId
+                AND rp.mealPlan.id = :mealPlanId
+                AND rp.isActive = true
+                AND rp.effectiveFrom <= :date
+                AND (rp.effectiveTo IS NULL OR rp.effectiveTo >= :date)
+                ORDER BY rp.effectiveFrom DESC
+                LIMIT 1
+            """)
     Optional<RoomPricing> findApplicablePricing(
+            @Param("hotelId") Long hotelId,
             @Param("roomId") Long roomId,
             @Param("rentTypeId") Long rentTypeId,
             @Param("mealPlanId") Long mealPlanId,
-            @Param("date") LocalDate date
-    );
+            @Param("date") LocalDate date);
 
     List<RoomPricing> findByRoomIdAndIsActiveTrue(Long roomId);
 
     @Query("""
-        SELECT rp FROM RoomPricing rp
-        WHERE rp.room.hotel.id = :hotelId
-        AND rp.isActive = true
-        AND rp.effectiveFrom <= :date
-        AND (rp.effectiveTo IS NULL OR rp.effectiveTo >= :date)
-    """)
+                SELECT rp FROM RoomPricing rp
+                WHERE rp.room.hotel.id = :hotelId
+                AND rp.isActive = true
+                AND rp.effectiveFrom <= :date
+                AND (rp.effectiveTo IS NULL OR rp.effectiveTo >= :date)
+            """)
     List<RoomPricing> findByHotelIdAndDate(@Param("hotelId") Long hotelId, @Param("date") LocalDate date);
 }

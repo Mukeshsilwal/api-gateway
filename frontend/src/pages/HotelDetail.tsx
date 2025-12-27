@@ -216,13 +216,20 @@ const HotelDetail: React.FC = () => {
             return;
         }
 
+        // Get tripId from state (passed from HotelList) or URL params (direct link)
+        const stateTripId = (location.state as any)?.tripId;
+        const params = new URLSearchParams(location.search);
+        const urlTripId = params.get('tripId');
+        const tripId = stateTripId || urlTripId;
+
         navigate('/hotel-booking', {
             state: {
                 hotel,
                 room,
                 checkIn: bookingParams.checkIn,
                 checkOut: bookingParams.checkOut,
-                guests: bookingParams.guests
+                guests: bookingParams.guests,
+                tripId // Pass tripId to booking page
             }
         });
     };
