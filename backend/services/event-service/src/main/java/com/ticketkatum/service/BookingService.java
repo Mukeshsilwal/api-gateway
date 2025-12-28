@@ -2,6 +2,7 @@ package com.ticketkatum.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
+import com.ticketkatum.dto.EventBookingCreatedEvent;
 import com.ticketkatum.entity.*;
 import com.ticketkatum.repository.*;
 import com.ticketkatum.util.QRCodeGenerator;
@@ -31,6 +32,7 @@ public class BookingService {
     private final AttendeeRepository attendeeRepository;
     private final QRCodeGenerator qrCodeGenerator;
     private final ObjectMapper objectMapper;
+    private final org.springframework.kafka.core.KafkaTemplate<String, Object> kafkaTemplate;
 
     /**
      * Book event tickets
@@ -66,7 +68,16 @@ public class BookingService {
                     .orElseThrow(() -> new RuntimeException("Ticket type not found"));
 
             if (!ticketType.isAvailable()) {
-                throw new RuntimeException("Ticket type not available: " + ticketType.getName());
+                LocalDateTime now = LocalDateTime.now();
+                boolean timeValid = (ticketType.getAvailableFrom() == null
+                        || now.isAfter(ticketType.getAvailableFrom())) &&
+                        (ticketType.getAvailableTo() == null || now.isBefore(ticketType.getAvailableTo()));
+
+                String reason = String.format("Active: %s, SoldOut: %s, TimeValid: %s (Now: %s, From: %s, To: %s)",
+                        ticketType.getIsActive(), ticketType.isSoldOut(), timeValid, now, ticketType.getAvailableFrom(),
+                        ticketType.getAvailableTo());
+
+                throw new RuntimeException("Ticket type not available: " + ticketType.getName() + " [" + reason + "]");
             }
 
             if (ticketType.getAvailableQuantity() < quantity) {
@@ -158,6 +169,41 @@ public class BookingService {
 
         log.info("Booking created: {}", bookingReference);
         Hibernate.initialize(savedBooking.getAttendees());
+
+        // Publish event (PENDING)
+        try {
+            Long tripId = null;
+            if (bookingData.containsKey("tripId") && bookingData.get("tripId") != null) {
+                Object tripIdObj = bookingData.get("tripId");
+                if (tripIdObj instanceof Number) {
+                    tripId = ((Number) tripIdObj).longValue();
+                } else {
+                    try {
+                        tripId = Long.parseLong(tripIdObj.toString());
+                    } catch (NumberFormatException e) {
+                        log.warn("Invalid tripId format: {}", tripIdObj);
+                    }
+                }
+            }
+
+            EventBookingCreatedEvent bookingEvent = com.ticketkatum.dto.EventBookingCreatedEvent.builder()
+                    .bookingId(savedBooking.getId())
+                    .tripId(tripId)
+                    .userId(userId)
+                    .eventId(eventId)
+                    .eventName(event.getName())
+                    .eventDate(event.getStartDateTime())
+                    .ticketType(selectedTickets.isEmpty() ? "General" : selectedTickets.get(0).getName())
+                    .ticketCount(savedBooking.getAttendees() != null ? savedBooking.getAttendees().size() : 0)
+                    .totalAmount(grandTotal)
+                    .status("PENDING")
+                    .build();
+
+            kafkaTemplate.send("event.booking.created", savedBooking.getId().toString(), bookingEvent);
+        } catch (Exception e) {
+            log.error("Failed to publish booking created event", e);
+        }
+
         return savedBooking;
     }
 
@@ -189,6 +235,24 @@ public class BookingService {
 
         EventBooking savedBooking = bookingRepository.save(booking);
         Hibernate.initialize(savedBooking.getAttendees());
+
+        // Publish event (CONFIRMED)
+        try {
+            com.ticketkatum.dto.EventBookingCreatedEvent event = com.ticketkatum.dto.EventBookingCreatedEvent.builder()
+                    .bookingId(savedBooking.getId())
+                    // tripId is unknown here, but trip-service will look it up by bookingId
+                    .tripId(null)
+                    .userId(savedBooking.getUserId())
+                    .eventId(savedBooking.getEvent().getId())
+                    .eventName(savedBooking.getEvent().getName())
+                    .status("CONFIRMED")
+                    .build();
+
+            kafkaTemplate.send("event.booking.created", savedBooking.getId().toString(), event);
+        } catch (Exception e) {
+            log.error("Failed to publish booking confirmed event", e);
+        }
+
         return savedBooking;
     }
 

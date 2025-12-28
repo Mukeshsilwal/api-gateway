@@ -19,4 +19,8 @@ public class BusBookingCreatedEvent implements Serializable {
     private String destination;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
+    private String operatorName;
+    private String busType;
+    private java.util.List<String> seatNumbers;
+    private java.math.BigDecimal totalAmount;
 }

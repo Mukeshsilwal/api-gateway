@@ -201,7 +201,7 @@ public class EventBookingProvider implements BookingProvider<Request> {
     }
 
     @Override
-    public String getBooking(String bookingId) {
+    public Response getBooking(String bookingId) {
         log.info("📋 Fetching EVENT booking: {}", bookingId);
 
         try {
@@ -215,14 +215,14 @@ public class EventBookingProvider implements BookingProvider<Request> {
                     });
 
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                return objectMapper.writeValueAsString(response.getBody());
+                return ResponseHandler.success("Booking retrieved successfully", response.getBody());
             }
 
-            return "{}";
+            return ResponseHandler.failure("Booking not found");
 
         } catch (Exception e) {
             log.error("❌ Failed to fetch EVENT booking: {}", bookingId, e);
-            return "{\"error\": \"" + e.getMessage() + "\"}";
+            return ResponseHandler.failure("Failed to fetch booking: " + e.getMessage());
         }
     }
 

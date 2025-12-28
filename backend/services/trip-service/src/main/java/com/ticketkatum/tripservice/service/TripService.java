@@ -320,6 +320,23 @@ public class TripService {
         booking.setAmount((BigDecimal) bookingRequest.get("amount"));
         booking.setStatus(TripBooking.BookingStatus.valueOf((String) bookingRequest.get("status")));
 
+        // Handle details serialization
+        if (bookingRequest.containsKey("details")) {
+            Object detailsObj = bookingRequest.get("details");
+            if (detailsObj instanceof String) {
+                booking.setDetails((String) detailsObj);
+            } else {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    mapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+                    booking.setDetails(mapper.writeValueAsString(detailsObj));
+                } catch (Exception e) {
+                    log.error("Failed to serialize booking details for trip: {}", tripId, e);
+                    booking.setDetails("{}");
+                }
+            }
+        }
+
         trip.getBookings().add(booking);
 
         // Update actual cost
@@ -354,7 +371,7 @@ public class TripService {
                 .collect(java.util.stream.Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public JourneyDTO initializeJourney(Long tripId, Long userId) {
         log.info("Initializing journey for trip: {}", tripId);
         Trip trip = tripRepository.findById(tripId)
@@ -429,6 +446,36 @@ public class TripService {
         }
 
         tripCheckpointRepository.delete(checkpoint);
+    }
+
+    @Transactional
+    public TripCheckpointDTO updateCheckpoint(Long journeyId, Long checkpointId, TripCheckpointDTO checkpointDTO) {
+        log.info("Updating checkpoint: {} in journey: {}", checkpointId, journeyId);
+        TripCheckpoint checkpoint = tripCheckpointRepository.findById(checkpointId)
+                .orElseThrow(() -> new RuntimeException("Checkpoint not found with ID: " + checkpointId));
+
+        if (checkpoint.getJourney() != null && !checkpoint.getJourney().getJourneyId().equals(journeyId)) {
+            throw new RuntimeException("Checkpoint does not belong to the specified journey");
+        }
+
+        if (checkpointDTO.getLocationName() != null) {
+            checkpoint.setLocationName(checkpointDTO.getLocationName());
+        }
+        if (checkpointDTO.getScheduledTime() != null) {
+            checkpoint.setScheduledTime(checkpointDTO.getScheduledTime());
+        }
+        if (checkpointDTO.getCheckpointType() != null) {
+            checkpoint.setCheckpointType(TripCheckpoint.CheckpointType.valueOf(checkpointDTO.getCheckpointType()));
+        }
+        if (checkpointDTO.getStatus() != null) {
+            checkpoint.setStatus(TripCheckpoint.CheckpointStatus.valueOf(checkpointDTO.getStatus()));
+        }
+        if (checkpointDTO.getNotes() != null) {
+            checkpoint.setNotes(checkpointDTO.getNotes());
+        }
+
+        checkpoint = tripCheckpointRepository.save(checkpoint);
+        return TripCheckpointDTO.fromEntity(checkpoint);
     }
 
     // Inner class for Kafka events

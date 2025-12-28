@@ -36,8 +36,8 @@ public class BusBookingProvider implements BookingProvider<Request> {
     }
 
     @Override
-    public String getBooking(String bookingId) {
-        return "Simulated Bus Booking Details";
+    public Response getBooking(String bookingId) {
+        return ResponseHandler.success("Simulated Bus Booking Details");
     }
 
     @Override

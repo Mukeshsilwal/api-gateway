@@ -1,6 +1,6 @@
 package com.ticketkatum.payment;
 
-import com.ticketkatum.dto.PaymentVerifiedEvent;
+import com.ticketkatum.events.payment.PaymentVerifiedEvent;
 import com.ticketkatum.entity.PaymentTransaction;
 import com.ticketkatum.enums.TransactionStatus;
 import com.ticketkatum.jms.EmailService;
@@ -33,6 +33,7 @@ public class PaymentOrchestrator {
     private final PaymentProviderFactory factory;
     private final TicketNotificationService notificationService;
     private final EmailService emailService;
+
     /**
      * Initiate payment with idempotency and duplicate check
      */
@@ -53,11 +54,10 @@ public class PaymentOrchestrator {
 
                 if (txn.getStatus() == TransactionStatus.SUCCESS) {
                     log.warn("Duplicate transaction detected: {}", transactionId);
-//                    publisher.publishPaymentSuccess(txn.getBookingId(),txn.getAmount());
+                    // publisher.publishPaymentSuccess(txn.getBookingId(),txn.getAmount());
                     return ResponseHandler.successWildcard(
                             "Transaction already completed",
-                            buildPaymentResponse(txn)
-                    );
+                            buildPaymentResponse(txn));
                 }
 
                 if (txn.getStatus() == TransactionStatus.FAILED ||
@@ -70,11 +70,9 @@ public class PaymentOrchestrator {
                     log.warn("Transaction already in progress: {}", transactionId);
                     return ResponseHandler.failureWildcard(
                             "Transaction already in progress",
-                            "Please wait for the current transaction to complete"
-                    );
+                            "Please wait for the current transaction to complete");
                 }
             }
-
 
             // Create new transaction
             PaymentTransaction txn = PaymentTransaction.builder()
@@ -111,8 +109,7 @@ public class PaymentOrchestrator {
             log.error("Error initiating payment for provider: {}", provider, e);
             return ResponseHandler.failureWildcard(
                     "Payment initiation failed",
-                    "An unexpected error occurred: " + e.getMessage()
-            );
+                    "An unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -132,16 +129,14 @@ public class PaymentOrchestrator {
             // Find transaction
             PaymentTransaction txn = txnRepo.findByInternalTxnId(req.getTransactionId())
                     .orElseThrow(() -> new InvalidTransactionException(
-                            "Transaction not found: " + req.getTransactionId()
-                    ));
+                            "Transaction not found: " + req.getTransactionId()));
 
             // Check if already verified successfully
             if (txn.getStatus() == TransactionStatus.SUCCESS) {
                 log.warn("Transaction already verified: {}", req.getTransactionId());
                 return ResponseHandler.successWildcard(
                         "Transaction already verified",
-                        buildPaymentResponse(txn)
-                );
+                        buildPaymentResponse(txn));
             }
 
             // Check if transaction expired
@@ -153,8 +148,7 @@ public class PaymentOrchestrator {
                 log.warn("Transaction expired: {}", req.getTransactionId());
                 return ResponseHandler.failureWildcard(
                         "Transaction expired",
-                        "The transaction has expired. Please initiate a new payment."
-                );
+                        "The transaction has expired. Please initiate a new payment.");
             }
 
             // Update status to processing
@@ -195,14 +189,12 @@ public class PaymentOrchestrator {
             log.error("Invalid transaction: {}", req.getTransactionId(), e);
             return ResponseHandler.failureWildcard(
                     "Invalid transaction",
-                    e.getMessage()
-            );
+                    e.getMessage());
         } catch (Exception e) {
             log.error("Error verifying payment: {}", req.getTransactionId(), e);
             return ResponseHandler.failureWildcard(
                     "Payment verification failed",
-                    "An unexpected error occurred: " + e.getMessage()
-            );
+                    "An unexpected error occurred: " + e.getMessage());
         }
     }
 
@@ -214,13 +206,11 @@ public class PaymentOrchestrator {
         try {
             PaymentTransaction txn = txnRepo.findByInternalTxnId(transactionId)
                     .orElseThrow(() -> new InvalidTransactionException(
-                            "Transaction not found: " + transactionId
-                    ));
+                            "Transaction not found: " + transactionId));
 
             return ResponseHandler.successWildcard(
                     "Transaction status retrieved",
-                    buildPaymentResponse(txn)
-            );
+                    buildPaymentResponse(txn));
 
         } catch (InvalidTransactionException e) {
             log.error("Transaction not found: {}", transactionId, e);
@@ -236,14 +226,12 @@ public class PaymentOrchestrator {
         try {
             PaymentTransaction txn = txnRepo.findByInternalTxnId(transactionId)
                     .orElseThrow(() -> new InvalidTransactionException(
-                            "Transaction not found: " + transactionId
-                    ));
+                            "Transaction not found: " + transactionId));
 
             if (txn.getStatus() == TransactionStatus.SUCCESS) {
                 return ResponseHandler.failureWildcard(
                         "Cannot cancel completed transaction",
-                        "Transaction has already been completed successfully"
-                );
+                        "Transaction has already been completed successfully");
             }
 
             txn.setStatus(TransactionStatus.CANCELLED);
@@ -253,8 +241,7 @@ public class PaymentOrchestrator {
             log.info("Transaction cancelled: {}", transactionId);
             return ResponseHandler.successWildcard(
                     "Transaction cancelled successfully",
-                    buildPaymentResponse(txn)
-            );
+                    buildPaymentResponse(txn));
 
         } catch (InvalidTransactionException e) {
             log.error("Transaction not found: {}", transactionId, e);
@@ -286,7 +273,6 @@ public class PaymentOrchestrator {
                 "currency", txn.getCurrency(),
                 "provider", txn.getProvider(),
                 "createdAt", txn.getCreatedAt(),
-                "completedAt", txn.getCompletedAt() != null ? txn.getCompletedAt() : ""
-        );
+                "completedAt", txn.getCompletedAt() != null ? txn.getCompletedAt() : "");
     }
 }

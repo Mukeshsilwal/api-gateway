@@ -57,7 +57,7 @@ export interface CheckpointDTO {
     locationName: string;
     scheduledTime: string;
     checkpointType: 'DEPARTURE' | 'TRANSIT' | 'ARRIVAL' | 'HOTEL_CHECKIN' | 'HOTEL_CHECKOUT' | 'ACTIVITY' | 'RETURN';
-    status?: 'PENDING' | 'REACHED' | 'SKIPPED';
+    status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'DELAYED' | 'CANCELLED';
     notes?: string;
     latitude?: number;
     longitude?: number;
@@ -194,6 +194,12 @@ export const deleteCheckpoint = async (journeyId: number, checkpointId: number):
     await tripApi.delete(`/journeys/${journeyId}/checkpoints/${checkpointId}`);
 };
 
+// Update checkpoint
+export const updateCheckpoint = async (journeyId: number, checkpointId: number, checkpoint: any): Promise<any> => {
+    const response = await tripApi.put(`/journeys/${journeyId}/checkpoints/${checkpointId}`, checkpoint);
+    return response.data;
+};
+
 export default {
     getTripDashboard,
     getMyTrips,
@@ -210,5 +216,6 @@ export default {
     initializeItinerary,
     generateJourney,
     addCheckpoint,
-    deleteCheckpoint
+    deleteCheckpoint,
+    updateCheckpoint
 };

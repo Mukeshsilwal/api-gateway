@@ -152,7 +152,6 @@ export default function PaymentSuccess() {
                 toast.success('Payment verified successfully!');
 
                 // 5. Success cleanup & Analytics
-                clearBookingContext();
                 analytics.trackEvent('purchase', {
                     transaction_id: transactionUuid,
                     value: parsedData?.total_amount || (result as any)?.data?.amount,
@@ -178,6 +177,9 @@ export default function PaymentSuccess() {
                         console.error('Failed to parse booking context:', e);
                     }
                 }
+
+                // Clear context AFTER reading it
+                clearBookingContext();
 
                 console.log('📦 Full verification result:', result);
                 console.log('📦 Extracted booking reference:', bookingReference);

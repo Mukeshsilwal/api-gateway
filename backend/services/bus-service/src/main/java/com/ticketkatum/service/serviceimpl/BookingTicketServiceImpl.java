@@ -96,6 +96,14 @@ public class BookingTicketServiceImpl implements BookingTicketService {
                         .destination(bus.getRoute().getDestinationBusStop().getName())
                         .departureTime(bus.getDepartureDateTime())
                         .arrivalTime(bus.getDepartureDateTime().plusHours(6)) // Estimated: Move to Route entity later
+                        .operatorName(bus.getBusName() != null ? bus.getBusName() : "TicketKatum Bus")
+                        .busType(bus.getBusType() != null ? bus.getBusType().name() : "Standard")
+                        .seatNumbers(confirmedSeats.stream().map(com.ticketkatum.entity.Seat::getSeatNumber)
+                                .collect(Collectors.toList()))
+                        .totalAmount(confirmedSeats.stream()
+                                .map(com.ticketkatum.entity.Seat::getPrice)
+                                .filter(java.util.Objects::nonNull)
+                                .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add))
                         .build();
 
                 try {

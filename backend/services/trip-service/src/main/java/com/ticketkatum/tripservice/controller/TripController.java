@@ -218,6 +218,19 @@ public class TripController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/journeys/{journeyId}/checkpoints/{checkpointId}")
+    @Operation(summary = "Update checkpoint", description = "Updates a checkpoint in a journey")
+    public ResponseEntity<com.ticketkatum.tripservice.dto.TripCheckpointDTO> updateCheckpoint(
+            @PathVariable("journeyId") Long journeyId,
+            @PathVariable("checkpointId") Long checkpointId,
+            @RequestBody com.ticketkatum.tripservice.dto.TripCheckpointDTO checkpointDTO) {
+
+        log.info("Updating checkpoint: {} in journey: {}", checkpointId, journeyId);
+        com.ticketkatum.tripservice.dto.TripCheckpointDTO updatedCheckpoint = tripService.updateCheckpoint(journeyId,
+                checkpointId, checkpointDTO);
+        return ResponseEntity.ok(updatedCheckpoint);
+    }
+
     @GetMapping("/{tripId}/bookings")
     @Operation(summary = "Get trip bookings", description = "Retrieves all bookings for a trip")
     public ResponseEntity<List<java.util.Map<String, Object>>> getTripBookings(@PathVariable("tripId") Long tripId) {

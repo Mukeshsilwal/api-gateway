@@ -218,33 +218,11 @@ public class GenericHotelService implements BookingProvider {
     }
 
     @Override
-    public String getBooking(String bookingId) {
+    public Response getBooking(String bookingId) {
         HotelBooking booking = hotelBookingRepo.findByBookingId(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        return """
-                <html>
-                  <body onload="document.forms[0].submit()">
-                    <form action="%s" method="GET">
-                      <input type="hidden" name="amt" value="%s"/>
-                      <input type="hidden" name="psc" value="0"/>
-                      <input type="hidden" name="pdc" value="0"/>
-                      <input type="hidden" name="tAmt" value="%s"/>
-                      <input type="hidden" name="pid" value="%s"/>
-                      <input type="hidden" name="scd" value="%s"/>
-                      <input type="hidden" name="su" value="%s"/>
-                      <input type="hidden" name="fu" value="%s"/>
-                    </form>
-                  </body>
-                </html>
-                """.formatted(
-                esewaProperties.getBaseUrl(),
-                booking.getTotalAmount(),
-                booking.getTotalAmount(),
-                booking.getId(),
-                esewaProperties.getMerchantCode(),
-                esewaProperties.getSuccessUrl(),
-                esewaProperties.getFailureUrl());
+        return ResponseHandler.success("Booking retrieved successfully", booking);
     }
 
     private BigDecimal calculateDynamicPrice(HotelBookingRequest request, HotelConfig config) {

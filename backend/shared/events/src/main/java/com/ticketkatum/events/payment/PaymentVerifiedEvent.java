@@ -1,4 +1,4 @@
-package com.ticketkatum.dto;
+package com.ticketkatum.events.payment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Event published to ActiveMQ when payment is verified.
+ * Event published to Kafka when payment is verified.
  * Consumed by booking services (hotel-service, event-service) to confirm
  * bookings.
  */

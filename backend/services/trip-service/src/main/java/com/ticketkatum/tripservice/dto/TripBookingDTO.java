@@ -24,6 +24,7 @@ public class TripBookingDTO implements Serializable {
     private LocalDateTime bookingDate;
     private BigDecimal amount;
     private String status;
+    private String details;
     private LocalDateTime createdAt;
 
     public static TripBookingDTO fromEntity(TripBooking booking) {
@@ -40,6 +41,7 @@ public class TripBookingDTO implements Serializable {
                 .bookingDate(booking.getBookingDate())
                 .amount(booking.getAmount())
                 .status(booking.getStatus().name())
+                .details(booking.getDetails())
                 .createdAt(booking.getCreatedAt())
                 .build();
     }

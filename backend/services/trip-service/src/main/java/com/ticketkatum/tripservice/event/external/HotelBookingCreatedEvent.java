@@ -6,22 +6,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BusBookingCreatedEvent {
+public class HotelBookingCreatedEvent {
     private Long bookingId;
     private Long tripId;
     private Long userId;
-    private String source;
-    private String destination;
-    private LocalDateTime departureTime;
-    private LocalDateTime arrivalTime;
-    private String operatorName;
-    private String busType;
-    private java.util.List<String> seatNumbers;
+    private String hotelName;
+    private String roomType;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+    private Integer numberOfGuests;
     private BigDecimal totalAmount;
 }

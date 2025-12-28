@@ -242,6 +242,15 @@ export function EventBooking() {
             // Priority 1: HTML Form (eSewa V2 API)
             if (htmlForm) {
                 console.log('📝 Rendering eSewa HTML form for auto-submission');
+
+                // Explicitly save booking context for redirection
+                if (bookingData.tripId) {
+                    sessionStorage.setItem('bookingContext', JSON.stringify({
+                        tripId: bookingData.tripId,
+                        isUnifiedBooking: false
+                    }));
+                }
+
                 toast.success('Booking created! Redirecting to eSewa...');
 
                 // Small delay to ensure toast is visible

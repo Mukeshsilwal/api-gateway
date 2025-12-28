@@ -13,7 +13,7 @@ public interface BookingProvider<T> {
 
     Response refund(Request request);
 
-    String getBooking(String bookingId);
+    Response getBooking(String bookingId);
 
     void confirmBooking(String bookingId, String transactionId);
 }

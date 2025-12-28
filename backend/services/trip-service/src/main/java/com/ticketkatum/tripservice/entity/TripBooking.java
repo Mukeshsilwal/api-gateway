@@ -48,6 +48,9 @@ public class TripBooking {
     @Column(name = "status", nullable = false)
     private BookingStatus status = BookingStatus.PENDING;
 
+    @Column(name = "details", columnDefinition = "TEXT")
+    private String details;
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

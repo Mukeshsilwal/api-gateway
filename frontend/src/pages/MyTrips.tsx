@@ -107,13 +107,7 @@ const MyTripsPage: React.FC = () => {
                         {filteredTrips.map((trip) => {
                             // Determine navigation based on trip status
                             const handleTripClick = () => {
-                                // For PLANNED trips (incomplete), redirect to continue planning
-                                if (trip.status === 'PLANNED' && trip.progressPercentage < 100) {
-                                    navigate(`/trips/${trip.tripId}/continue`);
-                                } else {
-                                    // For other statuses, go to trip dashboard
-                                    navigate(`/trips/${trip.tripId}`);
-                                }
+                                navigate(`/trips/${trip.tripId}`);
                             };
 
                             return (

@@ -119,4 +119,59 @@ public class BookingTicketController {
                     .body(ResponseHandler.failure("Unified booking failed: " + e.getMessage()));
         }
     }
+
+    private final com.ticketkatum.repository.BookingRepo bookingRepo;
+
+    /**
+     * GET BOOKING DETAILS (Generic)
+     * GET /api/booking/{bookingId}
+     * Looks up booking type and service from central repo, then fetches details
+     */
+    @GetMapping("/{bookingId}")
+    public ResponseEntity<Response> getGenericBookingDetails(@PathVariable("bookingId") String bookingId) {
+        log.info("📋 Get generic booking details: id={}", bookingId);
+
+        try {
+            // Find booking in central repo to determine provider info
+            com.ticketkatum.entity.Booking booking = bookingRepo.findByProviderBookingId(bookingId)
+                    .orElseThrow(() -> new RuntimeException("Booking not found in central registry"));
+
+            String category = booking.getCategory();
+            String service = booking.getProviderName(); // Assuming providerName maps to service
+
+            log.info("-> Resolved bookingId {} to Category: {}, Service: {}", bookingId, category, service);
+
+            BookingProvider provider = bookingProviderFactory.getProvider(category, service);
+            Response response = provider.getBooking(bookingId);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            log.error("Error fetching generic booking details for {}", bookingId, e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseHandler.failure(e.getMessage()));
+        }
+    }
+
+    /**
+     * GET BOOKING DETAILS
+     * GET /api/booking/{category}/{service}/{bookingId}
+     * Used by Payment Service to fetch booking details before payment
+     */
+    @GetMapping("/{category}/{service}/{bookingId}")
+    public ResponseEntity<Response> getBookingDetails(
+            @PathVariable("category") String category,
+            @PathVariable("service") String service,
+            @PathVariable("bookingId") String bookingId) {
+
+        log.info("📋 Get booking details: category={}, service={}, id={}", category, service, bookingId);
+
+        try {
+            BookingProvider provider = bookingProviderFactory.getProvider(category, service);
+            Response response = provider.getBooking(bookingId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error fetching booking: category={}, service={}, id={}", category, service, bookingId, e);
+            Response response = ResponseHandler.failure("Fetch failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 }

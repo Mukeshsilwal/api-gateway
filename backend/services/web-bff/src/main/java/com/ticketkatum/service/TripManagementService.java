@@ -218,4 +218,20 @@ public class TripManagementService {
                 .doOnError(
                         e -> log.error("Failed to delete checkpoint: {} from journey: {}", checkpointId, journeyId, e));
     }
+
+    /**
+     * Update checkpoint in journey
+     */
+    public Mono<Map> updateCheckpoint(Long journeyId, Long checkpointId, Map<String, Object> checkpointRequest) {
+        log.debug("Updating checkpoint via BFF: {} in journey: {}", checkpointId, journeyId);
+
+        return webClientBuilder.build()
+                .put()
+                .uri(tripServiceUrl + "/api/trips/journeys/" + journeyId + "/checkpoints/" + checkpointId)
+                .bodyValue(checkpointRequest)
+                .retrieve()
+                .bodyToMono(Map.class)
+                .doOnError(
+                        e -> log.error("Failed to update checkpoint: {} in journey: {}", checkpointId, journeyId, e));
+    }
 }

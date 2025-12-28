@@ -208,4 +208,18 @@ public class TripManagementController {
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()))
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
+
+    @PutMapping("/journeys/{journeyId}/checkpoints/{checkpointId}")
+    @Operation(summary = "Update checkpoint", description = "Update checkpoint via BFF")
+    public Mono<ResponseEntity<Map>> updateCheckpoint(
+            @PathVariable("journeyId") Long journeyId,
+            @PathVariable("checkpointId") Long checkpointId,
+            @RequestBody Map<String, Object> checkpointRequest,
+            HttpServletRequest request) {
+
+        log.info("BFF: Updating checkpoint: {} in journey: {}", checkpointId, journeyId);
+        return tripManagementService.updateCheckpoint(journeyId, checkpointId, checkpointRequest)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
 }

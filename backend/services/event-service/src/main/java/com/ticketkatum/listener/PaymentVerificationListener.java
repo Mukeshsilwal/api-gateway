@@ -1,6 +1,6 @@
 package com.ticketkatum.listener;
 
-import com.ticketkatum.dto.PaymentVerifiedEvent;
+import com.ticketkatum.events.payment.PaymentVerifiedEvent;
 import com.ticketkatum.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

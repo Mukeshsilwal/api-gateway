@@ -21,7 +21,8 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     List<Trip> findByUserIdAndStatusIn(@Param("userId") Long userId, @Param("statuses") List<Trip.TripStatus> statuses);
 
     @Query("SELECT t FROM Trip t WHERE t.userId = :userId AND t.startDate >= :fromDate AND t.endDate <= :toDate")
-    List<Trip> findByUserIdAndDateRange(@Param("userId") Long userId, @Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
+    List<Trip> findByUserIdAndDateRange(@Param("userId") Long userId, @Param("fromDate") LocalDate fromDate,
+            @Param("toDate") LocalDate toDate);
 
     @Query("SELECT t FROM Trip t LEFT JOIN FETCH t.checkpoints WHERE t.tripId = :tripId")
     Optional<Trip> findByIdWithCheckpoints(@Param("tripId") Long tripId);
@@ -29,13 +30,18 @@ public interface TripRepository extends JpaRepository<Trip, Long> {
     @Query("SELECT t FROM Trip t LEFT JOIN FETCH t.bookings WHERE t.tripId = :tripId")
     Optional<Trip> findByIdWithBookings(@Param("tripId") Long tripId);
 
-    // Fetch trip without eager loading collections to avoid MultipleBagFetchException
+    // Fetch trip without eager loading collections to avoid
+    // MultipleBagFetchException
     // Collections will be loaded lazily or via separate queries
     @Query("SELECT t FROM Trip t WHERE t.tripId = :tripId")
     Optional<Trip> findByIdWithDetails(@Param("tripId") Long tripId);
 
     @Query("SELECT COUNT(t) FROM Trip t WHERE t.userId = :userId AND t.status = :status")
     long countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") Trip.TripStatus status);
+
+    @Query("SELECT t FROM Trip t JOIN t.bookings b WHERE b.bookingId = :bookingId AND b.bookingType = :bookingType")
+    Optional<Trip> findTripByBookingIdAndType(@Param("bookingId") Long bookingId,
+            @Param("bookingType") com.ticketkatum.tripservice.entity.TripBooking.BookingType bookingType);
 
     @Query("SELECT t FROM Trip t WHERE t.status = 'IN_PROGRESS' AND t.startDate <= :today AND t.endDate >= :today")
     List<Trip> findActiveTrips(@Param("today") LocalDate today);

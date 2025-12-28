@@ -1,7 +1,7 @@
 package com.ticketkatum.payment.provider;
 
 import com.ticketkatum.configs.EsewaProperties;
-import com.ticketkatum.dto.PaymentVerifiedEvent;
+import com.ticketkatum.events.payment.PaymentVerifiedEvent;
 import com.ticketkatum.entity.PaymentTransaction;
 import com.ticketkatum.enums.TransactionStatus;
 import com.ticketkatum.event.PaymentEventPublisher;

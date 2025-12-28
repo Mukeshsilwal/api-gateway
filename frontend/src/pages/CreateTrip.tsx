@@ -64,8 +64,8 @@ const CreateTripPage: React.FC = () => {
                 toast.error("Trip created, but failed to initialize journey.");
             }
 
-            setStep(2); // Move to "Integrated Booking" step
-            toast.success('Trip created successfully! Now let\'s add some bookings.');
+            toast.success('Trip created successfully!');
+            navigate(`/trips/${trip.tripId}`);
         } catch (err: any) {
             alert('Failed to create trip: ' + (err.message || 'Unknown error'));
         } finally {
@@ -261,7 +261,7 @@ const CreateTripPage: React.FC = () => {
                                     Start Date *
                                 </label>
                                 <input
-                                    type="datetime-local"
+                                    type="date"
                                     name="startDate"
                                     value={formData.startDate}
                                     onChange={handleChange}
@@ -276,7 +276,7 @@ const CreateTripPage: React.FC = () => {
                                     End Date *
                                 </label>
                                 <input
-                                    type="datetime-local"
+                                    type="date"
                                     name="endDate"
                                     value={formData.endDate}
                                     onChange={handleChange}

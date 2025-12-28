@@ -1,4 +1,4 @@
-package com.ticketkatum.tripservice.event.external;
+package com.ticketkatum.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,16 +12,17 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BusBookingCreatedEvent {
+public class EventBookingCreatedEvent {
     private Long bookingId;
     private Long tripId;
     private Long userId;
-    private String source;
-    private String destination;
-    private LocalDateTime departureTime;
-    private LocalDateTime arrivalTime;
-    private String operatorName;
-    private String busType;
-    private java.util.List<String> seatNumbers;
+    private Long eventId;
+    private String eventName;
+    private String location;
+    private LocalDateTime eventDate;
+    private String ticketType;
+    private Integer ticketCount;
     private BigDecimal totalAmount;
+    private LocalDateTime startDateTime;
+    private String status;
 }

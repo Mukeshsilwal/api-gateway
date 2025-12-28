@@ -1,6 +1,6 @@
 package com.ticketkatum.event;
 
-import com.ticketkatum.dto.PaymentVerifiedEvent;
+import com.ticketkatum.events.payment.PaymentVerifiedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
