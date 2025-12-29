@@ -1,5 +1,6 @@
 package com.ticketkatum.tripservice.service;
 
+import com.ticketkatum.events.trip.TripCreatedEvent;
 import com.ticketkatum.tripservice.dto.TripDTO;
 import com.ticketkatum.tripservice.dto.request.CreateTripRequest;
 import com.ticketkatum.tripservice.dto.request.UpdateTripRequest;
@@ -248,7 +249,7 @@ public class TripService {
 
     private void publishTripEvent(String eventType, Trip trip) {
         try {
-            TripEvent event = TripEvent.builder()
+            TripCreatedEvent event = TripCreatedEvent.builder()
                     .eventType(eventType)
                     .tripId(trip.getTripId())
                     .userId(trip.getUserId())
@@ -478,19 +479,4 @@ public class TripService {
         return TripCheckpointDTO.fromEntity(checkpoint);
     }
 
-    // Inner class for Kafka events
-    @lombok.Data
-    @lombok.Builder
-    @lombok.NoArgsConstructor
-    @lombok.AllArgsConstructor
-    public static class TripEvent {
-        private String eventType;
-        private Long tripId;
-        private Long userId;
-        private String tripName;
-        private String status;
-        private LocalDate startDate;
-        private LocalDate endDate;
-        private java.time.LocalDateTime timestamp;
-    }
 }

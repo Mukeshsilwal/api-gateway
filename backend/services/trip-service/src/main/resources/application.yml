@@ -13,11 +13,13 @@ spring:
     password: ${DATABASE_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+      # ========== CONNECTION POOL OPTIMIZATIONS ==========
+      maximum-pool-size: 20                       # Increased from 10 for better concurrency
+      minimum-idle: 10                            # Increased from 5 to maintain ready connections
+      connection-timeout: 30000                   # 30 seconds
+      idle-timeout: 600000                        # 10 minutes
+      max-lifetime: 1800000                       # 30 minutes - prevents stale connections
+      leak-detection-threshold: 60000             # 60 seconds - detect connection leaks
   
   jpa:
     hibernate:
@@ -28,10 +30,28 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         use_sql_comments: true
+        
+        # ========== PERFORMANCE OPTIMIZATIONS ==========
+        
+        # Batch Processing - improves INSERT/UPDATE performance
         jdbc:
-          batch_size: 20
-        order_inserts: true
-        order_updates: true
+          batch_size: 50                          # Increased from 20 for better batching
+          fetch_size: 50                          # JDBC fetch size for result sets
+        order_inserts: true                       # Order INSERTs for better batching
+        order_updates: true                       # Order UPDATEs for better batching
+        batch_versioned_data: true                # Batch versioned entities (@Version)
+        
+        # Fetching Strategy - reduces N+1 queries
+        default_batch_fetch_size: 16              # Batch lazy loading (use powers of 2)
+        
+        # Query Optimization
+        query:
+          in_clause_parameter_padding: true       # Optimize IN clause with parameter padding
+          plan_cache_max_size: 2048               # Query plan cache size
+        
+        # Connection & Statement Management
+        connection:
+          provider_disables_autocommit: true      # Performance optimization for connections
   
   flyway:
     enabled: true
@@ -58,6 +78,8 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: all
       retries: 3
+      properties:
+        spring.json.add.type.headers: true
     consumer:
       group-id: trip-service-group
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -76,17 +98,17 @@ jwt:
 # Service URLs for inter-service communication
 services:
   booking-service:
-    url: ${BOOKING_SERVICE_URL:http://localhost:8081/booking-service}
+    url: ${BOOKING_SERVICE_URL:http://localhost:8091/booking-service}
   bus-service:
-    url: ${BUS_SERVICE_URL:http://localhost:8082/bus-service}
+    url: ${BUS_SERVICE_URL:http://localhost:8086/bus-service}
   hotel-service:
-    url: ${HOTEL_SERVICE_URL:http://localhost:8083/hotel-service}
+    url: ${HOTEL_SERVICE_URL:http://localhost:8087/hotel-service}
   event-service:
-    url: ${EVENT_SERVICE_URL:http://localhost:8084/event-service}
+    url: ${EVENT_SERVICE_URL:http://localhost:8093/api/events}
   tracking-service:
-    url: ${TRACKING_SERVICE_URL:http://localhost:8088/tracking-service}
+    url: ${TRACKING_SERVICE_URL:http://localhost:8097/tracking-service}
   alert-service:
-    url: ${ALERT_SERVICE_URL:http://localhost:8089/alert-service}
+    url: ${ALERT_SERVICE_URL:http://localhost:8094/alert-service}
 
 # Logging
 logging:

@@ -25,7 +25,7 @@ public class EventServiceClient {
 
     public EventServiceClient(
             WebClient.Builder webClientBuilder,
-            @Value("${services.event-service.url:http://localhost:8085}") String eventServiceUrl) {
+            @Value("${services.event-service.url:http://localhost:8093}") String eventServiceUrl) {
         this.webClient = webClientBuilder
                 .baseUrl(eventServiceUrl)
                 .build();

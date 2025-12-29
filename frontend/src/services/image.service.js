@@ -59,7 +59,7 @@ const imageService = {
             // The API returns a secure URL string
             // Handle both wrapped ({ data: url }) and direct (url) responses
             console.log(response);
-            const imageUrl = response.data || response;
+            const imageUrl = response.url || response.data || response;
 
             if (typeof imageUrl !== 'string') {
                 throw new Error('Invalid response from image upload API');

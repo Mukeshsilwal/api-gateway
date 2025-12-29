@@ -12,26 +12,15 @@
 
     <name>Ticket Katum Parent</name>
     <modules>
-        <module>gateway</module>
         <module>services/web-bff</module>
         <module>shared/common</module>
         <module>shared/events</module>
-        <module>services/booking-service</module>
         <module>services/payment-service</module>
-        <module>services/hotel-service</module>
-        <module>services/bus-service</module>
         <module>services/auth-service</module>
-        <module>services/market-service</module>
-        <module>services/eureka-server</module>
-        <module>services/ai-service</module>
-        <module>services/event-service</module>
-        <module>services/image-service</module>
         <module>services/trip-service</module>
-        <module>services/tracking-service</module>
-        <module>services/alert-service</module>
-        <module>services/analytics-service</module>
-        <module>services/sos-service</module>
-        <module>services/guide-service</module>
+        <module>services/safety-service</module>
+        <module>services/platform-service</module>
+        <module>services/travel-service</module>
     </modules>
 
     <properties>

@@ -92,7 +92,10 @@ const TicketingForm: React.FC<TicketingFormProps> = ({ data, onChange }) => {
                         type="number"
                         min="1"
                         value={formData.minTicketsPerOrder || 1}
-                        onChange={(e) => updateField('minTicketsPerOrder', parseInt(e.target.value))}
+                        onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            updateField('minTicketsPerOrder', isNaN(val) ? 0 : val);
+                        }}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
@@ -106,7 +109,10 @@ const TicketingForm: React.FC<TicketingFormProps> = ({ data, onChange }) => {
                         type="number"
                         min="1"
                         value={formData.maxTicketsPerOrder || 10}
-                        onChange={(e) => updateField('maxTicketsPerOrder', parseInt(e.target.value))}
+                        onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            updateField('maxTicketsPerOrder', isNaN(val) ? 0 : val);
+                        }}
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                 </div>
@@ -235,7 +241,10 @@ const TicketingForm: React.FC<TicketingFormProps> = ({ data, onChange }) => {
                                         type="number"
                                         min="0"
                                         value={ticket.price}
-                                        onChange={(e) => updateTicketType(index, 'price', parseFloat(e.target.value))}
+                                        onChange={(e) => {
+                                            const val = parseFloat(e.target.value);
+                                            updateTicketType(index, 'price', isNaN(val) ? 0 : val);
+                                        }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                                         required
                                     />
@@ -249,7 +258,10 @@ const TicketingForm: React.FC<TicketingFormProps> = ({ data, onChange }) => {
                                         type="number"
                                         min="1"
                                         value={ticket.quantity}
-                                        onChange={(e) => updateTicketType(index, 'quantity', parseInt(e.target.value))}
+                                        onChange={(e) => {
+                                            const val = parseInt(e.target.value);
+                                            updateTicketType(index, 'quantity', isNaN(val) ? 0 : val);
+                                        }}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                                         required
                                     />

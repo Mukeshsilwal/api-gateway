@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface Step {
@@ -73,12 +73,12 @@ const EventWizard: React.FC<EventWizardProps> = ({
                                         {/* Circle */}
                                         <div
                                             className={`w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all duration-300 ${isCompleted
-                                                    ? 'bg-green-500 text-white'
-                                                    : isCurrent
-                                                        ? 'bg-blue-500 text-white ring-4 ring-blue-200'
-                                                        : isAccessible
-                                                            ? 'bg-gray-200 text-gray-600'
-                                                            : 'bg-gray-100 text-gray-400'
+                                                ? 'bg-green-500 text-white'
+                                                : isCurrent
+                                                    ? 'bg-blue-500 text-white ring-4 ring-blue-200'
+                                                    : isAccessible
+                                                        ? 'bg-gray-200 text-gray-600'
+                                                        : 'bg-gray-100 text-gray-400'
                                                 }`}
                                         >
                                             {isCompleted ? <Check size={24} /> : index + 1}
@@ -133,8 +133,8 @@ const EventWizard: React.FC<EventWizardProps> = ({
                     onClick={handlePrevious}
                     disabled={currentStep === 0}
                     className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all ${currentStep === 0
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600'
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white border-2 border-gray-300 text-gray-700 hover:border-blue-500 hover:text-blue-600'
                         }`}
                 >
                     <ChevronLeft size={20} />

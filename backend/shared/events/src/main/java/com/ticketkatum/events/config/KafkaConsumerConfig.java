@@ -48,7 +48,7 @@ public class KafkaConsumerConfig {
                     JsonDeserializer<Object> jsonDeserializer = new JsonDeserializer<>(objectMapper);
                     jsonDeserializer.addTrustedPackages("*");
 
-                    jsonDeserializer.setUseTypeHeaders(true);
+                    jsonDeserializer.setUseTypeHeaders(false); // Changed to false to not require type headers
 
                     return new ErrorHandlingDeserializer<>(jsonDeserializer);
                 });

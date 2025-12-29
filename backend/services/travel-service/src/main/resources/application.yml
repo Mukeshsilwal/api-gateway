@@ -1,0 +1,113 @@
+server:
+  port: 8093
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: travel-service
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/travel_db
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      # ========== CONNECTION POOL OPTIMIZATIONS ==========
+      maximum-pool-size: 20                       # Increased from 10 for better concurrency
+      minimum-idle: 10                            # Increased from 5 to maintain ready connections
+      connection-timeout: 30000                   # 30 seconds
+      idle-timeout: 600000                        # 10 minutes
+      max-lifetime: 1800000                       # 30 minutes - prevents stale connections
+      leak-detection-threshold: 60000             # 60 seconds - detect connection leaks
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        
+        # ========== PERFORMANCE OPTIMIZATIONS ==========
+        
+        # Batch Processing - improves INSERT/UPDATE performance
+        jdbc:
+          batch_size: 50                          # Batch INSERT/UPDATE statements
+          fetch_size: 50                          # JDBC fetch size for result sets
+        order_inserts: true                       # Order INSERTs for better batching
+        order_updates: true                       # Order UPDATEs for better batching
+        batch_versioned_data: true                # Batch versioned entities (@Version)
+        
+        # Fetching Strategy - reduces N+1 queries
+        default_batch_fetch_size: 16              # Batch lazy loading (use powers of 2)
+        
+        # Query Optimization
+        query:
+          in_clause_parameter_padding: true       # Optimize IN clause with parameter padding
+          plan_cache_max_size: 2048               # Query plan cache size
+        
+        # Connection & Statement Management
+        connection:
+          provider_disables_autocommit: true      # Performance optimization for connections
+    open-in-view: false                           # Disable OSIV to prevent lazy loading issues
+
+  flyway:
+    enabled: false
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: travel-service
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+# SendGrid Configuration
+sendgrid:
+  api:
+    key: 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
+
+# Cloudinary Configuration
+cloudinary:
+  cloud-name: dsqubrfjp
+  api-key: 624365773875321
+  api-secret: 9P5wS1lelWdo6CubuJxzQiNTClw
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.ticketkatum.guide: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+
+# Eureka disabled
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false

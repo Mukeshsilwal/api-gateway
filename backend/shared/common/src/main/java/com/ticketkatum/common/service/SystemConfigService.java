@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@org.springframework.boot.autoconfigure.condition.ConditionalOnClass(name = "javax.sql.DataSource")
 public class SystemConfigService {
 
     private final SystemConfigRepository systemConfigRepository;

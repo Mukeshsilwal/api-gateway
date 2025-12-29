@@ -1,0 +1,27 @@
+server:
+  port: 8097 # Keeping tracking port as main, or new one. Let's use 8097.
+
+spring:
+  application:
+    name: safety-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/safety_db
+    username: postgres
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+# Merge Kafka consumer groups if needed, but they can coexist
+spring.kafka.consumer.group-id: safety-service-group
