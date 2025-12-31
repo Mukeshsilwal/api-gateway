@@ -1,0 +1,373 @@
+﻿[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.ticketkatum:monolith-app:jar:1.0.0
+[WARNING] 'build.plugins.plugin.version' for org.springframework.boot:spring-boot-maven-plugin is missing. @ line 276, column 21
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.ticketkatum:shared-library:jar:1.0.0
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 88, column 21
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Ticket Katum Parent                                                [pom]
+[INFO] shared-library                                                     [jar]
+[INFO] TicketKatum Auth Service                                           [jar]
+[INFO] Shared Events Library                                              [jar]
+[INFO] Travel Service                                                     [jar]
+[INFO] Trip Service                                                       [jar]
+[INFO] payment-service                                                    [jar]
+[INFO] safety-service                                                     [jar]
+[INFO] platform-service                                                   [jar]
+[INFO] TicketKatum Monolith App                                           [jar]
+[INFO] 
+[INFO] --------------------< com.ticketkatum:Ticket-Katum >--------------------
+[INFO] Building Ticket Katum Parent 0.0.1-SNAPSHOT                       [1/10]
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ Ticket-Katum ---
+[INFO] 
+[INFO] -------------------< com.ticketkatum:shared-library >-------------------
+[INFO] Building shared-library 1.0.0                                     [2/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ shared-library ---
+[INFO] Deleting C:\project\api-gateway\backend\shared\common\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ shared-library ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 1 resource
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ shared-library ---
+[INFO] Changes detected - recompiling the module!
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 17 source files to C:\project\api-gateway\backend\shared\common\target\classes
+[WARNING] /C:/project/api-gateway/backend/shared/common/src/main/java/com/ticketkatum/common/image/service/ImageService.java: C:\project\api-gateway\backend\shared\common\src\main\java\com\ticketkatum\common\image\service\ImageService.java uses unchecked or unsafe operations.
+[WARNING] /C:/project/api-gateway/backend/shared/common/src/main/java/com/ticketkatum/common/image/service/ImageService.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --------------------< com.ticketkatum:auth-service >--------------------
+[INFO] Building TicketKatum Auth Service 0.0.1-SNAPSHOT                  [3/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ auth-service ---
+[INFO] Deleting C:\project\api-gateway\backend\modules\auth\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ auth-service ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 5 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ auth-service ---
+[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Compiling 73 source files with javac [debug target 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/entity/User.java:[43,23] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/entity/User.java:[61,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/entity/User.java:[64,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/entity/User.java:[67,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/entity/Role.java:[34,29] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/entity/RegistrationRequest.java:[43,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[INFO] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/security/JwtService.java: Some input files use or override a deprecated API.
+[INFO] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/security/JwtService.java: Recompile with -Xlint:deprecation for details.
+[INFO] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/service/UserSessionService.java: C:\project\api-gateway\backend\modules\auth\src\main\java\com\ticketkatum\service\UserSessionService.java uses unchecked or unsafe operations.
+[INFO] /C:/project/api-gateway/backend/modules/auth/src/main/java/com/ticketkatum/service/UserSessionService.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] -------------------< com.ticketkatum:shared-events >--------------------
+[INFO] Building Shared Events Library 1.0.0                              [4/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ shared-events ---
+[INFO] Deleting C:\project\api-gateway\backend\shared\events\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ shared-events ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ shared-events ---
+[INFO] Changes detected - recompiling the module! :source
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 26 source files with javac [debug target 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] /C:/project/api-gateway/backend/shared/events/src/main/java/com/ticketkatum/events/hotel/HotelBookingConfirmedEvent.java:[12,1] Generating equals/hashCode implementation but without a call to superclass, even though this class does not extend java.lang.Object. If this is intentional, add '@EqualsAndHashCode(callSuper=false)' to your type.
+[INFO] 
+[INFO] -------------------< com.ticketkatum:travel-service >-------------------
+[INFO] Building Travel Service 1.0-SNAPSHOT                              [5/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ travel-service ---
+[INFO] Deleting C:\project\api-gateway\backend\modules\travel\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ travel-service ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 14 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ travel-service ---
+[INFO] Changes detected - recompiling the module! :dependency
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 358 source files with javac [debug target 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/Guide.java:[52,32] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/Guide.java:[55,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/Guide.java:[58,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/Guide.java:[61,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Waitlist.java:[33,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Waitlist.java:[36,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/EventReminder.java:[40,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/EventReminder.java:[45,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/ServicePackage.java:[48,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/ServicePackage.java:[51,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/ServicePackage.java:[54,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/PromoCode.java:[42,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/PromoCode.java:[50,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/PromoCode.java:[53,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Room.java:[90,35] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/dto/EventSearchCriteria.java:[49,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/dto/EventSearchCriteria.java:[50,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/NearbyHotelRequest.java:[34,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/NearbyHotelRequest.java:[42,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/NearbyHotelRequest.java:[46,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/NearbyHotelRequest.java:[50,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Hotel.java:[86,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Hotel.java:[87,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/HotelSearchRequest.java:[24,20] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/HotelSearchRequest.java:[27,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/model/HotelSearchRequest.java:[31,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/guide/entity/GuideLanguage.java:[33,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/RoomMaintenance.java:[37,34] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/RoomMaintenance.java:[42,26] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Hotel.java: Some input files use or override a deprecated API.
+[INFO] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/entity/Hotel.java: Recompile with -Xlint:deprecation for details.
+[INFO] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/redis/TicketCacheService.java: Some input files use unchecked or unsafe operations.
+[INFO] /C:/project/api-gateway/backend/modules/travel/src/main/java/com/ticketkatum/redis/TicketCacheService.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] --------------------< com.ticketkatum:trip-service >--------------------
+[INFO] Building Trip Service 1.0-SNAPSHOT                                [6/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ trip-service ---
+[INFO] Deleting C:\project\api-gateway\backend\modules\trip\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ trip-service ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 3 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ trip-service ---
+[INFO] Changes detected - recompiling the module! :dependency
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 34 source files with javac [debug target 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/Trip.java:[43,22] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/Trip.java:[47,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/Trip.java:[51,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/Trip.java:[63,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/TripParticipant.java:[45,29] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/TripParticipant.java:[49,31] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/TripCheckpoint.java:[54,30] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/trip/src/main/java/com/ticketkatum/tripservice/entity/TripBooking.java:[49,27] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] 
+[INFO] ------------------< com.ticketkatum:payment-service >-------------------
+[INFO] Building payment-service 0.0.1-SNAPSHOT                           [7/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ payment-service ---
+[INFO] Deleting C:\project\api-gateway\backend\modules\payment\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ payment-service ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 4 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ payment-service ---
+[INFO] Changes detected - recompiling the module!
+[INFO] Compiling 55 source files to C:\project\api-gateway\backend\modules\payment\target\classes
+[WARNING] /C:/project/api-gateway/backend/modules/payment/src/main/java/com/ticketkatum/configs/RedisConfig.java: C:\project\api-gateway\backend\modules\payment\src\main\java\com\ticketkatum\configs\RedisConfig.java uses or overrides a deprecated API.
+[WARNING] /C:/project/api-gateway/backend/modules/payment/src/main/java/com/ticketkatum/configs/RedisConfig.java: Recompile with -Xlint:deprecation for details.
+[WARNING] /C:/project/api-gateway/backend/modules/payment/src/main/java/com/ticketkatum/controller/PaymentController.java: Some input files use unchecked or unsafe operations.
+[WARNING] /C:/project/api-gateway/backend/modules/payment/src/main/java/com/ticketkatum/controller/PaymentController.java: Recompile with -Xlint:unchecked for details.
+[INFO] 
+[INFO] -------------------< com.ticketkatum:safety-service >-------------------
+[INFO] Building safety-service 0.0.1-SNAPSHOT                            [8/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ safety-service ---
+[INFO] Deleting C:\project\api-gateway\backend\modules\safety\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ safety-service ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ safety-service ---
+[INFO] Changes detected - recompiling the module! :dependency
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 28 source files with javac [debug target 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] /C:/project/api-gateway/backend/modules/safety/src/main/java/com/ticketkatum/trackingservice/entity/PointOfInterest.java:[67,25] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/safety/src/main/java/com/ticketkatum/trackingservice/entity/PointOfInterest.java:[73,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/safety/src/main/java/com/ticketkatum/trackingservice/entity/PointOfInterest.java:[76,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/safety/src/main/java/com/ticketkatum/sos/entity/EmergencyContact.java:[46,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/safety/src/main/java/com/ticketkatum/trackingservice/entity/LocationTracking.java:[64,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/safety/src/main/java/com/ticketkatum/trackingservice/dto/request/LocationUpdateRequest.java:[47,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] 
+[INFO] ------------------< com.ticketkatum:platform-service >------------------
+[INFO] Building platform-service 0.0.1-SNAPSHOT                          [9/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ platform-service ---
+[INFO] Deleting C:\project\api-gateway\backend\modules\platform\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ platform-service ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ platform-service ---
+[INFO] Changes detected - recompiling the module! :dependency
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 46 source files with javac [debug target 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/SOSTrigger.java:[47,23] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/Alert.java:[41,22] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/Alert.java:[74,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/AlertPreference.java:[36,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/AlertPreference.java:[39,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/AlertPreference.java:[42,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/AlertPreference.java:[45,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DailyMetric.java:[29,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DailyMetric.java:[32,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DailyMetric.java:[35,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DailyMetric.java:[38,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DailyMetric.java:[41,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/RevenueStream.java:[35,24] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/RevenueStream.java:[38,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/AlertRule.java:[62,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/alertservice/entity/AlertRule.java:[65,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DestinationStat.java:[27,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[WARNING] /C:/project/api-gateway/backend/modules/platform/src/main/java/com/ticketkatum/analytics/entity/DestinationStat.java:[30,21] @Builder will ignore the initializing expression entirely. If you want the initializing expression to serve as default, add @Builder.Default. If it is not supposed to be settable during building, make the field final.
+[INFO] 
+[INFO] --------------------< com.ticketkatum:monolith-app >--------------------
+[INFO] Building TicketKatum Monolith App 1.0.0                          [10/10]
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- maven-clean-plugin:2.5:clean (default-clean) @ monolith-app ---
+[INFO] Deleting C:\project\api-gateway\backend\monolith-app\target
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ monolith-app ---
+[WARNING] Using platform encoding (UTF-8 actually) to copy filtered resources, i.e. build is platform dependent!
+[INFO] Copying 4 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ monolith-app ---
+[INFO] Changes detected - recompiling the module! :dependency
+[WARNING] File encoding has not been set, using platform encoding UTF-8, i.e. build is platform dependent!
+[INFO] Compiling 274 source files with javac [debug target 21] to target\classes
+[INFO] -------------------------------------------------------------
+[WARNING] COMPILATION WARNING : 
+[INFO] -------------------------------------------------------------
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[WARNING] unknown enum constant javax.annotation.meta.When.MAYBE
+  reason: class file for javax.annotation.meta.When not found
+[INFO] 4 warnings 
+[INFO] -------------------------------------------------------------
+[INFO] -------------------------------------------------------------
+[ERROR] COMPILATION ERROR : 
+[INFO] -------------------------------------------------------------
+[ERROR] /C:/project/api-gateway/backend/monolith-app/src/main/java/com/ticketkatum/controller/JourneyManagementController.java:[3,31] cannot find symbol
+  symbol:   class JourneyManagementService
+  location: package com.ticketkatum.service
+[ERROR] /C:/project/api-gateway/backend/monolith-app/src/main/java/com/ticketkatum/controller/JourneyManagementController.java:[23,19] cannot find symbol
+  symbol:   class JourneyManagementService
+  location: class com.ticketkatum.controller.JourneyManagementController
+[ERROR] /C:/project/api-gateway/backend/monolith-app/src/main/java/com/ticketkatum/controller/JourneyManagementController.java:[18,1] cannot find symbol
+  symbol:   class JourneyManagementService
+  location: class com.ticketkatum.controller.JourneyManagementController
+[INFO] 3 errors 
+[INFO] -------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Ticket Katum Parent 0.0.1-SNAPSHOT ................. SUCCESS [  0.516 s]
+[INFO] shared-library 1.0.0 ............................... SUCCESS [ 14.254 s]
+[INFO] TicketKatum Auth Service 0.0.1-SNAPSHOT ............ SUCCESS [ 13.564 s]
+[INFO] Shared Events Library 1.0.0 ........................ SUCCESS [  8.566 s]
+[INFO] Travel Service 1.0-SNAPSHOT ........................ SUCCESS [ 24.290 s]
+[INFO] Trip Service 1.0-SNAPSHOT .......................... SUCCESS [ 10.610 s]
+[INFO] payment-service 0.0.1-SNAPSHOT ..................... SUCCESS [ 12.856 s]
+[INFO] safety-service 0.0.1-SNAPSHOT ...................... SUCCESS [ 12.949 s]
+[INFO] platform-service 0.0.1-SNAPSHOT .................... SUCCESS [  8.430 s]
+[INFO] TicketKatum Monolith App 1.0.0 ..................... FAILURE [ 19.311 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  02:08 min
+[INFO] Finished at: 2025-12-30T16:59:33+05:45
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.11.0:compile (default-compile) on project monolith-app: Compilation failure: Compilation failure: 
+[ERROR] /C:/project/api-gateway/backend/monolith-app/src/main/java/com/ticketkatum/controller/JourneyManagementController.java:[3,31] cannot find symbol
+[ERROR]   symbol:   class JourneyManagementService
+[ERROR]   location: package com.ticketkatum.service
+[ERROR] /C:/project/api-gateway/backend/monolith-app/src/main/java/com/ticketkatum/controller/JourneyManagementController.java:[23,19] cannot find symbol
+[ERROR]   symbol:   class JourneyManagementService
+[ERROR]   location: class com.ticketkatum.controller.JourneyManagementController
+[ERROR] /C:/project/api-gateway/backend/monolith-app/src/main/java/com/ticketkatum/controller/JourneyManagementController.java:[18,1] cannot find symbol
+[ERROR]   symbol:   class JourneyManagementService
+[ERROR]   location: class com.ticketkatum.controller.JourneyManagementController
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :monolith-app

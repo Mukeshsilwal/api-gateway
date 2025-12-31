@@ -1,132 +1,50 @@
 version: '3.8'
 
 services:
-  eureka-server:
-    image: mukeshsilwal/eureka-server:latest
+  monolith-app:
+    image: ticket-katum/monolith-app:latest
+    build:
+      context: ./backend
+      dockerfile: monolith-app/Dockerfile # Assuming Dockerfile needs creation or exists
     ports:
-      - "8761:8761"
-    networks:
-      - ticket-network
+      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-
-  gateway:
-    image: mukeshsilwal/gateway:latest
-    ports:
-      - "8222:8222"
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/travel_db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=admin
     depends_on:
-      - eureka-server
+      - postgres
     networks:
       - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
 
-  auth-service:
-    image: mukeshsilwal/auth-service:latest
+  postgres:
+    image: postgres:15-alpine
     ports:
-      - "8081:8081"
-    depends_on:
-      - eureka-server
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=travel_db
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  booking-service:
-    image: mukeshsilwal/booking-service:latest
-    ports:
-      - "8082:8082"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  payment-service:
-    image: mukeshsilwal/payment-service:latest
-    ports:
-      - "8083:8083"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  web-bff:
-    image: mukeshsilwal/web-bff:latest
-    ports:
-      - "8084:8084"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  hotel-service:
-    image: mukeshsilwal/hotel-service:latest
-    ports:
-      - "8085:8085"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  bus-service:
-    image: mukeshsilwal/bus-service:latest
-    ports:
-      - "8086:8086"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  market-service:
-    image: mukeshsilwal/market-service:latest
-    ports:
-      - "8087:8087"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
-
-  event-service:
-    image: mukeshsilwal/event-service:latest
-    ports:
-      - "8088:8088"
-    depends_on:
-      - eureka-server
-    networks:
-      - ticket-network
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_PROFILES_ACTIVE=docker
 
   frontend:
-    image: mukeshsilwal/frontend:latest
+    image: ticket-katum/frontend:latest
+    build:
+      context: ./frontend
     ports:
       - "80:80"
     depends_on:
-      - gateway
+      - monolith-app
     networks:
       - ticket-network
 
 networks:
   ticket-network:
     driver: bridge
+
+volumes:
+  postgres-data:

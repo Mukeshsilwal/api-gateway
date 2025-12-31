@@ -12,15 +12,15 @@
 
     <name>Ticket Katum Parent</name>
     <modules>
-        <module>services/web-bff</module>
+        <module>monolith-app</module>
         <module>shared/common</module>
         <module>shared/events</module>
-        <module>services/payment-service</module>
-        <module>services/auth-service</module>
-        <module>services/trip-service</module>
-        <module>services/safety-service</module>
-        <module>services/platform-service</module>
-        <module>services/travel-service</module>
+        <module>modules/payment</module>
+        <module>modules/auth</module>
+        <module>modules/trip</module>
+        <module>modules/safety</module>
+        <module>modules/platform</module>
+        <module>modules/travel</module>
     </modules>
 
     <properties>
