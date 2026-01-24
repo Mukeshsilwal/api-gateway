@@ -38,7 +38,7 @@ import java.util.Map;
 public class EsewaPaymentProvider implements PaymentProvider {
 
     private final EsewaProperties esewaProperties;
-    private final RestTemplate restTemplate;
+    private final RestTemplate paymentRestTemplate;
     private final PaymentTransactionRepository txnRepo;
     private final PaymentEventPublisher paymentEventPublisher;
 
@@ -182,7 +182,7 @@ public class EsewaPaymentProvider implements PaymentProvider {
 
             log.info("Verifying eSewa payment: {}", url);
 
-            ResponseEntity<String> responseEntity = restTemplate.getForEntity(url, String.class);
+            ResponseEntity<String> responseEntity = paymentRestTemplate.getForEntity(url, String.class);
 
             VerificationResult result = parseVerificationResponse(responseEntity.getBody());
 

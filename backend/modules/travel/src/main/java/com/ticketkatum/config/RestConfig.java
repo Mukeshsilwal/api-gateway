@@ -8,7 +8,8 @@ import org.springframework.web.client.RestTemplate;
 public class RestConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
+    @org.springframework.context.annotation.Primary
+    public RestTemplate travelRestTemplate() {
         return new RestTemplate();
     }
 }

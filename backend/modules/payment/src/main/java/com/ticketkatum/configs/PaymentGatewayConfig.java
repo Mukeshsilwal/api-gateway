@@ -13,7 +13,7 @@ import java.time.Duration;
 public class PaymentGatewayConfig {
 
     @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    public RestTemplate paymentRestTemplate(RestTemplateBuilder builder) {
         return builder
                 .setConnectTimeout(Duration.ofSeconds(30))
                 .setReadTimeout(Duration.ofSeconds(30))
