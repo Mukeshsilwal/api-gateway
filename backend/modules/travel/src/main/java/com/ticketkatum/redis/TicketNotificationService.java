@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
+@Service("travelTicketNotificationService")
 @Slf4j
 public class TicketNotificationService {
 
