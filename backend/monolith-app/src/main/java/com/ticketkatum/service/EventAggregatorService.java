@@ -275,6 +275,97 @@ public class EventAggregatorService {
                 .build();
     }
 
+    private final com.ticketkatum.client.PaymentServiceClient paymentServiceClient;
+    private final com.ticketkatum.config.PaymentConfig paymentConfig;
+
+    /**
+     * Book tickets and initiate payment
+     * @param bookingData Booking request data
+     * @return Booking initiation response with payment details
+     */
+    public Mono<com.ticketkatum.dto.event.BookingInitiationResponse> bookEvent(Map<String, Object> bookingData) {
+        log.info("Aggregator: Processing event booking for eventId: {}", bookingData.get("eventId"));
+        
+        // Step 1: Create booking in event-service
+        return eventServiceClient.bookTickets(bookingData)
+            .flatMap(bookingResponse -> {
+                log.info("Aggregator: Booking created. Initiating payment.");
+                
+                @SuppressWarnings("unchecked")
+                Map<String, Object> data = (Map<String, Object>) bookingResponse.getData();
+                String bookingReference = (String) data.get("bookingReference");
+                Number grandTotal = (Number) data.get("grandTotal");
+                String contactEmail = (String) bookingData.get("contactEmail");
+                String contactPhone = (String) bookingData.get("contactPhone");
+                
+                // Extract customer name
+                String customerName = contactEmail;
+                try {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> attendees = (List<Map<String, Object>>) bookingData.get("attendees");
+                    if (attendees != null && !attendees.isEmpty()) {
+                        Map<String, Object> firstAttendee = attendees.get(0);
+                        String firstName = (String) firstAttendee.get("firstName");
+                        String lastName = (String) firstAttendee.get("lastName");
+                        if (firstName != null && lastName != null) {
+                            customerName = firstName + " " + lastName;
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("Could not extract customer name", e);
+                }
+
+                // Step 2: Initiate Payment
+                com.ticketkatum.dto.payment.request.PaymentRequest paymentRequest = com.ticketkatum.dto.payment.request.PaymentRequest.builder()
+                        .amount(new java.math.BigDecimal(grandTotal.toString()))
+                        .currency("NPR")
+                        .bookingId(bookingReference)
+                        .successUrl(paymentConfig.getSuccessUrl())
+                        .failureUrl(paymentConfig.getFailureUrl())
+                        .metadata(Map.of(
+                                "bookingType", "EVENT",
+                                "customerName", customerName,
+                                "customerEmail", contactEmail,
+                                "customerPhone", contactPhone != null ? contactPhone : ""))
+                        .build();
+
+                return Mono.fromFuture(paymentServiceClient.initiatePayment("esewa", paymentRequest))
+                        .map(paymentResponse -> {
+                            String htmlForm = null;
+                            String paymentUrl = null;
+                            
+                            if (paymentResponse.getData() instanceof Map) {
+                                @SuppressWarnings("unchecked")
+                                Map<String, Object> dataMap = (Map<String, Object>) paymentResponse.getData();
+                                htmlForm = (String) dataMap.get("htmlForm");
+                                if (htmlForm == null) {
+                                    paymentUrl = (String) dataMap.get("paymentUrl");
+                                    if (paymentUrl == null) {
+                                        paymentUrl = (String) dataMap.get("payment_url");
+                                    }
+                                }
+                            }
+
+                            return com.ticketkatum.dto.event.BookingInitiationResponse.builder()
+                                    .bookingReference(bookingReference)
+                                    .htmlForm(htmlForm)
+                                    .paymentUrl(paymentUrl)
+                                    .transactionId(paymentResponse.getTransactionId())
+                                    .status("INITIATED")
+                                    .message("Booking created, redirecting to payment")
+                                    .build();
+                        })
+                        .onErrorResume(paymentError -> {
+                            log.error("Payment initiation failed for booking: {}", bookingReference, paymentError);
+                             return Mono.just(com.ticketkatum.dto.event.BookingInitiationResponse.builder()
+                                    .bookingReference(bookingReference)
+                                    .status("PAYMENT_FAILED")
+                                    .error("Payment initiation failed. Please try again.")
+                                    .build());
+                        });
+            });
+    }
+
     // Utility methods
     private Long getLong(Map<String, Object> map, String key) {
         Object value = map.get(key);

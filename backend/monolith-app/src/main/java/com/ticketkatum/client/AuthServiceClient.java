@@ -113,13 +113,13 @@ public class AuthServiceClient {
         log.debug("Validating session: {}", sessionId);
 
         return Mono.fromCallable(() -> {
-            Map<String, Object> response = authService.validateSession(sessionId, token);
+            com.ticketkatum.model.SessionValidationResponse response = authService.validateSession(sessionId, token);
             return SessionValidationResponse.builder()
-                    .valid((Boolean) response.get("valid"))
-                    .sessionId((String) response.get("sessionId"))
-                    .username((String) response.get("username"))
-                    .roles((List<String>) response.get("roles"))
-                    .ipAddress((String) response.get("ipAddress"))
+                    .valid(response.isValid())
+                    .sessionId(response.getSessionId())
+                    .username(response.getUsername())
+                    .roles(response.getRoles())
+                    .ipAddress(response.getIpAddress())
                     .build();
         })
         .subscribeOn(Schedulers.boundedElastic())
@@ -135,11 +135,13 @@ public class AuthServiceClient {
         log.debug("Fetching active sessions for user: {}", username);
 
         return Mono.fromCallable(() -> {
-            Map<String, Object> response = authService.getActiveSessions(username);
+            com.ticketkatum.model.ActiveSessionsResponse response = authService.getActiveSessions(username);
+            // Handling List<Map> is still tricky if DTO expects List<Map>.
+            // Assuming DTO matches Model here aside from package.
             return ActiveSessionsResponse.builder()
-                    .username((String) response.get("username"))
-                    .sessions((List<Map<Object, Object> >) response.get("sessions")) // Type erasure handling
-                    .totalCount((Long) response.get("totalCount"))
+                    .username(response.getUsername())
+                    .sessions(response.getSessions()) 
+                    .totalCount(response.getTotalCount())
                     .build();
         })
         .subscribeOn(Schedulers.boundedElastic())
@@ -246,9 +248,23 @@ public class AuthServiceClient {
     @Retry(name = SERVICE_NAME)
     public CompletableFuture<Map<String, Object>> processOAuth2Login(Map<String, Object> oauth2Request) {
         log.debug("Processing OAuth2 login for email: {}", oauth2Request.get("email"));
-        return Mono.fromCallable(() -> authService.processOAuth2Login(oauth2Request))
-                .subscribeOn(Schedulers.boundedElastic())
-                .toFuture();
+        return Mono.fromCallable(() -> {
+             com.ticketkatum.model.LoginResponse response = authService.processOAuth2Login(oauth2Request);
+             // Convert Model to Map to maintain backward compatibility for now
+             // Or can I assume callers can handle LoginResponse?
+             // Safest is to map back to Map as per signature.
+             return Map.of(
+                 "accessToken", response.getAccessToken(),
+                 "refreshToken", response.getRefreshToken(),
+                 "sessionId", response.getSessionId(),
+                 "username", response.getUsername(),
+                 "roles", response.getRoles(),
+                 "tokenType", response.getTokenType(),
+                 "provider", response.getProvider() != null ? response.getProvider() : "unknown"
+             );
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .toFuture();
     }
 
     // ============ Fallback Methods ============

@@ -273,154 +273,32 @@ public class EventBffController {
         @Operation(summary = "Book event tickets")
         public Mono<ResponseEntity<Response<?>>> bookTickets(@RequestBody Map<String, Object> bookingData) {
                 log.info("📤 BFF: Received event booking request for eventId: {}", bookingData.get("eventId"));
-                log.debug("Booking data: {}", bookingData);
-
-                // Step 1: Create booking in event-service (PENDING status)
-                return eventServiceClient.bookTickets(bookingData)
-                                .flatMap(bookingResponse -> {
-                                        log.info("📥 Booking response received from event-service");
-                                        log.debug("Booking response: {}", bookingResponse);
-
-                                        // Extract booking reference and amount
-                                        Map<String, Object> data = (Map<String, Object>) bookingResponse.getData();
-                                        String bookingReference = (String) data.get("bookingReference");
-                                        Number grandTotal = (Number) data.get("grandTotal");
-                                        String contactEmail = (String) bookingData.get("contactEmail");
-                                        String contactPhone = (String) bookingData.get("contactPhone");
-
-                                        log.info("✅ Booking created successfully - Reference: {}, Amount: NPR {}",
-                                                        bookingReference, grandTotal);
-
-                                        // Extract first attendee name or use contact email
-                                        String customerName = contactEmail;
-                                        try {
-                                                List<Map<String, Object>> attendees = (List<Map<String, Object>>) bookingData
-                                                                .get("attendees");
-                                                if (attendees != null && !attendees.isEmpty()) {
-                                                        Map<String, Object> firstAttendee = attendees.get(0);
-                                                        String firstName = (String) firstAttendee.get("firstName");
-                                                        String lastName = (String) firstAttendee.get("lastName");
-                                                        if (firstName != null && lastName != null) {
-                                                                customerName = firstName + " " + lastName;
-                                                        }
-                                                }
-                                        } catch (Exception e) {
-                                                log.warn("Could not extract customer name from attendees", e);
-                                        }
-
-                                        log.info("💳 Initiating eSewa payment for booking: {}", bookingReference);
-
-                                        // Step 2: Initiate payment with eSewa
-                                        com.ticketkatum.dto.payment.request.PaymentRequest paymentRequest = com.ticketkatum.dto.payment.request.PaymentRequest
-                                                        .builder()
-                                                        .amount(new java.math.BigDecimal(grandTotal.toString()))
-                                                        .currency("NPR")
-                                                        .bookingId(bookingReference)
-                                                        .successUrl("http://localhost:3000/payment/verify/esewa")
-                                                        .failureUrl("http://localhost:3000/payment/failure")
-                                                        .metadata(Map.of(
-                                                                        "bookingType", "EVENT",
-                                                                        "customerName", customerName,
-                                                                        "customerEmail", contactEmail,
-                                                                        "customerPhone",
-                                                                        contactPhone != null ? contactPhone : ""))
-                                                        .build();
-
-                                        // Call payment service asynchronously
-                                        return Mono.fromFuture(
-                                                        paymentServiceClient.initiatePayment("esewa", paymentRequest))
-                                                        .map(paymentResponse -> {
-                                                                log.info("💰 Payment initiated successfully - Transaction ID: {}",
-                                                                                paymentResponse.getTransactionId());
-                                                                log.debug("Payment response: {}", paymentResponse);
-
-                                                                // Step 3: Return combined response with payment URL
-                                                                Map<String, Object> responseData = new java.util.HashMap<>();
-                                                                responseData.put("bookingReference", bookingReference);
-
-                                                                // Extract HTML form or payment URL from
-                                                                // provider-specific data
-                                                                String htmlForm = null;
-                                                                String paymentUrl = null;
-                                                                if (paymentResponse.getData() != null && paymentResponse
-                                                                                .getData() instanceof Map) {
-                                                                        @SuppressWarnings("unchecked")
-                                                                        Map<String, Object> dataMap = (Map<String, Object>) paymentResponse
-                                                                                        .getData();
-
-                                                                        log.debug("Payment response data keys: {}",
-                                                                                        dataMap.keySet());
-
-                                                                        // Try to get HTML form first (eSewa V2 API)
-                                                                        htmlForm = (String) dataMap.get("htmlForm");
-
-                                                                        // Fallback to payment URL (if using different
-                                                                        // payment method)
-                                                                        if (htmlForm == null) {
-                                                                                paymentUrl = (String) dataMap
-                                                                                                .get("paymentUrl");
-                                                                                if (paymentUrl == null) {
-                                                                                        paymentUrl = (String) dataMap
-                                                                                                        .get("payment_url");
-                                                                                }
-                                                                        }
-
-                                                                        log.info("🔗 Payment method: {}",
-                                                                                        htmlForm != null ? "HTML Form"
-                                                                                                        : (paymentUrl != null
-                                                                                                                        ? "Payment URL"
-                                                                                                                        : "MISSING!"));
-                                                                } else {
-                                                                        log.warn("⚠️ Payment response data is null or not a Map!");
-                                                                }
-
-                                                                // Return HTML form or payment URL
-                                                                if (htmlForm != null) {
-                                                                        responseData.put("htmlForm", htmlForm);
-                                                                        log.info("📝 Returning HTML form for auto-submission");
-                                                                } else if (paymentUrl != null) {
-                                                                        responseData.put("paymentUrl", paymentUrl);
-                                                                        log.info("🔗 Returning payment URL: {}",
-                                                                                        paymentUrl);
-                                                                }
-
-                                                                responseData.put("transactionId",
-                                                                                paymentResponse.getTransactionId());
-
-                                                                log.info("📦 Returning booking response with payment method: {}",
-                                                                                paymentUrl != null ? "PRESENT"
-                                                                                                : "MISSING");
-
-                                                                return (ResponseEntity<Response<?>>) (ResponseEntity<?>) ResponseEntity
-                                                                                .ok(new Response<>(200,
-                                                                                                "Booking created, redirecting to payment",
-                                                                                                responseData));
-                                                        })
-                                                        .onErrorResume(paymentError -> {
-                                                                log.error("❌ Payment initiation failed for booking: {}",
-                                                                                bookingReference, paymentError);
-                                                                // If payment fails, return booking reference anyway so
-                                                                // user can retry
-                                                                Map<String, Object> responseData = new java.util.HashMap<>();
-                                                                responseData.put("bookingReference", bookingReference);
-                                                                responseData.put("error",
-                                                                                "Payment initiation failed. Please try again.");
-                                                                return Mono.just(
-                                                                                (ResponseEntity<Response<?>>) (ResponseEntity<?>) ResponseEntity
-                                                                                                .ok(new Response<>(500,
-                                                                                                                "Payment initiation failed",
-                                                                                                                responseData)));
-                                                        });
-                                })
-                                .onErrorResume(bookingError -> {
-                                        log.error("❌ Booking creation failed", bookingError);
-                                        return Mono.just(
-                                                        (ResponseEntity<Response<?>>) (ResponseEntity<?>) ResponseEntity
-                                                                        .badRequest()
-                                                                        .body(new Response<>(400,
-                                                                                        "Booking creation failed: "
-                                                                                                        + bookingError.getMessage())));
-                                });
+                
+                return eventAggregatorService.bookEvent(bookingData)
+                        .map(response -> {
+                             // Respond based on status
+                             if ("PAYMENT_FAILED".equals(response.getStatus())) {
+                                 return ResponseEntity.ok(new Response<>(500, response.getError(), response));
+                             }
+                             
+                             // Construct response data compatible with frontend expectations
+                             Map<String, Object> data = new java.util.HashMap<>();
+                             data.put("bookingReference", response.getBookingReference());
+                             data.put("transactionId", response.getTransactionId());
+                             
+                             if (response.getHtmlForm() != null) {
+                                 data.put("htmlForm", response.getHtmlForm());
+                             } else if (response.getPaymentUrl() != null) {
+                                 data.put("paymentUrl", response.getPaymentUrl());
+                             }
+                             
+                             return ResponseEntity.ok(new Response<>(200, response.getMessage(), data));
+                        })
+                        .onErrorResume(error -> {
+                            log.error("❌ Booking failed", error);
+                            return Mono.just(ResponseEntity.badRequest()
+                                    .body(new Response<>(400, "Booking failed: " + error.getMessage())));
+                        });
         }
 
         @GetMapping("/bookings/event/{reference}")

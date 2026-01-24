@@ -14,9 +14,9 @@ spring:
   # DATABASE CONFIGURATION
   # ============================================================
   datasource:
-    url: jdbc:postgresql://localhost:5432/travel_db
-    username: postgres
-    password: admin
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/portfolio_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 20
@@ -477,6 +477,14 @@ features:
   payment-integration: true
   booking-cancellation: true
   refund-processing: true
+
+# ============================================================
+# PAYMENT CONFIGURATION
+# ============================================================
+payment:
+  callback:
+    success-url: ${PAYMENT_SUCCESS_URL:http://localhost:3000/payment/verify/esewa}
+    failure-url: ${PAYMENT_FAILURE_URL:http://localhost:3000/payment/failure}
 
   # Admin Features
   bulk-operations: true

@@ -117,7 +117,7 @@ public class AuthModuleService implements AuthServiceApi {
     }
 
     @Override
-    public Map<String, Object> validateSession(String sessionId, String token) {
+    public SessionValidationResponse validateSession(String sessionId, String token) {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             throw new IllegalArgumentException("Session ID is required");
         }
@@ -137,17 +137,17 @@ public class AuthModuleService implements AuthServiceApi {
 
         sessionService.extendSession(sessionId);
 
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("valid", true);
-        responseData.put("sessionId", sessionId);
-        responseData.put("username", session.get("username"));
-        responseData.put("roles", session.get("roles"));
-        responseData.put("ipAddress", session.get("ipAddress"));
-        return responseData;
+        return SessionValidationResponse.builder()
+                .valid(true)
+                .sessionId(sessionId)
+                .username((String) session.get("username"))
+                .roles((List<String>) session.get("roles"))
+                .ipAddress((String) session.get("ipAddress"))
+                .build();
     }
 
     @Override
-    public Map<String, Object> getActiveSessions(String username) {
+    public ActiveSessionsResponse getActiveSessions(String username) {
         if (username == null || username.trim().isEmpty()) {
             throw new IllegalArgumentException("Username is required");
         }
@@ -155,11 +155,11 @@ public class AuthModuleService implements AuthServiceApi {
         List<Map<Object, Object>> sessions = sessionService.getUserSessions(username);
         Long sessionCount = sessionService.getUserSessionCount(username);
 
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("username", username);
-        responseData.put("sessions", sessions);
-        responseData.put("totalCount", sessionCount);
-        return responseData;
+        return ActiveSessionsResponse.builder()
+                .username(username)
+                .sessions(sessions)
+                .totalCount(sessionCount)
+                .build();
     }
 
     @Override
@@ -191,7 +191,7 @@ public class AuthModuleService implements AuthServiceApi {
     }
 
     @Override
-    public Map<String, Object> processOAuth2Login(Map<String, Object> oauth2Request) {
+    public LoginResponse processOAuth2Login(Map<String, Object> oauth2Request) {
         String email = (String) oauth2Request.get("email");
         String name = (String) oauth2Request.get("name");
         String provider = (String) oauth2Request.get("provider");
@@ -240,16 +240,16 @@ public class AuthModuleService implements AuthServiceApi {
                         "loginTime", System.currentTimeMillis(),
                         "provider", provider));
 
-        Map<String, Object> responseData = new HashMap<>();
-        responseData.put("accessToken", accessToken);
-        responseData.put("refreshToken", refreshToken);
-        responseData.put("sessionId", sessionId);
-        responseData.put("username", user.getEmail());
-        responseData.put("roles", roles);
-        responseData.put("tokenType", "Bearer");
-        responseData.put("provider", provider);
-        
-        return responseData;
+        return LoginResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .sessionId(sessionId)
+                .username(user.getEmail())
+                .roles(roles)
+                .activeSessionCount(sessionService.getUserSessionCount(user.getEmail())) // Add this if needed
+                .tokenType("Bearer")
+                .provider(provider)
+                .build();
     }
 
     @Override

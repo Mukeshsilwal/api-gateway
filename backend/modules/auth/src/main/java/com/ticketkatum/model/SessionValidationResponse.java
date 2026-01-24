@@ -11,13 +11,10 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponse {
-    private String accessToken;
-    private String refreshToken;
+public class SessionValidationResponse {
+    private boolean valid;
     private String sessionId;
     private String username;
     private List<String> roles;
-    private Long activeSessionCount;
-    private String tokenType; // e.g., "Bearer"
-    private String provider;
+    private String ipAddress;
 }
