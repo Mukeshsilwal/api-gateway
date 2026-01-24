@@ -278,7 +278,7 @@ public class EventBffController {
                         .map(response -> {
                              // Respond based on status
                              if ("PAYMENT_FAILED".equals(response.getStatus())) {
-                                 return ResponseEntity.ok(new Response<>(500, response.getError(), response));
+                                 return (ResponseEntity<Response<?>>) (ResponseEntity<?>) ResponseEntity.ok(new Response<>(500, response.getError(), response));
                              }
                              
                              // Construct response data compatible with frontend expectations
@@ -292,11 +292,11 @@ public class EventBffController {
                                  data.put("paymentUrl", response.getPaymentUrl());
                              }
                              
-                             return ResponseEntity.ok(new Response<>(200, response.getMessage(), data));
+                             return (ResponseEntity<Response<?>>) (ResponseEntity<?>) ResponseEntity.ok(new Response<>(200, response.getMessage(), data));
                         })
                         .onErrorResume(error -> {
                             log.error("❌ Booking failed", error);
-                            return Mono.just(ResponseEntity.badRequest()
+                            return Mono.just((ResponseEntity<Response<?>>) (ResponseEntity<?>) ResponseEntity.badRequest()
                                     .body(new Response<>(400, "Booking failed: " + error.getMessage())));
                         });
         }
