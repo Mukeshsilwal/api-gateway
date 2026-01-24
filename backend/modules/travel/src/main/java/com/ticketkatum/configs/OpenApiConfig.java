@@ -11,13 +11,14 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 
 /**
- * OpenAPI/Swagger configuration for bus-service
+ * OpenAPI/Swagger configuration for bus-service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized Swagger config
  * Access Swagger UI at: http://localhost:8083/swagger-ui.html
  */
-@Configuration
+// @Configuration
 public class OpenApiConfig {
 
-    @Bean
+    // @Bean
     public OpenAPI busServiceOpenAPI() {
         Server localServer = new Server();
         localServer.setUrl("http://localhost:8083");

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Setter
-@Component
+@Component("travelEsewaProperties")
 @ConfigurationProperties(prefix = "esewa")
 public class EsewaProperties {
 

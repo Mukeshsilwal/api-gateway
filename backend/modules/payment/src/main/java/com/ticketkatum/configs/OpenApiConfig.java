@@ -10,10 +10,14 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
+/**
+ * OpenAPI Configuration (Standalone Mode Only)
+ * DISABLED in monolith - using centralized Swagger config
+ */
+// @Configuration
 public class OpenApiConfig {
 
-    @Bean
+    // @Bean
     public OpenAPI customOpenAPI() {
         final String securitySchemeName = "bearerAuth";
 

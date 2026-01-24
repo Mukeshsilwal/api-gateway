@@ -6,7 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "permissions")
+@Table(name = "permissions_ticket")
 @Getter
 @Setter
 @NoArgsConstructor
