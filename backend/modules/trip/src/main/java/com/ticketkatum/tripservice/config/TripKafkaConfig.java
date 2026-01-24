@@ -29,8 +29,8 @@ public class TripKafkaConfig {
     @Value("${spring.kafka.consumer.group-id:trip-service-group}")
     private String groupId;
 
-    @Bean
-    public ConsumerFactory<String, Object> consumerFactory() {
+    @Bean("tripConsumerFactory")
+    public ConsumerFactory<String, Object> tripConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
 
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -61,10 +61,10 @@ public class TripKafkaConfig {
                 new ErrorHandlingDeserializer<>(jsonDeserializer));
     }
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Object> kafkaListenerContainerFactory() {
+    @Bean("tripKafkaListenerContainerFactory")
+    public ConcurrentKafkaListenerContainerFactory<String, Object> tripKafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, Object> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory());
+        factory.setConsumerFactory(tripConsumerFactory());
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
 
         // Error handling
