@@ -27,9 +27,13 @@ import java.util.Map;
  * Unified Redis Configuration for Travel Service covering Hotels and Buses.
  * Merges previous HotelRedisConfig and RedisConfig.
  */
-@Configuration
-@EnableCaching
-@EnableRedisRepositories(basePackages = "com.ticketkatum.repository")
+/**
+ * Travel Redis Configuration (Standalone Mode Only)
+ * DISABLED in monolith - using centralized CacheConfig instead
+ */
+// @Configuration
+// @EnableCaching
+// @EnableRedisRepositories(basePackages = "com.ticketkatum.repository")
 public class TravelRedisConfig {
 
     @Bean(name = "customRedisTemplate")

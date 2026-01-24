@@ -5,7 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+/**
+ * CORS Configuration (Standalone Mode Only)
+ * DISABLED in monolith - using centralized SecurityConfig instead
+ */
+// @Configuration
 public class CorsConfig {
 
     @Bean

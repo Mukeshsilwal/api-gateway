@@ -21,8 +21,12 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
-@EnableCaching
+/**
+ * Redis Configuration for Payment Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized Redis configuration
+ */
+// @Configuration  // Disabled for monolith - causes bean conflict
+// @EnableCaching  // Disabled for monolith
 public class RedisConfig {
 
     @Bean

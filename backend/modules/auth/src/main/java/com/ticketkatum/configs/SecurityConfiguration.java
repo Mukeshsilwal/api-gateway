@@ -34,10 +34,14 @@ import java.util.Arrays;
  * Configures authentication, authorization, and security filters including
  * OAuth2
  */
+/**
+ * Spring Security Configuration (Standalone Mode Only)
+ * DISABLED in monolith - using centralized SecurityConfig instead
+ */
 @Slf4j
-@Configuration
-@EnableWebSecurity
-@EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+// @Configuration
+// @EnableWebSecurity
+// @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 

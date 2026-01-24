@@ -8,8 +8,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
-@EnableCaching
+/**
+ * Alert Service Redis Configuration (Standalone Mode Only)
+ * DISABLED in monolith - using centralized CacheConfig instead
+ */
+// @Configuration
+// @EnableCaching
 public class AlertRedisConfig {
 
     @Bean

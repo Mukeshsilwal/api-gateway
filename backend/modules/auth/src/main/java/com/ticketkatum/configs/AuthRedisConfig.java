@@ -21,8 +21,12 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
-@EnableCaching
+/**
+ * Auth Redis Configuration (Standalone Mode Only)
+ * DISABLED in monolith - using centralized CacheConfig instead
+ */
+// @Configuration
+// @EnableCaching
 public class AuthRedisConfig {
 
     @Bean(name = "customRedisTemplate")
