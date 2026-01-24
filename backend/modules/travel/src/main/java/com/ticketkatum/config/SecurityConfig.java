@@ -7,14 +7,15 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Security Configuration for Event Service
+ * Security Configuration for Event Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized SecurityConfig instead
  * Temporarily allows all requests for testing
  */
-@Configuration
-@EnableWebSecurity
+// @Configuration  // Disabled for monolith - causes bean conflict
+// @EnableWebSecurity  // Disabled for monolith - using centralized security
 public class SecurityConfig {
 
-    @Bean
+    // @Bean  // Disabled for monolith
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())

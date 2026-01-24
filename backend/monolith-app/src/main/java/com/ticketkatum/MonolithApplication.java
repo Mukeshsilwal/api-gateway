@@ -12,9 +12,26 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@org.springframework.context.annotation.ComponentScan(basePackages = "com.ticketkatum", excludeFilters = @org.springframework.context.annotation.ComponentScan.Filter(type = org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE, classes = {
+@org.springframework.context.annotation.ComponentScan(
+    basePackages = "com.ticketkatum",
+    excludeFilters = {
+        @org.springframework.context.annotation.ComponentScan.Filter(
+            type = org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE,
+            classes = {
                 com.ticketkatum.common.service.SystemConfigService.class,
-                com.ticketkatum.SharedApplication.class }))
+                com.ticketkatum.SharedApplication.class
+            }
+        ),
+        // Exclude module-specific SecurityConfig classes to prevent conflicts
+        @org.springframework.context.annotation.ComponentScan.Filter(
+            type = org.springframework.context.annotation.FilterType.REGEX,
+            pattern = {
+                "com\\.ticketkatum\\.tripservice\\.config\\.SecurityConfig",
+                "com\\.ticketkatum\\.trackingservice\\.config\\.SecurityConfig"
+            }
+        )
+    }
+)
 @EnableCaching
 @EnableAsync
 @EnableScheduling

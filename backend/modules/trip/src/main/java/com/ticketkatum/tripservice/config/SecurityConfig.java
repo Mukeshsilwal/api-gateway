@@ -13,11 +13,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
-@Configuration
-@EnableWebSecurity
+/**
+ * Security Configuration for Trip Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized SecurityConfig instead
+ */
+// @Configuration  // Disabled for monolith - causes bean conflict
+// @EnableWebSecurity  // Disabled for monolith - using centralized security
 public class SecurityConfig {
 
-    @Bean
+    // @Bean  // Disabled for monolith
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
@@ -32,7 +36,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
+    // @Bean  // Disabled for monolith
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
