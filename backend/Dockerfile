@@ -2,28 +2,16 @@ FROM eclipse-temurin:21-jdk-alpine AS builder
 WORKDIR /app
 
 COPY mvnw .
-COPY .mvn/wrapper .mvn/wrapper
-COPY pom.xml ./pom.xml
-COPY services/web-bff/pom.xml ./services/web-bff/pom.xml
+COPY .mvn .mvn
+COPY pom.xml .
 
+# Copy all source code including shared libraries and modules
+COPY shared shared
+COPY modules modules
+COPY monolith-app monolith-app
 
-
-RUN chmod +x mvnw && ./mvnw -N install -DskipTests
-
-# Install local shared library if needed by this module
-COPY shared/common/pom.xml ./shared/common/pom.xml
-COPY shared/common/src ./shared/common/src
-RUN ./mvnw -f shared/common/pom.xml -DskipTests install -B
-
-# Install shared-events library if it exists (for event-driven arch)
-COPY shared/events/pom.xml ./shared/events/pom.xml
-COPY shared/events/src ./shared/events/src
-RUN ./mvnw -f shared/events/pom.xml -DskipTests install -B || echo "shared-events build failed or skipped"
-
-RUN ./mvnw -f services/web-bff/pom.xml dependency:go-offline -B
-COPY services/web-bff/src ./services/web-bff/src
-
-RUN ./mvnw -f services/web-bff/pom.xml clean package -DskipTests
+# Build the application from the root to ensure all dependencies are resolved correctly
+RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
@@ -32,7 +20,8 @@ RUN apk add --no-cache wget
 RUN addgroup -S spring && adduser -S spring -G spring
 USER spring:spring
 
-COPY --from=builder /app/services/web-bff/target/*.jar app.jar
+# Copy the built jar from monolith-app target
+COPY --from=builder /app/monolith-app/target/*.jar app.jar
 
 EXPOSE 8080
 
