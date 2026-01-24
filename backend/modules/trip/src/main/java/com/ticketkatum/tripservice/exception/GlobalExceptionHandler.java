@@ -12,7 +12,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+/**
+ * Global Exception Handler for Trip Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized GlobalExceptionHandler instead
+ */
+// @RestControllerAdvice  // Disabled for monolith - causes bean conflict
 @Slf4j
 public class GlobalExceptionHandler {
 

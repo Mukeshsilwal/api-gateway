@@ -17,9 +17,12 @@ import java.util.stream.Collectors;
 
 /**
  * Global exception handler for Payment Service
+ *//**
+ * Global Exception Handler for Payment Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized GlobalExceptionHandler instead
  */
-@RestControllerAdvice
 @Slf4j
+// @RestControllerAdvice  // Disabled for monolith - causes bean conflict
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(PaymentNotFoundException.class)

@@ -11,7 +11,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+/**
+ * Global Exception Handler for Auth Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized GlobalExceptionHandler instead
+ */
+// @RestControllerAdvice  // Disabled for monolith - causes bean conflict
 @Slf4j
 public class GlobalExceptionHandler {
 

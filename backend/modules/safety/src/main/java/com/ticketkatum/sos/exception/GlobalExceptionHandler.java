@@ -11,7 +11,11 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
+/**
+ * Global Exception Handler for Safety/SOS Service (Standalone Mode Only)
+ * DISABLED in monolith - using centralized GlobalExceptionHandler instead
+ */
+// @RestControllerAdvice  // Disabled for monolith - causes bean conflict
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
