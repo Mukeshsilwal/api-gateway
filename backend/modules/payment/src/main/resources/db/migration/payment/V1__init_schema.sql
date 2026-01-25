@@ -6,22 +6,24 @@
 
 CREATE TABLE IF NOT EXISTS payments (
     id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT,
+    booking_id VARCHAR(100),
+    transaction_id VARCHAR(100),
     txn_id VARCHAR(100),
     amount DOUBLE PRECISION,
-    status VARCHAR(20),
-    booking_id VARCHAR(100),
-    user_id BIGINT,
-    transaction_id VARCHAR(100),
+    currency VARCHAR(3) DEFAULT 'NPR',
     payment_method VARCHAR(50),
     provider VARCHAR(50),
-    currency VARCHAR(3) DEFAULT 'NPR',
+    status VARCHAR(20),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS payment_transactions (
     id BIGSERIAL PRIMARY KEY,
+    payment_id BIGINT,
     internal_txn_id VARCHAR(100) UNIQUE NOT NULL,
     external_txn_id VARCHAR(100),
+    provider_transaction_id VARCHAR(100),
     provider VARCHAR(50) NOT NULL,
     amount DECIMAL(19, 2) NOT NULL,
     fee DECIMAL(10, 2),
@@ -50,9 +52,10 @@ CREATE TABLE IF NOT EXISTS payment_transactions (
 
 CREATE TABLE IF NOT EXISTS refunds (
     id BIGSERIAL PRIMARY KEY,
+    payment_id BIGINT,
+    user_id BIGINT NOT NULL,
     refund_id VARCHAR(100) UNIQUE NOT NULL,
     ticket_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL,
     booking_id BIGINT NOT NULL,
     original_transaction_id VARCHAR(100) NOT NULL,
     original_external_txn_id VARCHAR(100),
@@ -77,6 +80,7 @@ CREATE TABLE IF NOT EXISTS refunds (
 CREATE TABLE IF NOT EXISTS user_payment_methods (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
+    payment_method VARCHAR(50),
     is_active BOOLEAN DEFAULT TRUE,
     is_default BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -86,5 +90,6 @@ CREATE TABLE IF NOT EXISTS payment_logs (
     id BIGSERIAL PRIMARY KEY,
     payment_id BIGINT,
     log_level VARCHAR(10),
+    message TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

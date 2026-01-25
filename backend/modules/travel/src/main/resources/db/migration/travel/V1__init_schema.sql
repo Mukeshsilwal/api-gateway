@@ -54,6 +54,34 @@ CREATE TABLE IF NOT EXISTS events (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS routes (
+    id BIGSERIAL PRIMARY KEY,
+    source VARCHAR(255),
+    destination VARCHAR(255),
+    distance_km DECIMAL(10,2),
+    estimated_duration_minutes INTEGER,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS bus (
+    id BIGSERIAL PRIMARY KEY,
+    bus_name VARCHAR(255),
+    bus_type VARCHAR(50),
+    departure_date_time TIMESTAMP,
+    base_price DECIMAL(10,2),
+    max_price DECIMAL(10,2),
+    route_id BIGINT REFERENCES routes(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS seats (
+    id BIGSERIAL PRIMARY KEY,
+    bus_id BIGINT REFERENCES bus(id),
+    seat_number VARCHAR(20),
+    is_booked BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- 2. BOOKING ENTITIES
 
 CREATE TABLE IF NOT EXISTS bookings (
@@ -61,6 +89,15 @@ CREATE TABLE IF NOT EXISTS bookings (
     customer_id BIGINT,
     provider_booking_id VARCHAR(100),
     status VARCHAR(50) DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS tickets (
+    id BIGSERIAL PRIMARY KEY,
+    booking_id BIGINT REFERENCES bookings(id),
+    seat_id BIGINT REFERENCES seats(id),
+    passenger_name VARCHAR(255),
+    ticket_status VARCHAR(50),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -90,7 +127,7 @@ CREATE TABLE IF NOT EXISTS attendees (
     email VARCHAR(255)
 );
 
--- 3. GUIDE SERVICE TABLES (Original V1)
+-- 3. GUIDE SERVICE TABLES
 
 CREATE TABLE IF NOT EXISTS guides (
     guide_id BIGSERIAL PRIMARY KEY,

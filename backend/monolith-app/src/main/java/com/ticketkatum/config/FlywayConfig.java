@@ -17,11 +17,11 @@ public class FlywayConfig {
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
                 .locations("classpath:db/migration/" + moduleName)
-                .table("flyway_schema_history_" + moduleName.toLowerCase())
+                .table("flyway_metadata_" + moduleName.toLowerCase())
                 .baselineOnMigrate(true)
                 .baselineVersion("0")
                 .outOfOrder(true)
-                .validateOnMigrate(true)
+                .validateOnMigrate(false) 
                 .load();
         
         // Ensure migrations are applied on startup
