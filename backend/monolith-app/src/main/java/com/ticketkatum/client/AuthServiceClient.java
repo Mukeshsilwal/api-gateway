@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AuthServiceClient {
 
+    @org.springframework.context.annotation.Lazy
     private final AuthServiceApi authService;
 
     private static final String SERVICE_NAME = "auth-service";

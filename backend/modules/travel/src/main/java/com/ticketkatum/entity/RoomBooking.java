@@ -13,11 +13,11 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "room_bookings", indexes = {
-        @Index(name = "idx_booking_reference", columnList = "bookingReference"),
-        @Index(name = "idx_room_dates", columnList = "room_id,checkIn,checkOut"),
-        @Index(name = "idx_customer", columnList = "customerId"),
-        @Index(name = "idx_status", columnList = "status"),
-        @Index(name = "idx_check_in", columnList = "checkIn")
+        @Index(name = "idx_rb_booking_reference", columnList = "bookingReference"),
+        @Index(name = "idx_rb_room_dates", columnList = "room_id,checkIn,checkOut"),
+        @Index(name = "idx_rb_customer", columnList = "customerId"),
+        @Index(name = "idx_rb_status", columnList = "status"),
+        @Index(name = "idx_rb_check_in", columnList = "checkIn")
 })
 @Getter
 @Setter

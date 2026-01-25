@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "sos_triggers", indexes = {
-        @Index(name = "idx_sos_user", columnList = "user_id"),
-        @Index(name = "idx_sos_trip", columnList = "trip_id"),
-        @Index(name = "idx_sos_status", columnList = "status")
+        @Index(name = "idx_st_sos_user", columnList = "user_id"),
+        @Index(name = "idx_st_sos_trip", columnList = "trip_id"),
+        @Index(name = "idx_st_sos_status", columnList = "status")
 })
 @Data
 @Builder
