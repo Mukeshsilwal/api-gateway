@@ -4,6 +4,12 @@
 -- Migration: V1__init_schema.sql
 -- ============================================================
 
+DROP TABLE IF EXISTS payment_logs CASCADE;
+DROP TABLE IF EXISTS user_payment_methods CASCADE;
+DROP TABLE IF EXISTS refunds CASCADE;
+DROP TABLE IF EXISTS payment_transactions CASCADE;
+DROP TABLE IF EXISTS payments CASCADE;
+
 CREATE TABLE IF NOT EXISTS payments (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT,

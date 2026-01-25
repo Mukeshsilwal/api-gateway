@@ -17,7 +17,7 @@ public class FlywayConfig {
         Flyway flyway = Flyway.configure()
                 .dataSource(dataSource)
                 .locations("classpath:db/migration/" + moduleName)
-                .table("flyway_schema_" + moduleName.toLowerCase())
+                .table("flyway_history_" + moduleName.toLowerCase())
                 .baselineOnMigrate(true)
                 .baselineVersion("0")
                 .outOfOrder(true)

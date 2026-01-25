@@ -4,6 +4,14 @@
 -- Migration: V1__init_schema.sql
 -- ============================================================
 
+DROP TABLE IF EXISTS refresh_tokens CASCADE;
+DROP TABLE IF EXISTS otps CASCADE;
+DROP TABLE IF EXISTS user_roles CASCADE;
+DROP TABLE IF EXISTS role_permissions CASCADE;
+DROP TABLE IF EXISTS users_table CASCADE;
+DROP TABLE IF EXISTS roles_ticket CASCADE;
+DROP TABLE IF EXISTS permissions CASCADE;
+
 CREATE TABLE IF NOT EXISTS permissions (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL,

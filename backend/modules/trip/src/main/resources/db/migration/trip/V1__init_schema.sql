@@ -4,6 +4,11 @@
 -- Migration: V1__init_schema.sql
 -- ============================================================
 
+DROP TABLE IF EXISTS trip_participants CASCADE;
+DROP TABLE IF EXISTS trip_bookings CASCADE;
+DROP TABLE IF EXISTS trip_checkpoints CASCADE;
+DROP TABLE IF EXISTS trips CASCADE;
+
 CREATE TABLE IF NOT EXISTS trips (
     trip_id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
