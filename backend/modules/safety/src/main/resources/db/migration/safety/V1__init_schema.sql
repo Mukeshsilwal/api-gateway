@@ -21,10 +21,10 @@ CREATE TABLE IF NOT EXISTS location_tracking (
 );
 
 -- Create indexes for location_tracking
-CREATE INDEX idx_location_trip_id ON location_tracking(trip_id);
-CREATE INDEX idx_location_entity ON location_tracking(entity_type, entity_id);
-CREATE INDEX idx_location_timestamp ON location_tracking(timestamp);
-CREATE INDEX idx_location_entity_timestamp ON location_tracking(entity_type, entity_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_location_trip_id ON location_tracking(trip_id);
+CREATE INDEX IF NOT EXISTS idx_location_entity ON location_tracking(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_location_timestamp ON location_tracking(timestamp);
+CREATE INDEX IF NOT EXISTS idx_location_entity_timestamp ON location_tracking(entity_type, entity_id, timestamp DESC);
 
 -- Create point_of_interest table
 CREATE TABLE IF NOT EXISTS point_of_interest (
@@ -47,10 +47,10 @@ CREATE TABLE IF NOT EXISTS point_of_interest (
 );
 
 -- Create indexes for point_of_interest
-CREATE INDEX idx_poi_category ON point_of_interest(category);
-CREATE INDEX idx_poi_region ON point_of_interest(region);
-CREATE INDEX idx_poi_location ON point_of_interest(latitude, longitude);
-CREATE INDEX idx_poi_active ON point_of_interest(is_active);
+CREATE INDEX IF NOT EXISTS idx_poi_category ON point_of_interest(category);
+CREATE INDEX IF NOT EXISTS idx_poi_region ON point_of_interest(region);
+CREATE INDEX IF NOT EXISTS idx_poi_location ON point_of_interest(latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_poi_active ON point_of_interest(is_active);
 
 -- Create geofence table for future use
 CREATE TABLE IF NOT EXISTS geofence (
@@ -66,8 +66,8 @@ CREATE TABLE IF NOT EXISTS geofence (
 );
 
 -- Create index for geofence
-CREATE INDEX idx_geofence_active ON geofence(is_active);
-CREATE INDEX idx_geofence_location ON geofence(center_latitude, center_longitude);
+CREATE INDEX IF NOT EXISTS idx_geofence_active ON geofence(is_active);
+CREATE INDEX IF NOT EXISTS idx_geofence_location ON geofence(center_latitude, center_longitude);
 
 -- Create tracking_session table
 CREATE TABLE IF NOT EXISTS tracking_session (
@@ -86,10 +86,10 @@ CREATE TABLE IF NOT EXISTS tracking_session (
 );
 
 -- Create indexes for tracking_session
-CREATE INDEX idx_session_trip ON tracking_session(trip_id);
-CREATE INDEX idx_session_entity ON tracking_session(entity_type, entity_id);
-CREATE INDEX idx_session_status ON tracking_session(status);
-CREATE INDEX idx_session_start_time ON tracking_session(start_time DESC);
+CREATE INDEX IF NOT EXISTS idx_session_trip ON tracking_session(trip_id);
+CREATE INDEX IF NOT EXISTS idx_session_entity ON tracking_session(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_session_status ON tracking_session(status);
+CREATE INDEX IF NOT EXISTS idx_session_start_time ON tracking_session(start_time DESC);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()

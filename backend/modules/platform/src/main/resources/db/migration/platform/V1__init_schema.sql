@@ -41,14 +41,14 @@ CREATE TABLE IF NOT EXISTS alerts (
 );
 
 -- Create indexes for alerts
-CREATE INDEX idx_alerts_user ON alerts(user_id, created_at DESC);
-CREATE INDEX idx_alerts_trip ON alerts(trip_id);
-CREATE INDEX idx_alerts_journey ON alerts(journey_id);
-CREATE INDEX idx_alerts_status ON alerts(status);
-CREATE INDEX idx_alerts_type ON alerts(alert_type);
-CREATE INDEX idx_alerts_severity ON alerts(severity);
-CREATE INDEX idx_alerts_scheduled ON alerts(scheduled_for) WHERE status = 'PENDING';
-CREATE INDEX idx_alerts_unread ON alerts(user_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX IF NOT EXISTS idx_alerts_user ON alerts(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_alerts_trip ON alerts(trip_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_journey ON alerts(journey_id);
+CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts(status);
+CREATE INDEX IF NOT EXISTS idx_alerts_type ON alerts(alert_type);
+CREATE INDEX IF NOT EXISTS idx_alerts_severity ON alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_alerts_scheduled ON alerts(scheduled_for) WHERE status = 'PENDING';
+CREATE INDEX IF NOT EXISTS idx_alerts_unread ON alerts(user_id, is_read) WHERE is_read = FALSE;
 
 -- Create alert_rules table
 CREATE TABLE IF NOT EXISTS alert_rules (
@@ -75,9 +75,9 @@ CREATE TABLE IF NOT EXISTS alert_rules (
 );
 
 -- Create indexes for alert_rules
-CREATE INDEX idx_rules_type ON alert_rules(alert_type);
-CREATE INDEX idx_rules_active ON alert_rules(is_active);
-CREATE INDEX idx_rules_priority ON alert_rules(priority DESC);
+CREATE INDEX IF NOT EXISTS idx_rules_type ON alert_rules(alert_type);
+CREATE INDEX IF NOT EXISTS idx_rules_active ON alert_rules(is_active);
+CREATE INDEX IF NOT EXISTS idx_rules_priority ON alert_rules(priority DESC);
 
 -- Create alert_preferences table
 CREATE TABLE IF NOT EXISTS alert_preferences (
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS alert_preferences (
 );
 
 -- Create index for alert_preferences
-CREATE INDEX idx_preferences_user ON alert_preferences(user_id);
+CREATE INDEX IF NOT EXISTS idx_preferences_user ON alert_preferences(user_id);
 
 -- Create alert_delivery_log table
 CREATE TABLE IF NOT EXISTS alert_delivery_log (
@@ -116,9 +116,9 @@ CREATE TABLE IF NOT EXISTS alert_delivery_log (
 );
 
 -- Create indexes for alert_delivery_log
-CREATE INDEX idx_delivery_alert ON alert_delivery_log(alert_id);
-CREATE INDEX idx_delivery_status ON alert_delivery_log(status);
-CREATE INDEX idx_delivery_channel ON alert_delivery_log(channel);
+CREATE INDEX IF NOT EXISTS idx_delivery_alert ON alert_delivery_log(alert_id);
+CREATE INDEX IF NOT EXISTS idx_delivery_status ON alert_delivery_log(status);
+CREATE INDEX IF NOT EXISTS idx_delivery_channel ON alert_delivery_log(channel);
 
 -- Create function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
