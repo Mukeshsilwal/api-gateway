@@ -11,6 +11,8 @@ spring:
     enabled: false
   zipkin:
     enabled: false
+  main:
+    allow-circular-references: true
 
   # ============================================================
   # DATABASE CONFIGURATION

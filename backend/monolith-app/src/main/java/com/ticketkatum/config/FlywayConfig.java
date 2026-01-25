@@ -10,7 +10,7 @@ import javax.sql.DataSource;
  * Each module gets its own Flyway migration instance and schema history table.
  * This prevents version collisions between modules (e.g., multiple V1__init.sql files).
  */
-@Configuration
+// @Configuration
 public class FlywayConfig {
 
     private Flyway createFlyway(DataSource dataSource, String moduleName) {
