@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+@org.springframework.stereotype.Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
         // FIXED: Use DISTINCT to avoid duplicates from amenities join

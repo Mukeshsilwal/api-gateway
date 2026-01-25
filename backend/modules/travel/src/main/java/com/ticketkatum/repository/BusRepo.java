@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@org.springframework.stereotype.Repository
 public interface BusRepo extends JpaRepository<Bus, Long> {
     @Query("""
             SELECT b FROM Bus b

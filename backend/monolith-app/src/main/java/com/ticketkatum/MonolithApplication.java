@@ -18,7 +18,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
         @org.springframework.context.annotation.ComponentScan.Filter(
             type = org.springframework.context.annotation.FilterType.ASSIGNABLE_TYPE,
             classes = {
-                com.ticketkatum.common.service.SystemConfigService.class,
                 com.ticketkatum.SharedApplication.class,
                 com.ticketkatum.modules.travel.config.TravelModuleConfiguration.class
             }

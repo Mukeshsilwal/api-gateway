@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+@org.springframework.stereotype.Repository
 public interface StaffRepo extends JpaRepository<Staff, Long> {
 
     List<Staff> findByHotelId(Long hotelId);
