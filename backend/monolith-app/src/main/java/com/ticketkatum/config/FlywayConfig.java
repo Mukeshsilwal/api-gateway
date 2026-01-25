@@ -19,7 +19,9 @@ public class FlywayConfig {
                 .locations("classpath:db/migration/" + moduleName)
                 .table("flyway_schema_history_" + moduleName.toLowerCase())
                 .baselineOnMigrate(true)
-                .validateOnMigrate(false) // Disable validation to avoid checksum issues during transition
+                .baselineVersion("0")
+                .outOfOrder(true)
+                .validateOnMigrate(true)
                 .load();
         
         // Ensure migrations are applied on startup
