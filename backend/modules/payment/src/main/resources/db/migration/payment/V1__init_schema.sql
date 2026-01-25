@@ -70,8 +70,9 @@ CREATE TABLE IF NOT EXISTS refunds (
     failure_reason TEXT,
     gateway_response TEXT,
     retry_count INTEGER DEFAULT 0,
-    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     processed_at TIMESTAMP,
     completed_at TIMESTAMP,
     failed_at TIMESTAMP
