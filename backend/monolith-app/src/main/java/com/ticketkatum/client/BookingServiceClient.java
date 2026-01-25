@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
  * Handles ticket booking, cancellation, and refunds
  */
 @Slf4j
-@Component
+@Component("bffBookingServiceClient")
 @RequiredArgsConstructor
 public class BookingServiceClient {
 

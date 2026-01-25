@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-@FeignClient(name = "booking-service")
+@FeignClient(name = "booking-service", contextId = "booking-service-client-travel")
 public interface BookingServiceClient {
 
     @GetMapping("/api/bookings/ticket/{ticketId}/validate-ownership")
