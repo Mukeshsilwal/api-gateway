@@ -14,8 +14,8 @@ CREATE TABLE live_polls (
 );
 
 -- Create indexes
-CREATE INDEX idx_live_polls_event ON live_polls(event_id);
-CREATE INDEX idx_live_polls_status ON live_polls(status);
+CREATE INDEX IF NOT EXISTS idx_live_polls_event ON live_polls(event_id);
+CREATE INDEX IF NOT EXISTS idx_live_polls_status ON live_polls(status);
 
 -- Add comments
 COMMENT ON TABLE live_polls IS 'Live interactive polls during events';

@@ -30,11 +30,11 @@ CREATE TABLE IF NOT EXISTS resale_transactions (
 );
 
 -- Create indexes
-CREATE INDEX idx_resale_listings_event_id ON resale_listings(event_id);
-CREATE INDEX idx_resale_listings_status ON resale_listings(status);
-CREATE INDEX idx_resale_listings_seller ON resale_listings(seller_user_id);
-CREATE INDEX idx_resale_transactions_listing ON resale_transactions(listing_id);
-CREATE INDEX idx_resale_transactions_buyer ON resale_transactions(buyer_user_id);
+CREATE INDEX IF NOT EXISTS idx_resale_listings_event_id ON resale_listings(event_id);
+CREATE INDEX IF NOT EXISTS idx_resale_listings_status ON resale_listings(status);
+CREATE INDEX IF NOT EXISTS idx_resale_listings_seller ON resale_listings(seller_user_id);
+CREATE INDEX IF NOT EXISTS idx_resale_transactions_listing ON resale_transactions(listing_id);
+CREATE INDEX IF NOT EXISTS idx_resale_transactions_buyer ON resale_transactions(buyer_user_id);
 
 -- Add comments
 COMMENT ON TABLE resale_listings IS 'Secondary market ticket listings';

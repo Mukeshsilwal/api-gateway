@@ -15,8 +15,8 @@ CREATE TABLE pricing_rules (
 );
 
 -- Create indexes
-CREATE INDEX idx_pricing_rules_active ON pricing_rules(active);
-CREATE INDEX idx_pricing_rules_priority ON pricing_rules(priority ASC);
+CREATE INDEX IF NOT EXISTS idx_pricing_rules_active ON pricing_rules(active);
+CREATE INDEX IF NOT EXISTS idx_pricing_rules_priority ON pricing_rules(priority ASC);
 
 -- Insert default pricing rules
 INSERT INTO pricing_rules (rule_type, condition_value, multiplier, priority, description) VALUES

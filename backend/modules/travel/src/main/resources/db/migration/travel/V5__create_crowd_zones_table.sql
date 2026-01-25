@@ -13,8 +13,8 @@ CREATE TABLE crowd_zones (
 );
 
 -- Create indexes
-CREATE INDEX idx_crowd_zones_event ON crowd_zones(event_id);
-CREATE INDEX idx_crowd_zones_status ON crowd_zones(status);
+CREATE INDEX IF NOT EXISTS idx_crowd_zones_event ON crowd_zones(event_id);
+CREATE INDEX IF NOT EXISTS idx_crowd_zones_status ON crowd_zones(status);
 
 -- Add comments
 COMMENT ON TABLE crowd_zones IS 'Real-time crowd monitoring zones';

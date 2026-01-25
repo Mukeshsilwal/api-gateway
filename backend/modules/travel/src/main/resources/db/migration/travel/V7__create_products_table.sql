@@ -15,9 +15,9 @@ CREATE TABLE products (
 );
 
 -- Create indexes
-CREATE INDEX idx_products_event ON products(event_id);
-CREATE INDEX idx_products_type ON products(type);
-CREATE INDEX idx_products_available ON products(available);
+CREATE INDEX IF NOT EXISTS idx_products_event ON products(event_id);
+CREATE INDEX IF NOT EXISTS idx_products_type ON products(type);
+CREATE INDEX IF NOT EXISTS idx_products_available ON products(available);
 
 -- Add comments
 COMMENT ON TABLE products IS 'F&B and merchandise products for events';

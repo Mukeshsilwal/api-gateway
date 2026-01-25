@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS bundle_items (
 );
 
 -- Create indexes
-CREATE INDEX idx_bundles_active ON bundles(active);
-CREATE INDEX idx_bundle_items_bundle_id ON bundle_items(bundle_id);
+CREATE INDEX IF NOT EXISTS idx_bundles_active ON bundles(active);
+CREATE INDEX IF NOT EXISTS idx_bundle_items_bundle_id ON bundle_items(bundle_id);
 
 -- Add comments
 COMMENT ON TABLE bundles IS 'Multi-item package deals (Event + Hotel + Bus)';

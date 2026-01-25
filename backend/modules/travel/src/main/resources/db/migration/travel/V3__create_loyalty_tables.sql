@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS point_transactions (
 );
 
 -- Create indexes
-CREATE INDEX idx_loyalty_profiles_tier ON loyalty_profiles(tier_level);
-CREATE INDEX idx_point_transactions_user ON point_transactions(user_id);
-CREATE INDEX idx_point_transactions_created ON point_transactions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_loyalty_profiles_tier ON loyalty_profiles(tier_level);
+CREATE INDEX IF NOT EXISTS idx_point_transactions_user ON point_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_point_transactions_created ON point_transactions(created_at DESC);
 
 -- Add comments
 COMMENT ON TABLE loyalty_profiles IS 'User loyalty program profiles';
