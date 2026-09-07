@@ -47,7 +47,33 @@ export const authApi = {
                 },
             }
         );
-        return response.data.data;
+        const data = response.data?.data || (response.data as any) || {};
+        const stats = data.statistics || {};
+        const userObj = data.user || data.userProfile || {};
+        const fullName = userObj.fullName
+            || `${userObj.firstName || ''} ${userObj.lastName || ''}`.trim()
+            || userObj.email
+            || 'User';
+
+        return {
+            ...data,
+            user: userObj,
+            userProfile: {
+                ...userObj,
+                fullName,
+            },
+            statistics: stats,
+            bookingSummary: data.bookingSummary || {
+                totalBookings: stats.totalBookings ?? 0,
+                activeBookings: stats.upcomingBookings ?? 0,
+                completedBookings: stats.completedBookings ?? 0,
+                cancelledBookings: stats.cancelledBookings ?? 0,
+            },
+            activeSessions: data.activeSessions || [],
+            recentBookings: data.recentBookings || [],
+            upcomingBookings: data.upcomingBookings || [],
+            paymentHistory: data.paymentHistory || [],
+        };
     },
 
     async getProfile(userId: number): Promise<UserDto> {

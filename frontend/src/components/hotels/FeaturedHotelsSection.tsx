@@ -60,7 +60,7 @@ const FeaturedHotelsSection = ({ hotels = [] }) => {
                         style={{ transform: `translateX(-${currentIndex * (100 / 3)}%)` }}
                     >
                         {hotels.map((hotel, index) => (
-                            <div key={hotel.hotelCode || hotel.hotelId || `hotel-${index}`} className="flex-shrink-0 w-full md:w-1/3">
+                            <div key={hotel.hotelCode || hotel.hotelId || hotel.id || `hotel-${index}`} className="flex-shrink-0 w-full md:w-1/3">
                                 <HotelCard hotel={hotel} />
                             </div>
                         ))}

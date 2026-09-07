@@ -5,6 +5,7 @@ import App from "./App";
 import { BusListProvider } from "./context/busdetails";
 import { SelectedBusProvider } from "./context/selectedbus";
 import { QueryProvider } from "./context/QueryProvider";
+import { ThemeProvider } from "./context/ThemeContext";
 import { Toaster } from 'react-hot-toast';
 import { reportWebVitals } from './utils/webVitals';
 
@@ -12,10 +13,11 @@ import { reportWebVitals } from './utils/webVitals';
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
-    <QueryProvider>
-      <BusListProvider>
-        <SelectedBusProvider>
-          <App />
+    <ThemeProvider>
+      <QueryProvider>
+        <BusListProvider>
+          <SelectedBusProvider>
+            <App />
           <Toaster
             position="top-right"
             toastOptions={{
@@ -43,6 +45,7 @@ root.render(
         </SelectedBusProvider>
       </BusListProvider>
     </QueryProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );
 

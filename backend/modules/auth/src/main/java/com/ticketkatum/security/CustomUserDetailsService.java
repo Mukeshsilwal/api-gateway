@@ -20,12 +20,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     private UserRepo userRepo;
 
     @Override
+    @org.springframework.transaction.annotation.Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         log.info("Authenticating user: {}", username);
 
         User user = userRepo.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + username));
+
+        // Initialize authorities while Hibernate session is open
+        user.getAuthorities();
 
         log.info("User found in Users table: {}", username);
 

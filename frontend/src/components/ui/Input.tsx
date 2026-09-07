@@ -20,13 +20,13 @@ const Input: React.FC<InputProps> = ({
     return (
         <div className={`w-full ${containerClassName}`}>
             {label && (
-                <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1.5 ml-1">
+                <label htmlFor={id} className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-1.5 ml-1">
                     {label}
                 </label>
             )}
             <div className="relative">
                 {Icon && (
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
                         <Icon size={18} />
                     </div>
                 )}
@@ -36,21 +36,21 @@ const Input: React.FC<InputProps> = ({
                         block w-full rounded-xl 
                         
                         /* Base Colors (Light Mode) */
-                        bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400
+                        bg-white border-slate-300 text-slate-900 placeholder-slate-400 shadow-sm
                         
                         /* Dark Mode Overrides */
-                        dark:bg-slate-800 dark:border-slate-700 dark:text-gray-100 dark:placeholder-gray-500
+                        dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:placeholder-slate-500
                         
                         /* Interaction States */
-                        focus:border-primary focus:ring-primary focus:bg-white dark:focus:bg-slate-900
+                        focus:border-purple-600 focus:ring-2 focus:ring-purple-500/25 focus:outline-none
                         
                         transition-all duration-200
-                        disabled:opacity-50 disabled:bg-gray-100 dark:disabled:bg-slate-800
+                        disabled:opacity-50 disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed
                         
                         ${Icon ? 'pl-10' : 'pl-4'} 
                         pr-4 py-2.5 
                         ${error
-                            ? 'border-red-500 focus:border-red-500 focus:ring-red-200 dark:focus:ring-red-900/30'
+                            ? 'border-red-500 focus:border-red-500 focus:ring-red-200 dark:focus:ring-red-900/40'
                             : 'border'
                         }
                         ${className}

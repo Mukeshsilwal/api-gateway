@@ -97,6 +97,7 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SeatDto getSeatById(long id) {
         Seat seat = seatRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Seat not found"));
@@ -104,11 +105,13 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SeatDto> getAllSeat() {
         return seatMapper.toDtoList(seatRepo.findAll());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SeatDto> findSeatRelatedToBus(String busName) {
         List<Seat> seats = seatRepo.findByBusBusName(busName);
         return seatMapper.toDtoList(seats);

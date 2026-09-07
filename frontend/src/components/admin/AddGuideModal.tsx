@@ -48,8 +48,11 @@ export function AddGuideModal({ isOpen, onClose, onSuccess }: AddGuideModalProps
             // The GuideDTO has @NotNull on userId. We might need to select a user from a dropdown or input an ID.
             // Let's add a User ID input for now for admin control.
 
+            const userId = formData.userId && !isNaN(formData.userId) ? formData.userId : 0;
+
             await guideService.createGuide({
                 ...formData,
+                userId,
                 specialties,
                 languages
             });
@@ -82,16 +85,15 @@ export function AddGuideModal({ isOpen, onClose, onSuccess }: AddGuideModalProps
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* User ID - Temporary for Admin */}
+                        {/* User ID - Optional */}
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Linked User ID</label>
+                            <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Linked User ID (Optional)</label>
                             <input
                                 type="number"
-                                required
-                                value={formData.userId || ''}
-                                onChange={e => setFormData({ ...formData, userId: parseInt(e.target.value) })}
+                                value={formData.userId ? formData.userId : ''}
+                                onChange={e => setFormData({ ...formData, userId: e.target.value ? parseInt(e.target.value, 10) : 0 })}
                                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                                placeholder="Existing User ID"
+                                placeholder="Auto-generated if left empty"
                             />
                         </div>
 

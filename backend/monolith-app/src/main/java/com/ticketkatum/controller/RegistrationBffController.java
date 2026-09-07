@@ -61,7 +61,7 @@ public class RegistrationBffController {
      * POST /api/bff/registration/admin/approve/{requestId}
      */
     @PostMapping("/admin/approve/{requestId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Mono<ResponseEntity<ApiResponse<String>>> approveRequest(
             @PathVariable("requestId") Long requestId,
             @RequestHeader("Authorization") String authorization) {
@@ -90,7 +90,7 @@ public class RegistrationBffController {
      * DELETE /api/bff/registration/admin/reject/{requestId}
      */
     @DeleteMapping("/admin/reject/{requestId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Mono<ResponseEntity<ApiResponse<String>>> rejectRequest(
             @PathVariable Long requestId,
             @RequestHeader("Authorization") String authorization) {
@@ -119,7 +119,7 @@ public class RegistrationBffController {
      * GET /api/bff/registration/admin/requests
      */
     @GetMapping("/admin/requests")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Mono<ResponseEntity<ApiResponse<List<?>>>> getAllRequests(
             @RequestHeader("Authorization") String authorization) {
 
@@ -145,7 +145,7 @@ public class RegistrationBffController {
      * GET /api/bff/registration/admin/requests/{requestId}
      */
     @GetMapping("/admin/requests/{requestId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public Mono<ResponseEntity<ApiResponse<Map<String, Object>>>> getRequestById(
             @PathVariable Long requestId,
             @RequestHeader("Authorization") String authorization) {

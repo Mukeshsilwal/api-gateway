@@ -3,15 +3,29 @@ import { formatValidationErrors } from '../utils/errorUtils';
 import Logger from '../utils/logger';
 import { removeSensitiveData } from '../utils/securityUtils';
 
-const REQUEST_TIMEOUT = 1000000; // 10 seconds - faster failure detection
+const REQUEST_TIMEOUT = 30000; // 30 seconds
 const MAX_RETRIES = 2;
-const RETRY_DELAY = 300000; // 300ms - faster retries
+const RETRY_DELAY = 300; // 300ms
 
 class ApiService {
   constructor() {
-    this.baseURL = API_CONFIG.BASE_URL;
+    this.baseURL = API_CONFIG.BASE_URL || '';
     this.isRefreshing = false;
     this.failedQueue = [];
+  }
+
+  isAuthEndpoint(endpoint) {
+    if (!endpoint) return false;
+    const path = typeof endpoint === 'string' ? endpoint.toLowerCase() : '';
+    return path.includes('/auth/login') ||
+           path.includes('/auth/register') ||
+           path.includes('/auth/refresh') ||
+           path.includes('/auth/forgot-password') ||
+           path.includes('/auth/reset-password') ||
+           path.includes('/auth/verify') ||
+           path.includes('/auth/admin/login') ||
+           path.includes('/auth/user/login') ||
+           path.includes('/login');
   }
 
   getFullUrl(endpoint) {
@@ -33,8 +47,6 @@ class ApiService {
 
   /** Determine if request should be retried */
   shouldRetry(error) {
-    // Retry on network errors or 5xx server errors
-    // Do NOT retry 401 here, handled separately
     if (!error.response) return true;
     const status = error.response?.status;
     return (status >= 500 && status !== 501) || status === 408 || status === 429;
@@ -78,23 +90,20 @@ class ApiService {
     // Get or generate correlation ID for request tracking
     let correlationId = options.correlationId;
     if (!correlationId) {
-      // Check if there's a correlation ID from a previous response
       correlationId = sessionStorage.getItem('lastCorrelationId') || this.generateCorrelationId();
     }
 
     const headers = {
       'Content-Type': 'application/json',
-      'X-Correlation-ID': correlationId, // Add correlation ID header
+      'X-Correlation-ID': correlationId,
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     };
 
-    // If body is FormData, let the browser set Content-Type
     if (options.body instanceof FormData) {
       delete headers['Content-Type'];
     }
 
-    // Create timeout controller if not provided
     const controller = options.signal ? null : this.createTimeoutController();
 
     const config = {
@@ -105,18 +114,16 @@ class ApiService {
 
     try {
       const response = await this.retryRequest(async () => {
-        const res = await fetch(url, config);
-        // Log API calls in development only
-        if (process.env.NODE_ENV === 'development') {
-          // optional logging
-        }
-        return res;
+        return await fetch(url, config);
       }, options.retries);
 
       // Handle non-OK responses
       if (!response.ok) {
-        // Handle 401 Unauthorized - Refresh Token Flow
-        if (response.status === 401 && !options._retry) {
+        const isAuthRequest = this.isAuthEndpoint(endpoint) || options.skipAuthRefresh;
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        // Handle 401 Unauthorized - Refresh Token Flow (ONLY for non-auth requests with an existing refresh token)
+        if (response.status === 401 && !options._retry && !isAuthRequest && refreshToken) {
           if (this.isRefreshing) {
             return new Promise((resolve, reject) => {
               this.failedQueue.push({ resolve, reject });
@@ -135,11 +142,12 @@ class ApiService {
           } catch (refreshError) {
             this.isRefreshing = false;
             this.processQueue(refreshError, null);
-            // Clear auth and redirect
             localStorage.removeItem('token');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('userRole');
-            window.location.href = '/login'; // Force redirect
+            if (window.location.pathname !== '/login' && window.location.pathname !== '/admin/login' && window.location.pathname !== '/register') {
+              window.location.href = '/login';
+            }
             throw refreshError;
           }
         }
@@ -151,11 +159,14 @@ class ApiService {
           const errorData = await response.json();
           error.data = errorData;
           if (errorData && typeof errorData === 'object') {
-            error.message = errorData.message || error.message;
-            error.code = errorData.code || `HTTP_${response.status}`;
+            error.message = errorData.message || errorData.error || error.message;
+            error.code = errorData.errorCode || errorData.code || `HTTP_${response.status}`;
             if (errorData.data) {
               error.details = errorData.data;
               error.fieldErrors = this.extractFieldErrors(errorData.data);
+            }
+            if (errorData.validationErrors || errorData.fieldErrors) {
+              error.fieldErrors = errorData.validationErrors || errorData.fieldErrors;
             }
           }
         } catch (_) {
@@ -167,9 +178,13 @@ class ApiService {
 
       return response;
     } catch (error) {
-      // Handle timeout
+      // Handle cancellation / timeout
       if (error.name === 'AbortError') {
+        if (options.signal && options.signal.aborted) {
+          throw error;
+        }
         const timeoutError = new Error('Request timeout');
+        timeoutError.name = 'AbortError';
         timeoutError.isTimeout = true;
         Logger.error('Request timeout:', timeoutError);
         throw timeoutError;
@@ -187,6 +202,7 @@ class ApiService {
 
   /** Extract and store correlation ID from response */
   extractCorrelationId(response) {
+    if (!response?.headers?.get) return null;
     const correlationId = response.headers.get('X-Correlation-ID');
     if (correlationId) {
       sessionStorage.setItem('lastCorrelationId', correlationId);
@@ -289,7 +305,7 @@ class ApiService {
       this.extractCorrelationId(response);
 
       // Check content type to determine how to parse
-      const contentType = response.headers.get('content-type');
+      const contentType = response?.headers?.get ? response.headers.get('content-type') : null;
 
       // If response is text/plain, return the text directly
       if (contentType && contentType.includes('text/plain')) {

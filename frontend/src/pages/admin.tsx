@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import authService from "../services/authService";
+import { useTheme } from "../context/ThemeContext";
 import { Sidebar } from "../components/admin/Sidebar";
 import { Header } from "../components/admin/Header";
 import { Dashboard } from "../components/admin/Dashboard";
@@ -28,7 +29,6 @@ type AdminTab =
     | 'tickets'
     | 'requests'
     | 'hotels'
-
     | 'events'
     | 'guides'
     | 'users'
@@ -44,21 +44,7 @@ export function AdminPanel() {
     const location = useLocation();
     const [activeTab, setActiveTab] = useState<AdminTab>((location.state?.tab as AdminTab) || 'dashboard');
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const [isDarkMode, setIsDarkMode] = useState(() => {
-        return localStorage.getItem('theme') === 'dark';
-    });
-
-    useEffect(() => {
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
-    }, [isDarkMode]);
-
-    const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+    const { isDark, toggleTheme } = useTheme();
 
     useEffect(() => {
         if (!localStorage.getItem("token")) {
@@ -95,7 +81,7 @@ export function AdminPanel() {
             case 'roles':
                 return <RoleManager />;
             case 'settings':
-                return <Settings isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />;
+                return <Settings isDarkMode={isDark} toggleDarkMode={toggleTheme} />;
             case 'scheduler':
                 return <TripScheduler />;
             case 'support':
@@ -110,7 +96,7 @@ export function AdminPanel() {
     };
 
     return (
-        <div className={`min-h-screen flex ${isDarkMode ? 'dark' : ''} bg-gray-50 dark:bg-gray-900 transition-colors duration-300`}>
+        <div className={`min-h-screen flex ${isDark ? 'dark' : ''} bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300`}>
             <Sidebar
                 activeTab={activeTab}
                 setActiveTab={(tab: string) => setActiveTab(tab as AdminTab)}
@@ -121,8 +107,8 @@ export function AdminPanel() {
 
             <main className={`flex-1 ${isSidebarCollapsed ? 'ml-20' : 'ml-72'} transition-all duration-300 flex flex-col`}>
                 <Header
-                    isDarkMode={isDarkMode}
-                    toggleDarkMode={toggleDarkMode}
+                    isDarkMode={isDark}
+                    toggleDarkMode={toggleTheme}
                     onProfileSettings={() => setActiveTab('settings')}
                 />
 

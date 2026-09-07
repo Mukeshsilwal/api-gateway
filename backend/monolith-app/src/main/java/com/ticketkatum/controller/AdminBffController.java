@@ -17,6 +17,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -35,17 +40,18 @@ public class AdminBffController {
 
     private final AdminAggregator adminAggregator;
     private final com.ticketkatum.service.LiveTrackingService liveTrackingService;
+    private final ObjectMapper objectMapper;
     private static final long OPERATION_TIMEOUT_SECONDS = 30;
 
     // ==================== DASHBOARD ENDPOINTS ====================
 
     /**
-     * Create bus in route (without seats)
+     * Create bus in route (with optional seats generation)
      */
     @PostMapping("/routes/{routeId}/buses")
-    @Operation(summary = "Create bus in route", description = "Create bus for a specific route without seats. Requires ADMIN role.")
+    @Operation(summary = "Create bus in route", description = "Create bus for a specific route. Supports wrapped or flat payload and generates seats if numberOfSeats > 0. Requires ADMIN role.")
     public CompletableFuture<ResponseEntity<Response<BusDto>>> createBusInRoute(
-             @RequestBody BusDto busDto,
+            @RequestBody JsonNode requestNode,
             @PathVariable("routeId") Long routeId) {
 
         String correlationId = UUID.randomUUID().toString();
@@ -61,19 +67,79 @@ public class AdminBffController {
                                     .build()));
         }
 
-        return adminAggregator.createBusInRoute(busDto, routeId)
-                .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .thenApply(response -> {
-                    log.info("[{}] Bus created successfully: busId={}",
-                            correlationId, response.getRouteId());
-                    return ResponseEntity.status(HttpStatus.CREATED).body(
+        try {
+            BusDto busDto;
+            int numberOfSeats = 0;
+
+            if (requestNode.has("busDto") && requestNode.get("busDto").isObject()) {
+                busDto = objectMapper.treeToValue(requestNode.get("busDto"), BusDto.class);
+                if (requestNode.has("numberOfSeats")) {
+                    numberOfSeats = requestNode.get("numberOfSeats").asInt(0);
+                }
+            } else {
+                busDto = objectMapper.treeToValue(requestNode, BusDto.class);
+                if (requestNode.has("numberOfSeats")) {
+                    numberOfSeats = requestNode.get("numberOfSeats").asInt(0);
+                }
+            }
+
+            if (busDto.getRouteId() == 0 && routeId != null) {
+                busDto.setRouteId(routeId);
+            }
+            if (busDto.getDate() == null && busDto.getDepartureDateTime() != null) {
+                busDto.setDate(busDto.getDepartureDateTime().toLocalDate());
+            }
+
+            final int seatsToGenerate = numberOfSeats;
+            return adminAggregator.createBusInRoute(busDto, routeId)
+                    .thenCompose(createdBus -> {
+                        if (seatsToGenerate > 0 && createdBus != null && createdBus.getId() != null) {
+                            List<CompletableFuture<SeatCreationResponse>> seatFutures = new ArrayList<>();
+                            for (int i = 1; i <= seatsToGenerate; i++) {
+                                SeatDto seat = SeatDto.builder()
+                                        .busId(createdBus.getId())
+                                        .busName(createdBus.getBusName())
+                                        .seatNumber(String.valueOf(i))
+                                        .status("AVAILABLE")
+                                        .reserved(false)
+                                        .price(createdBus.getBasePrice() != null ? createdBus.getBasePrice() : busDto.getBasePrice())
+                                        .build();
+                                seatFutures.add(adminAggregator.createSeat(seat));
+                            }
+                            return CompletableFuture.allOf(seatFutures.toArray(new CompletableFuture[0]))
+                                    .thenApply(v -> {
+                                        log.info("[{}] Generated {} seats for busId={}", correlationId, seatsToGenerate, createdBus.getId());
+                                        return createdBus;
+                                    })
+                                    .exceptionally(ex -> {
+                                        log.warn("[{}] Bus created but failed to generate some seats: {}", correlationId, ex.getMessage());
+                                        return createdBus;
+                                    });
+                        }
+                        return CompletableFuture.completedFuture(createdBus);
+                    })
+                    .orTimeout(OPERATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    .thenApply(response -> {
+                        log.info("[{}] Bus created successfully: busId={}",
+                                correlationId, response.getId() != null ? response.getId() : response.getRouteId());
+                        return ResponseEntity.status(HttpStatus.CREATED).body(
+                                Response.<BusDto>builder()
+                                        .statusCode(HttpStatus.CREATED.value())
+                                        .message("Bus created successfully")
+                                        .data(response)
+                                        .build());
+                    })
+                    .exceptionally(ex -> handleException(ex, correlationId, "Bus creation"));
+        } catch (Exception e) {
+            log.error("[{}] Failed to parse bus creation payload: {}", correlationId, e.getMessage(), e);
+            return CompletableFuture.completedFuture(
+                    ResponseEntity.badRequest().body(
                             Response.<BusDto>builder()
-                                    .statusCode(HttpStatus.CREATED.value())
-                                    .message("Bus created successfully")
-                                    .data(response)
-                                    .build());
-                })
-                .exceptionally(ex -> handleException(ex, correlationId, "Bus creation"));
+                                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                                    .message("Invalid bus creation payload: " + e.getMessage())
+                                    .data(null)
+                                    .build()));
+        }
     }
 
     /**

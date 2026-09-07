@@ -34,7 +34,7 @@ const API_CONFIG = {
     SEAT_BOOKING_DETAILS: '/api/bff/v1/seat/', // + {bookingId}/details
 
     // === Bus BFF ===
-    BUS_COMPLETE_DETAILS: '/api/bff/v1/buses/bus-details', // + {busId}/complete
+    BUS_COMPLETE_DETAILS: '/api/bff/v1/buses', // + /{busId}/complete
     BUS_DASHBOARD: '/api/bff/v1/buses/dashboard',
 
     // === Hotel BFF ===

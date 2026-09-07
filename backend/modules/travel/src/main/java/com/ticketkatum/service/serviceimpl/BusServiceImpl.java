@@ -25,17 +25,27 @@ public class BusServiceImpl implements BusService {
         private final BusRepo busRepo;
         private final RouteRepo routeRepo;
         private final BusMapper busMapper;
+        private final com.ticketkatum.mapper.SeatMapper seatMapper;
 
         @Override
         public BusDto createBusForRoute(BusDto busDto, long routeId) {
                 Route route = routeRepo.findById(routeId)
-                                .orElseThrow(() -> new RuntimeException());
+                                .orElseThrow(() -> new RuntimeException("Route not found with id: " + routeId));
 
                 Bus bus = busMapper.toEntity(busDto);
                 bus.setRoute(route);
 
                 Bus saved = busRepo.save(bus);
-                return busMapper.toDto(saved);
+                BusDto dto = busMapper.toDto(saved);
+                dto.setRouteId(route.getId());
+                if (dto.getRouteDto() == null) {
+                    dto.setRouteDto(new org.modelmapper.ModelMapper().map(route, com.ticketkatum.model.RouteDto.class));
+                }
+                if (saved.getSeats() != null) {
+                    dto.setSeats(seatMapper.toDtoList(saved.getSeats()));
+                    dto.setNumberOfSeats(saved.getSeats().size());
+                }
+                return dto;
         }
 
         @Override
@@ -85,10 +95,12 @@ public class BusServiceImpl implements BusService {
         @Override
         public BusSearchResponse searchBuses(BusSearchRequest req) {
 
-                LocalDate date = req.getDate();
+                LocalDate date = req.getDate() != null ? req.getDate() : LocalDate.now();
 
                 LocalDateTime startDateTime = date.atStartOfDay();
                 LocalDateTime endDateTime = date.plusDays(1).atStartOfDay();
+
+                int pageSize = (req.getPageSize() != null && req.getPageSize() > 0) ? req.getPageSize() : 10;
 
                 List<Bus> buses = busRepo.searchBuses(
                                 req.getSource(),
@@ -96,7 +108,7 @@ public class BusServiceImpl implements BusService {
                                 startDateTime,
                                 endDateTime,
                                 req.getCursor(),
-                                PageRequest.of(0, req.getPageSize()));
+                                PageRequest.of(0, pageSize));
 
                 List<BusDto> result = buses.stream()
                                 .map(busMapper::toDto)
@@ -104,12 +116,51 @@ public class BusServiceImpl implements BusService {
 
                 Long nextCursor = buses.isEmpty() ? null : buses.get(buses.size() - 1).getId();
 
-                boolean hasMore = buses.size() == req.getPageSize();
+                boolean hasMore = buses.size() == pageSize;
 
                 return BusSearchResponse.builder()
                                 .buses(result)
                                 .nextCursor(nextCursor)
                                 .hasMore(hasMore)
                                 .build();
+        }
+
+        @Override
+        public BusDto getBusById(long id) {
+                Bus bus = busRepo.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Bus not found with id: " + id));
+                BusDto dto = busMapper.toDto(bus);
+                if (bus.getRoute() != null) {
+                        dto.setRouteId(bus.getRoute().getId());
+                        if (dto.getRouteDto() == null) {
+                                dto.setRouteDto(new org.modelmapper.ModelMapper().map(bus.getRoute(), com.ticketkatum.model.RouteDto.class));
+                        }
+                }
+                if (bus.getSeats() != null) {
+                        dto.setSeats(seatMapper.toDtoList(bus.getSeats()));
+                        dto.setNumberOfSeats(bus.getSeats().size());
+                }
+                return dto;
+        }
+
+        @Override
+        public List<BusDto> getBusesByRoute(long routeId) {
+                return busRepo.findAll().stream()
+                                .filter(b -> b.getRoute() != null && b.getRoute().getId() == routeId)
+                                .map(bus -> {
+                                        BusDto dto = busMapper.toDto(bus);
+                                        if (bus.getRoute() != null) {
+                                                dto.setRouteId(bus.getRoute().getId());
+                                                if (dto.getRouteDto() == null) {
+                                                         dto.setRouteDto(new org.modelmapper.ModelMapper().map(bus.getRoute(), com.ticketkatum.model.RouteDto.class));
+                                                }
+                                        }
+                                        if (bus.getSeats() != null) {
+                                                dto.setSeats(seatMapper.toDtoList(bus.getSeats()));
+                                                dto.setNumberOfSeats(bus.getSeats().size());
+                                        }
+                                        return dto;
+                                })
+                                .toList();
         }
 }

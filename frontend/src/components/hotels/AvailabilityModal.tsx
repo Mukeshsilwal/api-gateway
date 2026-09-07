@@ -71,8 +71,9 @@ export function AvailabilityModal({ isOpen, onClose, hotel }) {
                                     <form onSubmit={handleCheckAvailability} className="space-y-4">
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">Check-in</label>
+                                                <label htmlFor="modal-checkin" className="block text-sm font-medium text-gray-700">Check-in</label>
                                                 <input
+                                                    id="modal-checkin"
                                                     type="date"
                                                     required
                                                     value={checkIn}
@@ -81,8 +82,9 @@ export function AvailabilityModal({ isOpen, onClose, hotel }) {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">Check-out</label>
+                                                <label htmlFor="modal-checkout" className="block text-sm font-medium text-gray-700">Check-out</label>
                                                 <input
+                                                    id="modal-checkout"
                                                     type="date"
                                                     required
                                                     value={checkOut}
@@ -93,8 +95,9 @@ export function AvailabilityModal({ isOpen, onClose, hotel }) {
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">Rooms</label>
+                                                <label htmlFor="modal-rooms" className="block text-sm font-medium text-gray-700">Rooms</label>
                                                 <input
+                                                    id="modal-rooms"
                                                     type="number"
                                                     min="1"
                                                     required
@@ -104,8 +107,9 @@ export function AvailabilityModal({ isOpen, onClose, hotel }) {
                                                 />
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-medium text-gray-700">Guests</label>
+                                                <label htmlFor="modal-guests" className="block text-sm font-medium text-gray-700">Guests</label>
                                                 <input
+                                                    id="modal-guests"
                                                     type="number"
                                                     min="1"
                                                     required

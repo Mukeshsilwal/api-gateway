@@ -55,12 +55,50 @@ public class SecurityConfig {
                                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                                // Enhanced HTTP Security Headers
+                                .headers(headers -> {
+                                                headers.frameOptions(frameOptions -> frameOptions.deny());
+                                                headers.xssProtection(xss -> xss.headerValue(org.springframework.security.web.header.writers.XXssProtectionHeaderWriter.HeaderValue.ENABLED_MODE_BLOCK));
+                                                headers.contentTypeOptions(org.springframework.security.config.Customizer.withDefaults());
+                                                headers.referrerPolicy(referrer -> referrer.policy(org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN));
+                                                headers.permissionsPolicy(permissions -> permissions.policy("camera=(), microphone=(), geolocation=(self)"));
+                                                headers.httpStrictTransportSecurity(hsts -> hsts
+                                                                .includeSubDomains(true)
+                                                                .maxAgeInSeconds(31536000));
+                                })
+                                // Standardized JSON Error Handling (prevents information leakage)
+                                .exceptionHandling(exceptions -> exceptions
+                                                .authenticationEntryPoint((request, response, authException) -> {
+                                                        log.warn("Unauthorized request to {}: {}", request.getRequestURI(), authException.getMessage());
+                                                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                                        response.setContentType("application/json");
+                                                        response.setCharacterEncoding("UTF-8");
+                                                        response.getWriter().write(String.format(
+                                                                "{\"timestamp\":\"%s\",\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Authentication required\",\"path\":\"%s\"}",
+                                                                java.time.Instant.now().toString(),
+                                                                request.getRequestURI()
+                                                        ));
+                                                })
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        log.warn("Access denied for request to {}: {}", request.getRequestURI(), accessDeniedException.getMessage());
+                                                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                                        response.setContentType("application/json");
+                                                        response.setCharacterEncoding("UTF-8");
+                                                        response.getWriter().write(String.format(
+                                                                "{\"timestamp\":\"%s\",\"status\":403,\"error\":\"Forbidden\",\"message\":\"Access denied\",\"path\":\"%s\"}",
+                                                                java.time.Instant.now().toString(),
+                                                                request.getRequestURI()
+                                                        ));
+                                                })
+                                )
                                 .authorizeHttpRequests(auth -> auth
                                                 .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC)
                                                 .permitAll()
                                                 // Public endpoints - ORDER MATTERS!
                                                 .requestMatchers("/error").permitAll()
                                                 .requestMatchers("/api/bff/v1/auth/**").permitAll()
+                                                .requestMatchers("/auth/**").permitAll()
+                                                .requestMatchers("/register/**").permitAll()
                                                 // OAuth2 endpoints - must be public
                                                 .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                                                 // Allow gateway public paths to forward to BFF (rewritten by ApiPathRewriteFilter)
@@ -71,13 +109,37 @@ public class SecurityConfig {
                                                                 "/v3/api-docs/**",
                                                                 "/swagger-ui.html",
                                                                 "/api/bff/v1/home",
+                                                                "/api/bff/v1/home-data",
                                                                 "/api/bff/v1/buses/**",
+                                                                "/api/bff/v1/hotels",
                                                                 "/api/bff/v1/hotels/**",
                                                                 "/api/bff/v1/registration/**",
                                                                 "/api/bff/v1/market/**",
                                                                 "/api/bff/v1/ai/**",
                                                                 "/api/bff/v1/events/**",
-                                                                "/api/bff/v1/payments/verify/**") // Payment verification callbacks
+                                                                "/api/bff/v1/payments/verify/**",
+                                                                "/api/bff/v1/payments/initiate/**",
+                                                                "/api/bff/v1/guides/**",
+                                                                "/api/guides/**",
+                                                                "/busStop/**",
+                                                                "/bus/**",
+                                                                "/seat/**",
+                                                                "/admin/**",
+                                                                "/bookSeats/**",
+                                                                "/api/route/**",
+                                                                "/api/v1/buses/**",
+                                                                "/api/v1/hotels",
+                                                                "/api/v1/hotels/**",
+                                                                "/api/v1/bookings/**",
+                                                                "/api/v1/payment/**",
+                                                                "/api/bff/v1/hotels/bookings/**",
+                                                                "/api/bff/v1/bookings/**",
+                                                                "/api/bff/v1/find/**",
+                                                                "/api/find/**",
+                                                                "/api/v1/find/**",
+                                                                "/hotel/**",
+                                                                "/booking/**",
+                                                                "/tickets/**")
                                                 .permitAll()
 
                                                 // Public API endpoints
@@ -93,9 +155,9 @@ public class SecurityConfig {
                                                 .requestMatchers("/api/payments/**").authenticated()
                                                 .requestMatchers("/api/user/**").authenticated()
 
-                                                // Admin endpoints - require authentication
-                                                .requestMatchers("/api/bff/v1/admin/**").authenticated()
-                                                .requestMatchers("/api/bff/v1/users/**").authenticated() // User management - admin only
+                                                // Admin endpoints - require ADMIN role
+                                                .requestMatchers("/api/bff/v1/admin/**").hasRole("ADMIN")
+                                                .requestMatchers("/api/bff/v1/users/**").hasRole("ADMIN")
                                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                                                 // All other requests require authentication
@@ -132,8 +194,7 @@ public class SecurityConfig {
                                 "http://localhost:5173",
                                 "http://localhost:4200",
                                 "https://ticketkatum.com",
-                                "https://www.ticketkatum.com",
-                                "https://yourdomain.com")); // Added from Auth config
+                                "https://www.ticketkatum.com"));
 
                 configuration.setAllowedMethods(Arrays.asList(
                                 "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
@@ -155,7 +216,8 @@ public class SecurityConfig {
                                 "X-Request-ID",
                                 "X-Correlation-ID",
                                 "Authorization",
-                                "Session-Id"));
+                                "Session-Id",
+                                "Content-Disposition"));
 
                 configuration.setAllowCredentials(true);
                 configuration.setMaxAge(3600L);

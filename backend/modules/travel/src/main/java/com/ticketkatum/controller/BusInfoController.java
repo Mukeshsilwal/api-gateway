@@ -17,7 +17,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/bus")
+@RequestMapping({"/bus", "/api/v1/buses"})
 @RequiredArgsConstructor
 public class BusInfoController {
 
@@ -51,6 +51,9 @@ public class BusInfoController {
      */
     @PostMapping("/search")
     public ResponseEntity<Response<BusSearchResponse>> searchBuses(@Valid @RequestBody BusSearchRequest req) {
+        if (req.getPageSize() == null || req.getPageSize() <= 0) {
+            req.setPageSize(10);
+        }
         log.info("Searching buses - From: {}, To: {}, Date: {}, Page: {}",
                 req.getSource(), req.getDestination(), req.getDate(), req.getPageSize());
 
@@ -66,6 +69,44 @@ public class BusInfoController {
             log.error("Error searching buses - From: {}, To: {}, Date: {}",
                     req.getSource(), req.getDestination(), req.getDate(), e);
             Response<BusSearchResponse> response = ResponseHandler.failure("Failed to search buses: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    /**
+     * Get bus by ID
+     * GET /bus/{id} or /api/v1/buses/{id}
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<Response<BusDto>> getBusById(@PathVariable("id") long id) {
+        log.info("Fetching bus by ID: {}", id);
+
+        try {
+            BusDto bus = busService.getBusById(id);
+            Response<BusDto> response = ResponseHandler.success("Bus retrieved successfully", bus);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error fetching bus by ID: {}", id, e);
+            Response<BusDto> response = ResponseHandler.failure("Failed to fetch bus: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    /**
+     * Get buses by route ID
+     * GET /bus/route/{routeId} or /api/v1/buses/route/{routeId}
+     */
+    @GetMapping("/route/{routeId}")
+    public ResponseEntity<Response<List<BusDto>>> getBusesByRoute(@PathVariable("routeId") long routeId) {
+        log.info("Fetching buses for route ID: {}", routeId);
+
+        try {
+            List<BusDto> buses = busService.getBusesByRoute(routeId);
+            Response<List<BusDto>> response = ResponseHandler.success("Found " + buses.size() + " buses", buses);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error fetching buses for route: {}", routeId, e);
+            Response<List<BusDto>> response = ResponseHandler.failure("Failed to fetch buses: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }

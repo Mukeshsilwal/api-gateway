@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { DataTable } from './DataTable';
 import { RoomManagerModal } from './RoomManagerModal';
 import { StaffManager } from './StaffManager';
+import { EditHotelModal } from './EditHotelModal';
 import hotelService from '../../services/hotel.service';
 import { HotelDto, AvailableRoomDto } from '../../types/dto';
 import { Column } from './DataTable';
@@ -16,6 +17,7 @@ export const HotelManager: React.FC = () => {
     const [selectedHotel, setSelectedHotel] = useState<HotelDto | null>(null);
     const [isRoomModalOpen, setIsRoomModalOpen] = useState(false);
     const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     const fetchHotels = async () => {
         try {
@@ -58,7 +60,7 @@ export const HotelManager: React.FC = () => {
             key: 'name',
             label: 'Hotel Name',
             sortable: true,
-            render: (name: string) => <span className="font-medium text-indigo-900">{name}</span>
+            render: (name: string) => <span className="font-medium text-slate-900 dark:text-slate-100">{name}</span>
         },
         { key: 'city', label: 'City', sortable: true },
         {
@@ -67,7 +69,7 @@ export const HotelManager: React.FC = () => {
             sortable: true,
             render: (rating: number) => (
                 <div className="flex items-center gap-1">
-                    <span className="font-bold text-gray-700">{rating}</span>
+                    <span className="font-bold text-gray-700 dark:text-slate-200">{rating}</span>
                     <svg className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
@@ -109,9 +111,23 @@ export const HotelManager: React.FC = () => {
                     <button
                         onClick={() => {
                             setSelectedHotel(hotel);
+                            setIsEditModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors font-medium text-sm flex items-center gap-1 border border-blue-200/50 dark:border-blue-800/40"
+                        title="Edit hotel details"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            setSelectedHotel(hotel);
                             setIsRoomModalOpen(true);
                         }}
-                        className="px-3 py-1.5 bg-teal-50 text-teal-600 rounded-lg hover:bg-teal-100 transition-colors font-medium text-sm flex items-center gap-1"
+                        className="px-3 py-1.5 bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-300 rounded-lg hover:bg-teal-100 dark:hover:bg-teal-900/50 transition-colors font-medium text-sm flex items-center gap-1 border border-teal-200/50 dark:border-teal-800/40"
                         title="View all rooms"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +141,7 @@ export const HotelManager: React.FC = () => {
                             setSelectedHotel(hotel);
                             setIsStaffModalOpen(true);
                         }}
-                        className="px-3 py-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors font-medium text-sm flex items-center gap-1"
+                        className="px-3 py-1.5 bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-300 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/50 transition-colors font-medium text-sm flex items-center gap-1 border border-purple-200/50 dark:border-purple-800/40"
                         title="Manage hotel staff"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +151,7 @@ export const HotelManager: React.FC = () => {
                     </button>
                     <button
                         onClick={() => handleDeleteHotel(hotel.id)}
-                        className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium text-sm flex items-center gap-1"
+                        className="px-3 py-1.5 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-300 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors font-medium text-sm flex items-center gap-1 border border-red-200/50 dark:border-red-800/40"
                         title="Delete hotel"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +165,7 @@ export const HotelManager: React.FC = () => {
     ];
 
     if (loading && !hotels.length) {
-        return <div className="p-8 text-center text-gray-500">Loading hotels...</div>;
+        return <div className="p-8 text-center text-gray-500 dark:text-slate-400">Loading hotels...</div>;
     }
 
     return (
@@ -160,7 +176,7 @@ export const HotelManager: React.FC = () => {
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                         Hotel Management
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage hotels and room inventory</p>
+                    <p className="text-gray-600 dark:text-slate-400 mt-1">Manage hotels and room inventory</p>
                 </div>
                 <button
                     onClick={() => navigate('/add-hotel')}
@@ -174,14 +190,14 @@ export const HotelManager: React.FC = () => {
             </div>
 
             {error && (
-                <div className="bg-red-50 text-red-600 p-4 rounded-lg border border-red-200">
+                <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-300 p-4 rounded-lg border border-red-200 dark:border-red-800">
                     {error}
                 </div>
             )}
 
             {/* Hotel List */}
             <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Registered Hotels</h3>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Registered Hotels</h3>
                 <DataTable
                     columns={hotelColumns}
                     data={hotels}
@@ -193,6 +209,16 @@ export const HotelManager: React.FC = () => {
 
             {selectedHotel && (
                 <>
+                    <EditHotelModal
+                        isOpen={isEditModalOpen}
+                        onClose={() => {
+                            setIsEditModalOpen(false);
+                            setSelectedHotel(null);
+                        }}
+                        hotel={selectedHotel}
+                        onHotelUpdated={fetchHotels}
+                    />
+
                     <RoomManagerModal
                         isOpen={isRoomModalOpen}
                         onClose={() => {

@@ -121,7 +121,7 @@ public class RegistrationService {
         // Send credentials via email
         emailService.sendCredentials(user.getEmail(), user.getEmail(), temporaryPassword);
 
-        log.info("Admin approved and credentials sent to: {}", user.getEmail());
+        log.info("Admin approved and credentials sent to: {}. Temporary Password: {}", user.getEmail(), temporaryPassword);
     }
 
     @Transactional
@@ -198,9 +198,34 @@ public class RegistrationService {
                 .collect(Collectors.toList());
     }
 
+    public AdminRegistrationRequestDto getRequestById(Long requestId) {
+        RegistrationRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Registration request not found"));
+        return mapToDto(request);
+    }
+
+    @Transactional
+    public void rejectRequest(Long requestId) {
+        log.info("Rejecting admin registration request ID: {}", requestId);
+
+        RegistrationRequest request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Registration request not found"));
+
+        if (request.getStatus() != RequestStatus.PENDING) {
+            throw new BadRequestException("Request has already been processed");
+        }
+
+        request.setStatus(RequestStatus.REJECTED);
+        requestRepository.save(request);
+        log.info("Admin registration request ID: {} rejected", requestId);
+    }
+
     private AdminRegistrationRequestDto mapToDto(RegistrationRequest request) {
+        String fullName = (request.getFirstName() != null ? request.getFirstName() : "")
+                + (request.getLastName() != null ? " " + request.getLastName() : "");
         return AdminRegistrationRequestDto.builder()
                 .id(request.getId())
+                .fullName(fullName.trim())
                 .email(request.getEmail())
                 .status(request.getStatus())
                 .phone(request.getPhoneNumber())

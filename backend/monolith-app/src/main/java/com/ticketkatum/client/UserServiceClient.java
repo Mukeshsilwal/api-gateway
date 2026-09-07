@@ -25,6 +25,7 @@ public class UserServiceClient {
 
     private final WebClient.Builder webClientBuilder;
     private final ServiceUrlConfig serviceUrls;
+    private final com.ticketkatum.service.serviceimpl.UserService userService;
 
     private static final String CIRCUIT_BREAKER_NAME = "userService";
 
@@ -39,12 +40,49 @@ public class UserServiceClient {
     public CompletableFuture<UserDto> getUserById(Integer userId) {
         log.debug("Fetching user by ID: {}", userId);
 
+        if (userService != null && userId != null) {
+            return CompletableFuture.supplyAsync(() -> {
+                com.ticketkatum.model.UserDto u = userService.getUser(userId.longValue());
+                return toDto(u);
+            });
+        }
+
         return getWebClient()
                 .get()
                 .uri("/api/users/{id}", userId)
                 .retrieve()
                 .bodyToMono(UserDto.class)
                 .toFuture();
+    }
+
+    public CompletableFuture<UserDto> getUserByEmail(String email) {
+        log.debug("Fetching user by email: {}", email);
+
+        if (userService != null && email != null) {
+            return CompletableFuture.supplyAsync(() -> {
+                com.ticketkatum.model.UserDto u = userService.getUserByEmail(email);
+                return toDto(u);
+            });
+        }
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    private UserDto toDto(com.ticketkatum.model.UserDto u) {
+        if (u == null) return null;
+        return UserDto.builder()
+                .id(u.getId())
+                .firstName(u.getFirstName())
+                .lastName(u.getLastName())
+                .email(u.getEmail())
+                .phoneNumber(u.getPhoneNumber())
+                .roles(u.getRoles())
+                .role(u.getRole())
+                .organizationName(u.getOrganizationName())
+                .enabled(u.getEnabled())
+                .accountNonLocked(u.getAccountNonLocked())
+                .credentialsNonExpired(u.getCredentialsNonExpired())
+                .build();
     }
 
     @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getAllUsersFallback")

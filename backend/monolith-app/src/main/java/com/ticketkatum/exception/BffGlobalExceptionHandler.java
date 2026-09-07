@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
- * Global exception handler for web-bff
- * Handles downstream service errors and common exceptions
+ * Global exception handler for web-bff (Merged into unified GlobalExceptionHandler)
  */
-@RestControllerAdvice
+// @RestControllerAdvice
 @Slf4j
 public class BffGlobalExceptionHandler {
 

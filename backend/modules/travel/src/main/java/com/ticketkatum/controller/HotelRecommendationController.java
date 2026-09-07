@@ -52,10 +52,10 @@ public class HotelRecommendationController {
     @GetMapping("/personalized")
     @Operation(summary = "Get personalized recommendations")
     public ResponseEntity<List<HotelRecommendation>> getPersonalizedRecommendations(
-            @RequestParam String userId,
-            @RequestParam Double latitude,
-            @RequestParam Double longitude,
-            @RequestParam(defaultValue = "10") Integer limit) {
+            @RequestParam(name = "userId") String userId,
+            @RequestParam(name = "latitude") Double latitude,
+            @RequestParam(name = "longitude") Double longitude,
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit) {
         log.info("Getting personalized recommendations for user: {}", userId);
         List<HotelRecommendation> recommendations =
                 hotelService.getPersonalizedRecommendations(userId, latitude, longitude, limit);
@@ -65,7 +65,7 @@ public class HotelRecommendationController {
     @GetMapping("/featured")
     @Operation(summary = "Get featured hotels")
     public ResponseEntity<Response<List<HotelRecommendation>>> getFeaturedHotels(
-            @RequestParam(defaultValue = "10") Integer limit) {
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit) {
 
         log.info("Getting featured hotels");
         List<HotelRecommendation> hotels = hotelService.getFeaturedHotels(limit);
@@ -79,10 +79,10 @@ public class HotelRecommendationController {
     @GetMapping("/city/{city}")
     @Operation(summary = "Search hotels by city")
     public ResponseEntity<List<HotelRecommendation>> searchByCity(
-            @PathVariable String city,
-            @RequestParam(required = false) Double userLat,
-            @RequestParam(required = false) Double userLon,
-            @RequestParam(defaultValue = "20") Integer limit) {
+            @PathVariable(name = "city") String city,
+            @RequestParam(name = "userLat", required = false) Double userLat,
+            @RequestParam(name = "userLon", required = false) Double userLon,
+            @RequestParam(name = "limit", defaultValue = "20") Integer limit) {
         log.info("Searching hotels in city: {}", city);
         List<HotelRecommendation> hotels =
                 hotelService.searchByCity(city, userLat, userLon, limit);
@@ -101,9 +101,9 @@ public class HotelRecommendationController {
     @GetMapping("/top-rated")
     @Operation(summary = "Get top-rated hotels")
     public ResponseEntity<Response<List<HotelRecommendation>>> getTopRatedHotels(
-            @RequestParam(defaultValue = "10") Integer limit,
-            @RequestParam(required = false) Double userLat,
-            @RequestParam(required = false) Double userLon) {
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit,
+            @RequestParam(name = "userLat", required = false) Double userLat,
+            @RequestParam(name = "userLon", required = false) Double userLon) {
 
         log.info("Getting top-rated hotels");
 
@@ -119,11 +119,11 @@ public class HotelRecommendationController {
     @GetMapping("/budget")
     @Operation(summary = "Get budget hotels")
     public ResponseEntity<List<HotelRecommendation>> getBudgetHotels(
-            @RequestParam BigDecimal maxPrice,
-            @RequestParam(required = false) String city,
-            @RequestParam(defaultValue = "20") Integer limit,
-            @RequestParam(required = false) Double userLat,
-            @RequestParam(required = false) Double userLon) {
+            @RequestParam(name = "maxPrice") BigDecimal maxPrice,
+            @RequestParam(name = "city", required = false) String city,
+            @RequestParam(name = "limit", defaultValue = "20") Integer limit,
+            @RequestParam(name = "userLat", required = false) Double userLat,
+            @RequestParam(name = "userLon", required = false) Double userLon) {
         log.info("Getting budget hotels with max price: {}", maxPrice);
         List<HotelRecommendation> hotels =
                 hotelService.getBudgetHotels(maxPrice, city, limit, userLat, userLon);
@@ -133,11 +133,11 @@ public class HotelRecommendationController {
     @GetMapping("/star-rating/{stars}")
     @Operation(summary = "Get hotels by star rating")
     public ResponseEntity<List<HotelRecommendation>> getHotelsByStarRating(
-            @PathVariable Integer stars,
-            @RequestParam(required = false) String city,
-            @RequestParam(defaultValue = "20") Integer limit,
-            @RequestParam(required = false) Double userLat,
-            @RequestParam(required = false) Double userLon) {
+            @PathVariable(name = "stars") Integer stars,
+            @RequestParam(name = "city", required = false) String city,
+            @RequestParam(name = "limit", defaultValue = "20") Integer limit,
+            @RequestParam(name = "userLat", required = false) Double userLat,
+            @RequestParam(name = "userLon", required = false) Double userLon) {
         log.info("Getting {}-star hotels", stars);
         List<HotelRecommendation> hotels =
                 hotelService.getHotelsByStarRating(stars, city, limit, userLat, userLon);
@@ -216,9 +216,9 @@ public class HotelRecommendationController {
      */
     @GetMapping("/recommendations")
     public ResponseEntity<Response<?>> getPersonalizedRecommendations(
-            @RequestParam Double lat,
-            @RequestParam Double lon,
-            @RequestParam(defaultValue = "10") @Min(1) @Max(20) Integer limit,
+            @RequestParam(name = "lat", required = false, defaultValue = "27.7172") Double lat,
+            @RequestParam(name = "lon", required = false, defaultValue = "85.3240") Double lon,
+            @RequestParam(name = "limit", defaultValue = "10") @Min(1) @Max(20) Integer limit,
             @RequestHeader(value = "X-User-Id", required = false) String userId) {
 
         log.info("Getting personalized recommendations for user: {}", userId);

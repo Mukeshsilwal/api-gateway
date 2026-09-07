@@ -137,43 +137,43 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
         <div className="space-y-6">
             {/* Header */}
             <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-gray-700 to-gray-900 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-900 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
                     Settings
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Manage your account preferences and security</p>
+                <p className="text-slate-600 dark:text-slate-400 mt-1">Manage your account preferences and security</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Appearance Settings */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                         <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                         </svg>
                         Appearance
                     </h3>
 
-                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                    <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
                         <div>
-                            <p className="font-medium text-gray-900 dark:text-white">Dark Mode</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">Toggle dark theme for the admin panel</p>
+                            <p className="font-medium text-slate-900 dark:text-white">Dark Mode</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Toggle dark theme for the admin panel</p>
                         </div>
                         <button
                             onClick={toggleDarkMode}
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${isDarkMode ? 'bg-indigo-600' : 'bg-gray-200'
+                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 ${isDarkMode ? 'bg-indigo-600' : 'bg-slate-300 dark:bg-slate-700'
                                 }`}
                         >
                             <span
                                 className={`${isDarkMode ? 'translate-x-6' : 'translate-x-1'
-                                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform`}
+                                    } inline-block h-4 w-4 transform rounded-full bg-white transition-transform shadow-sm`}
                             />
                         </button>
                     </div>
                 </div>
 
                 {/* Security Settings */}
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                         <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
@@ -182,31 +182,31 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
 
                     <div className="space-y-4">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Address</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Email Address</label>
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-500"
                                 placeholder="you@example.com"
                             />
                             {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Old Password</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Old Password</label>
                             <div className="relative">
                                 <input
                                     type={showOldPassword ? "text" : "password"}
                                     value={oldPassword}
                                     onChange={(e) => setOldPassword(e.target.value)}
-                                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-500"
                                     placeholder="Leave empty if forgotten"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowOldPassword(!showOldPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-medium"
                                 >
                                     {showOldPassword ? "Hide" : "Show"}
                                 </button>
@@ -214,19 +214,19 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">New Password</label>
                             <div className="relative">
                                 <input
                                     type={showNewPassword ? "text" : "password"}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-500"
                                     placeholder="Min. 8 characters"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowNewPassword(!showNewPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-medium"
                                 >
                                     {showNewPassword ? "Hide" : "Show"}
                                 </button>
@@ -235,19 +235,19 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password</label>
+                            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Confirm Password</label>
                             <div className="relative">
                                 <input
                                     type={showConfirmPassword ? "text" : "password"}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-slate-400 dark:placeholder-slate-500"
                                     placeholder="Confirm new password"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-medium"
                                 >
                                     {showConfirmPassword ? "Hide" : "Show"}
                                 </button>
@@ -260,7 +260,7 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                                 <button
                                     onClick={handleSendOtp}
                                     disabled={isSendingOtp}
-                                    className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                                 >
                                     {isSendingOtp ? "Sending OTP..." : "Send OTP to Email"}
                                 </button>
@@ -268,12 +268,12 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                                 <button
                                     onClick={handleChangePassword}
                                     disabled={isSubmitting}
-                                    className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="w-full py-3 px-4 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                                 >
                                     {isSubmitting ? "Updating..." : "Change Password"}
                                 </button>
                             )}
-                            <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3">
+                            <p className="text-center text-xs text-slate-500 dark:text-slate-400 mt-3">
                                 {!oldPassword ? "Forgot your password? Use OTP to reset it." : "Enter old password to change directly."}
                             </p>
                         </div>
@@ -282,17 +282,17 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
             </div>
 
             {/* Session Management */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                     <svg className="w-6 h-6 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                     Session Management
                 </h3>
 
-                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-100 dark:border-red-800">
-                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Emergency Controls</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <div className="p-4 bg-red-50 dark:bg-red-950/20 rounded-xl border border-red-100 dark:border-red-900/50">
+                    <h4 className="font-medium text-slate-900 dark:text-white mb-2">Emergency Controls</h4>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
                         Force logout the current user from all devices. This action cannot be undone.
                     </p>
                     <button
@@ -325,7 +325,7 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                                 console.log('[Settings] User cancelled logout action');
                             }
                         }}
-                        className="w-full py-2 px-4 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg transition-colors text-sm font-medium"
+                        className="w-full py-2 px-4 bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/60 rounded-lg transition-colors text-sm font-medium"
                     >
                         Logout All My Devices
                     </button>
@@ -334,13 +334,13 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
 
             {/* OTP Modal */}
             {otpModalVisible && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-gray-100 dark:border-gray-700">
+                <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50 p-4">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-sm p-6 border border-slate-200 dark:border-slate-800">
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Verify OTP</h3>
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Verify OTP</h3>
                             <button
                                 onClick={() => setOtpModalVisible(false)}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -348,8 +348,8 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                             </button>
                         </div>
 
-                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                            We sent a verification code to <span className="font-semibold text-gray-900 dark:text-white">{email}</span>
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">
+                            We sent a verification code to <span className="font-semibold text-slate-900 dark:text-white">{email}</span>
                         </p>
 
                         <input
@@ -358,21 +358,21 @@ export const Settings: React.FC<SettingsProps> = ({ isDarkMode, toggleDarkMode }
                             placeholder="Enter 6-digit code"
                             value={otp}
                             onChange={(e) => setOtp(e.target.value)}
-                            className="w-full p-3 border border-gray-200 dark:border-gray-600 rounded-xl bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-center text-lg tracking-widest focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-2"
+                            className="w-full p-3 border border-slate-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-center text-lg tracking-widest focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-2"
                         />
                         {errors.otp && <p className="text-sm text-red-500 mb-4">{errors.otp}</p>}
 
                         <div className="grid grid-cols-2 gap-3 mt-4">
                             <button
                                 onClick={() => setOtpModalVisible(false)}
-                                className="py-2 px-4 border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                className="py-2 px-4 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={handleChangePassword}
                                 disabled={isSubmitting}
-                                className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors disabled:opacity-50"
+                                className="py-2 px-4 bg-green-600 hover:bg-green-700 text-white rounded-xl transition-colors disabled:opacity-50 font-medium"
                             >
                                 {isSubmitting ? "Verifying..." : "Verify & Change"}
                             </button>

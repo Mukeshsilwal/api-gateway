@@ -122,20 +122,34 @@ export const AddHotelPage = () => {
         setLoading(true);
         try {
             // 1. Create Hotel
-            const hotelPayload = {
+            const minP = Number(hotelData.minPrice);
+            const maxP = Number(hotelData.maxPrice);
+            const hotelPayload: any = {
                 ...hotelData,
-                latitude: Number(hotelData.latitude) || 0,
-                longitude: Number(hotelData.longitude) || 0,
-                minPrice: Number(hotelData.minPrice) || 0,
-                maxPrice: Number(hotelData.maxPrice) || Number(hotelData.minPrice) || 0,
+                latitude: Number(hotelData.latitude) || 27.7172,
+                longitude: Number(hotelData.longitude) || 85.3240,
                 stars: Number(hotelData.stars) || 3,
                 rating: Number(hotelData.rating) || 0,
                 totalRooms: Number(hotelData.totalRooms) || 0
             };
 
+            if (!isNaN(minP) && minP > 0) {
+                hotelPayload.minPrice = minP;
+            } else {
+                delete hotelPayload.minPrice;
+            }
+
+            if (!isNaN(maxP) && maxP > 0) {
+                hotelPayload.maxPrice = maxP;
+            } else if (hotelPayload.minPrice) {
+                hotelPayload.maxPrice = hotelPayload.minPrice;
+            } else {
+                delete hotelPayload.maxPrice;
+            }
+
             const createdHotel = await hotelService.createHotel(hotelPayload) as any;
 
-            if (createdHotel && createdHotel.id) {
+            if (createdHotel && (createdHotel.id || createdHotel.hotelCode)) {
                 toast.success('Hotel added successfully! Please add rooms in the Hotel Manager.');
                 navigate('/admin');
             } else {
@@ -430,7 +444,15 @@ export const AddHotelPage = () => {
                 {activeUploads > 0 && <p className="text-sm text-amber-600 font-medium mt-2 animate-pulse">Uploading {activeUploads} image(s)... Please wait.</p>}
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-between items-center pt-4">
+                <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={() => navigate('/admin')}
+                    className="border-gray-300 text-gray-700 hover:bg-gray-100"
+                >
+                    Cancel & Return to Hotel Manager
+                </Button>
                 <Button onClick={handleSubmit} disabled={isSubmitDisabled} className="bg-green-600 hover:bg-green-700 text-white gap-2">
                     <Save size={18} />
                     {loading ? 'Creating...' : (activeUploads > 0 ? `Waiting for Uploads...` : 'Create Hotel')}

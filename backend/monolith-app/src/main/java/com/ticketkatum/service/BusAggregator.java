@@ -70,7 +70,16 @@ public class BusAggregator {
         CompletableFuture<BusDto> busFuture = busClient.getBusById(busId);
 
         return busFuture.thenCompose(bus -> {
-            CompletableFuture<RouteDto> routeFuture = routeClient.getRouteById(bus.getRouteDto().getId());
+            Integer routeId = 0;
+            if (bus.getRouteDto() != null) {
+                routeId = bus.getRouteDto().getId();
+            } else if (bus.getRouteId() > 0) {
+                routeId = (int) bus.getRouteId();
+            }
+
+            CompletableFuture<RouteDto> routeFuture = (routeId > 0)
+                    ? routeClient.getRouteById(routeId)
+                    : CompletableFuture.completedFuture(null);
 
             CompletableFuture<List<SeatDto>> seatsFuture = seatClient.getSeatsByBusName(bus.getBusName());
 
@@ -78,6 +87,13 @@ public class BusAggregator {
                     .thenApply(v -> {
                         RouteDto route = routeFuture.join();
                         List<SeatDto> seats = seatsFuture.join();
+                        if (seats == null || seats.isEmpty()) {
+                            if (bus.getSeats() != null && !bus.getSeats().isEmpty()) {
+                                seats = bus.getSeats();
+                            } else {
+                                seats = Collections.emptyList();
+                            }
+                        }
 
                         // Get bus stops for route
                         List<BusStopDto> busStops = fetchBusStopsForRoute(route);
@@ -111,6 +127,13 @@ public class BusAggregator {
     public CompletableFuture<AggregatedBusSearchResults> searchBusesWithDetails(
             BusSearchRequest searchRequest) {
 
+        if (searchRequest.getPageSize() == null || searchRequest.getPageSize() <= 0) {
+            searchRequest.setPageSize(10);
+        }
+        if (searchRequest.getDate() == null) {
+            searchRequest.setDate(LocalDate.now());
+        }
+
         log.info("Searching buses: {} to {} on {}",
                 searchRequest.getSource(),
                 searchRequest.getDestination(),
@@ -118,7 +141,9 @@ public class BusAggregator {
 
         return busClient.searchBuses(searchRequest)
                 .thenCompose(searchResponse -> {
-                    List<BusDto> buses = searchResponse.getBuses();
+                    List<BusDto> buses = (searchResponse != null && searchResponse.getBuses() != null)
+                            ? searchResponse.getBuses()
+                            : Collections.emptyList();
 
                     // Fetch complete info for each bus in parallel
                     List<CompletableFuture<EnrichedBusDto>> enrichedFutures = buses.stream()
@@ -304,20 +329,26 @@ public class BusAggregator {
             log.warn("Bus {} has null routeDto, skipping route enrichment", bus.getBusName());
 
             return seatClient.getSeatsByBusName(bus.getBusName())
-                    .thenApply(seats -> EnrichedBusDto.builder()
-                            .bus(bus)
-                            .route(null)
-                            .totalSeats(seats.size())
-                            .availableSeats(countAvailableSeats(seats))
-                            .seatAvailability(calculateSeatAvailability(seats))
-                            .build())
-                    .exceptionally(ex -> {
-                        log.warn("Error fetching seats for bus {}", bus.getBusName(), ex);
+                    .thenApply(seats -> {
+                        if (seats == null || seats.isEmpty()) {
+                            seats = (bus.getSeats() != null) ? bus.getSeats() : Collections.emptyList();
+                        }
                         return EnrichedBusDto.builder()
                                 .bus(bus)
-                                .totalSeats(0)
-                                .availableSeats(0)
-                                .seatAvailability(0.0)
+                                .route(null)
+                                .totalSeats(seats.size())
+                                .availableSeats(countAvailableSeats(seats))
+                                .seatAvailability(calculateSeatAvailability(seats))
+                                .build();
+                    })
+                    .exceptionally(ex -> {
+                        log.warn("Error fetching seats for bus {}", bus.getBusName(), ex);
+                        List<SeatDto> fallbackSeats = (bus.getSeats() != null) ? bus.getSeats() : Collections.emptyList();
+                        return EnrichedBusDto.builder()
+                                .bus(bus)
+                                .totalSeats(fallbackSeats.size())
+                                .availableSeats(countAvailableSeats(fallbackSeats))
+                                .seatAvailability(calculateSeatAvailability(fallbackSeats))
                                 .build();
                     });
         }
@@ -330,6 +361,9 @@ public class BusAggregator {
                 .thenApply(v -> {
                     RouteDto route = routeFuture.join();
                     List<SeatDto> seats = seatsFuture.join();
+                    if (seats == null || seats.isEmpty()) {
+                        seats = (bus.getSeats() != null) ? bus.getSeats() : Collections.emptyList();
+                    }
 
                     return EnrichedBusDto.builder()
                             .bus(bus)
@@ -341,32 +375,25 @@ public class BusAggregator {
                 })
                 .exceptionally(ex -> {
                     log.warn("Error enriching bus: {}", bus.getBusName(), ex);
+                    List<SeatDto> fallbackSeats = (bus.getSeats() != null) ? bus.getSeats() : Collections.emptyList();
                     return EnrichedBusDto.builder()
                             .bus(bus)
-                            .totalSeats(0)
-                            .availableSeats(0)
-                            .seatAvailability(0.0)
+                            .totalSeats(fallbackSeats.size())
+                            .availableSeats(countAvailableSeats(fallbackSeats))
+                            .seatAvailability(calculateSeatAvailability(fallbackSeats))
                             .build();
                 });
     }
 
     private List<BusStopDto> fetchBusStopsForRoute(RouteDto route) {
         List<BusStopDto> stops = new ArrayList<>();
-
-        if (route.getSourceBusStop().getId() == 0) {
-            busStopClient.getBusStopById(route.getSourceBusStop().getId())
-                    .thenAccept(stops::add)
-                    .exceptionally(ex -> null)
-                    .join();
+        if (route == null) return stops;
+        if (route.getSourceBusStop() != null) {
+            stops.add(route.getSourceBusStop());
         }
-
-        if (route.getDestinationBusStop().getId() == 0) {
-            busStopClient.getBusStopById(route.getDestinationBusStop().getId())
-                    .thenAccept(stops::add)
-                    .exceptionally(ex -> null)
-                    .join();
+        if (route.getDestinationBusStop() != null) {
+            stops.add(route.getDestinationBusStop());
         }
-
         return stops;
     }
 

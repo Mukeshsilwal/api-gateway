@@ -75,9 +75,17 @@ public class HotelController {
 
     @Operation(summary = "Get all hotels", description = "Retrieves all hotels with optional filters and pagination")
     @GetMapping
-    public ResponseEntity<Response<List<HotelDTO>>> getAllHotels() {
+    public ResponseEntity<Response<List<HotelDTO>>> getAllHotels(
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) Integer minStars,
+            @RequestParam(required = false) Integer maxPrice) {
 
-        List<HotelDTO> hotels = hotelService.getAllHotels();
+        List<HotelDTO> hotels;
+        if ((city != null && !city.isBlank()) || minStars != null || maxPrice != null) {
+            hotels = hotelService.getAllHotels(city, minStars, maxPrice, org.springframework.data.domain.Pageable.unpaged()).getContent();
+        } else {
+            hotels = hotelService.getAllHotels();
+        }
 
         Response<List<HotelDTO>> response = ResponseHandler.success(
                 "Found " + hotels.size() + " hotels",

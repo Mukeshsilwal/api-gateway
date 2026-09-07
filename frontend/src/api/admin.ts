@@ -47,10 +47,10 @@ export const adminApi = {
      * Supports ETag via If-None-Match header in the calling layer (React Query).
      */
     getSummary: async (window: '7d' | '30d' | '90d' = '30d', tz: string = 'Asia/Kathmandu'): Promise<AdminSummary> => {
-        const response = await client.get<BffResponse<AdminSummary>>('/api/bff/v1/admin/summary', {
+        const response = await client.get<BffResponse<AdminSummary>>('/bff/v1/admin/summary', {
             params: { window, tz }
         });
-        return response.data.data;
+        return response.data?.data || (response.data as any);
     },
 
 

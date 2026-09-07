@@ -4,80 +4,83 @@
 
 @layer base {
   :root {
-    /* Warm Stone Palette for Friendly/Trustworthy Vibe */
+    /* Clean Modern Slate Palette - Light Mode */
+    --background: 210 20% 98%;
+    --foreground: 222.2 47.4% 11.2%;
 
-    /* Background: Warm Stone 50 */
-    --background: 60 5% 96%;
-    /* Foreground: Stone 900 (Soft Black) */
-    --foreground: 24 10% 10%;
-
-    /* Card / Surface: White */
+    /* Elevated Surface */
     --card: 0 0% 100%;
-    --card-foreground: 24 10% 10%;
+    --card-foreground: 222.2 47.4% 11.2%;
 
-    /* Popover: White */
+    /* Popover & Flyouts */
     --popover: 0 0% 100%;
-    --popover-foreground: 24 10% 10%;
+    --popover-foreground: 222.2 47.4% 11.2%;
 
-    /* Primary Brand: Purple (Purple 600) */
-    --primary: 271 81% 56%;
+    /* Primary Brand: Vibrant Purple / Violet */
+    --primary: 265 83% 57%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary: Stone 100 for subtle backgrounds */
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 10% 10%;
+    /* Secondary: Crisp Slate */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    /* Muted: Stone 100 */
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5% 45%;
+    /* Muted Content */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 42%;
 
-    /* Accent: Purple 100 for highlights */
-    --accent: 270 100% 95%;
-    --accent-foreground: 24 10% 10%;
+    /* Accent Highlights */
+    --accent: 265 100% 96%;
+    --accent-foreground: 265 83% 40%;
 
-    /* Destructive: Red */
+    /* Destructive Alert */
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Borders & Inputs: Stone 200 */
-    --border: 24 5% 90%;
-    --input: 24 5% 90%;
-    --ring: 271 81% 56%;
+    /* Borders & Inputs */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 265 83% 57%;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    /* Base Colors - Dark Mode */
-    --background: 222.2 84% 4.9%;
-    /* Slate 950 */
+    /* Deep Obsidian Slate - Dark Mode */
+    --background: 222.2 47% 7%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    /* Elevated Card Surface (Distinct from background for depth) */
+    --card: 222.2 40% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    /* Popover & Flyouts */
+    --popover: 222.2 40% 14%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 244.5 57.9% 60%;
-    /* Indigo 500 */
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Primary Brand: Vibrant Violet with glow */
+    --primary: 265 89% 66%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 160 84% 39%;
-    --secondary-foreground: 0 0% 100%;
+    /* Secondary */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
+    /* Muted Details (High visibility, zero eye strain) */
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 215 25% 72%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    /* Accent */
+    --accent: 265 70% 20%;
+    --accent-foreground: 265 100% 90%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 244.5 57.9% 50.6%;
+    /* Borders & Inputs (Crisp separation) */
+    --border: 217.2 32.6% 22%;
+    --input: 217.2 32.6% 20%;
+    --ring: 265 89% 66%;
   }
 }
 
@@ -126,32 +129,48 @@
     /* Firefox */
   }
 
-  /* Form Input Field - Consistent styling */
+  /* Form Input Field - Consistent styling in both modes */
   .input-field {
-    @apply w-full px-4 py-2.5 border border-slate-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200 ease-in-out bg-white;
+    @apply w-full px-4 py-2.5 border border-slate-300 dark:border-slate-700 rounded-xl text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/40 focus:border-purple-600 transition-all duration-200 ease-in-out bg-white dark:bg-slate-900 shadow-sm;
   }
 
   .input-field:disabled {
-    @apply bg-gray-100 cursor-not-allowed opacity-60;
+    @apply bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60;
   }
 
   /* Primary Button - Main CTA */
   .btn-primary {
-    @apply px-6 py-2.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-purple-700 hover:to-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
+    @apply px-6 py-2.5 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-700 hover:to-indigo-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600 transition-all duration-200 ease-in-out transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none;
   }
 
   /* Secondary Button - Alternative actions */
   .btn-secondary {
-    @apply px-6 py-2.5 bg-white text-slate-700 font-semibold border-2 border-slate-300 rounded-lg shadow-sm hover:shadow-md hover:border-slate-400 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed;
+    @apply px-6 py-2.5 bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-semibold border border-slate-300 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-md hover:border-slate-400 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-400 transition-all duration-200 ease-in-out disabled:opacity-60 disabled:cursor-not-allowed;
   }
 
-  /* Card Component - Consistent container */
+  /* Card Component - Consistent container in both modes */
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-slate-100 p-6 transition-all duration-200 ease-in-out;
+    @apply bg-white dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 p-6 transition-all duration-200 ease-in-out backdrop-blur-sm;
   }
 
   .card-hover {
-    @apply card hover:shadow-lg hover:-translate-y-1;
+    @apply card hover:shadow-xl hover:shadow-purple-500/5 hover:border-purple-500/40 dark:hover:border-purple-500/40 hover:-translate-y-1;
+  }
+
+  /* Custom Modern Scrollbars */
+  ::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.4);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.7);
   }
 
   /* Smooth Fade In Animation */

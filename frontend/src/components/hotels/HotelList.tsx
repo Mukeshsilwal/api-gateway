@@ -51,8 +51,8 @@ export function HotelList({ hotels, loading, hasMore, loadMore }) {
             className="!overflow-visible" // Fix for some layout issues with infinite scroll
         >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {hotels.map((hotel) => (
-                    <HotelCard key={hotel.hotelId} hotel={hotel} />
+                {hotels.map((hotel, index) => (
+                    <HotelCard key={hotel.hotelId || hotel.id || hotel.hotelCode || index} hotel={hotel} />
                 ))}
             </div>
         </InfiniteScroll>

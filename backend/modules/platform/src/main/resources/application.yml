@@ -37,4 +37,4 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
 
 # OpenAI Key should be env var
-spring.ai.openai.api-key: ${OPENAI_API_KEY}
+spring.ai.openai.api-key: ${OPENAI_API_KEY:sk-demo-key-for-local-development-ticketkatum}

@@ -88,7 +88,7 @@ export default defineConfig({
                                 maxEntries: 50,
                                 maxAgeSeconds: 5 * 60 // 5 minutes
                             },
-                            networkTimeoutSeconds: 3
+                            networkTimeoutSeconds: 10
                         }
                     }
                 ]
@@ -141,8 +141,14 @@ export default defineConfig({
         chunkSizeWarningLimit: 600,
     },
     server: {
-        open: true,
+        open: false,
         port: 3000,
+        headers: {
+            'X-Content-Type-Options': 'nosniff',
+            'X-Frame-Options': 'DENY',
+            'X-XSS-Protection': '1; mode=block',
+            'Referrer-Policy': 'strict-origin-when-cross-origin',
+        },
         proxy: {
             // Proxy all backend API endpoints to avoid CORS issues during development
             '/busStop': {

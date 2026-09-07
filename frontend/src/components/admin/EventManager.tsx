@@ -276,8 +276,8 @@ export const EventManager: React.FC<EventManagerProps> = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Event Manager</h1>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Event Manager</h1>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                         Manage and approve events from organizers
                     </p>
                 </div>
@@ -285,14 +285,14 @@ export const EventManager: React.FC<EventManagerProps> = () => {
                     <button
                         onClick={fetchEvents}
                         disabled={loading}
-                        className="flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
                     >
                         <RefreshCw size={20} className={loading ? 'animate-spin' : ''} />
                         Refresh
                     </button>
                     <button
                         onClick={() => navigate('/add-event')}
-                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
                     >
                         <Plus size={20} />
                         Create Event
@@ -301,27 +301,27 @@ export const EventManager: React.FC<EventManagerProps> = () => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/80 dark:border-slate-800 p-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search */}
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <input
                             type="text"
                             placeholder="Search events..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                            className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500"
                         />
                     </div>
 
                     {/* Status Filter */}
                     <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white appearance-none"
+                            className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white appearance-none"
                         >
                             <option value="ALL">All Status</option>
                             <option value="DRAFT">Draft</option>
@@ -334,11 +334,11 @@ export const EventManager: React.FC<EventManagerProps> = () => {
 
                     {/* Category Filter */}
                     <div className="relative">
-                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                         <select
                             value={categoryFilter}
                             onChange={(e) => setCategoryFilter(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white appearance-none"
+                            className="w-full pl-10 pr-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white appearance-none"
                         >
                             <option value="ALL">All Categories</option>
                             <option value="MUSIC">Music</option>
@@ -457,7 +457,7 @@ const EventCard: React.FC<EventCardProps> = ({
     const venue = basicInfo.venue;
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden hover:shadow-md transition-shadow">
             {/* Event Image */}
             <div className="relative h-48 bg-gradient-to-br from-indigo-500 to-purple-600">
                 {basicInfo.coverImage ? (
@@ -479,20 +479,20 @@ const EventCard: React.FC<EventCardProps> = ({
             {/* Event Details */}
             <div className="p-4 space-y-3">
                 <div>
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-white line-clamp-1">
+                    <h3 className="font-semibold text-lg text-slate-900 dark:text-white line-clamp-1">
                         {basicInfo.name || 'Untitled Event'}
                     </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-slate-600 dark:text-slate-400">
                         by {event.organizerName || 'Unknown Organizer'}
                     </p>
                 </div>
 
                 <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                         <Calendar size={16} />
                         <span>{formatDate(basicInfo.startDateTime || (event as any).startDateTime)}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+                    <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                         <MapPin size={16} />
                         <span className="line-clamp-1">
                             {basicInfo.type === 'ONLINE' ? 'Online Event' : venue?.name || 'TBA'}
@@ -501,33 +501,33 @@ const EventCard: React.FC<EventCardProps> = ({
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-gray-200 dark:border-gray-700">
+                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-slate-200 dark:border-slate-800">
                     <div className="text-center">
-                        <div className="flex items-center justify-center gap-1 text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center justify-center gap-1 text-slate-600 dark:text-slate-400">
                             <Users size={14} />
                         </div>
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white mt-1">
+                        <p className="text-xs font-semibold text-slate-900 dark:text-white mt-1">
                             {event.ticketsSold || 0}/{event.totalTickets || 0}
                         </p>
-                        <p className="text-xs text-gray-500">Tickets</p>
+                        <p className="text-xs text-slate-500">Tickets</p>
                     </div>
                     <div className="text-center">
-                        <div className="flex items-center justify-center gap-1 text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center justify-center gap-1 text-slate-600 dark:text-slate-400">
                             <DollarSign size={14} />
                         </div>
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white mt-1">
+                        <p className="text-xs font-semibold text-slate-900 dark:text-white mt-1">
                             {formatCurrency(event.revenue)}
                         </p>
-                        <p className="text-xs text-gray-500">Revenue</p>
+                        <p className="text-xs text-slate-500">Revenue</p>
                     </div>
                     <div className="text-center">
-                        <div className="flex items-center justify-center gap-1 text-gray-600 dark:text-gray-400">
+                        <div className="flex items-center justify-center gap-1 text-slate-600 dark:text-slate-400">
                             <Eye size={14} />
                         </div>
-                        <p className="text-xs font-semibold text-gray-900 dark:text-white mt-1">
+                        <p className="text-xs font-semibold text-slate-900 dark:text-white mt-1">
                             {event.views || 0}
                         </p>
-                        <p className="text-xs text-gray-500">Views</p>
+                        <p className="text-xs text-slate-500">Views</p>
                     </div>
                 </div>
 
@@ -565,14 +565,14 @@ const EventCard: React.FC<EventCardProps> = ({
                     )}
                     <button
                         onClick={() => onViewDetails(event)}
-                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white text-sm rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white text-sm rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
                     >
                         <Eye size={16} />
                         Details
                     </button>
                     <button
                         onClick={() => onViewAnalytics(event)}
-                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 text-sm rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 text-sm rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
                     >
                         <BarChart2 size={16} />
                         Analytics
@@ -584,7 +584,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     <button
                         onClick={() => onClone(event)}
                         disabled={actionLoading}
-                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
                         title="Clone Event"
                     >
                         <Copy size={16} />
@@ -592,7 +592,7 @@ const EventCard: React.FC<EventCardProps> = ({
                     </button>
                     <button
                         onClick={() => onExport(event.id)}
-                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 text-sm rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                         title="Export Attendees"
                     >
                         <Download size={16} />
@@ -607,23 +607,23 @@ const EventCard: React.FC<EventCardProps> = ({
 // Reject Modal Component
 const RejectModal: React.FC<RejectModalProps> = ({ event, rejectReason, setRejectReason, onConfirm, onClose, loading }) => {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-md w-full p-6">
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white dark:bg-slate-900 rounded-xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-800 shadow-2xl">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-4">
                     Reject Event
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
+                <p className="text-slate-600 dark:text-slate-400 mb-4">
                     Are you sure you want to reject "{event?.basicInfo?.name || 'this event'}"?
                 </p>
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                         Rejection Reason *
                     </label>
                     <textarea
                         value={rejectReason}
                         onChange={(e) => setRejectReason(e.target.value)}
                         placeholder="Please provide a reason for rejection..."
-                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-red-500 dark:bg-gray-700 dark:text-white resize-none"
+                        className="w-full px-3 py-2 border border-slate-300 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 resize-none"
                         rows={4}
                     />
                 </div>
@@ -631,14 +631,14 @@ const RejectModal: React.FC<RejectModalProps> = ({ event, rejectReason, setRejec
                     <button
                         onClick={onClose}
                         disabled={loading}
-                        className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={onConfirm}
                         disabled={loading || !rejectReason.trim()}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 font-medium"
                     >
                         {loading ? 'Rejecting...' : 'Reject Event'}
                     </button>
@@ -655,16 +655,16 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
     const venue = basicInfo.venue;
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full my-8">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-xl max-w-4xl w-full my-8 border border-slate-200 dark:border-slate-800 shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                         Event Details
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                     >
                         <XCircle size={24} />
                     </button>
@@ -674,35 +674,35 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
                 <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
                     {/* Basic Info */}
                     <div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
                             Basic Information
                         </h4>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Event Name</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{basicInfo.name}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Event Name</p>
+                                <p className="font-medium text-slate-900 dark:text-white">{basicInfo.name}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Status</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Status</p>
                                 <div className="mt-1">{getStatusBadge(event.status)}</div>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Category</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{basicInfo.category}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Category</p>
+                                <p className="font-medium text-slate-900 dark:text-white">{basicInfo.category}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Type</p>
-                                <p className="font-medium text-gray-900 dark:text-white">{basicInfo.type}</p>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Type</p>
+                                <p className="font-medium text-slate-900 dark:text-white">{basicInfo.type}</p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">Start Date</p>
-                                <p className="font-medium text-gray-900 dark:text-white">
+                                <p className="text-sm text-slate-500 dark:text-slate-400">Start Date</p>
+                                <p className="font-medium text-slate-900 dark:text-white">
                                     {formatDate(basicInfo.startDateTime || (event as any).startDateTime)}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">End Date</p>
-                                <p className="font-medium text-gray-900 dark:text-white">
+                                <p className="text-sm text-slate-500 dark:text-slate-400">End Date</p>
+                                <p className="font-medium text-slate-900 dark:text-white">
                                     {formatDate(basicInfo.endDateTime || (event as any).endDateTime)}
                                 </p>
                             </div>
@@ -712,12 +712,12 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
                     {/* Venue */}
                     {basicInfo.type !== 'ONLINE' && venue?.name && (
                         <div>
-                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                            <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
                                 Venue
                             </h4>
-                            <p className="font-medium text-gray-900 dark:text-white">{venue.name}</p>
+                            <p className="font-medium text-slate-900 dark:text-white">{venue.name}</p>
                             {venue.address && (
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-sm text-slate-500 dark:text-slate-400">
                                     {venue.address.street}, {venue.address.city}
                                 </p>
                             )}
@@ -727,19 +727,19 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
                     {/* Ticket Types */}
                     {ticketing.ticketTypes && ticketing.ticketTypes.length > 0 && (
                         <div>
-                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                            <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
                                 Ticket Types
                             </h4>
                             <div className="space-y-2">
                                 {ticketing.ticketTypes.map((ticket, idx) => (
-                                    <div key={idx} className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                    <div key={idx} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200/50 dark:border-slate-700/50">
                                         <div>
-                                            <p className="font-medium text-gray-900 dark:text-white">{ticket.name}</p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            <p className="font-medium text-slate-900 dark:text-white">{ticket.name}</p>
+                                            <p className="text-sm text-slate-500 dark:text-slate-400">
                                                 {ticket.quantitySold || 0} / {ticket.quantity} sold
                                             </p>
                                         </div>
-                                        <p className="font-semibold text-gray-900 dark:text-white">
+                                        <p className="font-semibold text-slate-900 dark:text-white">
                                             {formatCurrency(ticket.price)}
                                         </p>
                                     </div>
@@ -750,23 +750,23 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
 
                     {/* Statistics */}
                     <div>
-                        <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                        <h4 className="text-lg font-semibold text-slate-900 dark:text-white mb-3">
                             Statistics
                         </h4>
                         <div className="grid grid-cols-3 gap-4">
-                            <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div className="p-4 bg-blue-50 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/40 rounded-xl">
                                 <p className="text-sm text-blue-600 dark:text-blue-400">Total Tickets</p>
                                 <p className="text-2xl font-bold text-blue-900 dark:text-blue-300">
                                     {event.totalTickets || 0}
                                 </p>
                             </div>
-                            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="p-4 bg-green-50 dark:bg-green-950/40 border border-green-100 dark:border-green-900/40 rounded-xl">
                                 <p className="text-sm text-green-600 dark:text-green-400">Tickets Sold</p>
                                 <p className="text-2xl font-bold text-green-900 dark:text-green-300">
                                     {event.ticketsSold || 0}
                                 </p>
                             </div>
-                            <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                            <div className="p-4 bg-purple-50 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/40 rounded-xl">
                                 <p className="text-sm text-purple-600 dark:text-purple-400">Revenue</p>
                                 <p className="text-2xl font-bold text-purple-900 dark:text-purple-300">
                                     {formatCurrency(event.revenue)}
@@ -777,10 +777,10 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({ event, onClose, f
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-800">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium"
                     >
                         Close
                     </button>
@@ -796,21 +796,21 @@ const AnalyticsModal: React.FC<{ event: EventDto; onClose: () => void }> = ({ ev
     const AnalyticsDashboard = React.lazy(() => import('../analytics/AnalyticsDashboard'));
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-            <div className="bg-white dark:bg-gray-800 rounded-lg max-w-7xl w-full my-8">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-xl max-w-7xl w-full my-8 border border-slate-200 dark:border-slate-800 shadow-2xl">
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
                     <div>
-                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                             Analytics Dashboard
                         </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                             {event.basicInfo?.name || 'Event Analytics'}
                         </p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                     >
                         <XCircle size={24} />
                     </button>
@@ -828,10 +828,10 @@ const AnalyticsModal: React.FC<{ event: EventDto; onClose: () => void }> = ({ ev
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-end gap-3 p-6 border-t border-gray-200 dark:border-gray-700">
+                <div className="flex justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-800">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        className="px-4 py-2 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors font-medium"
                     >
                         Close
                     </button>

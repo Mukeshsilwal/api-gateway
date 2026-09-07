@@ -42,7 +42,7 @@ public class ValidationUtils {
      */
     public static void validateLatitude(Double latitude) {
         if (latitude == null) {
-            throw new InvalidHotelDataException("Latitude is required");
+            return;
         }
         if (latitude < -90.0 || latitude > 90.0) {
             throw new InvalidHotelDataException(
@@ -55,7 +55,7 @@ public class ValidationUtils {
      */
     public static void validateLongitude(Double longitude) {
         if (longitude == null) {
-            throw new InvalidHotelDataException("Longitude is required");
+            return;
         }
         if (longitude < -180.0 || longitude > 180.0) {
             throw new InvalidHotelDataException(

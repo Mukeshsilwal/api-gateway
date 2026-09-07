@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PricingRequestDto {
+    private Long hotelId;
     private Long roomId;
     private Long rentTypeId;
     private Long mealPlanId;

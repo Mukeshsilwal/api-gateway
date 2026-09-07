@@ -1,18 +1,26 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios';
 
 // Constants
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
-const REQUEST_TIMEOUT = 10000;
+const REQUEST_TIMEOUT = 30000; // 30 seconds
 const MAX_RETRIES = 3;
 
 // Types
 export interface ApiError {
     message: string;
     code?: string;
+    errorCode?: string;
+    status?: number;
+    statusCode?: number;
     fieldErrors?: Record<string, string>;
+    validationErrors?: Record<string, string>;
 }
 
 // Client Instance
+const rawBaseUrl = import.meta.env.VITE_API_URL || '';
+const BASE_URL = rawBaseUrl
+    ? (rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl.replace(/\/+$/, '')}/api`)
+    : '/api';
+
 const client: AxiosInstance = axios.create({
     baseURL: BASE_URL,
     timeout: REQUEST_TIMEOUT,
@@ -32,6 +40,11 @@ const getRetryDelay = (attempt: number): number => {
 // Request Interceptor: Auth & Headers
 client.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+        // Prevent duplicate '/api' prefix when endpoint path also starts with '/api/'
+        if (config.url?.startsWith('/api/') && (config.baseURL?.endsWith('/api') || config.baseURL === '/api')) {
+            config.url = config.url.replace(/^\/api/, '');
+        }
+
         const token = localStorage.getItem('token');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
@@ -61,14 +74,15 @@ client.interceptors.request.use(
 
         // Add Request ID for tracing
         if (!config.headers['X-Request-ID']) {
-            config.headers['X-Request-ID'] = crypto.randomUUID();
+            config.headers['X-Request-ID'] = typeof crypto !== 'undefined' && crypto.randomUUID
+                ? crypto.randomUUID()
+                : `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
         }
 
         return config;
     },
     (error) => Promise.reject(error)
 );
-
 
 // Queue to store requests waiting for token refresh
 let isRefreshing = false;
@@ -85,16 +99,29 @@ const processQueue = (error: any, token: string | null = null) => {
     failedQueue = [];
 };
 
+const isAuthEndpoint = (url?: string): boolean => {
+    if (!url) return false;
+    const path = url.toLowerCase();
+    return path.includes('/auth/login') ||
+           path.includes('/auth/register') ||
+           path.includes('/auth/refresh') ||
+           path.includes('/auth/forgot-password') ||
+           path.includes('/auth/reset-password') ||
+           path.includes('/login');
+};
+
 // Response Interceptor: Retries & Error Handling
 client.interceptors.response.use(
     (response: AxiosResponse) => {
         return response;
     },
     async (error: AxiosError) => {
-        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean, _retryCount?: number };
+        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean; _retryCount?: number; skipAuthRefresh?: boolean };
+        const isAuthRequest = isAuthEndpoint(originalRequest?.url) || originalRequest?.skipAuthRefresh;
+        const refreshToken = localStorage.getItem('refreshToken');
 
-        // Handle 401 Unauthorized - Refresh Token Flow
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Handle 401 Unauthorized - Refresh Token Flow (ONLY for non-auth requests with an existing refresh token)
+        if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isAuthRequest && refreshToken) {
             if (isRefreshing) {
                 return new Promise<string>((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
@@ -113,19 +140,23 @@ client.interceptors.response.use(
             originalRequest._retry = true;
             isRefreshing = true;
 
-            const refreshToken = localStorage.getItem('refreshToken');
             const sessionId = localStorage.getItem('sessionId');
 
             if (!refreshToken) {
                 isRefreshing = false;
-                // Redirect to login if no refresh token
-                window.location.href = '/login';
+                if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                    window.location.href = '/login';
+                }
                 return Promise.reject(error);
             }
 
             try {
                 // Perform refresh
-                const response = await axios.post(`${BASE_URL}/api/bff/v1/auth/refresh`, {}, {
+                const refreshEndpoint = BASE_URL.endsWith('/api')
+                    ? `${BASE_URL}/bff/v1/auth/refresh`
+                    : `${BASE_URL}/api/bff/v1/auth/refresh`;
+
+                const response = await axios.post(refreshEndpoint, {}, {
                     headers: {
                         'Authorization': `Bearer ${refreshToken}`,
                         'Session-Id': sessionId || ''
@@ -156,7 +187,9 @@ client.interceptors.response.use(
                 localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
                 localStorage.removeItem('userRole');
-                window.location.href = '/login';
+                if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                    window.location.href = '/login';
+                }
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;
@@ -164,7 +197,7 @@ client.interceptors.response.use(
         }
 
         // Handle 429 Too Many Requests (Rate Limit)
-        if (error.response?.status === 429) {
+        if (error.response?.status === 429 && originalRequest) {
             const retryAfter = error.response.headers['retry-after'];
             if (retryAfter) {
                 const waitMs = parseInt(retryAfter, 10) * 1000;
@@ -174,9 +207,9 @@ client.interceptors.response.use(
         }
 
         // Retry Logic (5xx errors or Network errors)
-        // We do NOT retry 4xx errors (client errors) except 429
         const shouldRetry =
-            !originalRequest._retryCount || originalRequest._retryCount < MAX_RETRIES;
+            originalRequest &&
+            (!originalRequest._retryCount || originalRequest._retryCount < MAX_RETRIES);
 
         const isRetryableError =
             !error.response || // Network Error
@@ -190,11 +223,19 @@ client.interceptors.response.use(
             return client(originalRequest);
         }
 
-        // Normalize Error
+        // Normalize Error Payload
+        const responseData = error.response?.data as any;
+        const validationMap = responseData?.validationErrors || responseData?.fieldErrors || undefined;
+        const statusCode = error.response?.status;
+
         const apiError: ApiError = {
-            message: (error.response?.data as any)?.message || error.message || 'An unexpected error occurred',
-            code: (error.response?.data as any)?.code,
-            fieldErrors: (error.response?.data as any)?.fieldErrors,
+            message: responseData?.message || responseData?.error || error.message || 'An unexpected error occurred. Please try again.',
+            code: responseData?.errorCode || responseData?.code || (statusCode ? `HTTP_${statusCode}` : 'NETWORK_ERROR'),
+            errorCode: responseData?.errorCode || responseData?.code,
+            status: statusCode,
+            statusCode: statusCode,
+            fieldErrors: validationMap,
+            validationErrors: validationMap,
         };
 
         return Promise.reject(apiError);

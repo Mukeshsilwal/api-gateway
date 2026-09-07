@@ -6,17 +6,13 @@ import Button from './ui/Button';
 import { User } from '../types/auth'; // Import User type
 import { useUnifiedBookingCart } from '../hooks/useUnifiedBookingCart';
 import { CartDrawer } from './unified-booking/CartDrawer';
+import { useTheme } from '../context/ThemeContext';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [scrolled, setScrolled] = useState<boolean>(false);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
-    if (localStorage.getItem('theme')) {
-      return localStorage.getItem('theme') as 'light' | 'dark';
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
+  const { theme, toggleTheme } = useTheme();
 
   // Explicitly type the user state
   const [user, setUser] = useState<User | null>(authService.getCurrentUser() as User | null);
@@ -57,19 +53,6 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [location, lastScrollY]);
 
-  useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
-
   const handleLogout = () => {
     authService.logout();
     setUser(null);
@@ -78,8 +61,9 @@ const Navbar: React.FC = () => {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Bus', path: '/buslist' },
+    { name: 'Buses', path: '/buslist' },
     { name: 'Hotels', path: '/hotels' },
+    { name: 'Flights', path: '/plane-list' },
     { name: 'Events', path: '/events' },
     { name: 'Market', path: '/market' },
   ];
@@ -88,15 +72,15 @@ const Navbar: React.FC = () => {
         fixed top-0 left-0 right-0 z-50 transition-all duration-300
         ${isVisible ? 'translate-y-0' : '-translate-y-full'}
         ${scrolled || !isHome
-      ? 'bg-white/90 dark:bg-black/90 backdrop-blur-md shadow-sm py-3'
+      ? 'bg-white/95 dark:bg-slate-950/95 backdrop-blur-xl shadow-md border-b border-slate-200/80 dark:border-slate-800 py-3'
       : 'bg-transparent py-5'}
     `;
 
   const linkClasses = (path: string) => `
-    font-medium transition-colors duration-200
+    font-semibold text-sm transition-all duration-200 px-3 py-1.5 rounded-xl
     ${location.pathname === path
-      ? 'text-primary font-bold'
-      : 'text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary-400'
+      ? 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 font-bold'
+      : 'text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-slate-100/70 dark:hover:bg-slate-800/60'
     }
   `;
 
@@ -105,17 +89,20 @@ const Navbar: React.FC = () => {
       <nav className={navbarClasses}>
         <div className="container mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-xl">
-              T
+          <Link to="/" className="flex items-center gap-2.5 group">
+            <div className="w-10 h-10 bg-gradient-to-br from-brand-orange-500 via-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-md group-hover:scale-105 group-hover:shadow-purple-500/25 transition-all">
+              <Ticket size={20} className="transform -rotate-12" />
             </div>
-            <span className="text-xl font-display font-bold text-gray-900 dark:text-white">
-              TicketKatum
-            </span>
+            <div className="flex flex-col">
+              <span className="text-xl font-display font-black tracking-tight text-gray-900 dark:text-white leading-none">
+                Ticket<span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-orange-500 to-purple-600">Katum</span>
+              </span>
+              <span className="text-[10px] tracking-widest uppercase font-bold text-gray-400 dark:text-gray-500">Nepal Travel</span>
+            </div>
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.name}
@@ -129,7 +116,7 @@ const Navbar: React.FC = () => {
             {/* Cart Icon */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200"
+              className="relative p-2 rounded-xl transition-colors hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
               aria-label="Open cart"
             >
               <ShoppingCart size={20} />
@@ -143,9 +130,11 @@ const Navbar: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-full transition-colors hover:bg-gray-100 dark:hover:bg-white/10 text-gray-700 dark:text-gray-200"
+              className="p-2 rounded-xl transition-all duration-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700"
+              aria-label="Toggle dark/light theme"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} className="text-slate-700" />}
             </button>
           </div>
 
@@ -156,6 +145,12 @@ const Navbar: React.FC = () => {
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
                   Hi, {user.firstName || 'User'}
                 </span>
+                <Link
+                  to="/dashboard"
+                  className="text-sm font-medium hover:underline text-purple-600 dark:text-purple-400"
+                >
+                  Dashboard
+                </Link>
                 <Link
                   to="/my-bookings"
                   className="text-sm font-medium hover:underline text-indigo-600 dark:text-indigo-400"
@@ -206,8 +201,9 @@ const Navbar: React.FC = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className={`md:hidden p-2 text-gray-900`}
+            className="md:hidden p-2 text-slate-800 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
             onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle navigation menu"
           >
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -216,34 +212,42 @@ const Navbar: React.FC = () => {
         {/* Mobile Menu */}
         {
           isOpen && (
-            <div className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-100 shadow-xl p-4 flex flex-col gap-4 animate-slide-down">
+            <div className="md:hidden absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200/80 dark:border-slate-800 shadow-2xl p-4 flex flex-col gap-3 animate-slide-down">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
-                  className="text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg"
+                  className="text-slate-700 dark:text-slate-200 font-semibold p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
                 </Link>
               ))}
-              <div className="h-px bg-gray-100 my-2"></div>
+              <div className="h-px bg-slate-200 dark:bg-slate-800 my-1"></div>
               <button
                 onClick={() => { toggleTheme(); setIsOpen(false); }}
-                className="flex items-center gap-2 text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg"
+                className="flex items-center gap-2.5 text-slate-700 dark:text-slate-200 font-semibold p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
               >
-                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                {theme === 'dark' ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} />}
                 <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
               </button>
-              <div className="h-px bg-gray-100 my-2"></div>
+              <div className="h-px bg-slate-200 dark:bg-slate-800 my-1"></div>
               {user ? (
                 <>
-                  <div className="px-2 py-2 text-sm text-gray-500">
-                    Signed in as <span className="font-medium text-gray-900">{user.email}</span>
+                  <div className="px-2.5 py-1.5 text-sm text-slate-500 dark:text-slate-400">
+                    Signed in as <span className="font-semibold text-slate-900 dark:text-white">{user.email}</span>
                   </div>
                   <Link
+                    to="/dashboard"
+                    className="text-slate-700 dark:text-slate-200 font-semibold p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl flex items-center gap-2 transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Ticket size={18} className="text-purple-600 dark:text-purple-400" />
+                    Dashboard
+                  </Link>
+                  <Link
                     to="/my-bookings"
-                    className="text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg flex items-center gap-2"
+                    className="text-slate-700 dark:text-slate-200 font-semibold p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl flex items-center gap-2 transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <Ticket size={18} />
@@ -251,7 +255,7 @@ const Navbar: React.FC = () => {
                   </Link>
                   <Link
                     to="/trips"
-                    className="text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg flex items-center gap-2"
+                    className="text-slate-700 dark:text-slate-200 font-semibold p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl flex items-center gap-2 transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -261,7 +265,7 @@ const Navbar: React.FC = () => {
                   </Link>
                   <Link
                     to="/alerts"
-                    className="text-gray-700 font-medium p-2 hover:bg-gray-50 rounded-lg flex items-center gap-2"
+                    className="text-slate-700 dark:text-slate-200 font-semibold p-2.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl flex items-center gap-2 transition-colors"
                     onClick={() => setIsOpen(false)}
                   >
                     <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -271,7 +275,7 @@ const Navbar: React.FC = () => {
                   </Link>
                   <Button
                     variant="outline"
-                    className="w-full justify-center text-red-600 border-red-200 hover:bg-red-50"
+                    className="w-full justify-center text-red-600 border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/30"
                     onClick={() => {
                       handleLogout();
                       setIsOpen(false);

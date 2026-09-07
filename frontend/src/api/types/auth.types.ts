@@ -93,10 +93,23 @@ export interface ActivityLog {
 }
 
 export interface AggregatedUserDashboard {
-    userProfile: UserDto;
-    bookingSummary: BookingSummary;
-    activeSessions: SessionInfo[];
-    recentActivity: ActivityLog[];
+    userProfile?: UserDto;
+    user?: UserDto;
+    bookingSummary?: BookingSummary;
+    statistics?: {
+        totalBookings?: number;
+        completedBookings?: number;
+        cancelledBookings?: number;
+        upcomingBookings?: number;
+        totalSpent?: number;
+        averageBookingValue?: number;
+        loyaltyPoints?: number;
+    };
+    activeSessions?: SessionInfo[] | null;
+    recentActivity?: ActivityLog[];
+    recentBookings?: any[];
+    upcomingBookings?: any[];
+    paymentHistory?: any[];
     preferences?: Record<string, any>;
 }
 

@@ -16,15 +16,42 @@ public class SeatMapper {
     private final ModelMapper mapper;
 
     public Seat toEntity(SeatDto dto) {
-        return mapper.map(dto, Seat.class);
+        if (dto == null) return null;
+        Seat seat = new Seat();
+        seat.setId(dto.getId());
+        seat.setSeatNumber(dto.getSeatNumber());
+        seat.setPrice(dto.getPrice());
+        seat.setReserved(dto.isReserved());
+        if (dto.getStatus() != null) {
+            try {
+                seat.setStatus(com.ticketkatum.enums.SeatStatus.valueOf(dto.getStatus().toUpperCase()));
+            } catch (Exception ignored) {
+                seat.setStatus(com.ticketkatum.enums.SeatStatus.AVAILABLE);
+            }
+        }
+        return seat;
     }
 
     public SeatDto toDto(Seat entity) {
-        SeatDto dto = mapper.map(entity, SeatDto.class);
+        if (entity == null) return null;
+        SeatDto dto = new SeatDto();
+        dto.setId(entity.getId());
+        dto.setSeatNumber(entity.getSeatNumber());
+        dto.setPrice(entity.getPrice());
+        if (entity.getBus() != null) {
+            try {
+                dto.setBusId(entity.getBus().getId());
+                dto.setBusName(entity.getBus().getBusName());
+            } catch (Exception ignored) {
+            }
+        }
         if (entity.getStatus() != null) {
             dto.setStatus(entity.getStatus().name());
             // Backward compatibility: HELD or BOOKED means reserved
             dto.setReserved(entity.getStatus() != com.ticketkatum.enums.SeatStatus.AVAILABLE);
+        } else {
+            dto.setStatus(entity.isReserved() ? "BOOKED" : "AVAILABLE");
+            dto.setReserved(entity.isReserved());
         }
         if (entity.getHoldExpiresAt() != null) {
             dto.setHoldExpiresAt(entity.getHoldExpiresAt().toString());
@@ -33,12 +60,14 @@ public class SeatMapper {
     }
 
     public List<Seat> toEntityList(List<SeatDto> dtoList) {
+        if (dtoList == null) return java.util.Collections.emptyList();
         return dtoList.stream()
                 .map(this::toEntity)
                 .collect(Collectors.toList());
     }
 
     public List<SeatDto> toDtoList(List<Seat> entityList) {
+        if (entityList == null) return java.util.Collections.emptyList();
         return entityList.stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());

@@ -22,6 +22,9 @@ public class SlugGenerator {
      * Generate slug from text
      */
     public String generateSlug(String text) {
+        if (text == null || text.isBlank()) {
+            return "item-" + UUID.randomUUID().toString().substring(0, 8);
+        }
         String noWhitespace = WHITESPACE.matcher(text).replaceAll("-");
         String normalized = Normalizer.normalize(noWhitespace, Normalizer.Form.NFD);
         String slug = NON_LATIN.matcher(normalized).replaceAll("");

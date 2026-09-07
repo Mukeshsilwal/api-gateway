@@ -13,9 +13,9 @@ public class HotelSpecification {
             if (!StringUtils.hasText(city)) {
                 return null;
             }
-            return criteriaBuilder.equal(
+            return criteriaBuilder.like(
                     criteriaBuilder.lower(root.get("city")),
-                    city.toLowerCase());
+                    "%" + city.trim().toLowerCase() + "%");
         };
     }
 
@@ -24,7 +24,9 @@ public class HotelSpecification {
             if (minStars == null) {
                 return null;
             }
-            return criteriaBuilder.greaterThanOrEqualTo(root.get("starRating"), minStars);
+            return criteriaBuilder.or(
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("stars"), minStars),
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("starRating"), minStars));
         };
     }
 
@@ -38,6 +40,9 @@ public class HotelSpecification {
     }
 
     public static Specification<Hotel> isActive() {
-        return (root, query, criteriaBuilder) -> criteriaBuilder.isTrue(root.get("active"));
+        return (root, query, criteriaBuilder) -> criteriaBuilder.or(
+                criteriaBuilder.isTrue(root.get("active")),
+                criteriaBuilder.isNull(root.get("active"))
+        );
     }
 }

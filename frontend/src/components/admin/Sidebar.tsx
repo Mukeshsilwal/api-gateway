@@ -6,7 +6,6 @@ import {
     Bus,
     Map,
     Hotel,
-
     Ticket,
     FileText,
     Activity,
@@ -16,9 +15,12 @@ import {
     Menu,
     Calendar,
     LifeBuoy,
-    UserCheck
+    UserCheck,
+    Sun,
+    Moon
 } from 'lucide-react';
 import authService from '../../services/authService';
+import { useTheme } from '../../context/ThemeContext';
 
 interface SidebarProps {
     activeTab: string;
@@ -30,6 +32,7 @@ interface SidebarProps {
 
 export function Sidebar({ activeTab, setActiveTab, onLogout, isCollapsed, onToggle }: SidebarProps) {
     const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false);
+    const { isDark, toggleTheme } = useTheme();
 
     const handleLogoutClick = async () => {
         if (isLoggingOut) return;
@@ -169,7 +172,18 @@ export function Sidebar({ activeTab, setActiveTab, onLogout, isCollapsed, onTogg
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-border shrink-0">
+            <div className="p-4 border-t border-border shrink-0 space-y-1">
+                <button
+                    onClick={toggleTheme}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 text-muted-foreground hover:bg-muted hover:text-foreground rounded-lg transition-colors ${isCollapsed ? 'justify-center' : ''}`}
+                    title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                >
+                    {isDark ? <Sun size={20} className="text-amber-400 shrink-0" /> : <Moon size={20} className="text-slate-600 dark:text-slate-400 shrink-0" />}
+                    <span className={`font-medium text-sm transition-all duration-300 overflow-hidden whitespace-nowrap ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+                        {isDark ? 'Light Mode' : 'Dark Mode'}
+                    </span>
+                </button>
+
                 <button
                     onClick={handleLogoutClick}
                     disabled={isLoggingOut}

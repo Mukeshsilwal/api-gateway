@@ -34,10 +34,14 @@ public class RedisHotelCacheService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
+    @org.springframework.beans.factory.annotation.Value("${cache.redis.enabled:false}")
+    private boolean redisEnabled;
+
     /**
      * Add hotel to Redis geospatial index
      */
     public void addHotelToGeoIndex(Hotel hotel) {
+        if (!redisEnabled || hotel == null) return;
         try {
             GeoOperations<String, Object> geoOps = redisTemplate.opsForGeo();
             Point location = new Point(hotel.getLongitude(), hotel.getLatitude());
@@ -54,8 +58,7 @@ public class RedisHotelCacheService {
      * Batch add multiple hotels to geospatial index
      */
     public void addHotelsToGeoIndex(List<Hotel> hotels) {
-        if (hotels == null || hotels.isEmpty()) {
-            log.info("No hotels to add to geo index, skipping...");
+        if (!redisEnabled || hotels == null || hotels.isEmpty()) {
             return;
         }
 
@@ -86,6 +89,7 @@ public class RedisHotelCacheService {
      * Cache hotel details
      */
     public void cacheHotelDetails(Hotel hotel) {
+        if (!redisEnabled || hotel == null) return;
         try {
             String key = HOTEL_DETAIL_PREFIX + hotel.getId();
             redisTemplate.opsForValue().set(key, hotel, HOTEL_DETAIL_TTL_HOURS, TimeUnit.HOURS);
@@ -99,6 +103,7 @@ public class RedisHotelCacheService {
      * Get cached hotel details
      */
     public Optional<Hotel> getCachedHotelDetails(Long hotelId) {
+        if (!redisEnabled || hotelId == null) return Optional.empty();
         try {
             String key = HOTEL_DETAIL_PREFIX + hotelId;
             Hotel hotel = (Hotel) redisTemplate.opsForValue().get(key);
@@ -370,6 +375,10 @@ public class RedisHotelCacheService {
      * Warm up cache with popular locations or all hotels
      */
     public void warmUpCache(List<Hotel> hotels) {
+        if (!redisEnabled) {
+            log.info("Redis cache disabled (cache.redis.enabled=false). Skipping hotel cache warm-up.");
+            return;
+        }
         log.info("Warming up Redis cache with {} hotels", hotels.size());
 
         try {

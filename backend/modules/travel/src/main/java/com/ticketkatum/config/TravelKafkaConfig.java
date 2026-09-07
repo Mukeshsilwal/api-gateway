@@ -22,10 +22,10 @@ import java.util.Map;
 @Configuration
 public class TravelKafkaConfig {
 
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${spring.kafka.bootstrap-servers:localhost:9092}")
     private String bootstrapServers;
 
-    @Value("${spring.kafka.consumer.group-id}")
+    @Value("${spring.kafka.consumer.group-id:travel-service-group}")
     private String groupId;
 
     @Bean

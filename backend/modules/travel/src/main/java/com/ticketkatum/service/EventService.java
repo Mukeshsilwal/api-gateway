@@ -78,20 +78,73 @@ public class EventService implements EventServiceApi {
 
         // Generate unique slug
         String name = (String) data.get("name");
+        if (name == null || name.isBlank()) {
+            name = (String) data.get("title");
+        }
+        if (name == null || name.isBlank()) {
+            name = "Untitled Event";
+        }
         String slug = slugGenerator.generateUniqueSlug(name);
+
+        Event.EventCategory category = Event.EventCategory.OTHER;
+        if (data.get("category") != null) {
+            try {
+                category = Event.EventCategory.valueOf(data.get("category").toString().trim().toUpperCase());
+            } catch (Exception ignored) {}
+        }
+
+        Event.EventType eventType = Event.EventType.OFFLINE;
+        if (data.get("type") != null || data.get("eventType") != null) {
+            Object t = data.get("type") != null ? data.get("type") : data.get("eventType");
+            try {
+                eventType = Event.EventType.valueOf(t.toString().trim().toUpperCase());
+            } catch (Exception ignored) {}
+        }
+
+        LocalDateTime startDateTime = LocalDateTime.now().plusDays(1);
+        if (data.get("startDateTime") != null) {
+            try {
+                startDateTime = LocalDateTime.parse(data.get("startDateTime").toString().trim());
+            } catch (Exception ignored) {}
+        } else if (data.get("startDate") != null) {
+            try {
+                startDateTime = LocalDateTime.parse(data.get("startDate").toString().trim());
+            } catch (Exception ignored) {}
+        }
+
+        LocalDateTime endDateTime = startDateTime.plusHours(4);
+        if (data.get("endDateTime") != null) {
+            try {
+                endDateTime = LocalDateTime.parse(data.get("endDateTime").toString().trim());
+            } catch (Exception ignored) {}
+        } else if (data.get("endDate") != null) {
+            try {
+                endDateTime = LocalDateTime.parse(data.get("endDate").toString().trim());
+            } catch (Exception ignored) {}
+        }
+
+        String desc = (String) data.get("description");
+        if (desc == null || desc.isBlank()) {
+            desc = name;
+        }
+
+        String coverImage = (String) data.get("coverImage");
+        if (coverImage == null || coverImage.isBlank()) {
+            coverImage = "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4";
+        }
 
         // Build event
         Event event = Event.builder()
                 .organizer(organizer)
                 .slug(slug)
                 .name(name)
-                .category(Event.EventCategory.valueOf((String) data.get("category")))
-                .type(Event.EventType.valueOf((String) data.get("type")))
-                .startDateTime(LocalDateTime.parse((String) data.get("startDateTime")))
-                .endDateTime(LocalDateTime.parse((String) data.get("endDateTime")))
-                .description((String) data.get("description"))
+                .category(category)
+                .type(eventType)
+                .startDateTime(startDateTime)
+                .endDateTime(endDateTime)
+                .description(desc)
                 .shortDescription((String) data.get("shortDescription"))
-                .coverImage((String) data.get("coverImage"))
+                .coverImage(coverImage)
                 .status(Event.EventStatus.DRAFT)
                 .build();
 
@@ -111,6 +164,9 @@ public class EventService implements EventServiceApi {
                 log.info("Creating {} ticket types for event {}", ticketTypes.size(), savedEvent.getId());
 
                 for (Map<String, Object> ticketData : ticketTypes) {
+                    LocalDateTime availFrom = parseSafeDateTime(ticketing.get("salesStartDate"));
+                    LocalDateTime availTo = parseSafeDateTime(ticketing.get("salesEndDate"));
+
                     TicketType ticket = TicketType.builder()
                             .event(savedEvent)
                             .name((String) ticketData.get("name"))
@@ -119,12 +175,8 @@ public class EventService implements EventServiceApi {
                             .price(new BigDecimal(ticketData.get("price").toString()))
                             .quantity(((Number) ticketData.get("quantity")).intValue())
                             .quantitySold(0)
-                            .availableFrom(ticketing.get("salesStartDate") != null
-                                    ? LocalDateTime.parse((String) ticketing.get("salesStartDate"))
-                                    : null)
-                            .availableTo(ticketing.get("salesEndDate") != null
-                                    ? LocalDateTime.parse((String) ticketing.get("salesEndDate"))
-                                    : null)
+                            .availableFrom(availFrom)
+                            .availableTo(availTo)
                             .isActive(true)
                             .sortOrder(0)
                             .build();
@@ -254,14 +306,34 @@ public class EventService implements EventServiceApi {
         return eventRepository.findByOrganizerId(organizerId, pageable);
     }
 
+    private LocalDateTime parseSafeDateTime(Object val) {
+        if (val == null) return null;
+        String s = val.toString().trim();
+        if (s.isEmpty()) return null;
+        try {
+            if (s.length() == 10) { // e.g. YYYY-MM-DD
+                return java.time.LocalDate.parse(s).atStartOfDay();
+            }
+            return LocalDateTime.parse(s);
+        } catch (Exception e) {
+            log.warn("Failed to parse date time: {}", s);
+            return null;
+        }
+    }
+
     /**
      * Search events
      */
     public Page<Event> searchEvents(Map<String, Object> searchParams, Pageable pageable) {
         log.info("Searching events with params: {}", searchParams);
 
-        if (searchParams.containsKey("query")) {
-            String query = (String) searchParams.get("query");
+        String query = null;
+        if (searchParams.containsKey("query") && searchParams.get("query") != null) {
+            query = searchParams.get("query").toString().trim();
+        } else if (searchParams.containsKey("search") && searchParams.get("search") != null) {
+            query = searchParams.get("search").toString().trim();
+        }
+        if (query != null && !query.isEmpty()) {
             return eventRepository.searchByName(query, pageable);
         }
 

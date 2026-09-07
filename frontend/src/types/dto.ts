@@ -115,11 +115,17 @@ export interface HotelDto {
     rating?: number;
     images: string[];
     amenities: string[];
-    startingPrice: number;
+    startingPrice?: number;
+    minPrice?: number;
+    maxPrice?: number;
+    stars?: number;
+    phone?: string;
+    email?: string;
     availableRooms?: number;
     totalRooms?: number;
     latitude?: number;
     longitude?: number;
+    rooms?: any[];
 }
 
 export interface AvailableRoomDto {

@@ -13,6 +13,8 @@ spring:
     enabled: false
   main:
     allow-circular-references: true
+  session:
+    store-type: none
 
   # ============================================================
   # DATABASE CONFIGURATION
@@ -31,7 +33,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -59,14 +61,43 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
             user-name-attribute: sub
 
+  # Kafka Configuration
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: ${KAFKA_GROUP_ID:ticketkatum-consumer}
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+    listener:
+      auto-startup: false
+    admin:
+      auto-create: false
+      fail-fast: false
+      modify-topic-configs: false
+
+  # Spring AI Configuration
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:sk-demo-key-for-local-development-ticketkatum}
+
 # ============================================================
 # MICROSERVICES REGISTRATION
 # All microservices URLs for service-to-service communication
-# Consolidated and verified against actual service ports
+# Consolidated monolith - all internal communications resolve locally
 # ============================================================
+microservices:
   # ========== CORE SERVICES (Consolidated Monolith) ==========
   
-  # All services are now internal or loopback to the monolith on port 8080
+  # All services are internal or loopback to the monolith on port 8080
   auth-service-url: ${AUTH_SERVICE_URL:http://localhost:8080}
   travel-service-url: ${TRAVEL_SERVICE_URL:http://localhost:8080}
   trip-service-url: ${TRIP_SERVICE_URL:http://localhost:8080}
@@ -74,45 +105,44 @@ spring:
   platform-service-url: ${PLATFORM_SERVICE_URL:http://localhost:8080}
   safety-service-url: ${SAFETY_SERVICE_URL:http://localhost:8080}
   
-  # ========== LEGACY ALIASES (For Backward Compatibility) ==========
-  # These point to the consolidated services above
+  # ========== SERVICE ALIASES ==========
+  event-service-url: ${EVENT_SERVICE_URL:http://localhost:8080}
+  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8080}
+  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8080}
+  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8080}
+  guide-service-url: ${GUIDE_SERVICE_URL:http://localhost:8080}
+  market-service-url: ${MARKET_SERVICE_URL:http://localhost:8080}
   
-  # Travel Service aliases (all point to 8093)
-  event-service-url: ${EVENT_SERVICE_URL:http://localhost:8093}
-  hotel-service-url: ${HOTEL_SERVICE_URL:http://localhost:8093}
-  bus-service-url: ${BUS_SERVICE_URL:http://localhost:8093}
-  booking-service-url: ${BOOKING_SERVICE_URL:http://localhost:8093}
-  guide-service-url: ${GUIDE_SERVICE_URL:http://localhost:8093}
-  market-service-url: ${MARKET_SERVICE_URL:http://localhost:8093}
+  # Trip Service aliases
+  journey-service-url: ${JOURNEY_SERVICE_URL:http://localhost:8080}
+  timeline-service-url: ${TIMELINE_SERVICE_URL:http://localhost:8080}
   
-  # Trip Service aliases (all point to 8095)
-  journey-service-url: ${JOURNEY_SERVICE_URL:http://localhost:8095}
-  timeline-service-url: ${TIMELINE_SERVICE_URL:http://localhost:8095}
+  # Platform Service aliases
+  ai-service-url: ${AI_SERVICE_URL:http://localhost:8080}
+  analytics-service-url: ${ANALYTICS_SERVICE_URL:http://localhost:8080}
+  alert-service-url: ${ALERT_SERVICE_URL:http://localhost:8080}
+  notification-service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8080}
+  email-service-url: ${EMAIL_SERVICE_URL:http://localhost:8080}
+  sms-service-url: ${SMS_SERVICE_URL:http://localhost:8080}
   
-  # Platform Service aliases (all point to 8094)
-  ai-service-url: ${AI_SERVICE_URL:http://localhost:8094}
-  analytics-service-url: ${ANALYTICS_SERVICE_URL:http://localhost:8094}
-  alert-service-url: ${ALERT_SERVICE_URL:http://localhost:8094}
-  notification-service-url: ${NOTIFICATION_SERVICE_URL:http://localhost:8094}
-  email-service-url: ${EMAIL_SERVICE_URL:http://localhost:8094}
-  sms-service-url: ${SMS_SERVICE_URL:http://localhost:8094}
+  # Safety Service aliases
+  sos-service-url: ${SOS_SERVICE_URL:http://localhost:8080}
+  tracking-service-url: ${TRACKING_SERVICE_URL:http://localhost:8080}
   
-  # Safety Service aliases (all point to 8097)
-  sos-service-url: ${SOS_SERVICE_URL:http://localhost:8097}
-  tracking-service-url: ${TRACKING_SERVICE_URL:http://localhost:8097}
+  # Auth Service aliases
+  user-service-url: ${USER_SERVICE_URL:http://localhost:8080}
   
-  # Auth Service aliases (all point to 8089)
-  user-service-url: ${USER_SERVICE_URL:http://localhost:8089}
-  
-  # Travel Service sub-service aliases (all point to 8093)
-  recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8093}
-  maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8093}
-  staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8093}
-  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8093}
-  route-service-url: ${ROUTE_SERVICE_URL:http://localhost:8093}
-  seat-service-url: ${SEAT_SERVICE_URL:http://localhost:8093}
-  ticket-service-url: ${TICKET_SERVICE_URL:http://localhost:8093}
-  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8093}
+  # Travel Service sub-service aliases
+  recommendation-service-url: ${RECOMMENDATION_SERVICE_URL:http://localhost:8080}
+  maintenance-service-url: ${MAINTENANCE_SERVICE_URL:http://localhost:8080}
+  staff-service-url: ${STAFF_SERVICE_URL:http://localhost:8080}
+  bus-stop-service-url: ${BUS_STOP_SERVICE_URL:http://localhost:8080}
+  route-service-url: ${ROUTE_SERVICE_URL:http://localhost:8080}
+  seat-service-url: ${SEAT_SERVICE_URL:http://localhost:8080}
+  ticket-service-url: ${TICKET_SERVICE_URL:http://localhost:8080}
+  bus-booking-service-url: ${BUS_BOOKING_SERVICE_URL:http://localhost:8080}
+  bus-service:
+    timeout: 5000
   
   # ========== TIMEOUT CONFIGURATION ==========
   timeout:
@@ -207,6 +237,10 @@ resilience4j:
         recordExceptions:
           - java.net.ConnectException
           - java.util.concurrent.TimeoutException
+        ignoreExceptions:
+          - org.springframework.security.core.AuthenticationException
+          - org.springframework.security.authentication.BadCredentialsException
+          - org.springframework.security.core.userdetails.UsernameNotFoundException
 
       userService:
         registerHealthIndicator: true
@@ -334,6 +368,9 @@ logging:
     org.springframework.web: DEBUG
     io.github.resilience4j: DEBUG
     org.springframework.web.reactive.function.client: DEBUG
+    org.apache.kafka: ERROR
+    org.springframework.kafka: ERROR
+    com.netflix.discovery: ERROR
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
@@ -416,6 +453,16 @@ cors:
     - X-Page-Number
   allow-credentials: true
   max-age: 3600
+
+# ============================================================
+# SERVICE DISCOVERY CONFIGURATION
+# Disable Eureka Discovery in monolith
+# ============================================================
+eureka:
+  client:
+    enabled: false
+    register-with-eureka: false
+    fetch-registry: false
 
 # ============================================================
 # CACHE CONFIGURATION
@@ -550,6 +597,14 @@ notification:
     enabled: ${SMS_ENABLED:false}
     provider: ${SMS_PROVIDER:sparrow}
     api-key: ${SMS_API_KEY:}
+
+sendgrid:
+  api:
+    key: ${SENDGRID_API_KEY:SG.dummy_key_for_local_development}
+  sender:
+    email: ${SENDGRID_SENDER_EMAIL:noreply@ticketkatum.com}
+    name: ${SENDGRID_SENDER_NAME:Ticket Katum}
+  enabled: ${SENDGRID_ENABLED:false}
 
 # ============================================================
 # FILE UPLOAD CONFIGURATION

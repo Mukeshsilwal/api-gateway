@@ -2,8 +2,8 @@ package com.ticketkatum.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
@@ -12,13 +12,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@AllArgsConstructor
 @Slf4j
 public class TicketNotificationService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ChannelTopic ticketUpdatesTopic;
     private final ObjectMapper objectMapper;
+
+    public TicketNotificationService(
+            @Qualifier("customRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+            @Qualifier("ticketUpdatesTopic") ChannelTopic ticketUpdatesTopic,
+            ObjectMapper objectMapper) {
+        this.redisTemplate = redisTemplate;
+        this.ticketUpdatesTopic = ticketUpdatesTopic;
+        this.objectMapper = objectMapper;
+    }
 
     public void publishTicketUpdate(Long ticketId, String updateType, Object data) {
         try {
@@ -32,8 +40,8 @@ public class TicketNotificationService {
             redisTemplate.convertAndSend(ticketUpdatesTopic.getTopic(), jsonMessage);
 
             log.info("Published update for ticket {}: {}", ticketId, updateType);
-        } catch (JsonProcessingException e) {
-            log.error("Error publishing ticket update", e);
+        } catch (Exception e) {
+            log.warn("Unable to publish ticket update to Redis (service offline): {}", e.getMessage());
         }
     }
 

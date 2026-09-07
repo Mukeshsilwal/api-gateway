@@ -25,7 +25,6 @@ public class CreateHotelRequest {
     @NotBlank(message = "City is required")
     private String city;
 
-    @NotBlank(message = "Country is required")
     private String country;
 
     private String hotelCode;
@@ -58,6 +57,10 @@ public class CreateHotelRequest {
     @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
     @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
     private Double longitude;
+
+    // Pricing
+    private java.math.BigDecimal minPrice;
+    private java.math.BigDecimal maxPrice;
 
     // Additional fields
     private String zipCode;

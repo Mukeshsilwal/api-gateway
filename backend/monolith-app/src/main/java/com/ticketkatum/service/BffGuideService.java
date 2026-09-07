@@ -36,7 +36,16 @@ public class BffGuideService {
         return guideServiceClient.createGuide(guideDTO)
                 .onErrorResume(e -> {
                     log.error("Error creating guide", e);
-                    return Mono.error(new RuntimeException("Failed to create guide", e));
+                    String msg = e.getMessage();
+                    if (e instanceof org.springframework.web.reactive.function.client.WebClientResponseException) {
+                        org.springframework.web.reactive.function.client.WebClientResponseException we =
+                                (org.springframework.web.reactive.function.client.WebClientResponseException) e;
+                        String body = we.getResponseBodyAsString();
+                        if (body != null && !body.isBlank()) {
+                            msg = body;
+                        }
+                    }
+                    return Mono.error(new RuntimeException("Failed to create guide: " + msg, e));
                 });
     }
 

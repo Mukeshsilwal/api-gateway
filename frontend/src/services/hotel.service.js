@@ -12,9 +12,9 @@ const hotelService = {
      * Get all hotels
      * @returns {Promise<Array>} List of all hotels
      */
-    async getAllHotels() {
+    async getAllHotels(options = {}) {
         try {
-            const response = await apiService.get(API_CONFIG.ENDPOINTS.GET_ALL_HOTELS);
+            const response = await apiService.get(API_CONFIG.ENDPOINTS.GET_ALL_HOTELS, options);
             console.log('Raw hotel response:', response);
 
             // ApiService already unwraps { code, message, data }
@@ -47,9 +47,11 @@ const hotelService = {
      */
     async getHotelById(hotelId) {
         try {
-            const response = await apiService.get(
-                `${API_CONFIG.ENDPOINTS.GET_HOTEL_BY_ID}${hotelId}`
-            );
+            const isNumeric = /^\d+$/.test(String(hotelId).trim());
+            const url = isNumeric
+                ? `${API_CONFIG.ENDPOINTS.HOTEL_DETAILS}${hotelId}`
+                : `${API_CONFIG.ENDPOINTS.GET_HOTEL_BY_ID}${hotelId}`;
+            const response = await apiService.get(url);
             return response.data || response;
         } catch (error) {
             console.error(`Error fetching hotel ${hotelId}:`, error);
@@ -154,9 +156,11 @@ const hotelService = {
      */
     async getRoomsByHotel(hotelId) {
         try {
-            const response = await apiService.get(
-                `${API_CONFIG.ENDPOINTS.GET_ROOMS_BY_HOTEL}${hotelId}/rooms`
-            );
+            const isNumeric = /^\d+$/.test(String(hotelId).trim());
+            const url = isNumeric
+                ? `/api/bff/v1/hotels/hotel/${hotelId}/rooms`
+                : `${API_CONFIG.ENDPOINTS.GET_ROOMS_BY_HOTEL}${hotelId}/rooms`;
+            const response = await apiService.get(url);
             return response.data || response;
         } catch (error) {
             console.error(`Error fetching rooms for hotel ${hotelId}:`, error);

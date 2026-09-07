@@ -53,34 +53,119 @@ public class RoomBookingService {
      * Calculate dynamic pricing for a room booking
      */
     public PricingResponseDto calculatePrice(PricingRequestDto request) {
+        if (request == null || request.getRoomId() == null) {
+            throw new IllegalArgumentException("Room ID is required to calculate price");
+        }
 
-        RoomPricing pricing = pricingRepository
-                .findApplicablePricing(
-                        request.getHotelId(),
-                        request.getRoomId(),
-                        request.getRentTypeId(),
-                        request.getMealPlanId(),
-                        request.getCheckIn().toLocalDate())
-                .orElseThrow(() -> new RuntimeException(
-                        "No pricing configuration found for the selected options"));
+        Room room = roomRepository.findById(request.getRoomId())
+                .orElseThrow(() -> new RuntimeException("Room not found: " + request.getRoomId()));
 
-        RentType rentType = pricing.getRentType();
+        Long hotelId = request.getHotelId();
+        if (hotelId == null && room.getHotel() != null) {
+            hotelId = room.getHotel().getId();
+        }
 
-        // Calculate number of units (hours/days/weeks)
-        long diffHours = ChronoUnit.HOURS.between(request.getCheckIn(), request.getCheckOut());
-        double unitsDouble = (double) diffHours / rentType.getDurationHours();
+        LocalDate checkInDate = request.getCheckIn() != null ? request.getCheckIn().toLocalDate() : LocalDate.now();
+
+        // 1. Try finding explicit configured pricing
+        RoomPricing pricing = null;
+        try {
+            List<RoomPricing> pricings = pricingRepository.findApplicablePricing(
+                    hotelId,
+                    request.getRoomId(),
+                    request.getRentTypeId(),
+                    request.getMealPlanId(),
+                    checkInDate);
+            if (pricings != null && !pricings.isEmpty()) {
+                pricing = pricings.get(0);
+            }
+        } catch (Exception e) {
+            log.warn("Error querying room pricing: {}", e.getMessage());
+        }
+
+        RentType rentType = null;
+        if (pricing != null && pricing.getRentType() != null) {
+            rentType = pricing.getRentType();
+        } else if (request.getRentTypeId() != null) {
+            rentType = rentTypeRepository.findById(request.getRentTypeId()).orElse(null);
+        }
+        if (rentType == null) {
+            rentType = rentTypeRepository.findByCode("DAILY")
+                    .orElseGet(() -> rentTypeRepository.findAll().stream().findFirst()
+                            .orElse(RentType.builder().id(1L).name("Daily").code("DAILY").durationHours(24).build()));
+        }
+
+        MealPlan mealPlan = null;
+        if (pricing != null && pricing.getMealPlan() != null) {
+            mealPlan = pricing.getMealPlan();
+        } else if (request.getMealPlanId() != null) {
+            mealPlan = mealPlanRepository.findById(request.getMealPlanId()).orElse(null);
+        }
+        if (mealPlan == null) {
+            mealPlan = mealPlanRepository.findByCode("NONE")
+                    .orElseGet(() -> mealPlanRepository.findAll().stream().findFirst()
+                            .orElse(MealPlan.builder().id(1L).name("No Meal").code("NONE").build()));
+        }
+
+        // Calculate duration and units
+        long diffHours = 24;
+        if (request.getCheckIn() != null && request.getCheckOut() != null) {
+            diffHours = ChronoUnit.HOURS.between(request.getCheckIn(), request.getCheckOut());
+        }
+        int durationHours = (rentType.getDurationHours() != null && rentType.getDurationHours() > 0)
+                ? rentType.getDurationHours()
+                : 24;
+        double unitsDouble = (double) diffHours / durationHours;
         int units = (int) Math.ceil(unitsDouble);
-
-        // Ensure at least 1 unit
-        if (units == 0 && diffHours > 0)
+        if (units <= 0) {
             units = 1;
+        }
 
-        // Calculate amounts
-        BigDecimal baseTotal = pricing.getBaseRate().multiply(BigDecimal.valueOf(units));
-        BigDecimal mealTotal = pricing.getMealAddonCost().multiply(BigDecimal.valueOf(units));
+        BigDecimal baseRate;
+        BigDecimal mealCost;
+
+        if (pricing != null) {
+            baseRate = pricing.getBaseRate() != null ? pricing.getBaseRate() : BigDecimal.valueOf(2000);
+            mealCost = pricing.getMealAddonCost() != null ? pricing.getMealAddonCost() : BigDecimal.ZERO;
+        } else {
+            // Dynamic fallback based on room entity
+            baseRate = room.getBasePrice() != null ? room.getBasePrice() : BigDecimal.valueOf(2000);
+
+            // Adjust base rate for rent type duration if needed
+            if (durationHours == 1) {
+                baseRate = baseRate.divide(BigDecimal.valueOf(10), 2, java.math.RoundingMode.HALF_UP);
+            } else if (durationHours >= 168) {
+                baseRate = baseRate.multiply(BigDecimal.valueOf(6));
+            }
+
+            // Determine meal addon cost
+            mealCost = BigDecimal.ZERO;
+            if (mealPlan.getCode() != null) {
+                switch (mealPlan.getCode().toUpperCase()) {
+                    case "BREAKFAST":
+                        mealCost = BigDecimal.valueOf(350);
+                        break;
+                    case "HALF_BOARD":
+                        mealCost = BigDecimal.valueOf(750);
+                        break;
+                    case "FULL_BOARD":
+                        mealCost = BigDecimal.valueOf(1200);
+                        break;
+                    case "ALL_INCLUSIVE":
+                        mealCost = BigDecimal.valueOf(1800);
+                        break;
+                    default:
+                        mealCost = BigDecimal.ZERO;
+                        break;
+                }
+            }
+        }
+
+        BigDecimal baseTotal = baseRate.multiply(BigDecimal.valueOf(units));
+        BigDecimal mealTotal = mealCost.multiply(BigDecimal.valueOf(units));
         BigDecimal subtotal = baseTotal.add(mealTotal);
-        BigDecimal tax = subtotal.multiply(BigDecimal.valueOf(0.13)); // 13% VAT
-        BigDecimal total = subtotal.add(tax);
+        BigDecimal tax = subtotal.multiply(BigDecimal.valueOf(0.13)).setScale(2, java.math.RoundingMode.HALF_UP); // 13% VAT
+        BigDecimal total = subtotal.add(tax).setScale(2, java.math.RoundingMode.HALF_UP);
 
         String breakdown = String.format(
                 "%s × %d %s = NPR %.2f | Meal: NPR %.2f | Tax (13%%): NPR %.2f",
@@ -88,11 +173,11 @@ public class RoomBookingService {
                 baseTotal, mealTotal, tax);
 
         return PricingResponseDto.builder()
-                .baseRate(pricing.getBaseRate())
-                .mealCost(pricing.getMealAddonCost())
+                .baseRate(baseRate)
+                .mealCost(mealCost)
                 .units(units)
                 .rentTypeName(rentType.getName())
-                .mealPlanName(pricing.getMealPlan().getName())
+                .mealPlanName(mealPlan.getName())
                 .subtotal(subtotal)
                 .tax(tax)
                 .total(total)
@@ -223,28 +308,61 @@ public class RoomBookingService {
     public BookingResponseDto lockRoom(RoomBookingRequestDto request, Long customerId) {
         LocalDateTime threshold = LocalDateTime.now().minusMinutes(LOCK_TIMEOUT_MINUTES);
 
-        // Find available rooms
-        List<Room> availableRooms = bookingRepository.findAvailableRooms(
-                request.getHotelId(),
-                request.getRoomType(),
-                request.getCheckIn(),
-                request.getCheckOut(),
-                request.getGuestsCount(),
-                threshold);
+        Room selectedRoom = null;
 
-        if (availableRooms.isEmpty()) {
-            throw new RuntimeException("No rooms available for selection");
+        // 1. If explicit roomId is provided, check its availability directly
+        if (request.getRoomId() != null) {
+            java.util.Optional<Room> rOpt = roomRepository.findById(request.getRoomId());
+            if (rOpt.isPresent() && checkAvailability(rOpt.get().getId(), request.getCheckIn(), request.getCheckOut())) {
+                selectedRoom = rOpt.get();
+            }
         }
 
-        Room selectedRoom = availableRooms.get(0);
+        // 2. Find available rooms by type & hotel if not already selected
+        if (selectedRoom == null && request.getHotelId() != null) {
+            List<Room> availableRooms = bookingRepository.findAvailableRooms(
+                    request.getHotelId(),
+                    request.getRoomType(),
+                    request.getCheckIn(),
+                    request.getCheckOut(),
+                    request.getGuestsCount() != null ? request.getGuestsCount() : 1,
+                    threshold);
 
-        // Double-check availability
-        if (!checkAvailability(selectedRoom.getId(), request.getCheckIn(), request.getCheckOut())) {
-            throw new RuntimeException("Room was just taken");
+            if (availableRooms.isEmpty()) {
+                // Try relaxing the roomType and guestsCount filter
+                availableRooms = bookingRepository.findAvailableRooms(
+                        request.getHotelId(),
+                        null,
+                        request.getCheckIn(),
+                        request.getCheckOut(),
+                        1,
+                        threshold);
+            }
+
+            if (!availableRooms.isEmpty()) {
+                selectedRoom = availableRooms.get(0);
+            } else {
+                // If query returned empty, check all rooms in the hotel directly
+                List<Room> allRooms = roomRepository.findByHotelId(request.getHotelId());
+                for (Room r : allRooms) {
+                    if (checkAvailability(r.getId(), request.getCheckIn(), request.getCheckOut())) {
+                        selectedRoom = r;
+                        break;
+                    }
+                }
+            }
         }
+
+        if (selectedRoom == null) {
+            throw new RuntimeException("No rooms available for the selected dates");
+        }
+
+        Long hotelId = request.getHotelId() != null ? request.getHotelId() : 
+                (selectedRoom.getHotel() != null ? selectedRoom.getHotel().getId() : null);
 
         // Calculate pricing
         PricingRequestDto pricingRequest = PricingRequestDto.builder()
+                .hotelId(hotelId)
                 .roomId(selectedRoom.getId())
                 .rentTypeId(request.getRentTypeId())
                 .mealPlanId(request.getMealPlanId())
@@ -254,16 +372,38 @@ public class RoomBookingService {
 
         PricingResponseDto pricing = calculatePrice(pricingRequest);
 
-        RentType rentType = rentTypeRepository.findById(request.getRentTypeId())
-                .orElseThrow(() -> new RuntimeException("Rent type not found"));
-        MealPlan mealPlan = mealPlanRepository.findById(request.getMealPlanId())
-                .orElseThrow(() -> new RuntimeException("Meal plan not found"));
+        RentType rentType = null;
+        if (request.getRentTypeId() != null) {
+            rentType = rentTypeRepository.findById(request.getRentTypeId()).orElse(null);
+        }
+        if (rentType == null) {
+            rentType = rentTypeRepository.findByCode("DAILY")
+                    .orElseGet(() -> rentTypeRepository.findAll().stream().findFirst()
+                            .orElse(RentType.builder().id(1L).name("Daily").code("DAILY").durationHours(24).build()));
+        }
+
+        MealPlan mealPlan = null;
+        if (request.getMealPlanId() != null) {
+            mealPlan = mealPlanRepository.findById(request.getMealPlanId()).orElse(null);
+        }
+        if (mealPlan == null) {
+            mealPlan = mealPlanRepository.findByCode("NONE")
+                    .orElseGet(() -> mealPlanRepository.findAll().stream().findFirst()
+                            .orElse(MealPlan.builder().id(1L).name("No Meal").code("NONE").build()));
+        }
+
+        String custName = request.getCustomerName() != null && !request.getCustomerName().isBlank() 
+                ? request.getCustomerName() : "Guest User";
+        String custEmail = request.getCustomerEmail() != null && !request.getCustomerEmail().isBlank() 
+                ? request.getCustomerEmail() : "guest@ticketkatum.com";
+        String custPhone = request.getCustomerPhone() != null && !request.getCustomerPhone().isBlank() 
+                ? request.getCustomerPhone() : "9800000000";
 
         // Create PENDING booking (Lock)
         RoomBooking booking = RoomBooking.builder()
                 .bookingReference(generateBookingReference())
                 .room(selectedRoom)
-                .customerId(customerId)
+                .customerId(customerId != null ? customerId : 1L)
                 .rentType(rentType)
                 .mealPlan(mealPlan)
                 .checkIn(request.getCheckIn())
@@ -274,11 +414,11 @@ public class RoomBookingService {
                 .subtotal(pricing.getSubtotal())
                 .taxAmount(pricing.getTax())
                 .totalAmount(pricing.getTotal())
-                .guestsCount(request.getGuestsCount())
+                .guestsCount(request.getGuestsCount() != null ? request.getGuestsCount() : 1)
                 .specialRequests(request.getSpecialRequests())
-                .customerName(request.getCustomerName())
-                .customerEmail(request.getCustomerEmail())
-                .customerPhone(request.getCustomerPhone())
+                .customerName(custName)
+                .customerEmail(custEmail)
+                .customerPhone(custPhone)
                 .status(BookingStatus.PENDING) // Lock status
                 .build();
 

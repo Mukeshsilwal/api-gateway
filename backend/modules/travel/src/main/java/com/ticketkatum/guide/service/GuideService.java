@@ -30,14 +30,21 @@ public class GuideService {
         private final ReviewRepository reviewRepository;
 
         public GuideDTO registerGuide(GuideDTO request) {
-                log.info("Registering guide for user: {}", request.getUserId());
-
-                if (guideRepository.existsByUserId(request.getUserId())) {
-                        throw new RuntimeException("Guide profile already exists for user");
+                Long targetUserId = request.getUserId();
+                if (targetUserId == null || targetUserId <= 0) {
+                        targetUserId = System.currentTimeMillis() % 1000000000L + (long)(Math.random() * 1000);
+                        while (guideRepository.existsByUserId(targetUserId)) {
+                                targetUserId++;
+                        }
+                        request.setUserId(targetUserId);
+                } else if (guideRepository.existsByUserId(targetUserId)) {
+                        throw new RuntimeException("Guide profile already exists for user ID: " + targetUserId);
                 }
 
+                log.info("Registering guide for user: {}", targetUserId);
+
                 Guide guide = Guide.builder()
-                                .userId(request.getUserId())
+                                .userId(targetUserId)
                                 .fullName(request.getFullName())
                                 .licenseNumber(request.getLicenseNumber())
                                 .yearsExperience(request.getYearsExperience())

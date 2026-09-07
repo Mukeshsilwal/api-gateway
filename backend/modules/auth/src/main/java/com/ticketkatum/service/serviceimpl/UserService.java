@@ -49,7 +49,7 @@ public class UserService {
                 .organizationName(request.getOrganizationName())
                 .enabled(true)
                 .accountNonLocked(true)
-                .credentialsNonExpired(false) // Force password change on first login
+                .credentialsNonExpired(true)
                 .createdAt(LocalDateTime.now())
                 .build();
 

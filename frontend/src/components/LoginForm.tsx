@@ -145,10 +145,10 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
 
     const containerClasses = transparent
         ? `w-full max-w-md space-y-8 bg-white/10 backdrop-blur-md p-8 rounded-3xl border border-white/20 shadow-2xl ${className}`
-        : `w-full max-w-md space-y-8 bg-white p-8 rounded-2xl shadow-xl border border-gray-100 ${className}`;
+        : `w-full max-w-md space-y-8 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xl dark:shadow-2xl border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white ${className}`;
 
-    const textClasses = transparent ? "text-white" : "text-gray-900";
-    const subTextClasses = transparent ? "text-indigo-200" : "text-gray-500";
+    const textClasses = transparent ? "text-white" : "text-slate-900 dark:text-white";
+    const subTextClasses = transparent ? "text-indigo-200" : "text-slate-600 dark:text-slate-400";
 
     // Custom styles for transparent mode inputs
     const transparentInputStyles = transparent ? "bg-white/5 border-white/20 text-white placeholder-indigo-200/50 focus:ring-teal-400 focus:border-transparent" : "";
@@ -173,11 +173,6 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
                     icon={Mail}
                     className={transparentInputStyles}
                     containerClassName={transparent ? "text-white" : ""}
-                // We need to handle label styling manually or pass a prop if Input supported it
-                // For now, Input label uses text-gray-700. We can override with css or just accept it.
-                // Let's rely on the fact that Input uses standard classes.
-                // Actually, Input component has hardcoded label classes. 
-                // I'll add a quick override via style prop if needed, but let's try to keep it simple.
                 />
 
                 <Input
@@ -203,10 +198,10 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
                 {/* OAuth Divider */}
                 <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
-                        <div className={`w-full border-t ${transparent ? 'border-white/30' : 'border-gray-300'}`}></div>
+                        <div className={`w-full border-t ${transparent ? 'border-white/30' : 'border-slate-200 dark:border-slate-700'}`}></div>
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className={`px-2 ${transparent ? 'bg-white/10 text-indigo-200' : 'bg-white text-gray-500'}`}>
+                        <span className={`px-3 ${transparent ? 'bg-white/10 text-indigo-200' : 'bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400'}`}>
                             Or continue with
                         </span>
                     </div>
@@ -217,12 +212,12 @@ export default function LoginForm({ onSuccess, redirectOnSuccess = true, transpa
             </div>
 
             <div className="mt-6 flex items-center justify-between text-sm">
-                <Link to="/change-password" className={`${transparent ? 'text-indigo-300 hover:text-white' : 'text-primary hover:text-primary-700'} font-medium transition-colors`}>
+                <Link to="/change-password" className={`${transparent ? 'text-indigo-300 hover:text-white' : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300'} font-medium transition-colors`}>
                     Forgot password?
                 </Link>
                 <p className={subTextClasses}>
                     No account?{' '}
-                    <Link to="/register" className={`${transparent ? 'text-teal-400 hover:text-teal-300' : 'text-primary hover:text-primary-700'} font-bold transition-colors`}>
+                    <Link to="/register" className={`${transparent ? 'text-teal-400 hover:text-teal-300' : 'text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-bold'} transition-colors`}>
                         Sign up
                     </Link>
                 </p>

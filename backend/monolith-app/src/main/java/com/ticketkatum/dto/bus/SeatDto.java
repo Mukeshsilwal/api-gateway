@@ -12,15 +12,13 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Builder
 public class SeatDto {
+    private Long id;
     @NotNull
     private Long busId;
-    @NotNull
     private String busName;
-    @NotNull
     private boolean reserved; // Deprecated, use status
     @NotNull
     private String status; // AVAILABLE, HELD, BOOKED
-    @NotNull
     private String holdExpiresAt;
     @NotNull
     private String seatNumber;

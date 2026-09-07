@@ -95,7 +95,7 @@ export const BusManager: React.FC = () => {
 
         setIsLoadingDetails(true);
         try {
-            const res = await ApiService.get(`${API_CONFIG.ENDPOINTS.BUS_COMPLETE_DETAILS}${bus.id}/complete`);
+            const res = await ApiService.get(`${API_CONFIG.ENDPOINTS.BUS_COMPLETE_DETAILS}/${bus.id}/complete`);
             if (res && res.data) {
                 const completeData = res.data;
                 setSelectedBusForPreview(completeData);
@@ -345,81 +345,81 @@ export const BusManager: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h2 className="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
                         Bus Management
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage your fleet of buses and seats</p>
+                    <p className="text-gray-600 dark:text-slate-400 mt-1">Manage your fleet of buses and seats</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => getAllBuses()}
-                        className="p-3 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
+                        className="p-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl hover:bg-gray-50 dark:hover:bg-slate-700 transition-all text-gray-600 dark:text-slate-300"
                         title="Refresh"
                     >
-                        <RefreshCw className="w-5 h-5 text-gray-600" />
+                        <RefreshCw className="w-5 h-5" />
                     </button>
                 </div>
             </div>
 
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-200/80 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <BusIcon className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                            <p className="text-sm text-gray-500">Total Buses</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.total}</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">Total Buses</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-200/80 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl flex items-center justify-center">
                             <Ticket className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-                            <p className="text-sm text-gray-500">With Seats</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.active}</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">With Seats</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-200/80 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-purple-600 rounded-xl flex items-center justify-center">
                             <Layout className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.empty}</p>
-                            <p className="text-sm text-gray-500">No Seats</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.empty}</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">No Seats</p>
                         </div>
                     </div>
                 </div>
-                <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-200/80 dark:border-slate-800 shadow-sm">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
                             <Layout className="w-6 h-6 text-white" />
                         </div>
                         <div>
-                            <p className="text-2xl font-bold text-gray-900">{stats.totalSeats}</p>
-                            <p className="text-sm text-gray-500">Total Seats</p>
+                            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stats.totalSeats}</p>
+                            <p className="text-sm text-gray-500 dark:text-slate-400">Total Seats</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Tab Navigation */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                <div className="border-b border-gray-100">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200/80 dark:border-slate-800 shadow-sm overflow-hidden">
+                <div className="border-b border-gray-100 dark:border-slate-800">
                     <nav className="flex -mb-px">
                         {tabList.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
                                 className={`flex-1 sm:flex-none px-6 py-4 flex items-center justify-center gap-2 text-sm font-medium border-b-2 transition-all ${activeTab === tab.id
-                                    ? 'border-indigo-500 text-indigo-600 bg-indigo-50/50'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                                    ? 'border-purple-600 text-purple-600 dark:text-purple-400 bg-purple-50/50 dark:bg-purple-950/30'
+                                    : 'border-transparent text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 hover:bg-gray-50 dark:hover:bg-slate-800/50'
                                     }`}
                             >
                                 <tab.icon className="w-5 h-5" />
@@ -441,8 +441,8 @@ export const BusManager: React.FC = () => {
                                             key={status}
                                             onClick={() => setStatusFilter(status)}
                                             className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${statusFilter === status
-                                                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/30'
-                                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                                ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                                                : 'bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-slate-700'
                                                 }`}
                                         >
                                             {status === 'all' && `All (${stats.total})`}
@@ -456,12 +456,12 @@ export const BusManager: React.FC = () => {
                                         type="date"
                                         value={dateFilter}
                                         onChange={(e) => setDateFilter(e.target.value)}
-                                        className="px-4 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="px-4 py-2 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                                     />
                                     {dateFilter && (
                                         <button
                                             onClick={() => setDateFilter('')}
-                                            className="p-2 text-gray-400 hover:text-gray-600"
+                                            className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-slate-200"
                                         >
                                             <RotateCcw className="w-5 h-5" />
                                         </button>
@@ -478,19 +478,19 @@ export const BusManager: React.FC = () => {
                                 exportable={true}
                                 expandable={true}
                                 renderExpandedRow={(bus) => (
-                                    <div className="p-4 bg-gray-50 rounded-lg">
-                                        <h4 className="text-sm font-semibold text-gray-900 mb-2">Bus Details & Seats</h4>
+                                    <div className="p-4 bg-gray-50/70 dark:bg-slate-800/60 rounded-xl border border-gray-100 dark:border-slate-700">
+                                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-2">Bus Details & Seats</h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <p className="text-sm text-gray-600">Route: <span className="font-medium text-gray-900">{bus.route?.origin || (bus.route as any)?.sourceBusStop?.name} → {bus.route?.destination || (bus.route as any)?.destinationBusStop?.name}</span></p>
-                                                <p className="text-sm text-gray-600">Type: <span className="font-medium text-gray-900">{bus.busType}</span></p>
+                                                <p className="text-sm text-gray-600 dark:text-slate-400">Route: <span className="font-medium text-gray-900 dark:text-slate-100">{bus.route?.origin || (bus.route as any)?.sourceBusStop?.name} → {bus.route?.destination || (bus.route as any)?.destinationBusStop?.name}</span></p>
+                                                <p className="text-sm text-gray-600 dark:text-slate-400">Type: <span className="font-medium text-gray-900 dark:text-slate-100">{bus.busType}</span></p>
                                             </div>
                                             <div>
                                                 {/* Preview of seats directly in row */}
                                                 <div className="flex items-center gap-2">
-                                                    <span className="text-sm text-gray-600">Capacity: {bus.numberOfSeats}</span>
+                                                    <span className="text-sm text-gray-600 dark:text-slate-400">Capacity: {bus.numberOfSeats}</span>
                                                     <button
-                                                        className="text-xs text-indigo-600 underline"
+                                                        className="text-xs text-purple-600 dark:text-purple-400 hover:underline font-semibold"
                                                         onClick={() => handleViewSeats(bus)}
                                                     >
                                                         View Seat Layout
@@ -508,35 +508,35 @@ export const BusManager: React.FC = () => {
                     {activeTab === 'add' && (
                         <div className="max-w-2xl mx-auto">
                             <div className="text-center mb-8">
-                                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-purple-500/25">
                                     <Plus className="w-8 h-8 text-white" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900">Create New Bus</h3>
-                                <p className="text-gray-500 mt-1">Add a scheduled bus for a selected route</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">Create New Bus</h3>
+                                <p className="text-gray-500 dark:text-slate-400 mt-1">Add a scheduled bus for a selected route</p>
                             </div>
 
                             {allRoutes.length > 0 ? (
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Bus Name</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Bus Name</label>
                                         <input
                                             type="text"
                                             placeholder="e.g. Deluxe Express"
                                             value={busName}
                                             onChange={(e) => setBusName(e.target.value)}
-                                            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Bus Type</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Bus Type</label>
                                         <select
                                             value={busType}
                                             onChange={(e) => setBusType(e.target.value)}
-                                            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                                            className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         >
                                             {['SEMI_DELUXE', 'VIP', 'DELUXE', 'STANDARD'].map((type) => (
-                                                <option key={type} value={type}>
+                                                <option key={type} value={type} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100">
                                                     {type.replace('_', ' ')}
                                                 </option>
                                             ))}
@@ -544,15 +544,15 @@ export const BusManager: React.FC = () => {
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Route</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Route</label>
                                         <select
                                             value={busRoute}
                                             onChange={(e) => setBusRoute(e.target.value)}
-                                            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                                            className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         >
-                                            <option value="">Select Route</option>
+                                            <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100">Select Route</option>
                                             {allRoutes.map((route) => (
-                                                <option key={route.id} value={route.id}>
+                                                <option key={route.id} value={route.id} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100">
                                                     {route.origin || (route as any).sourceBusStop.name} → {route.destination || (route as any).destinationBusStop.name}
                                                 </option>
                                             ))}
@@ -561,75 +561,75 @@ export const BusManager: React.FC = () => {
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Date</label>
                                             <input
                                                 type="date"
                                                 value={busDate}
                                                 onChange={(e) => setBusDate(e.target.value)}
                                                 min={today}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Time</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Time</label>
                                             <input
                                                 type="time"
                                                 value={busTime}
                                                 onChange={(e) => setBusTime(e.target.value)}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Base Price (Rs)</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Base Price (Rs)</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g. 1000"
                                                 value={basePrice}
                                                 onChange={(e) => setBasePrice(e.target.value)}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Max Price (Rs)</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Max Price (Rs)</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g. 1500"
                                                 value={maxPrice}
                                                 onChange={(e) => setMaxPrice(e.target.value)}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Total Seats</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Total Seats</label>
                                         <input
                                             type="number"
                                             placeholder="e.g. 40"
                                             value={totalSeats}
                                             onChange={(e) => setTotalSeats(e.target.value)}
-                                            className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                            className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                         />
                                     </div>
 
                                     <button
                                         onClick={createNewBus}
                                         disabled={isCreatingBus}
-                                        className={`w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-xl transition-all font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] ${isCreatingBus ? 'opacity-80 cursor-not-allowed' : ''}`}
+                                        className={`w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-4 rounded-xl transition-all font-semibold shadow-lg hover:shadow-xl hover:scale-[1.02] ${isCreatingBus ? 'opacity-80 cursor-not-allowed' : ''}`}
                                     >
                                         {isCreatingBus ? 'Creating Bus...' : 'Create Bus'}
                                     </button>
                                 </div>
                             ) : (
-                                <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-300">
-                                    <MapIcon className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                                    <p className="text-gray-500 font-medium">No routes available</p>
-                                    <p className="text-gray-400 text-sm mt-1">Create a route first to add buses</p>
+                                <div className="text-center py-12 bg-gray-50 dark:bg-slate-800/40 rounded-2xl border border-dashed border-gray-300 dark:border-slate-700">
+                                    <MapIcon className="w-16 h-16 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
+                                    <p className="text-gray-500 dark:text-slate-400 font-medium">No routes available</p>
+                                    <p className="text-gray-400 dark:text-slate-500 text-sm mt-1">Create a route first to add buses</p>
                                 </div>
                             )}
                         </div>
@@ -639,21 +639,21 @@ export const BusManager: React.FC = () => {
                     {activeTab === 'seats' && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Add Seat Form */}
-                            <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 p-6 rounded-2xl border border-gray-200">
+                            <div className="bg-gradient-to-br from-gray-50 to-gray-100/50 dark:from-slate-800/80 dark:to-slate-800/40 p-6 rounded-2xl border border-gray-200 dark:border-slate-700">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-md">
                                         <Plus className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-bold text-gray-900">Add Seat</h3>
-                                        <p className="text-sm text-gray-500">Add seats to a bus</p>
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">Add Seat</h3>
+                                        <p className="text-sm text-gray-500 dark:text-slate-400">Add seats to a bus</p>
                                     </div>
                                 </div>
 
                                 {allBuses.length > 0 ? (
                                     <div className="space-y-4">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Select Bus</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Select Bus</label>
                                             <select
                                                 value={seatBusId}
                                                 onChange={(e) => {
@@ -662,9 +662,9 @@ export const BusManager: React.FC = () => {
                                                     const bus = allBuses.find(b => String(b.id) === String(selectedValue));
                                                     setSelectedBusForPreview(bus || null);
                                                 }}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             >
-                                                <option value="">Select Bus</option>
+                                                <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100">Select Bus</option>
                                                 {allBuses.map((bus) => {
                                                     const route = bus.route || bus.route12;
                                                     const routeName = route ? `${route.origin || (route as any).sourceBusStop?.name} → ${route.destination || (route as any).destinationBusStop?.name}` : '';
@@ -673,7 +673,7 @@ export const BusManager: React.FC = () => {
                                                     const dateStr = dateVal ? new Date(dateVal).toLocaleDateString() : '';
 
                                                     return (
-                                                        <option key={bus.id} value={String(bus.id)}>
+                                                        <option key={bus.id} value={String(bus.id)} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100">
                                                             {displayName} {dateStr ? `(${dateStr})` : ''} - {Array.isArray(bus.seats) ? bus.seats.length : 0} seats
                                                         </option>
                                                     );
@@ -682,36 +682,36 @@ export const BusManager: React.FC = () => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Seat Number</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Seat Number</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. A1, B2"
                                                 value={seatNumber}
                                                 onChange={(e) => setSeatNumber(e.target.value)}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-2">Price (Rs)</label>
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">Price (Rs)</label>
                                             <input
                                                 type="number"
                                                 placeholder="e.g. 1200"
                                                 value={seatPrice}
                                                 onChange={(e) => setSeatPrice(e.target.value)}
-                                                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                                className="w-full p-4 border border-gray-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                             />
                                         </div>
 
-                                        <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                                        <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-slate-800/80 rounded-xl border border-gray-200 dark:border-slate-700">
                                             <input
                                                 type="checkbox"
                                                 id="reserved"
                                                 checked={isReserved}
                                                 onChange={(e) => setIsReserved(e.target.checked)}
-                                                className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                                                className="w-5 h-5 text-purple-600 border-gray-300 dark:border-slate-600 rounded focus:ring-purple-500"
                                             />
-                                            <label htmlFor="reserved" className="text-sm font-medium text-gray-700 cursor-pointer">
+                                            <label htmlFor="reserved" className="text-sm font-medium text-gray-700 dark:text-slate-300 cursor-pointer">
                                                 Mark as Reserved (Booked)
                                             </label>
                                         </div>
@@ -725,8 +725,8 @@ export const BusManager: React.FC = () => {
                                         </button>
                                     </div>
                                 ) : (
-                                    <div className="text-center py-8 bg-white rounded-xl border border-dashed border-gray-300">
-                                        <p className="text-gray-500">No buses available. Create a bus first.</p>
+                                    <div className="text-center py-8 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-700">
+                                        <p className="text-gray-500 dark:text-slate-400">No buses available. Create a bus first.</p>
                                     </div>
                                 )}
                             </div>
@@ -734,14 +734,14 @@ export const BusManager: React.FC = () => {
                             {/* Seat Preview */}
                             <div>
                                 <div className="flex items-center gap-3 mb-4">
-                                    <h3 className="text-lg font-bold text-gray-900">Seat Layout Preview</h3>
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Seat Layout Preview</h3>
                                     {selectedBusForPreview && (() => {
                                         const bus = selectedBusForPreview;
                                         const route = bus.route || bus.route12;
                                         const routeName = route ? `${route.origin || (route as any).sourceBusStop?.name} → ${route.destination || (route as any).destinationBusStop?.name}` : '';
                                         const displayName = bus.busName || routeName || `Bus #${bus.id}`;
                                         return (
-                                            <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium">
+                                            <span className="px-3 py-1 bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 rounded-full text-sm font-medium border border-purple-200/50 dark:border-purple-800/40">
                                                 {displayName}
                                             </span>
                                         );
@@ -759,11 +759,11 @@ export const BusManager: React.FC = () => {
 
             {/* Seat Preview Modal */}
             {selectedBusForPreview && activeTab === 'list' && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelectedBusForPreview(null)}>
-                    <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-                        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setSelectedBusForPreview(null)}>
+                    <div className="bg-white dark:bg-slate-900 border border-gray-200/80 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-900">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                                     {(() => {
                                         const bus = selectedBusForPreview;
                                         const route = bus.route || bus.route12;
@@ -771,20 +771,20 @@ export const BusManager: React.FC = () => {
                                         return bus.busName || routeName || `Bus #${bus.id}`;
                                     })()}
                                 </h3>
-                                <p className="text-sm text-gray-500">{selectedBusForPreview.date}</p>
+                                <p className="text-sm text-gray-500 dark:text-slate-400">{selectedBusForPreview.date}</p>
                             </div>
                             <button
                                 onClick={() => setSelectedBusForPreview(null)}
-                                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors text-gray-500 dark:text-slate-400"
                             >
-                                <RotateCcw className="w-5 h-5 text-gray-500" />
+                                <RotateCcw className="w-5 h-5" />
                             </button>
                         </div>
                         <div className="p-6">
                             {isLoadingDetails ? (
                                 <div className="flex flex-col items-center justify-center py-12">
-                                    <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-                                    <p className="text-gray-500">Loading seat details...</p>
+                                    <div className="w-12 h-12 border-4 border-purple-200 dark:border-purple-900/40 border-t-purple-600 rounded-full animate-spin mb-4"></div>
+                                    <p className="text-gray-500 dark:text-slate-400">Loading seat details...</p>
                                 </div>
                             ) : (
                                 <BusSeatPreview

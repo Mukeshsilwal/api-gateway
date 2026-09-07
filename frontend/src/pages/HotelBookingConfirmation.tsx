@@ -1,6 +1,8 @@
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import NavigationBar from '../components/Navbar';
 import Footer from '../components/Footer';
+import bookingService from '../services/bookingService';
 
 interface BookingData {
     confirmationNumber?: string;
@@ -13,13 +15,55 @@ interface BookingData {
     status: string;
     currency: string;
     totalAmount: number;
+    customerName?: string;
+    customerEmail?: string;
     [key: string]: any;
 }
 
 const HotelBookingConfirmation: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const { bookingData } = location.state || {};
+    const [bookingData, setBookingData] = useState<any>(location.state?.bookingData || null);
+
+    useEffect(() => {
+        // 1. If returning from eSewa with ?data=...
+        const params = new URLSearchParams(location.search);
+        const encodedData = params.get('data');
+        let refFromEsewa: string | null = null;
+
+        if (encodedData) {
+            try {
+                const decoded = atob(encodedData);
+                const esewaRes = JSON.parse(decoded);
+                if (esewaRes.transaction_uuid) {
+                    refFromEsewa = esewaRes.transaction_uuid;
+                    // Trigger backend booking confirmation
+                    bookingService.confirmBooking(esewaRes.transaction_uuid).catch(err => {
+                        console.warn("Backend confirmation note:", err);
+                    });
+                }
+            } catch (e) {
+                console.error("Failed to parse eSewa callback data", e);
+            }
+        }
+
+        // 2. Fallback to sessionStorage if location.state is missing
+        if (!bookingData) {
+            const cached = sessionStorage.getItem('lastBooking');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (refFromEsewa) {
+                        parsed.status = 'CONFIRMED';
+                        parsed.confirmationNumber = refFromEsewa;
+                    }
+                    setBookingData(parsed);
+                } catch (e) {
+                    console.error("Failed to parse lastBooking from session", e);
+                }
+            }
+        }
+    }, [location.search, bookingData]);
 
     if (!bookingData) {
         return (

@@ -92,11 +92,25 @@ public class HotelServiceClient {
         @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getAllHotelsFallback")
         @Retry(name = SERVICE_NAME)
         public CompletableFuture<List<HotelDTO>> getAllHotels() {
+                return getAllHotels(null, null, null);
+        }
 
+        @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getAllHotelsFilteredFallback")
+        @Retry(name = SERVICE_NAME)
+        public CompletableFuture<List<HotelDTO>> getAllHotels(String city, Integer minStars, Integer maxPrice) {
                 return getWebClient()
                                 .get()
                                 .uri(uriBuilder -> {
                                         var builder = uriBuilder.path("/api/v1/hotels");
+                                        if (city != null && !city.isBlank()) {
+                                                builder.queryParam("city", city);
+                                        }
+                                        if (minStars != null) {
+                                                builder.queryParam("minStars", minStars);
+                                        }
+                                        if (maxPrice != null) {
+                                                builder.queryParam("maxPrice", maxPrice);
+                                        }
                                         return builder.build();
                                 })
                                 .retrieve()
@@ -117,10 +131,17 @@ public class HotelServiceClient {
                                 .get()
                                 .uri(uriBuilder -> {
                                         var builder = uriBuilder.path("/api/v1/hotels");
-                                        if (criteria.getCity() != null)
-                                                builder.queryParam("city", criteria.getCity());
-                                        if (criteria.getMinStars() != null)
-                                                builder.queryParam("minStars", criteria.getMinStars());
+                                        if (criteria != null) {
+                                                if (criteria.getCity() != null && !criteria.getCity().isBlank()) {
+                                                        builder.queryParam("city", criteria.getCity());
+                                                }
+                                                if (criteria.getMinStars() != null) {
+                                                        builder.queryParam("minStars", criteria.getMinStars());
+                                                }
+                                                if (criteria.getMaxPrice() != null) {
+                                                        builder.queryParam("maxPrice", criteria.getMaxPrice());
+                                                }
+                                        }
                                         return builder.build();
                                 })
                                 .retrieve()
@@ -317,14 +338,19 @@ public class HotelServiceClient {
                                 .build());
         }
 
-        private CompletableFuture<List<HotelDTO>> getAllHotelsFallback(String city, Integer minStars, Throwable ex) {
-                log.warn("Fallback: getAllHotels");
+        private CompletableFuture<List<HotelDTO>> getAllHotelsFallback(Throwable ex) {
+                log.warn("Fallback: getAllHotels", ex);
+                return CompletableFuture.completedFuture(Collections.emptyList());
+        }
+
+        private CompletableFuture<List<HotelDTO>> getAllHotelsFilteredFallback(String city, Integer minStars, Integer maxPrice, Throwable ex) {
+                log.warn("Fallback: getAllHotelsFiltered city: {}, minStars: {}, maxPrice: {}", city, minStars, maxPrice, ex);
                 return CompletableFuture.completedFuture(Collections.emptyList());
         }
 
         private CompletableFuture<List<HotelDTO>> searchHotelsFallback(HotelSearchCriteria criteria, Throwable ex) {
-                log.warn("Fallback: searchHotels");
-                return CompletableFuture.completedFuture(Collections.emptyList());
+                log.warn("Fallback: searchHotels, falling back to getAllHotels", ex);
+                return getAllHotels();
         }
 
         private CompletableFuture<List<RoomDTO>> getRoomsByHotelIdFallback(Long hotelId, Throwable ex) {
@@ -367,11 +393,11 @@ public class HotelServiceClient {
         /**
          * Calculate price
          */
-        @CircuitBreaker(name = CIRCUIT_BREAKER_NAME)
+        @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "calculatePriceFallback")
         @Retry(name = SERVICE_NAME)
         public CompletableFuture<com.ticketkatum.dto.hotel.booking.PricingResponseDto> calculatePrice(
                         com.ticketkatum.dto.hotel.booking.PricingRequestDto request) {
-                log.debug("Calculating price for room: {}", request.getRoomId());
+                log.debug("Calculating price for room: {}", request != null ? request.getRoomId() : null);
 
                 return getWebClient()
                                 .post()
@@ -382,6 +408,35 @@ public class HotelServiceClient {
                                 .map(response -> objectMapper(response.getData(),
                                                 com.ticketkatum.dto.hotel.booking.PricingResponseDto.class))
                                 .toFuture();
+        }
+
+        private CompletableFuture<com.ticketkatum.dto.hotel.booking.PricingResponseDto> calculatePriceFallback(
+                        com.ticketkatum.dto.hotel.booking.PricingRequestDto request, Throwable ex) {
+                log.warn("Fallback: calculatePrice for room: {}", request != null ? request.getRoomId() : null, ex);
+                long diffHours = 24;
+                if (request != null && request.getCheckIn() != null && request.getCheckOut() != null) {
+                        diffHours = java.time.temporal.ChronoUnit.HOURS.between(request.getCheckIn(), request.getCheckOut());
+                }
+                int units = (int) Math.ceil((double) diffHours / 24.0);
+                if (units <= 0) units = 1;
+                java.math.BigDecimal baseRate = java.math.BigDecimal.valueOf(2500);
+                java.math.BigDecimal subtotal = baseRate.multiply(java.math.BigDecimal.valueOf(units));
+                java.math.BigDecimal tax = subtotal.multiply(java.math.BigDecimal.valueOf(0.13)).setScale(2, java.math.RoundingMode.HALF_UP);
+                java.math.BigDecimal total = subtotal.add(tax).setScale(2, java.math.RoundingMode.HALF_UP);
+
+                return CompletableFuture.completedFuture(
+                                com.ticketkatum.dto.hotel.booking.PricingResponseDto.builder()
+                                                .baseRate(baseRate)
+                                                .mealCost(java.math.BigDecimal.ZERO)
+                                                .units(units)
+                                                .rentTypeName("Daily")
+                                                .mealPlanName("No Meal")
+                                                .subtotal(subtotal)
+                                                .tax(tax)
+                                                .total(total)
+                                                .priceBreakdown(String.format("Daily × %d = NPR %.2f | Tax (13%%): NPR %.2f", units, subtotal, tax))
+                                                .build()
+                );
         }
 
         /**

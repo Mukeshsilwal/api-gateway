@@ -31,17 +31,26 @@ public class HotelMapper {
                 .country(hotel.getCountry())
                 .phone(hotel.getPhone())
                 .email(hotel.getEmail())
-                .stars(hotel.getStars())
-                .rating(hotel.getRating());
-        // SAFE: Only access images if initialized
-        if (Hibernate.isInitialized(hotel.getImages())) {
+                .stars(hotel.getStars() != null ? hotel.getStars() : hotel.getStarRating())
+                .rating(hotel.getRating() != null ? hotel.getRating() : hotel.getAverageRating())
+                .minPrice(hotel.getMinPrice())
+                .maxPrice(hotel.getMaxPrice())
+                .latitude(hotel.getLatitude())
+                .longitude(hotel.getLongitude())
+                .amenities(hotel.getAmenities())
+                .active(hotel.getActive())
+                .featured(hotel.getFeatured())
+                .zipCode(hotel.getZipCode())
+                .website(hotel.getWebsite());
+        // SAFE: Only access images if initialized and non-null
+        if (hotel.getImages() != null && Hibernate.isInitialized(hotel.getImages())) {
             builder.images(new HashSet<>(hotel.getImages()));
         } else {
             builder.images(new HashSet<>());
         }
 
-        // SAFE: Only access rooms if initialized
-        if (Hibernate.isInitialized(hotel.getRooms())) {
+        // SAFE: Only access rooms if initialized and non-null
+        if (hotel.getRooms() != null && Hibernate.isInitialized(hotel.getRooms())) {
             List<RoomDTO> roomDTOs = hotel.getRooms().stream()
                     .map(this::toRoomDTOWithoutHotel)
                     .collect(Collectors.toList());
@@ -73,15 +82,15 @@ public class HotelMapper {
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt());
 
-        // SAFE: Only access amenities if initialized
-        if (Hibernate.isInitialized(room.getAmenities())) {
+        // SAFE: Only access amenities if initialized and non-null
+        if (room.getAmenities() != null && Hibernate.isInitialized(room.getAmenities())) {
             builder.amenities(new HashSet<>(room.getAmenities()));
         } else {
             builder.amenities(new HashSet<>());
         }
 
-        // SAFE: Only access images if initialized
-        if (Hibernate.isInitialized(room.getImages())) {
+        // SAFE: Only access images if initialized and non-null
+        if (room.getImages() != null && Hibernate.isInitialized(room.getImages())) {
             builder.images(new HashSet<>(room.getImages()));
         } else {
             builder.images(new HashSet<>());
@@ -117,15 +126,15 @@ public class HotelMapper {
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt());
 
-        // SAFE: Only access amenities if initialized
-        if (Hibernate.isInitialized(room.getAmenities())) {
+        // SAFE: Only access amenities if initialized and non-null
+        if (room.getAmenities() != null && Hibernate.isInitialized(room.getAmenities())) {
             builder.amenities(new HashSet<>(room.getAmenities()));
         } else {
             builder.amenities(new HashSet<>());
         }
 
-        // SAFE: Only access images if initialized
-        if (Hibernate.isInitialized(room.getImages())) {
+        // SAFE: Only access images if initialized and non-null
+        if (room.getImages() != null && Hibernate.isInitialized(room.getImages())) {
             builder.images(new HashSet<>(room.getImages()));
         } else {
             builder.images(new HashSet<>());
@@ -177,12 +186,21 @@ public class HotelMapper {
                 .country(hotel.getCountry())
                 .phone(hotel.getPhone())
                 .email(hotel.getEmail())
-                .stars(hotel.getStars())
-                .rating(hotel.getRating())
-                .images(new HashSet<>(hotel.getImages()))
-                .rooms(hotel.getRooms().stream()
+                .stars(hotel.getStars() != null ? hotel.getStars() : hotel.getStarRating())
+                .rating(hotel.getRating() != null ? hotel.getRating() : hotel.getAverageRating())
+                .minPrice(hotel.getMinPrice())
+                .maxPrice(hotel.getMaxPrice())
+                .latitude(hotel.getLatitude())
+                .longitude(hotel.getLongitude())
+                .amenities(hotel.getAmenities())
+                .active(hotel.getActive())
+                .featured(hotel.getFeatured())
+                .zipCode(hotel.getZipCode())
+                .website(hotel.getWebsite())
+                .images(hotel.getImages() != null ? new HashSet<>(hotel.getImages()) : new HashSet<>())
+                .rooms(hotel.getRooms() != null ? hotel.getRooms().stream()
                         .map(this::roomToDTOWithCollections)
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.toList()) : new ArrayList<>())
                 .build();
     }
 
@@ -203,8 +221,8 @@ public class HotelMapper {
                 .capacity(room.getCapacity())
                 .basePrice(room.getBasePrice())
                 .maxPrice(room.getMaxPrice())
-                .amenities(new HashSet<>(room.getAmenities()))
-                .images(new HashSet<>(room.getImages()))
+                .amenities(room.getAmenities() != null ? new HashSet<>(room.getAmenities()) : new HashSet<>())
+                .images(room.getImages() != null ? new HashSet<>(room.getImages()) : new HashSet<>())
                 .active(room.isActive())
                 .createdAt(room.getCreatedAt())
                 .updatedAt(room.getUpdatedAt())

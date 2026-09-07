@@ -8,6 +8,7 @@ import com.ticketkatum.dto.auth.request.LoginRequest;
 import com.ticketkatum.dto.auth.response.*;
 import com.ticketkatum.model.JwtRequest;
 import com.ticketkatum.modules.auth.api.AuthServiceApi;
+import org.springframework.context.annotation.Lazy;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,13 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class AuthServiceClient {
 
-    @org.springframework.context.annotation.Lazy
     private final AuthServiceApi authService;
+
+    public AuthServiceClient(@Lazy AuthServiceApi authService) {
+        this.authService = authService;
+    }
 
     private static final String SERVICE_NAME = "auth-service";
     private static final String CIRCUIT_BREAKER_NAME = "authService";
@@ -273,7 +276,21 @@ public class AuthServiceClient {
     private CompletableFuture<LoginResponse> loginFallback(
             LoginRequest loginRequest, String ipAddress, String userAgent, Throwable ex) {
         log.warn("Fallback: login for user: {}", loginRequest.getUsername(), ex);
-        throw new RuntimeException("Authentication service unavailable", ex);
+        Throwable cause = ex;
+        while (cause instanceof java.util.concurrent.CompletionException || cause instanceof java.util.concurrent.ExecutionException) {
+            if (cause.getCause() != null) {
+                cause = cause.getCause();
+            } else {
+                break;
+            }
+        }
+        if (cause instanceof org.springframework.security.core.AuthenticationException) {
+            throw (org.springframework.security.core.AuthenticationException) cause;
+        }
+        if (cause instanceof RuntimeException) {
+            throw (RuntimeException) cause;
+        }
+        throw new RuntimeException("Authentication service unavailable: " + (cause != null ? cause.getMessage() : ex.getMessage()), cause != null ? cause : ex);
     }
 
     private CompletableFuture<SessionValidationResponse> validateSessionFallback(

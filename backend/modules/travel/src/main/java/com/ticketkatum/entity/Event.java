@@ -62,6 +62,16 @@ public class Event implements Serializable {
         }
     }
 
+    @PrePersist
+    private void ensureRequiredDefaults() {
+        if (this.coverImage == null || this.coverImage.isBlank()) {
+            this.coverImage = "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4";
+        }
+        if (this.description == null || this.description.isBlank()) {
+            this.description = this.name != null ? this.name : "Event description";
+        }
+    }
+
     @Column(name = "slug", nullable = false, unique = true, length = 255)
     private String slug;
 

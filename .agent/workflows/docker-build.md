@@ -4,6 +4,9 @@ description: Build and run the application using Docker
 
 # Docker Build and Deployment Workflow
 
+**Status:** ✅ Dockerfile Fixed (2026-01-24)  
+**Issue:** The Dockerfile was trying to build non-existent `services/web-bff` - now correctly builds `monolith-app`
+
 ## Overview
 This project uses a **monolith architecture** where all services (auth, travel, trip, payment, platform, safety) are consolidated into a single `monolith-app` module.
 

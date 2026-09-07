@@ -16,5 +16,9 @@ public interface BusService {
 
     List<BusDto> getAllBusInfo();
 
-    BusSearchResponse searchBuses(BusSearchRequest request);  // NEW
+    BusSearchResponse searchBuses(BusSearchRequest request);
+
+    BusDto getBusById(long id);
+
+    List<BusDto> getBusesByRoute(long routeId);
 }

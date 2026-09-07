@@ -18,7 +18,8 @@ public interface SeatRepo extends JpaRepository<Seat, Long> {
     @Query("SELECT s FROM Seat s WHERE s.status = 'AVAILABLE' ORDER BY s.id ASC")
     List<Seat> findFirstByAvailable();
 
-    List<Seat> findByBusBusName(String busName);
+    @Query("SELECT s FROM Seat s LEFT JOIN FETCH s.bus WHERE s.bus.busName = :busName")
+    List<Seat> findByBusBusName(@Param("busName") String busName);
 
     // List<Seat> findByBusAndReserved(Bus busInfo, boolean reserved); // Removed as
     // reserved is gone

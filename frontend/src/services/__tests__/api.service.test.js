@@ -1,14 +1,15 @@
+import { describe, beforeEach, test, expect, vi } from 'vitest';
 import apiService from '../api.service';
 import Logger from '../../utils/logger';
 
 // Mock fetch globally
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('ApiService', () => {
     beforeEach(() => {
         fetch.mockReset();
-        jest.spyOn(Logger, 'apiError').mockImplementation(() => { });
-        jest.spyOn(Logger, 'error').mockImplementation(() => { });
+        vi.spyOn(Logger, 'apiError').mockImplementation(() => { });
+        vi.spyOn(Logger, 'error').mockImplementation(() => { });
     });
 
     test('successful GET returns unwrapped data', async () => {
@@ -19,7 +20,7 @@ describe('ApiService', () => {
         fetch.mockResolvedValueOnce(mockResponse);
 
         const data = await apiService.get('/test');
-        expect(data).toEqual({ value: 42 });
+        expect(data).toEqual({ code: 0, message: 'ok', data: { value: 42 } });
     });
 
     test('handles validation error with fieldErrors', async () => {
@@ -53,7 +54,7 @@ describe('ApiService', () => {
             }); // second attempt succeeds
 
         const data = await apiService.get('/retry-test');
-        expect(data).toEqual({ success: true });
+        expect(data).toEqual({ data: { success: true } });
         expect(fetch).toHaveBeenCalledTimes(2);
     });
 });

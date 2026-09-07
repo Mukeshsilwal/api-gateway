@@ -43,16 +43,21 @@ public class AuthAggregator {
                         throw new AggregationException("Login failed: empty response from auth service");
                     }
                     CompletableFuture<UserDto> userFuture =
-                            userClient.getUserById(extractUserId(loginResponse.getUsername()));
+                            userClient.getUserByEmail(loginResponse.getUsername())
+                                    .exceptionally(err -> {
+                                        log.warn("Could not fetch user profile for {}: {}", loginResponse.getUsername(), err.getMessage());
+                                        return null;
+                                    });
 
                     CompletableFuture<Long> onlineCountFuture =
-                            authClient.getOnlineUserCount();
+                            authClient.getOnlineUserCount()
+                                    .exceptionally(err -> 1L);
 
                     return CompletableFuture.allOf(userFuture, onlineCountFuture)
                             .thenApply(v -> AggregatedLoginResponse.builder()
                                     .authData(loginResponse)
-                                    .userProfile(userFuture.join())
-                                    .onlineUserCount(onlineCountFuture.join())
+                                    .userProfile(userFuture.getNow(null))
+                                    .onlineUserCount(onlineCountFuture.getNow(1L))
                                     .recentBookings(Collections.emptyList())
                                     .userPreferences(new HashMap<>())
                                     .build()
@@ -60,7 +65,18 @@ public class AuthAggregator {
                 })
                 .exceptionally(ex -> {
                     log.error("Error in aggregated login", ex);
-                    throw new AggregationException("Login aggregation failed", ex);
+                    Throwable cause = ex;
+                    while (cause instanceof java.util.concurrent.CompletionException || cause instanceof java.util.concurrent.ExecutionException) {
+                        if (cause.getCause() != null) {
+                            cause = cause.getCause();
+                        } else {
+                            break;
+                        }
+                    }
+                    if (cause instanceof RuntimeException) {
+                        throw (RuntimeException) cause;
+                    }
+                    throw new AggregationException("Login aggregation failed: " + cause.getMessage(), cause);
                 });
 
     }

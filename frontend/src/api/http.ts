@@ -38,6 +38,17 @@ const processQueue = (error: any, token: string | null = null) => {
     failedQueue = [];
 };
 
+const isAuthEndpoint = (url) => {
+    if (!url) return false;
+    const path = url.toLowerCase();
+    return path.includes('/auth/login') ||
+           path.includes('/auth/register') ||
+           path.includes('/auth/refresh') ||
+           path.includes('/auth/forgot-password') ||
+           path.includes('/auth/reset-password') ||
+           path.includes('/login');
+};
+
 // Add a response interceptor
 http.interceptors.response.use(
     (response) => {
@@ -45,9 +56,11 @@ http.interceptors.response.use(
     },
     async (error) => {
         const originalRequest = error.config;
+        const isAuthRequest = isAuthEndpoint(originalRequest?.url) || originalRequest?.skipAuthRefresh;
+        const refreshToken = localStorage.getItem('refreshToken');
 
-        // Handle 401 Unauthorized
-        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+        // Handle 401 Unauthorized (ONLY for non-auth requests with an existing refresh token)
+        if (error.response && error.response.status === 401 && !originalRequest._retry && !isAuthRequest && refreshToken) {
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
@@ -62,27 +75,18 @@ http.interceptors.response.use(
             originalRequest._retry = true;
             isRefreshing = true;
 
-            const refreshToken = localStorage.getItem('refreshToken');
             const sessionId = localStorage.getItem('sessionId');
 
             if (!refreshToken) {
                 isRefreshing = false;
-                // Redirect to login if no refresh token
-                window.location.href = '/login';
+                if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                    window.location.href = '/login';
+                }
                 return Promise.reject(error);
             }
 
             try {
-                // Perform refresh using axios instance or fetch to avoid circular interceptor issues on the refresh call itself
-                // but usually refresh call doesn't have same interceptors or we skip it.
-                // We use a fresh axios call or the instance. If instance, need to handle 401 loop. 
-                // But refresh 401 should logout.
-
-                // Using fetch for simplicity and isolation
-                // const response = await axios.post ...
-                // Note: http.defaults.baseURL is defined.
-
-                const baseURL = import.meta.env.VITE_API_BASE_URL || "/api/bff"; // Same as http creation
+                const baseURL = import.meta.env.VITE_API_BASE_URL || "/api/bff";
 
                 const response = await axios.post(`${baseURL}/v1/auth/refresh`, {}, {
                     headers: {
@@ -107,7 +111,9 @@ http.interceptors.response.use(
                 localStorage.removeItem('token');
                 localStorage.removeItem('refreshToken');
                 localStorage.removeItem('userRole');
-                window.location.href = '/login';
+                if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+                    window.location.href = '/login';
+                }
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;

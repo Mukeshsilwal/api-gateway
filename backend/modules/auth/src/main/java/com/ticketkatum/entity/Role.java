@@ -34,10 +34,19 @@ public class Role implements Serializable {
     private Set<Permission> permissions = new HashSet<>();
 
     public List<SimpleGrantedAuthority> getAuthorities() {
-        List<SimpleGrantedAuthority> authorities = getPermissions().stream()
-                .map(permission -> new SimpleGrantedAuthority(permission.getName()))
-                .collect(Collectors.toList());
+        List<SimpleGrantedAuthority> authorities = new java.util.ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_" + this.name));
+        try {
+            if (permissions != null) {
+                for (Permission permission : permissions) {
+                    if (permission != null && permission.getName() != null) {
+                        authorities.add(new SimpleGrantedAuthority(permission.getName()));
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+            // Safe fallback when permissions collection proxy is detached outside Hibernate session
+        }
         return authorities;
     }
 }

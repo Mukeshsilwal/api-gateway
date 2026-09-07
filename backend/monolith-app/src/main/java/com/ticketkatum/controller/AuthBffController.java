@@ -65,8 +65,22 @@ public class AuthBffController {
                         new Response<>(200, "Login successful", response)))
                 .exceptionally(ex -> {
                     log.error("Login failed", ex);
+                    Throwable cause = ex;
+                    while (cause instanceof java.util.concurrent.CompletionException || cause instanceof java.util.concurrent.ExecutionException) {
+                        if (cause.getCause() != null) {
+                            cause = cause.getCause();
+                        } else {
+                            break;
+                        }
+                    }
+                    String errorMsg = cause.getMessage() != null ? cause.getMessage() : "Invalid credentials";
+                    if (cause instanceof org.springframework.security.authentication.BadCredentialsException) {
+                        errorMsg = "Invalid email or password";
+                    } else if (cause instanceof org.springframework.security.core.userdetails.UsernameNotFoundException) {
+                        errorMsg = "User not found with provided credentials";
+                    }
                     return ResponseEntity.status(401).body(
-                            new Response<>(401, "Login failed: " + ex.getMessage(), null));
+                            new Response<>(401, errorMsg, null));
                 });
     }
 

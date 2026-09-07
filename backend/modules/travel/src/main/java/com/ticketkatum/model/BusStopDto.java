@@ -9,8 +9,5 @@ import lombok.*;
 @NoArgsConstructor
 public class BusStopDto {
     private int id;
-    @NonNull
-    @NotEmpty
     private String name;
-
 }

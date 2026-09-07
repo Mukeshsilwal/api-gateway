@@ -6,17 +6,27 @@ import Footer from '../components/Footer';
 import { ShieldCheck, CreditCard, User, Calendar, MapPin, Info, Mail, Phone } from 'lucide-react';
 import useEsewaPayment, { PAYMENT_STATES } from '../hooks/useEsewaPayment';
 import BookingStatus from '../components/BookingStatus';
+import authService from '../services/authService';
 
 const HotelBooking: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { hotel, room, checkIn, checkOut, guests } = location.state || {}; // Cast to any if strictly typed or define interface
 
+    const currentUser = authService.getUserData() || (() => {
+        try {
+            const raw = localStorage.getItem('userData') || localStorage.getItem('user');
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    })();
+
     const [bookingData, setBookingData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
+        firstName: currentUser?.firstName || '',
+        lastName: currentUser?.lastName || '',
+        email: currentUser?.email || '',
+        phone: currentUser?.phoneNumber || currentUser?.phone || '',
         address: '',
         specialRequests: '',
         paymentMethod: 'esewa'
@@ -60,13 +70,12 @@ const HotelBooking: React.FC = () => {
 
         try {
             // Unified payload for BFF bookings/complete - matching CompleteBookingRequest DTO
-            const userStr = localStorage.getItem('user');
-            const user = userStr ? JSON.parse(userStr) : {};
+            const user = currentUser || {};
 
             const bookingPayload = {
                 bookingRequest: {
-                    hotelId: String(hotel.id),
-                    hotelName: hotel.name,
+                    hotelId: String(hotel.id || hotel.hotelId || hotel.hotelCode),
+                    hotelName: hotel.name || hotel.hotelName,
                     roomType: room.roomType || room.type || room.name,
                     numberOfRooms: 1,
                     checkInDate: new Date(checkIn).toISOString().split('T')[0],
@@ -111,7 +120,7 @@ const HotelBooking: React.FC = () => {
                     metadata: {}
                 },
                 userId: user.id ? String(user.id) : (user.userId || "GUEST"),
-                roomIds: [room.id],
+                roomIds: [room.id || room.roomId],
                 category: room.category || 'Standard',
                 service: 'HOTEL',
                 sessionId: generateRandomId()

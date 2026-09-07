@@ -63,6 +63,7 @@ const DashboardDemo = lazy(() => import("./components/DashboardDemo"));
 const MarketDashboard = lazy(() => import("./pages/MarketDashboard"));
 const MarketHub = lazy(() => import("./pages/MarketHub"));
 const MyBookings = lazy(() => import("./pages/MyBookings"));
+const UserDashboard = lazy(() => import("./pages/Dashboard"));
 
 // Market Service Pages
 const ResaleMarketplace = lazy(() => import("./pages/ResaleMarketplace"));
@@ -255,6 +256,15 @@ const App: React.FC = () => {
                   }
                   errorElement={<ErrorPage />}
                 />
+                <Route
+                  path="/admin/dashboard"
+                  element={
+                    <ProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.SUPER_ADMIN]}>
+                      <AdminPanel />
+                    </ProtectedRoute>
+                  }
+                  errorElement={<ErrorPage />}
+                />
 
                 {/* Super Admin Panel Route */}
                 <Route
@@ -319,6 +329,15 @@ const App: React.FC = () => {
                 <Route path="/events/:eventId/pricing" element={<DynamicPricingDisplay />} errorElement={<ErrorPage />} />
 
                 {/* User Routes */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <UserDashboard />
+                    </ProtectedRoute>
+                  }
+                  errorElement={<ErrorPage />}
+                />
                 <Route path="/my-bookings" element={<MyBookings />} errorElement={<ErrorPage />} />
 
                 {/* Utility Routes */}
@@ -329,7 +348,6 @@ const App: React.FC = () => {
                 {/* NEW Aggregated Booking Routes */}
                 <Route path="/bus-booking" element={<BusBookingPage />} errorElement={<ErrorPage />} />
                 <Route path="/market-purchase" element={<MarketPurchasePage />} errorElement={<ErrorPage />} />
-                <Route path="/hotel-booking" element={<HotelBookingPage />} errorElement={<ErrorPage />} />
 
                 {/* Unified Booking Routes */}
                 <Route path="/unified-checkout" element={<UnifiedCheckout />} errorElement={<ErrorPage />} />

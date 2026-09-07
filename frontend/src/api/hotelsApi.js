@@ -174,8 +174,11 @@ const hotelsApi = {
      * @param {number|string} id - Hotel ID
      */
     getHotelDetails: async (id) => {
-        // Use GET_HOTEL_BY_ID to support fetching by code (e.g. SRdddHddd1)
-        const response = await api.get(`${API_CONFIG.ENDPOINTS.GET_HOTEL_BY_ID}${id}`);
+        const isNumeric = /^\d+$/.test(String(id).trim());
+        const endpoint = isNumeric
+            ? `${API_CONFIG.ENDPOINTS.HOTEL_DETAILS}${id}`
+            : `${API_CONFIG.ENDPOINTS.GET_HOTEL_BY_ID}${id}`;
+        const response = await api.get(endpoint);
         // Unwrap if wrapped in standard API response { code, message, data }
         if (response.data && response.data.data) {
             return response.data.data;
@@ -188,7 +191,11 @@ const hotelsApi = {
      * @param {number|string} hotelId - Hotel ID
      */
     getHotelRooms: async (hotelId) => {
-        const response = await api.get(`${API_CONFIG.ENDPOINTS.GET_ROOMS_BY_HOTEL}${hotelId}/rooms`);
+        const isNumeric = /^\d+$/.test(String(hotelId).trim());
+        const endpoint = isNumeric
+            ? `/api/bff/v1/hotels/hotel/${hotelId}/rooms`
+            : `${API_CONFIG.ENDPOINTS.GET_ROOMS_BY_HOTEL}${hotelId}/rooms`;
+        const response = await api.get(endpoint);
         // Unwrap if wrapped in standard API response { code, message, data }
         if (response.data && response.data.data) {
             return response.data.data;

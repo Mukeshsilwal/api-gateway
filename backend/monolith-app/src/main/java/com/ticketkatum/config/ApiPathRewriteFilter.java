@@ -41,6 +41,50 @@ public class ApiPathRewriteFilter extends HttpFilter {
             return;
         }
 
+        if (uri != null && (uri.equals("/auth") || uri.startsWith("/auth/"))) {
+            String newUri = INTERNAL_BASE + uri;
+            log.debug("Rewriting legacy auth URI '{}' -> '{}'", uri, newUri);
+
+            req.getRequestDispatcher(newUri + (req.getQueryString() != null ? "?" + req.getQueryString() : ""))
+                    .forward(req, res);
+            return;
+        }
+
+        if (uri != null && (uri.equals("/api/bff/v1/admin/requests") || uri.equals("/api/admin/requests"))) {
+            req.getRequestDispatcher("/api/bff/v1/registration/admin/requests" + (req.getQueryString() != null ? "?" + req.getQueryString() : ""))
+                    .forward(req, res);
+            return;
+        }
+
+        if (uri != null && (uri.startsWith("/api/bff/v1/admin/approve/") || uri.startsWith("/api/admin/approve/"))) {
+            String id = uri.substring(uri.lastIndexOf('/') + 1);
+            req.getRequestDispatcher("/api/bff/v1/registration/admin/approve/" + id + (req.getQueryString() != null ? "?" + req.getQueryString() : ""))
+                    .forward(req, res);
+            return;
+        }
+
+        if (uri != null && (uri.equals("/api/bff/v1/admin/register") || uri.equals("/api/admin/register") || uri.equals("/api/bff/v1/admin/request"))) {
+            req.getRequestDispatcher("/api/bff/v1/registration/admin/request" + (req.getQueryString() != null ? "?" + req.getQueryString() : ""))
+                    .forward(req, res);
+            return;
+        }
+
+        if (uri != null && (uri.equals("/api/bff/v1/find") || uri.startsWith("/api/bff/v1/find/"))) {
+            String newUri = "/api/v1/find" + uri.substring("/api/bff/v1/find".length());
+            log.debug("Rewriting hotel find URI '{}' -> '{}'", uri, newUri);
+            req.getRequestDispatcher(newUri + (req.getQueryString() != null ? "?" + req.getQueryString() : ""))
+                    .forward(req, res);
+            return;
+        }
+
+        if (uri != null && uri.matches("^/api/bff/v1/buses/bus-details/?\\d+/complete$")) {
+            String busId = uri.replaceAll("^/api/bff/v1/buses/bus-details/?(\\d+)/complete$", "$1");
+            log.debug("Rewriting bus details URI '{}' -> '/api/bff/v1/buses/{}/complete'", uri, busId);
+            req.getRequestDispatcher("/api/bff/v1/buses/" + busId + "/complete" + (req.getQueryString() != null ? "?" + req.getQueryString() : ""))
+                    .forward(req, res);
+            return;
+        }
+
         chain.doFilter(req, res);
     }
 }

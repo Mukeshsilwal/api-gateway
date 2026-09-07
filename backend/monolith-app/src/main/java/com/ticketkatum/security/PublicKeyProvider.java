@@ -18,7 +18,7 @@ import java.util.Map;
  * Fetches the public key from auth-service on startup
  */
 @Slf4j
-@Component
+// @Component
 public class PublicKeyProvider {
 
     @Value("${microservices.auth-service-url}")

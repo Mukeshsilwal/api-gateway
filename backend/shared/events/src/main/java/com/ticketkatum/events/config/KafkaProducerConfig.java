@@ -59,15 +59,17 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 
-    // Topic Definitions with partitions and replication
-    
-    @Bean
-    public NewTopic organizerOnboardedTopic() {
-        return TopicBuilder.name("events.organizer.onboarded.v1")
-                .partitions(3)
-                .replicas(1) // Set to 3 in production
-                .build();
-    }
+    // Topic Definitions with partitions and replication (only when kafka profile is active)
+    @Configuration
+    @org.springframework.context.annotation.Profile("kafka")
+    public static class KafkaTopicConfig {
+        @Bean
+        public NewTopic organizerOnboardedTopic() {
+            return TopicBuilder.name("events.organizer.onboarded.v1")
+                    .partitions(3)
+                    .replicas(1) // Set to 3 in production
+                    .build();
+        }
 
     @Bean
     public NewTopic eventCreatedTopic() {
@@ -173,5 +175,6 @@ public class KafkaProducerConfig {
                 .partitions(3)
                 .replicas(1)
                 .build();
+    }
     }
 }

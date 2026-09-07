@@ -10,13 +10,13 @@ const SeatLegend = () => {
     ];
 
     return (
-        <div className="flex flex-wrap gap-4 justify-center md:justify-start items-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="flex flex-wrap gap-4 justify-center md:justify-start items-center p-4 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/80 dark:border-slate-800">
             {legendItems.map((item) => (
                 <div key={item.status} className="flex items-center gap-2">
                     <div className="w-6 h-6">
                         <SeatIcon status={item.status} seatNumber="" />
                     </div>
-                    <span className="text-sm text-gray-600 font-medium">{item.label}</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">{item.label}</span>
                 </div>
             ))}
         </div>

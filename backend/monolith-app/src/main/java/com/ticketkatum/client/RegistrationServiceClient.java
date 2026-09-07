@@ -1,203 +1,154 @@
 package com.ticketkatum.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ticketkatum.config.ServiceUrlConfig;
 import com.ticketkatum.dto.Response;
 import com.ticketkatum.dto.auth.AdminRegistrationRequestDto;
 import com.ticketkatum.dto.auth.AdminRegistrationRequestWeb;
 import com.ticketkatum.dto.auth.request.ChangePasswordRequest;
 import com.ticketkatum.dto.auth.response.RegistrationResponse;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
+import com.ticketkatum.service.serviceimpl.RegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class RegistrationServiceClient {
 
-    private final WebClient.Builder webClientBuilder;
-    private final ServiceUrlConfig serviceUrls;
-
-    private static final String SERVICE_NAME = "registration-service";
-    private static final String CIRCUIT_BREAKER_NAME = "registrationService";
-
-    private WebClient getWebClient() {
-        return webClientBuilder
-                .baseUrl(serviceUrls.getRegistrationServiceUrl())
-                .build();
-    }
+    private final RegistrationService registrationService;
 
     // ============================================
     // Registration Requests
     // ============================================
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "registerAdminFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<Response<RegistrationResponse>> registerAdmin(AdminRegistrationRequestWeb request) {
-        log.debug("Registering admin: {}", request.getEmail());
+        log.info("Registering admin directly: {}", request.getEmail());
 
-        return getWebClient()
-                .post()
-                .uri("/api/registration/admin/request")
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<RegistrationResponse>>() {})
-                .toFuture();
+        return CompletableFuture.supplyAsync(() -> {
+            com.ticketkatum.model.CreateRegistrationRequest req = new com.ticketkatum.model.CreateRegistrationRequest();
+            req.setFirstName(request.getFirstName());
+            req.setLastName(request.getLastName());
+            req.setEmail(request.getEmail());
+            req.setPhoneNumber(request.getPhoneNumber());
+            req.setOrganizationName(request.getOrganizationName());
+
+            com.ticketkatum.model.RegistrationResponse result = registrationService.registerAdmin(req);
+
+            RegistrationResponse resp = RegistrationResponse.builder()
+                    .requestId(result.getRequestId())
+                    .email(result.getEmail())
+                    .status(result.getStatus())
+                    .build();
+
+            return Response.<RegistrationResponse>builder()
+                    .statusCode(201)
+                    .message("Registration request submitted successfully")
+                    .data(resp)
+                    .build();
+        });
     }
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "approveRequestFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<Response<Void>> approveRequest(Long requestId, String token) {
-        log.debug("Approving registration request: {}", requestId);
+        log.info("Approving registration request directly: {}", requestId);
 
-        return getWebClient()
-                .post()
-                .uri("/api/registration/admin/approve/{id}", requestId)
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<Void>>() {})
-                .toFuture();
+        return CompletableFuture.supplyAsync(() -> {
+            registrationService.approveRequest(requestId);
+            return Response.<Void>builder()
+                    .statusCode(200)
+                    .message("Admin approved successfully")
+                    .build();
+        });
     }
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "rejectRequestFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<Response<Void>> rejectRequest(Long requestId, String token) {
-        log.debug("Rejecting registration request: {}", requestId);
+        log.info("Rejecting registration request directly: {}", requestId);
 
-        return getWebClient()
-                .delete()
-                .uri("/api/registration/admin/reject/{id}", requestId)
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<Void>>() {})
-                .toFuture();
+        return CompletableFuture.supplyAsync(() -> {
+            registrationService.rejectRequest(requestId);
+            return Response.<Void>builder()
+                    .statusCode(200)
+                    .message("Admin request rejected successfully")
+                    .build();
+        });
     }
 
     // ============================================
     // Fetch Requests
     // ============================================
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getAllRequestsFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<List<AdminRegistrationRequestDto>> getAllRequests(String token) {
-        log.debug("Fetching all registration requests");
+        log.info("Fetching all registration requests directly");
 
-        return getWebClient()
-                .get()
-                .uri("/api/registration/admin/requests")
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<List<AdminRegistrationRequestDto>>>() {})
-                .map(Response::getData)
-                .toFuture();
+        return CompletableFuture.supplyAsync(() -> {
+            List<com.ticketkatum.model.AdminRegistrationRequestDto> list = registrationService.getAllRequests();
+            if (list == null) return Collections.emptyList();
+            return list.stream().map(r -> AdminRegistrationRequestDto.builder()
+                    .id(r.getId())
+                    .fullName(r.getFullName())
+                    .email(r.getEmail())
+                    .phone(r.getPhone())
+                    .status(r.getStatus())
+                    .build()).collect(Collectors.toList());
+        });
     }
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "getRequestByIdFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<AdminRegistrationRequestDto> getRequestById(Long requestId, String token) {
-        log.debug("Fetching registration request: {}", requestId);
+        log.info("Fetching registration request directly: {}", requestId);
 
-        return getWebClient()
-                .get()
-                .uri("/api/registration/admin/requests/{id}", requestId)
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<AdminRegistrationRequestDto>>() {})
-                .map(Response::getData)
-                .toFuture();
+        return CompletableFuture.supplyAsync(() -> {
+            com.ticketkatum.model.AdminRegistrationRequestDto r = registrationService.getRequestById(requestId);
+            if (r == null) return null;
+            return AdminRegistrationRequestDto.builder()
+                    .id(r.getId())
+                    .fullName(r.getFullName())
+                    .email(r.getEmail())
+                    .phone(r.getPhone())
+                    .status(r.getStatus())
+                    .build();
+        });
     }
 
     // ============================================
     // Password / OTP
     // ============================================
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "changePasswordFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<Response<Void>> changePassword(ChangePasswordRequest request, String token) {
-        log.debug("Changing password for user: {}", request.getUsername());
+        log.info("Changing password directly for: {}", request.getUsername());
 
-        return getWebClient()
-                .post()
-                .uri("/api/registration/change-password")
-                .header("Authorization", "Bearer " + token)
-                .bodyValue(request)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<Void>>() {})
-                .toFuture();
+        return CompletableFuture.supplyAsync(() -> {
+            com.ticketkatum.model.ChangePasswordRequest req = new com.ticketkatum.model.ChangePasswordRequest();
+            req.setUsername(request.getUsername());
+            req.setOldPassword(request.getOldPassword());
+            req.setNewPassword(request.getNewPassword());
+            registrationService.changePassword(req);
+            return Response.<Void>builder()
+                    .statusCode(200)
+                    .message("Password changed successfully")
+                    .build();
+        });
     }
 
-    @CircuitBreaker(name = CIRCUIT_BREAKER_NAME, fallbackMethod = "sendOtpFallback")
-    @Retry(name = SERVICE_NAME)
     public CompletableFuture<Response<Void>> sendOtp(String username) {
-        log.debug("Sending OTP to: {}", username);
+        log.info("Sending OTP directly to: {}", username);
 
-        return getWebClient()
-                .post()
-                .uri("/api/registration/send-otp")
-                .bodyValue(Collections.singletonMap("username", username))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Response<Void>>() {})
-                .toFuture();
-    }
-
-    // ============================================
-    // Fallback Methods
-    // ============================================
-
-    private CompletableFuture<Response<Void>> registerAdminFallback(AdminRegistrationRequestWeb req, Throwable ex) {
-        log.warn("Fallback: registerAdmin failed for {}", req.getEmail());
-        return failedResponse("Registration service unavailable");
-    }
-
-    private CompletableFuture<Response<Void>> approveRequestFallback(Long id, String token, Throwable ex) {
-        log.warn("Fallback: approveRequest failed for id={}", id);
-        return failedResponse("Approval service unavailable");
-    }
-
-    private CompletableFuture<Response<Void>> rejectRequestFallback(Long id, String token, Throwable ex) {
-        log.warn("Fallback: rejectRequest failed for id={}", id);
-        return failedResponse("Rejection service unavailable");
-    }
-
-    private CompletableFuture<List<AdminRegistrationRequestDto>> getAllRequestsFallback(String token, Throwable ex) {
-        log.warn("Fallback: getAllRequests");
-        return CompletableFuture.completedFuture(Collections.emptyList());
-    }
-
-    private CompletableFuture<AdminRegistrationRequestDto> getRequestByIdFallback(Long id, String token, Throwable ex) {
-        log.warn("Fallback: getRequestById id={}", id);
-        return CompletableFuture.completedFuture(null);
-    }
-
-    private CompletableFuture<Response<Void>> changePasswordFallback(ChangePasswordRequest req, String token, Throwable ex) {
-        log.warn("Fallback: changePassword for {}", req.getUsername());
-        return failedResponse("Password change unavailable");
-    }
-
-    private CompletableFuture<Response<Void>> sendOtpFallback(String username, Throwable ex) {
-        log.warn("Fallback: sendOtp for {}", username);
-        return failedResponse("OTP service unavailable");
-    }
-
-    // ============================================
-    // Utility
-    // ============================================
-
-    private CompletableFuture<Response<Void>> failedResponse(String msg) {
-        return CompletableFuture.completedFuture(
-                Response.<Void>builder()
-                        .message(msg)
-                        .data(null)
-                        .build()
-        );
+        return CompletableFuture.supplyAsync(() -> {
+            com.ticketkatum.entity.User user = new com.ticketkatum.entity.User();
+            user.setEmail(username);
+            try {
+                registrationService.sentOtp(user);
+            } catch (Exception e) {
+                log.error("Failed to send OTP", e);
+            }
+            return Response.<Void>builder()
+                    .statusCode(200)
+                    .message("OTP sent successfully")
+                    .build();
+        });
     }
 }
+

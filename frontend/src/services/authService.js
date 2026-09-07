@@ -65,17 +65,22 @@ class AuthService {
      */
     async login(aggregatedResponse) {
         // Handle BFF response structure where data is nested in 'data' property
-        const responseData = aggregatedResponse.data || aggregatedResponse;
+        const responseData = aggregatedResponse?.data || aggregatedResponse;
 
-        if (!responseData || !responseData.authData) {
+        if (!responseData || (!responseData.authData && !responseData.accessToken)) {
             console.error('Invalid login response format', aggregatedResponse);
             return false;
         }
 
-        const { authData, userProfile, userPreferences } = responseData;
-        // Support both structures (authData wrapper or direct)
-        const tokenData = authData || responseData;
-        const { accessToken, refreshToken, sessionId, roles, expiresIn } = tokenData; // Added expiresIn
+        const authData = responseData.authData || responseData;
+        const userProfile = responseData.userProfile || (authData.user ? authData.user : null);
+        const userPreferences = responseData.userPreferences || null;
+        const { accessToken, refreshToken, sessionId, roles, expiresIn } = authData;
+
+        if (!accessToken) {
+            console.error('No accessToken found in login response', responseData);
+            return false;
+        }
 
         // Store tokens
         localStorage.setItem(this.TOKEN_KEY, accessToken);
@@ -90,12 +95,9 @@ class AuthService {
         // Store Roles
         if (Array.isArray(roles)) {
             localStorage.setItem(this.ROLES_KEY, JSON.stringify(roles));
-            // For backward compatibility, store the "primary" role (e.g. highest privilege or first)
-            // Or just store the first one. Let's try to find the "highest" role.
             const primaryRole = this.normalizeRole(roles);
             localStorage.setItem(this.ROLE_KEY, primaryRole);
         } else if (roles) {
-            // Legacy single role case
             localStorage.setItem(this.ROLES_KEY, JSON.stringify([roles]));
             localStorage.setItem(this.ROLE_KEY, roles);
         }

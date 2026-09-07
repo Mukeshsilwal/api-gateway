@@ -485,8 +485,12 @@ public class BusServiceClient {
 
     private CompletableFuture<BusSearchResponse> searchBusesFallback(BusSearchRequest request, Exception ex) {
         log.error("Fallback triggered for searchBuses", ex);
-        return CompletableFuture.failedFuture(
-                new ServiceUnavailableException(SERVICE_NAME));
+        return CompletableFuture.completedFuture(
+                BusSearchResponse.builder()
+                        .buses(List.of())
+                        .nextCursor(0)
+                        .hasMore(false)
+                        .build());
     }
 
     private CompletableFuture<List<BusDto>> getBusesByRouteFallback(Integer routeId, Exception ex) {

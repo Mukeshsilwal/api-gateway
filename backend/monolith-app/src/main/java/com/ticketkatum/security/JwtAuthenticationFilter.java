@@ -43,7 +43,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/api/hotels/search/**",
             "/api/hotels/*",
             "/api/bff/v1/home",
+            "/api/bff/v1/hotels",
             "/api/bff/v1/hotels/**",
+            "/api/v1/hotels",
+            "/api/v1/hotels/**",
+            "/api/v1/bookings/**",
             "/api/bff/v1/buses/**",
             "/api/bff/v1/registration/**",
             "/api/bff/market/**",
@@ -92,7 +96,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 if (username != null && roles != null) {
                     List<SimpleGrantedAuthority> authorities = roles.stream()
-                            .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                            .map(role -> {
+                                String r = role.startsWith("ROLE_") ? role : "ROLE_" + role;
+                                return new SimpleGrantedAuthority(r);
+                            })
                             .collect(Collectors.toList());
 
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -115,10 +122,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.warn("JWT token missing required claims - username: {}, roles: {}", username, roles);
                 }
             } catch (Exception e) {
-                // If token is invalid, we log it but allow request to proceed (context remains
-                // anonymous).
-                // SecurityConfig will block if it's a protected endpoint.
-                log.error("JWT authentication failed for path {}: {}", path, e.getMessage());
+                // If token is invalid, clear context to prevent thread-local contamination
+                log.warn("JWT authentication failed for path {}: {}", path, e.getMessage());
+                SecurityContextHolder.clearContext();
             }
         }
 

@@ -17,7 +17,7 @@ import java.util.Base64;
 @Slf4j
 public class AuthEmailService {
 
-    @Value("${sendgrid.api.key}")
+    @Value("${sendgrid.api.key:}")
     private String sendGridApiKey;
 
     private static final String FROM_EMAIL = "ticketkatum5@gmail.com";

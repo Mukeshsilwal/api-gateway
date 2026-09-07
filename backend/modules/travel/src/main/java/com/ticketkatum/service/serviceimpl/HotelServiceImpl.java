@@ -69,18 +69,22 @@ public class HotelServiceImpl implements HotelService {
                     .description(request.getDescription())
                     .address(request.getAddress())
                     .city(request.getCity())
-                    .country(request.getCountry())
-                    .latitude(request.getLatitude())
-                    .longitude(request.getLongitude())
+                    .country(request.getCountry() != null && !request.getCountry().isBlank() ? request.getCountry() : "Nepal")
+                    .latitude(request.getLatitude() != null ? request.getLatitude() : 27.7172)
+                    .longitude(request.getLongitude() != null ? request.getLongitude() : 85.3240)
                     .zipCode(request.getZipCode())
-                    .featured(request.getFeatured())
+                    .featured(request.getFeatured() != null ? request.getFeatured() : false)
                     .website(request.getWebsite())
                     .averageRating(request.getRating())
-                    .phone(request.getPhone())
-                    .email(request.getEmail())
+                    .phone(request.getPhone() != null ? request.getPhone() : request.getContactPhone())
+                    .email(request.getEmail() != null ? request.getEmail() : request.getContactEmail())
                     .stars(request.getStars())
+                    .starRating(request.getStars())
                     .rating(request.getRating())
-                    .images(request.getImages())
+                    .minPrice(request.getMinPrice())
+                    .maxPrice(request.getMaxPrice())
+                    .amenities(request.getAmenities() != null && !request.getAmenities().isEmpty() ? String.join(",", request.getAmenities()) : null)
+                    .images(request.getImages() != null ? request.getImages() : new java.util.HashSet<>())
                     .createdAt(LocalDateTime.now())
                     .updatedAt(LocalDateTime.now())
                     .active(true)
@@ -136,10 +140,19 @@ public class HotelServiceImpl implements HotelService {
             log.debug("Fetching hotel from database - code: {}", hotelCode);
 
             Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
-                    .orElseThrow(() -> {
-                        log.warn("Hotel not found - code: {}", hotelCode);
-                        return new HotelNotFoundException(hotelCode);
+                    .orElseGet(() -> {
+                        try {
+                            Long id = Long.parseLong(hotelCode);
+                            return hotelRepository.findById(id).orElse(null);
+                        } catch (NumberFormatException e) {
+                            return null;
+                        }
                     });
+
+            if (hotel == null) {
+                log.warn("Hotel not found - code: {}", hotelCode);
+                throw new HotelNotFoundException(hotelCode);
+            }
 
             // Initialize collections while still in transaction
             Hibernate.initialize(hotel.getImages());
@@ -228,12 +241,42 @@ public class HotelServiceImpl implements HotelService {
             hotel.setDescription(request.getDescription());
             hotel.setAddress(request.getAddress());
             hotel.setCity(request.getCity());
-            hotel.setCountry(request.getCountry());
-            hotel.setPhone(request.getPhone());
-            hotel.setEmail(request.getEmail());
+            if (request.getCountry() != null && !request.getCountry().isBlank()) {
+                hotel.setCountry(request.getCountry());
+            }
+            hotel.setPhone(request.getPhone() != null ? request.getPhone() : request.getContactPhone());
+            hotel.setEmail(request.getEmail() != null ? request.getEmail() : request.getContactEmail());
             hotel.setStars(request.getStars());
+            hotel.setStarRating(request.getStars());
             hotel.setRating(request.getRating());
-            hotel.setImages(request.getImages());
+            hotel.setAverageRating(request.getRating());
+            if (request.getMinPrice() != null) {
+                hotel.setMinPrice(request.getMinPrice());
+            }
+            if (request.getMaxPrice() != null) {
+                hotel.setMaxPrice(request.getMaxPrice());
+            }
+            if (request.getAmenities() != null && !request.getAmenities().isEmpty()) {
+                hotel.setAmenities(String.join(",", request.getAmenities()));
+            }
+            if (request.getImages() != null && !request.getImages().isEmpty()) {
+                hotel.setImages(request.getImages());
+            }
+            if (request.getLatitude() != null) {
+                hotel.setLatitude(request.getLatitude());
+            }
+            if (request.getLongitude() != null) {
+                hotel.setLongitude(request.getLongitude());
+            }
+            if (request.getZipCode() != null) {
+                hotel.setZipCode(request.getZipCode());
+            }
+            if (request.getWebsite() != null) {
+                hotel.setWebsite(request.getWebsite());
+            }
+            if (request.getFeatured() != null) {
+                hotel.setFeatured(request.getFeatured());
+            }
             hotel.setUpdatedAt(LocalDateTime.now());
 
             Hotel updatedHotel = hotelRepository.save(hotel);
@@ -285,9 +328,13 @@ public class HotelServiceImpl implements HotelService {
         ValidationUtils.validateRequiredField(request.getName(), "Hotel name");
         ValidationUtils.validateRequiredField(request.getCity(), "City");
 
-        // Validate coordinates
-        ValidationUtils.validateLatitude(request.getLatitude());
-        ValidationUtils.validateLongitude(request.getLongitude());
+        // Validate coordinates if provided
+        if (request.getLatitude() != null) {
+            ValidationUtils.validateLatitude(request.getLatitude());
+        }
+        if (request.getLongitude() != null) {
+            ValidationUtils.validateLongitude(request.getLongitude());
+        }
 
         // Validate star rating
         ValidationUtils.validateStarRating(request.getStars());

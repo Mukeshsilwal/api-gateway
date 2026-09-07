@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import client from '../../src/api/client';
+import client from '../../api/client';
 import axios from 'axios';
 
 vi.mock('axios', async (importOriginal) => {

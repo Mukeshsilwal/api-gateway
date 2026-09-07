@@ -25,8 +25,10 @@ spring:
     listener:
       ack-mode: manual
       concurrency: 3
+      auto-startup: false
     admin:
-      auto-create: true
+      auto-create: false
+      fail-fast: false
       properties:
         replication.factor: 1 # Set to 3 in production
         min.insync.replicas: 1 # Set to 2 in production

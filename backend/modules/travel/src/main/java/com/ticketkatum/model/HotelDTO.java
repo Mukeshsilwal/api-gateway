@@ -25,6 +25,15 @@ public class HotelDTO {
     private String email;
     private Integer stars;
     private Double rating;
+    private java.math.BigDecimal minPrice;
+    private java.math.BigDecimal maxPrice;
+    private Double latitude;
+    private Double longitude;
+    private String amenities;
+    private Boolean active;
+    private Boolean featured;
+    private String zipCode;
+    private String website;
     private Set<String> images;
     private List<RoomDTO> rooms;
 }

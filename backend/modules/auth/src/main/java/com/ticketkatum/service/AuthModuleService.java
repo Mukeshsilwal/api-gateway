@@ -39,6 +39,7 @@ public class AuthModuleService implements AuthServiceApi {
     private final UserService userService;
 
     @Override
+    @Transactional
     public LoginResponse login(JwtRequest loginRequest, String ipAddress, String userAgent) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -179,16 +180,6 @@ public class AuthModuleService implements AuthServiceApi {
         return userService.createUser(request);
     }
 
-    @Override
-    public UserDto registerAdmin(CreateRegistrationRequest request) {
-         log.info("Attempting to register admin: {}", request.getEmail());
-         // RegistrationService handles logic but returns void in Controller?
-         // Controller calls registrationService.registerAdmin(request) then returns null data.
-         // Wait, Controller returns UserDto as null in Response.
-         // Let's modify to return UserDto if possible or null.
-         registrationService.registerAdmin(request);
-         return null; 
-    }
 
     @Override
     public LoginResponse processOAuth2Login(Map<String, Object> oauth2Request) {

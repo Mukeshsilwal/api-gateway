@@ -73,10 +73,19 @@ public class RoomServiceImpl implements RoomService {
 
             // Find hotel
             Hotel hotel = hotelRepository.findByHotelCode(hotelCode)
-                    .orElseThrow(() -> {
-                        log.warn("Hotel not found with code: {}", hotelCode);
-                        return new HotelNotFoundException(hotelCode);
+                    .orElseGet(() -> {
+                        try {
+                            Long id = Long.parseLong(hotelCode);
+                            return hotelRepository.findById(id).orElse(null);
+                        } catch (NumberFormatException e) {
+                            return null;
+                        }
                     });
+
+            if (hotel == null) {
+                log.warn("Hotel not found with code/id: {}", hotelCode);
+                throw new HotelNotFoundException(hotelCode);
+            }
 
             // Check for duplicate room number
             if (roomRepository.existsByHotelIdAndRoomNumber(hotel.getId(), req.getRoomNumber())) {
@@ -88,9 +97,6 @@ public class RoomServiceImpl implements RoomService {
                     .roomNumber(req.getRoomNumber())
                     .roomType(req.getRoomType())
                     .description(req.getDescription())
-                    .capacity(req.getCapacity())
-                    .basePrice(req.getBasePrice())
-                    .maxPrice(req.getMaxPrice())
                     .capacity(req.getCapacity())
                     .basePrice(req.getBasePrice())
                     .maxPrice(req.getMaxPrice())
@@ -268,6 +274,12 @@ public class RoomServiceImpl implements RoomService {
             log.debug("Fetching rooms for hotel: {}", hotelCode);
 
             List<Room> rooms = roomRepository.findByHotelHotelCode(hotelCode);
+            if (rooms.isEmpty()) {
+                try {
+                    Long hotelId = Long.parseLong(hotelCode);
+                    rooms = roomRepository.findByHotelId(hotelId);
+                } catch (NumberFormatException ignored) {}
+            }
 
             // Initialize amenities and images for ALL rooms while still in transaction
             rooms.forEach(room -> {

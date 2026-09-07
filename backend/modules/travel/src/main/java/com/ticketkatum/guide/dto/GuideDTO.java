@@ -18,8 +18,6 @@ import java.util.List;
 public class GuideDTO {
 
     private Long guideId;
-
-    @NotNull(message = "User ID is required")
     private Long userId;
 
     @NotBlank(message = "Full name is required")

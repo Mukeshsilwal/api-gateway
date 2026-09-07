@@ -150,7 +150,7 @@ const BusList = () => {
 
     if (!initialLoadComplete && loading && buses.length === 0) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300">
                 <Navbar />
                 <main className="flex-grow flex items-center justify-center">
                     <LoadingSpinner size="lg" text="Finding the best buses for you..." />
@@ -162,17 +162,17 @@ const BusList = () => {
 
     if (error && buses.length === 0) {
         return (
-            <div className="min-h-screen bg-gray-50 flex flex-col">
+            <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300">
                 <Navbar />
                 <main className="flex-grow flex items-center justify-center p-4">
-                    <Card className="max-w-md w-full text-center p-8 border-red-100">
-                        <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Card className="max-w-md w-full text-center p-8 border-red-200 dark:border-red-900/50">
+                        <div className="w-16 h-16 bg-red-50 dark:bg-red-950/40 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-200 dark:border-red-800/40">
                             <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">Something went wrong</h3>
-                        <p className="text-gray-600 mb-6">{error}</p>
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Something went wrong</h3>
+                        <p className="text-slate-600 dark:text-slate-400 mb-6">{error}</p>
                         <Button onClick={() => window.location.reload()}>Try Again</Button>
                     </Card>
                 </main>
@@ -182,7 +182,7 @@ const BusList = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col transition-colors duration-300">
             <Navbar />
 
             <main className="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
@@ -196,7 +196,7 @@ const BusList = () => {
                         <span className="flex items-center gap-2">
                             <Filter size={18} /> Filters
                         </span>
-                        <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+                        <span className="bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 text-xs px-2.5 py-0.5 rounded-full font-bold">
                             {filteredBuses.length} results
                         </span>
                     </Button>
@@ -205,25 +205,25 @@ const BusList = () => {
                 <div className="flex flex-col lg:flex-row gap-8">
                     {/* Filters Sidebar (Desktop) */}
                     <aside className={`
-            fixed inset-0 z-40 bg-white lg:bg-transparent lg:static lg:z-auto lg:w-72 lg:block
+            fixed inset-0 z-40 bg-white dark:bg-slate-900 lg:bg-transparent lg:dark:bg-transparent lg:static lg:z-auto lg:w-72 lg:block
             transform transition-transform duration-300 ease-in-out
             ${showMobileFilters ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
           `}>
                         <div className="h-full lg:h-auto overflow-y-auto lg:overflow-visible p-6 lg:p-0">
                             <div className="lg:hidden flex items-center justify-between mb-6">
-                                <h3 className="text-xl font-bold text-gray-900">Filters</h3>
-                                <button onClick={() => setShowMobileFilters(false)} className="p-2 text-gray-500">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">Filters</h3>
+                                <button onClick={() => setShowMobileFilters(false)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                                     <X size={24} />
                                 </button>
                             </div>
 
                             <Card className="sticky top-24">
-                                <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-                                    <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                        <Filter size={20} className="text-primary" /> Filters
+                                <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                                    <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                        <Filter size={20} className="text-purple-600 dark:text-purple-400" /> Filters
                                     </h3>
                                     <button
-                                        className="text-sm text-primary hover:text-primary-700 font-medium transition-colors"
+                                        className="text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-semibold transition-colors"
                                         onClick={() => setFilters({ maxPrice: "", busType: "" })}
                                     >
                                         Reset
@@ -240,28 +240,28 @@ const BusList = () => {
                                             placeholder="e.g. 2000"
                                             value={filters.maxPrice}
                                             onChange={handleFilterChange}
-                                            icon={() => <span className="text-gray-400 text-sm font-bold">Rs.</span>}
+                                            icon={() => <span className="text-slate-400 dark:text-slate-500 text-sm font-bold">Rs.</span>}
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">Bus Type</label>
+                                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-200 mb-2">Bus Type</label>
                                         <select
                                             name="busType"
                                             value={filters.busType}
                                             onChange={handleFilterChange}
-                                            className="w-full rounded-xl border-gray-200 bg-gray-50 focus:border-primary focus:ring-primary py-2.5 px-4 text-sm transition-all"
+                                            className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:border-purple-600 focus:ring-2 focus:ring-purple-500/20 py-2.5 px-4 text-sm transition-all"
                                         >
-                                            <option value="">All Types</option>
-                                            <option value="Deluxe">Deluxe</option>
-                                            <option value="Luxury">Luxury</option>
-                                            <option value="Standard">Standard</option>
+                                            <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">All Types</option>
+                                            <option value="Deluxe" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Deluxe</option>
+                                            <option value="Luxury" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Luxury</option>
+                                            <option value="Standard" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Standard</option>
                                         </select>
                                     </div>
                                 </div>
 
-                                <div className="p-6 bg-gray-50/50 rounded-b-2xl border-t border-gray-100">
-                                    <p className="text-sm text-gray-500 text-center">
+                                <div className="p-6 bg-slate-50/50 dark:bg-slate-800/40 rounded-b-2xl border-t border-slate-100 dark:border-slate-800">
+                                    <p className="text-sm text-slate-500 dark:text-slate-400 text-center font-medium">
                                         Showing {filteredBuses.length} buses
                                     </p>
                                     <Button
@@ -279,20 +279,20 @@ const BusList = () => {
                     <div className="flex-1">
                         <div className="mb-6 flex items-center justify-between">
                             <div>
-                                <h2 className="text-2xl font-bold text-gray-900">Available Buses</h2>
-                                <p className="text-sm text-gray-500 mt-1">
+                                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Available Buses</h2>
+                                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                                     {searchParams?.source} to {searchParams?.destination} • {searchParams?.date}
                                 </p>
                             </div>
                         </div>
 
                         {filteredBuses.length === 0 && !loading ? (
-                            <Card className="p-12 text-center border-dashed border-2 border-gray-200 shadow-none bg-transparent">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Search className="w-8 h-8 text-gray-400" />
+                            <Card className="p-12 text-center border-dashed border-2 border-slate-300 dark:border-slate-700 shadow-none bg-transparent">
+                                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200 dark:border-slate-700">
+                                    <Search className="w-8 h-8 text-slate-400 dark:text-slate-500" />
                                 </div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">No buses found</h3>
-                                <p className="text-gray-500">Try adjusting your filters or search for a different date.</p>
+                                <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">No buses found</h3>
+                                <p className="text-slate-500 dark:text-slate-400">Try adjusting your filters or search for a different date.</p>
                             </Card>
                         ) : (
                             <div className="space-y-4">
@@ -319,7 +319,7 @@ const BusList = () => {
 
                         {!hasMore && buses.length > 0 && (
                             <div className="py-8 text-center">
-                                <span className="inline-block px-4 py-1 bg-gray-100 text-gray-500 text-xs rounded-full font-medium">
+                                <span className="inline-block px-4 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs rounded-full font-semibold border border-slate-200/80 dark:border-slate-700">
                                     End of list
                                 </span>
                             </div>

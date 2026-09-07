@@ -18,12 +18,12 @@ const Button: React.FC<ButtonProps> = ({
     const baseStyles = "inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95";
 
     const variants = {
-        primary: "bg-primary text-white hover:bg-primary-600 shadow-lg shadow-primary/30 focus:ring-primary",
-        secondary: "bg-secondary text-white hover:bg-secondary/90 shadow-lg shadow-secondary/30 focus:ring-secondary",
-        outline: "border-2 border-primary text-primary hover:bg-primary-50 focus:ring-primary",
-        ghost: "text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:ring-gray-200",
+        primary: "bg-primary text-white hover:bg-primary/90 shadow-lg shadow-primary/25 focus:ring-primary",
+        secondary: "bg-secondary dark:bg-slate-800 text-secondary-foreground dark:text-slate-100 hover:bg-secondary/80 dark:hover:bg-slate-700 border border-border/80 shadow-sm focus:ring-border",
+        outline: "border-2 border-primary text-primary hover:bg-primary/10 dark:hover:bg-primary/20 focus:ring-primary",
+        ghost: "text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white focus:ring-slate-300 dark:focus:ring-slate-700",
         danger: "bg-destructive text-white hover:bg-destructive/90 shadow-lg shadow-destructive/30 focus:ring-destructive",
-        white: "bg-white text-gray-900 hover:bg-gray-50 shadow-md focus:ring-gray-200"
+        white: "bg-white dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 shadow-md focus:ring-slate-300 dark:focus:ring-slate-700"
     };
 
     const sizes = {

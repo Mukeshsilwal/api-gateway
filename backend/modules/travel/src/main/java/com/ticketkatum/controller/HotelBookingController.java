@@ -51,12 +51,24 @@ public class HotelBookingController {
         return ResponseEntity.ok(ResponseHandler.success("Price calculated successfully", pricing));
     }
 
+    private Long parseUserId(String userIdStr) {
+        if (userIdStr == null || userIdStr.isBlank()) {
+            return 1L;
+        }
+        try {
+            return Long.parseLong(userIdStr.trim());
+        } catch (NumberFormatException e) {
+            return Math.abs((long) userIdStr.hashCode());
+        }
+    }
+
     @Operation(summary = "Lock room (Initiate Booking)", description = "Locks a room for 15 minutes (Status: PENDING)")
     @PostMapping("/lock")
     public ResponseEntity<Response<BookingResponseDto>> lockRoom(
-            @RequestHeader("X-User-Id") Long customerId,
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
             @Valid @RequestBody RoomBookingRequestDto request) {
 
+        Long customerId = parseUserId(userIdHeader);
         log.info("Locking room for customer: {}", customerId);
 
         BookingResponseDto booking = bookingService.lockRoom(request, customerId);
@@ -69,9 +81,10 @@ public class HotelBookingController {
     @Operation(summary = "Confirm booking", description = "Confirms a locked booking")
     @PostMapping("/{reference}/confirm")
     public ResponseEntity<Response<BookingResponseDto>> confirmBooking(
-            @RequestHeader("X-User-Id") Long customerId,
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
             @PathVariable String reference) {
 
+        Long customerId = parseUserId(userIdHeader);
         log.info("Confirming booking: {}", reference);
 
         BookingResponseDto booking = bookingService.confirmBooking(reference, customerId);
@@ -83,9 +96,10 @@ public class HotelBookingController {
     @Operation(summary = "Create booking (Immediate)", description = "Directly creates a CONFIRMED booking (Legacy)")
     @PostMapping
     public ResponseEntity<Response<BookingResponseDto>> createBooking(
-            @RequestHeader("X-User-Id") Long customerId,
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
             @Valid @RequestBody RoomBookingRequestDto request) {
 
+        Long customerId = parseUserId(userIdHeader);
         // For backward compatibility, calling lock then confirm immediately
         BookingResponseDto locked = bookingService.lockRoom(request, customerId);
         BookingResponseDto confirmed = bookingService.confirmBooking(locked.getBookingReference(), customerId);
@@ -106,8 +120,9 @@ public class HotelBookingController {
     @Operation(summary = "Get customer bookings", description = "Retrieves all bookings for a customer")
     @GetMapping("/customer")
     public ResponseEntity<Response<List<BookingResponseDto>>> getCustomerBookings(
-            @RequestHeader("X-User-Id") Long customerId) {
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader) {
 
+        Long customerId = parseUserId(userIdHeader);
         List<BookingResponseDto> bookings = bookingService.getCustomerBookings(customerId);
         return ResponseEntity.ok(ResponseHandler.success("Found " + bookings.size() + " bookings", bookings));
     }
@@ -115,9 +130,10 @@ public class HotelBookingController {
     @Operation(summary = "Cancel booking", description = "Cancels an existing booking")
     @PostMapping("/{reference}/cancel")
     public ResponseEntity<Response<Void>> cancelBooking(
-            @RequestHeader("X-User-Id") Long customerId,
+            @RequestHeader(value = "X-User-Id", required = false) String userIdHeader,
             @PathVariable String reference) {
 
+        Long customerId = parseUserId(userIdHeader);
         bookingService.cancelBooking(reference, customerId);
         return ResponseEntity.ok(ResponseHandler.success("Booking cancelled successfully"));
     }

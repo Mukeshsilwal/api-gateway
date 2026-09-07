@@ -37,7 +37,21 @@ public class SystemConfigService {
     }
 
     public String getString(String key) {
-        return configCache.get(key);
+        String value = configCache.get(key);
+        if (value == null && systemConfigRepository != null) {
+            try {
+                value = systemConfigRepository.findByConfigKey(key)
+                        .filter(c -> Boolean.TRUE.equals(c.getIsActive()))
+                        .map(SystemConfig::getConfigValue)
+                        .orElse(null);
+                if (value != null) {
+                    configCache.put(key, value);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to fetch system config key {}: {}", key, e.getMessage());
+            }
+        }
+        return value;
     }
 
     public String getString(String key, String defaultValue) {

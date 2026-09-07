@@ -15,19 +15,20 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusDto {
+    private Long id;
     private long routeId;
     @NotNull
     private String busName;
     @NotNull
     private String busType;
     @NotNull
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd['T'][ ]HH:mm[:ss]")
     private LocalDateTime departureDateTime;
     @NotNull
     private BigDecimal basePrice;
     @NotNull
     private BigDecimal maxPrice;
 
-    @NotNull
     private LocalDate date;
     @Nullable
     private List<SeatDto> seats;

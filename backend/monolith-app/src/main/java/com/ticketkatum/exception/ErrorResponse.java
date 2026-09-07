@@ -41,6 +41,22 @@ public class ErrorResponse {
     // Additional context
     private Map<String, Object> metadata;
 
+    public int getStatusCode() {
+        return status;
+    }
+
+    public void setStatusCode(int statusCode) {
+        this.status = statusCode;
+    }
+
+    public Map<String, String> getFieldErrors() {
+        return validationErrors;
+    }
+
+    public void setFieldErrors(Map<String, String> fieldErrors) {
+        this.validationErrors = fieldErrors;
+    }
+
     public static ErrorResponse of(int status, String error, String message) {
         return ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())

@@ -34,39 +34,39 @@ export interface CreateGuideRequest {
 const guideService = {
     getAllGuides: async (): Promise<Guide[]> => {
         const response = await client.get(`${API_CONFIG.BFF_PREFIX}/guides`);
-        return response.data;
+        return response.data?.data || response.data || [];
     },
 
     getGuide: async (guideId: number): Promise<Guide> => {
         const response = await client.get(`${API_CONFIG.BFF_PREFIX}/guides/${guideId}`);
-        return response.data;
+        return response.data?.data || response.data;
     },
 
     createGuide: async (data: CreateGuideRequest): Promise<Guide> => {
         const response = await client.post(`${API_CONFIG.BFF_PREFIX}/guides`, data);
-        return response.data;
+        return response.data?.data || response.data;
     },
 
     verifyGuide: async (guideId: number, verifiedBy: number): Promise<Guide> => {
         const response = await client.patch(`${API_CONFIG.BFF_PREFIX}/guides/${guideId}/verify?verifiedBy=${verifiedBy}`);
-        return response.data;
+        return response.data?.data || response.data;
     },
 
     rejectGuide: async (guideId: number, reason: string, rejectedBy: number): Promise<Guide> => {
         const response = await client.patch(
             `${API_CONFIG.BFF_PREFIX}/guides/${guideId}/reject?reason=${encodeURIComponent(reason)}&rejectedBy=${rejectedBy}`
         );
-        return response.data;
+        return response.data?.data || response.data;
     },
 
     activateGuide: async (guideId: number): Promise<Guide> => {
         const response = await client.patch(`${API_CONFIG.BFF_PREFIX}/guides/${guideId}/activate`);
-        return response.data;
+        return response.data?.data || response.data;
     },
 
     deactivateGuide: async (guideId: number): Promise<Guide> => {
         const response = await client.patch(`${API_CONFIG.BFF_PREFIX}/guides/${guideId}/deactivate`);
-        return response.data;
+        return response.data?.data || response.data;
     }
 };
 

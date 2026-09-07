@@ -84,12 +84,35 @@ public class User implements UserDetails {
         updatedAt = LocalDateTime.now();
     }
 
+    @Transient
+    private Collection<GrantedAuthority> cachedAuthorities;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-                .map(Role::getAuthorities)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toSet());
+        if (cachedAuthorities != null) {
+            return cachedAuthorities;
+        }
+        Set<GrantedAuthority> auths = new HashSet<>();
+        if (roles != null) {
+            for (Role role : roles) {
+                if (role != null && role.getName() != null) {
+                    auths.add(new org.springframework.security.core.authority.SimpleGrantedAuthority("ROLE_" + role.getName()));
+                    try {
+                        if (role.getPermissions() != null) {
+                            for (Permission p : role.getPermissions()) {
+                                if (p != null && p.getName() != null) {
+                                    auths.add(new org.springframework.security.core.authority.SimpleGrantedAuthority(p.getName()));
+                                }
+                            }
+                        }
+                    } catch (Exception ignored) {
+                        // Fallback safely if permissions proxy is not initialized
+                    }
+                }
+            }
+        }
+        this.cachedAuthorities = auths;
+        return auths;
     }
 
     @Override

@@ -20,6 +20,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BusDto {
+    private Long id;
     private Long routeId;
 
     @com.fasterxml.jackson.annotation.JsonProperty("busName")
@@ -31,7 +32,7 @@ public class BusDto {
     private BusType busType;
 
     @com.fasterxml.jackson.annotation.JsonProperty("departureDateTime")
-    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @com.fasterxml.jackson.annotation.JsonFormat(pattern = "yyyy-MM-dd['T'][ ]HH:mm[:ss]")
     private LocalDateTime departureDateTime;
 
     private BigDecimal basePrice;

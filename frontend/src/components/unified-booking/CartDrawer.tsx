@@ -15,11 +15,11 @@ interface CartDrawerProps {
 export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
     const {
-        cartItems,
-        totalAmount,
-        itemCount,
-        removeFromCart,
-        clearCart,
+        cartItems = [],
+        totalAmount = 0,
+        itemCount = 0,
+        removeFromCart = () => {},
+        clearCart = () => {},
     } = useUnifiedBookingCart();
 
     const handleCheckout = () => {
